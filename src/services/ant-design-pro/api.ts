@@ -1,0 +1,674 @@
+// @ts-ignore
+/* eslint-disable */
+import { request } from 'umi';
+import request1 from './apiRequest';
+
+/** 获取当前的用户 GET /api/currentUser */
+export async function currentUser(options?: { [key: string]: any }) {
+  // const user: any = await request1.get('/sms/user');
+  let user: any = JSON.parse(sessionStorage.getItem('userInfo') as string);
+  if (!user) {
+    user = await request1.get('/sms/user');
+    sessionStorage.setItem('userInfo', JSON.stringify(user));
+  }
+  return {
+    name: user?.data?.name,
+    // avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
+    avatar: 'http://m.imeitou.com/uploads/allimg/220713/7-220G3111245.jpg',
+    userid: user.data.id,
+    departmentName: user.data.departmentName,
+    departmentId: user.data.departmentId,
+    mobile: user.data.mobile,
+    userName: user.data.userName,
+    weChat: user.data.weChat,
+    idCard: user.data.idCard,
+    sex: user.data.sex,
+    isReset: user.data.isReset,
+    ecId: user.data.ecId,
+    // access: 'admin',
+    // id: user.data.id,
+    router: [
+      {
+        path: '/user',
+        layout: false,
+        routes: [
+          {
+            path: '/user',
+            routes: [
+              {
+                name: 'login',
+                path: '/user/login',
+                component: './user/Login',
+              },
+            ],
+          },
+          {
+            component: './404',
+          },
+        ],
+      },
+      {
+        path: '/welcome',
+        name: '首页',
+        // icon: 'smile',
+        component: './Welcome',
+        // routes: [
+        //   {
+        //     name: '工作台',
+        //     icon: 'DashboardOutlined',
+        //     path: '/welcome',
+        //     component: './Welcome',
+        //   },
+        // ],
+      },
+      // {
+      //   name: '列表',
+      //   // icon: 'table',
+      //   path: '/list',
+      //   component: './TableList',
+      // },
+      {
+        name: '学员管理',
+        path: '/business',
+        // redirect: '/business/studentmanage',
+        routes: [
+          {
+            name: '信息共享',
+            icon: 'table',
+            // path: '/admins/contract',
+            // component: './Admins/Contract',
+            routes: [
+              {
+                name: '合同模板下载',
+                path: '/business/contemplates/contractcontemplate',
+                component: './Admins/ConTemplate/ContractContemplate',
+              },
+              {
+                name: '公司信息',
+                icon: 'table',
+                path: '/business/contract',
+                component: './Business/Contract',
+              },
+              {
+                name: '其他共享文件',
+                path: '/business/documents',
+                component: './Business/Documents',
+              },
+            ],
+          },
+          {
+            name: '售前服务',
+            icon: 'MessageOutlined',
+            routes: [
+              {
+                name: '潜在所属学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanages',
+                component: './Business/StudentManages',
+              },
+              {
+                name: '潜在学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanage',
+                component: './Business/StudentManage',
+              },
+              {
+                name: '小程序下单学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanageswx',
+                component: './Business/StudentManageWx',
+              },
+              {
+                name: '潜在团组',
+                icon: 'TeamOutlined',
+                path: '/business/companymanage',
+                component: './Business/CompanyManage',
+              },
+              {
+                name: '推荐学员',
+                path: '/business/recommend',
+                component: './Business/Recommend',
+              },
+              {
+                name: '跟踪回访记录',
+                icon: 'MessageOutlined',
+                path: '/business/adminreturnvisit',
+                component: './Admins/AdminReturnVisit',
+              },
+              {
+                name: '学员提供信息',
+                path: '/business/provideuser',
+                component: './Business/ProvideUser',
+              },
+              // {
+              //   name: '新媒体学员',
+              //   path: '/business/provide/resource',
+              //   component: './Business/ProvideUser/Resource',
+              // },
+              {
+                name: '小程序二维码下载',
+                path: '/business/qrcode',
+                component: './Business/QRCode',
+              },
+            ],
+          },
+          {
+            name: '学员管理',
+            icon: 'TeamOutlined',
+            routes: [
+              {
+                name: '正式学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanagetrue',
+                component: './Business/StudentManageTrue',
+              },
+              {
+                name: '正式团组',
+                icon: 'TeamOutlined',
+                path: '/business/companymanagetrue',
+                component: './Business/CompanyManageTrue',
+              },
+              {
+                name: '提供人学员',
+                path: '/business/studentdeal',
+                component: './Business/StudentDeal',
+              },
+              {
+                name: '学员黑/白名单',
+                // icon: 'UsergroupDeleteOutlined',
+                path: '/business/blackliststudent',
+                component: './Business/BlacklistStudent',
+              },
+              {
+                name: '报名学员',
+                path: '/business/signupstudent',
+                component: './Business/SignUpStudent',
+              },
+              {
+                name: '班级管理',
+                path: '/business/classlist',
+                component: './Business/ClassList',
+              },
+              {
+                name: '消息管理',
+                path: '/business/message',
+                component: './Business/Message',
+              },
+              {
+                name: '报考资料设置',
+                icon: 'table',
+                path: '/business/jobassociation',
+                component: './Business/JobAssociation',
+              },
+              {
+                name: '服务记录',
+                path: '/business/servicerecord',
+                component: './Business/Servicerecord',
+              },
+            ],
+          },
+          {
+            name: '订单缴费',
+            icon: 'AccountBookOutlined',
+            routes: [
+              {
+                name: '订单列表',
+                icon: 'table',
+                path: '/business/businessorder',
+                component: './Business/BusinessOrder',
+              },
+              {
+                name: '缴费列表',
+                path: '/business/businesscharge/list',
+                component: './Business/BusinessCharge/List',
+              },
+              {
+                name: '发票信息',
+                path: '/business/invoice',
+                component: './Business/Invoice',
+              },
+              {
+                name: '缴费审核',
+                path: '/business/businesscharge/audit',
+                component: './Business/BusinessCharge/Audit',
+              },
+              {
+                name: '喜报列表',
+                path: '/business/businesscharge/xibao',
+                component: './Business/BusinessCharge/xibao',
+              },
+              {
+                name: '退费列表',
+                icon: 'AccountBookOutlined',
+                path: '/business/refundCharge/list',
+                component: './Business/RefundCharge/List',
+              },
+              {
+                name: '退费审核',
+                path: '/business/refundCharge/audit',
+                component: './Business/RefundCharge/Audit',
+              },
+              {
+                name: '财务查询',
+                path: '/business/businessorder/search',
+                component: './Business/BusinessOrder/searchFalg',
+              },
+            ],
+          },
+          {
+            name: '资源管理',
+            icon: 'table',
+            routes: [
+              {
+                name: '资源库',
+                icon: 'table',
+                path: '/business/resource/info',
+                component: './Business/Resource/ResourceInfo',
+              },
+              {
+                name: '流转资源看板',
+                icon: 'table',
+                path: '/business/resource/statistics',
+                component: './Business/Resource/Statistics',
+              },
+              {
+                name: '领取记录',
+                icon: 'table',
+                path: '/business/receive',
+                component: './Business/Receive',
+              },
+            ],
+          },
+          {
+            name: '付费申请',
+            icon: 'table',
+            routes: [
+              {
+                name: '申请列表',
+                icon: 'table',
+                path: '/business/paymentapply/list',
+                component: './Business/PaymentApply/List',
+              },
+              {
+                name: '审核列表',
+                path: '/business/paymentapply/audit',
+                component: './Business/PaymentApply/Audit',
+              },
+            ],
+          },
+          {
+            name: '合同管理',
+            icon: 'table',
+            // path: '/admins/contract',
+            // component: './Admins/Contract',
+            routes: [
+              {
+                name: '合同列表',
+                path: '/business/contractlist',
+                component: './Admins/ContractList',
+              },
+              {
+                name: '合同审核',
+                path: '/business/contractaudit',
+                component: './Business/ContractAudit',
+              },
+              {
+                name: '合同模板',
+                path: '/business/contemplate',
+                component: './Admins/ConTemplate',
+              },
+            ],
+          },
+
+          {
+            name: '数据统计',
+            icon: 'AreaChartOutlined',
+            // path: '/admins/contract',
+            // component: './Admins/Contract',
+            routes: [
+              // {
+              //   name: '部门看板',
+              //   path: '/business/statistics/departmentkanban',
+              //   component: './Business/Statistics/DepartmentKanban',
+              // },
+              {
+                name: '学生来源',
+                path: '/business/statistics/source',
+                component: './Business/Statistics/Source',
+              },
+              // {
+              //   name: '招生老师业绩统计',
+              //   path: '/business/statistics/performance',
+              //   component: './Business/Statistics/Performance',
+              // },
+              {
+                name: '业绩统计',
+                path: '/business/statistics/performances',
+                component: './Business/Statistics/Performances',
+              },
+              {
+                name: '新媒体运营统计',
+                path: '/business/statistics/operations',
+                component: './Business/Statistics/Operations',
+              },
+            ],
+          },
+          {
+            name: '历史遗留退缴费',
+            icon: 'AccountBookOutlined',
+            routes: [
+              {
+                name: '缴费列表',
+                path: '/business/oldcharge/charges/audit',
+                component: './Business/OldCharge/Charge/Audit',
+              },
+
+              {
+                name: '退费列表',
+                path: '/business/oldcharge/refundCharges/audit',
+                component: './Business/OldCharge/RefundCharge/Audit',
+              },
+            ],
+          },
+          {
+            name: '反馈中心',
+            icon: 'AccountBookOutlined',
+            routes: [
+              {
+                name: '反馈中心',
+                path: '/business/feedback',
+                component: './Business/Feedback',
+              },
+            ],
+          },
+          {
+            name: '培训申请',
+            icon: 'AccountBookOutlined',
+            routes: [
+              {
+                name: '培训申请',
+                path: '/foreground/cetrificate',
+                component: './Foreground/Certificate',
+              },
+            ],
+          },
+        ],
+      },
+
+      {
+        path: '/department',
+        name: '部门看板',
+        // redirect: './finance/financecharge',
+        routes: [
+          {
+            name: '个人看板',
+            icon: 'table',
+            path: '/department/user',
+            component: './Department/AchievementUser',
+          },
+          {
+            name: '部门看板',
+            icon: 'table',
+            path: '/department/achievement',
+            component: './Department/Achievement',
+          },
+          {
+            name: 'EC统计',
+            icon: 'table',
+            path: '/department/ec',
+            component: './Department/ECCall',
+          },
+        ],
+      },
+      {
+        name: '个人中心',
+        path: '/users',
+        // component: './UserCenter',
+        routes: [
+          {
+            name: '个人中心',
+            icon: 'UserOutlined',
+            path: '/users/usercenter',
+            component: './UserCenter',
+          },
+        ],
+      },
+      {
+        name: '行政人资',
+        path: '/foreground',
+        // component: './UserCenter',
+        routes: [
+          {
+            name: '招聘管理',
+            icon: 'UserOutlined',
+            path: '/foreground/recruit',
+            component: './Foreground/Recruit',
+          },
+          {
+            name: '招聘统计',
+            icon: 'table',
+            path: '/foreground/statistics',
+            component: './Foreground/Statistics',
+          },
+          {
+            name: '培训申请',
+            icon: 'MessageOutlined',
+            path: '/foreground/cetrificate',
+            component: './Foreground/Certificate',
+          },
+          {
+            name: '证书管理',
+            // icon: 'BookOutlined',
+            icon: 'ReadOutlined',
+            path: '/foreground/cetrificateadmin',
+            component: './Foreground/Certificateadmin',
+          },
+          {
+            name: '服务协议',
+            icon: 'FolderOpenOutlined',
+            // icon: 'AuditOutlined',
+            path: '/foreground/agreement',
+            component: './Foreground/Agreement',
+          },
+          {
+            name: '人员资料',
+            icon: 'TeamOutlined',
+            path: '/foreground/usermanage',
+            component: './Foreground/UserManage',
+          },
+        ],
+      },
+
+      {
+        name: '管理员管理',
+        // icon: 'UserOutlined',
+        path: '/admins',
+        // component: './Admins/AdminUser',
+        routes: [
+          {
+            name: '用户管理',
+            icon: 'TeamOutlined',
+            path: '/admins/usermanage',
+            component: './Admins/UserManage',
+          },
+          {
+            name: '部门管理',
+            icon: 'ClusterOutlined',
+            path: '/admins/department',
+            component: './Admins/Department',
+          },
+          {
+            name: '角色管理',
+            icon: 'TeamOutlined',
+            path: '/admins/adminRole',
+            component: './Admins/AdminRole',
+          },
+          {
+            name: '收费标准',
+            icon: 'ClusterOutlined',
+            path: '/admins/jobassociation',
+            component: './Admins/JobAssociation',
+          },
+          {
+            name: '报名资料',
+            icon: 'table',
+            path: '/admins/signupdata',
+            component: './Admins/SignUpData',
+          },
+          {
+            name: '数据字典',
+            icon: 'ReadOutlined',
+            path: '/admins/dictionaries',
+            component: './Admins/Dictionaries',
+          },
+          {
+            name: '赋权规则',
+            icon: 'ReadOutlined',
+            path: '/admins/interceptionRule',
+            component: './Admins/InterceptionRule',
+          },
+          {
+            name: '系统设置',
+            icon: 'SettingOutlined',
+            path: '/admins/sysconfig',
+            component: './Admins/SysConfig',
+          },
+          {
+            name: '通知管理',
+            icon: 'BellOutlined',
+            path: '/admins/notice',
+            component: './Admins/Notice',
+          },
+          {
+            name: '系统日志',
+            icon: 'FolderOpenOutlined',
+            path: '/admins/adminlog',
+            component: './Admins/AdminLog',
+          },
+          {
+            name: '通话记录',
+            icon: 'table',
+            path: '/admins/callhistory',
+            component: './Admins/CallHistory',
+          },
+          {
+            name: '公司信息',
+            icon: 'table',
+            path: '/admins/contract',
+            component: './Admins/Contract',
+
+            // routes: [
+            //   {
+            //     name: '系统公司',
+            //     path: '/admins/contract',
+            //     component: './Admins/Contract',
+            //   },
+            // {
+            //   name: '合同模板',
+            //   path: '/admins/contemplate',
+            //   component: './Admins/ConTemplate',
+            // },
+            // {
+            //   name: '合同列表',
+            //   path: '/admins/contractlist',
+            //   component: './Admins/ContractList',
+            // },
+            // ],
+          },
+          {
+            name: '排班计划',
+            path: '/admins/scheduling',
+            icon: 'ReadOutlined',
+            component: './Admins/Scheduling',
+          },
+          {
+            name: '推荐学员配置',
+            path: '/admins/recommends',
+            icon: 'ReadOutlined',
+            component: './Admins/Recommend',
+          },
+        ],
+      },
+
+      {
+        path: '/',
+        redirect: '/welcome',
+      },
+      {
+        component: './404',
+      },
+    ],
+  };
+}
+
+/** 退出登录接口 POST /api/login/outLogin */
+export async function outLogin(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/login/outLogin', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
+/** 登录接口 POST /api/login/account */
+export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
+  return request<API.LoginResult>('/api/login/account', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 此处后端没有提供注释 GET /api/notices */
+export async function getNotices(options?: { [key: string]: any }) {
+  return request<API.NoticeIconList>('/api/notices', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+/** 获取规则列表 GET /api/rule */
+export async function rule(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.RuleList>('/api/rule', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 新建规则 PUT /api/rule */
+export async function updateRule(options?: { [key: string]: any }) {
+  return request<API.RuleListItem>('/api/rule', {
+    method: 'PUT',
+    ...(options || {}),
+  });
+}
+
+/** 新建规则 POST /api/rule */
+export async function addRule(options?: { [key: string]: any }) {
+  return request<API.RuleListItem>('/api/rule', {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
+
+/** 删除规则 DELETE /api/rule */
+export async function removeRule(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/rule', {
+    method: 'DELETE',
+    ...(options || {}),
+  });
+}

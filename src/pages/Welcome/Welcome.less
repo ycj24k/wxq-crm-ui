@@ -1,0 +1,156 @@
+@import (reference) '~antd/es/style/themes/index';
+
+.pre {
+  margin: 12px 0;
+  padding: 12px 20px;
+  background: @input-bg;
+  box-shadow: @card-shadow;
+}
+.ant-pro-card-body .ant-pro-card-body-center {
+  padding: 0;
+}
+.cards {
+  padding: 0;
+  .ant-pro-card-body {
+    padding: 0;
+  }
+}
+.leftBox {
+  display: flex;
+  &-div {
+    margin-left: 30px;
+  }
+  &-title {
+    margin-bottom: 0.5em;
+    font-size: 20px;
+  }
+  &-wh {
+    color: #ccc;
+  }
+}
+// .contentUl::-webkit-scrollbar {
+//   display: none;
+// }
+.contentUl {
+  height: 300px;
+  overflow: auto;
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding-right: 50px;
+    .indexSpan {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      color: white;
+      line-height: 32px;
+      text-align: center;
+      background: #314659;
+      border-radius: 50%;
+    }
+  }
+}
+.navigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  &-icon {
+    color: rgb(24, 144, 255);
+  }
+  div {
+    width: 25%;
+    margin-bottom: 30px;
+    text-align: center;
+    p {
+      width: 32px;
+      height: 32px;
+      margin: 2px auto;
+      background-image: url('../../../public/kaixinguo.png');
+    }
+    a {
+      color: black;
+      // background-image: url('../../../public//kaixinguo.png');
+    }
+    a:hover {
+      color: skyblue;
+    }
+  }
+}
+.xibao {
+  // height: 300px;
+  // // padding: 0 30px;
+  // overflow: hidden;
+  // text-align: center;
+  ul {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    // width: 200px;
+    li {
+      position: absolute;
+      top: 285px;
+      display: none;
+      animation: content 5s linear normal;
+      p {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 10px;
+      }
+      // a {
+      //   display: inline-block;
+      //   width: 32px;
+      //   height: 32px;
+      //   // margin: 2px auto;
+      //   background-image: url('../../../public//lihua.png');
+      // }
+      span {
+        flex: 1;
+      }
+    }
+  }
+}
+.content :hover {
+  text-decoration: underline;
+}
+@keyframes content {
+  from {
+    top: 285px;
+  }
+  to {
+    top: -75px;
+  }
+}
+.contentTitle {
+  // padding: 2px 0;
+  font-size: 14px;
+  span {
+    display: inline-block;
+    margin-right: 8px;
+  }
+}
+.yeji {
+  display: flex;
+  // align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 180px;
+  // margin-top: 20px;
+  // background-color: pink;
+  // margin-bottom: 30px;
+  .yuan {
+    font-size: 21px;
+  }
+  .ant-pro-card-body {
+    padding: 0 20px;
+    overflow: auto;
+  }
+}
+// .AchievementUser {
+//   .ant-pro-card-body {
+//     overflow: auto;
+//   }
+// }

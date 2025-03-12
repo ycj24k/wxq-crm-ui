@@ -1,0 +1,93 @@
+@import '~antd/es/style/variable.less';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+.tablebut {
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+canvas {
+  display: block;
+}
+.aaaa1 {
+  .ant-modal-confirm-btns {
+    display: none;
+  }
+}
+.ant-table-footer {
+  background-color: rgb(255, 242, 204);
+}
+.xibaoimg {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  margin: 2px auto;
+  background-image: url('../public/lihua.png');
+}
+.bianpao {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  // margin: 2px auto;
+  background-image: url('../public/bianpao.gif');
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.ant-pro-grid-content.wide {
+  max-width: 100%;
+}
+.ant-tabs-top > .ant-tabs-nav {
+  margin-bottom: 0;
+}
+.newss {
+  top: 52px !important;
+}
+ul,
+ol {
+  list-style: none;
+}
+.ant-modal-body {
+  margin-left: 25px;
+}
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+// Compatible with IE11
+@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
+  body .ant-design-pro > .ant-layout {
+    min-height: 100vh;
+  }
+}
