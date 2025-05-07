@@ -10,6 +10,7 @@ import {
 import type { ProFormInstance } from '@ant-design/pro-form';
 import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
+import dictionaries from '@/services/util/dictionaries';
 interface valueType {
   name: string;
   value: string;
@@ -90,11 +91,11 @@ export default (props: any) => {
         width={200}
         required
         request={async () => Dictionaries.getList('configGroup') as any}
-        // fieldProps={{
-        //   onChange: (e) => {
-        //     setValueType(e);
-        //   },
-        // }}
+      // fieldProps={{
+      //   onChange: (e) => {
+      //     setValueType(e);
+      //   },
+      // }}
       />
       <ProFormText width="xl" name="code" label="代码" rules={[{ required: true }]} />
       <ProFormText width="xl" name="name" label="名称" rules={[{ required: true }]} />
@@ -110,10 +111,14 @@ export default (props: any) => {
           },
         }}
       />
-      {ValueType === '1' ? (
+      {ValueType === '1' && (
         <ProFormText width="xl" name="value" label="值" />
-      ) : (
+      )}
+      {ValueType === '2' && (
         <ProFormSwitch name="value" label="值" checkedChildren="开启" unCheckedChildren="关闭" />
+      )}
+      {ValueType == '3' && (
+        <ProFormSelect request={async () => dictionaries.getList('bankType') as any} name="value" label="值" />
       )}
 
       <ProFormTextArea width="xl" name="description" label="描述" />

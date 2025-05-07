@@ -92,6 +92,7 @@ export default (props: any) => {
     setStudentId,
     setStudentVisible,
     isFormal = false,
+    isPay = null,
     parentId = null,
     companyStudent = null,
     recommend = false,
@@ -517,6 +518,17 @@ export default (props: any) => {
         </span>
       ),
     },
+    {
+      title: '是否为出镜人专属资源',
+      key: 'isLive',
+      dataIndex: 'isLive',
+      valueType: 'select',
+      valueEnum: {
+        true: '是',
+        false: '否'
+      },
+      hideInTable: true
+    },
 
     {
       title: '所属老师',
@@ -739,6 +751,9 @@ export default (props: any) => {
       arr.push(item.id);
     });
     params['id-notIn'] = arr.join(',');
+  }
+  if (isPay != null) {
+    params.isPay = isPay;
   }
   if (isFormal != null) {
     params.isFormal = isFormal;

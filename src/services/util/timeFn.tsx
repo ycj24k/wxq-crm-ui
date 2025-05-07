@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import ExportJsonExcel from 'js-export-excel';
 import Dictionaries from './dictionaries';
+import dictionaries from './dictionaries';
 //data 为所需要导出的表格数据
 //dataTables {key:value} key 为表头数据， value 为每一列data表格的key
 //type为区分，后端很多地方使用了type 在取值时做区分使用
@@ -135,6 +136,11 @@ const DownTable = (
     method: (data: any) => {
       return Dictionaries.getName('dict_stu_refund_type', data.method);
     },
+    isUseUp: (data: any) => {
+      let str = ''
+      if (type == 'chargeLog') str = data.isUseUp ? '已下单' : '未下单';
+      return str
+    },
 
     provider: (data: any) => {
       let str = ''
@@ -158,15 +164,15 @@ const DownTable = (
       if (type == 'student') {
         str = Dictionaries.getName('studentType', data.type);
       } else if (type == 'charge' || type == 'refund') {
-        str = [0, 2].includes(data.type) ? '缴费' : '退费';
+        str = Dictionaries.getCascaderName('chargeType', data.type);
         if (data.amount) {
-          data.amount = [0, 2].includes(data.type) ? data.amount : -data.amount;
+          data.amount = [1, 3].includes(data.type) ? -data.amount : data.amount;
         }
         if (data.performanceAmount) {
-          data.performanceAmount = [0, 2].includes(data.type) ? data.performanceAmount : -data.performanceAmount;
+          data.performanceAmount = [1, 3].includes(data.type) ? -data.performanceAmount : data.performanceAmount;
         }
         if (data.commissionBase) {
-          data.commissionBase = [0, 2].includes(data.type) ? data.commissionBase : -data.commissionBase;
+          data.commissionBase = [1, 3].includes(data.type) ? -data.commissionBase : data.commissionBase;
         }
       } else if (type == 'invoice') {
         str = Dictionaries.getName('invoiceType', data.type);

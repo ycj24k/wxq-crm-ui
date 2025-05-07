@@ -102,6 +102,12 @@ export default (props: any) => {
                   } else {
                     obj[str] = false;
                   }
+                } else if (str == 'isLive') {
+                  if (items == '是') {
+                    obj[str] = true;
+                  } else {
+                    obj[str] = false;
+                  }
                 } else if (str == 'sex') {
                   if (items == '男') {
                     obj[str] = false;

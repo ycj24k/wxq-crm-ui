@@ -62,3 +62,18 @@ export function getSession() {
     })
   }, 1000 * 60 * 10)
 }
+
+export async function getCompanyRequest() {
+  return (await apiRequest.get('/sms/contract/conCompany', { _isGetAll: true })).data.content?.map((e: any) => {
+    return {
+      label: e.name,
+      value: e.id + ''
+    }
+  })
+}
+
+export function getInfo() {
+  return {
+    origin: 'http://10.168.1.10:80'
+  }
+}

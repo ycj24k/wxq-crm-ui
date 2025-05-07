@@ -150,6 +150,9 @@ export default (props: any) => {
             <Descriptions.Item label="资源类型">
               {Dictionaries.getName('circulationType', renderData.source)}
             </Descriptions.Item>
+            <Descriptions.Item label="是否为出镜人专属资源">
+              {renderData.isLive ? '是' : '否'}
+            </Descriptions.Item>
             <Descriptions.Item
               label="用户状态"
               contentStyle={{ color: renderData.enable === false ? 'red' : 'rgb(0,172,132)' }}

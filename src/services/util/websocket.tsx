@@ -5,7 +5,7 @@ import { history, Link } from 'umi';
 import request from '../ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import React from 'react';
-import { getSession } from './util';
+import { getInfo, getSession } from './util';
 
 var number = 0;
 const loginPath = '/user/login';
@@ -33,7 +33,7 @@ class Socket {
       console.log('您的浏览器支持WebSocket', window.location.origin);
       let socketUrl = '';
       if (process.env.NODE_ENV == 'development') {
-        socketUrl = 'http://10.168.1.10:80/sms/public/server/' + tokenValue;
+        socketUrl = (/^[0-9\.]+$/.test(window.location.hostname) ? getInfo().origin : window.location.origin + ':23424') + '/sms/public/server/' + tokenValue;
         // socketUrl = 'ws://10.168.1.11:8085/sms/public/server/' + tokenValue;
       } else {
         socketUrl = window.location.origin + ':8085/sms/public/server/' + tokenValue;
@@ -43,7 +43,7 @@ class Socket {
       //var socketUrl="${request.contextPath}/im/"+$("#userId").val();
       // var socketUrl = './server/' + tokenValue;
       // var socketUrl = 'http://10.168.1.10:80/sms/server/' + tokenValue;
-      socketUrl = socketUrl.replace('https', 'ws').replace('http', 'ws');
+      socketUrl = socketUrl.replace('https', 'wss').replace('http', 'ws');
       console.log(socketUrl);
       if (socket != null) {
         socket.close();

@@ -45,9 +45,12 @@ import DownHeader from './DownHeader';
 import chargeDownload from '@/services/util/chargeDownload'
 import './Charge.less';
 import filter from '@/services/util/filter';
-import { ModalForm, ProFormDigit, ProFormInstance } from '@ant-design/pro-form';
+import { ModalForm, ProFormDigit, ProFormInstance, ProFormTextArea, ProFormUploadDragger } from '@ant-design/pro-form';
 import Invoice from '@/pages/Business/Invoice/Invoice';
 import ChargeNew from './ChargeNew';
+import * as XLSX from 'XLSX';
+import { biuldDataFromExcelJson } from '@/services/util/util';
+import TextArea from 'antd/lib/input/TextArea';
 
 export default (props: any) => {
   const {
@@ -74,7 +77,7 @@ export default (props: any) => {
     params['type-in'] = '1,3';
   } else if (chargeType == 'chargeList') {
     // param.confirm = true;
-    params['type-in'] = '0,2';
+    params['type-in'] = '0,2,4,5,6';
     params['userId-isNull'] = false;
     delete params.type;
   } else {
@@ -100,6 +103,8 @@ export default (props: any) => {
   const [previewVisible, setPreviewVisible] = useState<any>(false);
   const [achievementVisible, setAchievementVisible] = useState<any>(false);
   const [Badges, setBadges] = useState<any>([0, 0]);
+  const [uploadFormVisible, setUploadFormVisible] = useState<boolean>(false);
+  const [uploadData, setUploadData] = useState<any>();
   const [fromDataList, setFromDataList] = useState<any>({});
   const url = '/sms/business/bizCharge';
   const url2 = '/sms/business/bizStudentUser';
@@ -194,18 +199,32 @@ export default (props: any) => {
       width: 130,
       fixed: 'left',
       sorter: true,
-      render: (text, record) => (
-        <div style={{ textAlign: 'center' }}>
-          <text>{record.num}</text>
-          {record.type == '0' || record.type == '1' ? (
-            <Tag color="#87CEEB">新系统</Tag>
-          ) : (
-            <Tag color="red">老系统</Tag>
-          )}
-        </div>
-      ),
+      // render: (text, record) => (
+      //   <div style={{ textAlign: 'center' }}>
+      //     <text>{record.num}</text>
+      //     {record.type == '0' || record.type == '1' ? (
+      //       <Tag color="#87CEEB">新系统</Tag>
+      //     ) : (
+      //       <Tag color="red">老系统</Tag>
+      //     )}
+      //   </div>
+      // ),
     },
-
+    {
+      title: '第三方订单编号',
+      dataIndex: 'num2',
+      hideInTable: true,
+      hideInSearch: chargeType == 'refundList' || chargeType == 'refund'
+    },
+    {
+      title: '缴费类型',
+      dataIndex: 'type',
+      width: 120,
+      // hideInTable: true,
+      valueType: 'select',
+      key: 'type',
+      valueEnum: Dictionaries.getSearch("chargeType")
+    },
     {
       title: '审核状态',
       dataIndex: 'confirm',
@@ -260,23 +279,6 @@ export default (props: any) => {
       render: (text, record) => {
         return <>{Dictionaries.getDepartmentName(record.departmentId).reverse().slice(1).join('-')}</>
       }
-    },
-    {
-      title: '新老缴/退费',
-      dataIndex: 'type',
-      hideInTable: true,
-      valueType: 'select',
-      key: 'type',
-      valueEnum:
-        chargeType == 'refundList' || chargeType == 'refund'
-          ? {
-            1: '新系统退费',
-            3: '老系统退费',
-          }
-          : {
-            0: '新系统缴费',
-            2: '老系统缴费',
-          },
     },
     {
       title: '学员',
@@ -334,7 +336,7 @@ export default (props: any) => {
       dataIndex: 'paymentTime',
       valueType: 'dateRange',
       render: (text, record) => (
-        <span>{record.createTime}</span>
+        <span>{record.paymentTime}</span>
       ),
     },
     {
@@ -678,7 +680,7 @@ export default (props: any) => {
             style={{ marginRight: '10px', marginBottom: '8px' }}
             onClick={async (e) => {
               e.stopPropagation();
-              if (record.type == 0 || record.type == 1) {
+              if (record.type != 2 && record.type != 3) {
                 setRenderData({ orderId: record.orderId, type: chargeType });
                 setModalVisible(true);
               } else {
@@ -1161,7 +1163,18 @@ export default (props: any) => {
             );
           }}
           toolBarRender={[
-            <a
+
+            <Button
+              hidden={chargeType == 'refundList' || chargeType == 'refund'}
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setUploadFormVisible(true);
+              }}
+            >
+              导入对公转账流水
+            </Button>
+            , <a
               hidden={chargeType != 'refundList' && chargeType != 'refund'}
               download="汇德退费申请表协议版（未下单直接退款模板）"
               href="./template/汇德退费申请表协议版（未下单直接退款模板）.doc"
@@ -1326,6 +1339,63 @@ export default (props: any) => {
           <div> <a onClick={() => setachievement('max')}>最大</a> <a onClick={() => setachievement('min')}>最小</a>  </div>
           <ProFormDigit name='performanceAmount' label='业绩金额' />
         </ModalForm>
+        <Modal
+          title="批量导入"
+          okText="导入"
+          onCancel={() => {
+            setUploadFormVisible(false)
+          }}
+          onOk={async () => {
+            if (!uploadData) {
+              message.error('请上传文件')
+              return
+            }
+            request.baseOptions({ url: "/sms/business/bizCharge/uploadRemarkCode", data: uploadData }, 'POST', 'up', false).then(res => {
+              if (res.status == 'success') {
+                message.success('导入成功')
+                setUploadFormVisible(false);
+                callbackRef();
+              } else {
+                // content. = res.msg.replaceAll('\n', '<br />')
+                Modal.confirm({
+                  title: '导入失败',
+                  // okText: '我已了解',
+                  content: <div style={{ whiteSpace: 'pre' }}>{res.msg}</div>,
+                })
+              }
+              setUploadData(undefined)
+            })
+          }}
+          width={800}
+          visible={uploadFormVisible}
+        >
+          <a download="导入对公转账流水模板.xlsx" href="./template/导入对公转账流水模板.xlsx">
+            下载导入对公转账流水模板
+          </a>
+          <ProFormUploadDragger
+            accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            name='file'
+            fieldProps={{
+              beforeUpload: (file: any, fileList: any[]) => {
+                const reader = new FileReader();
+                reader.onload = (e: any) => {
+                  let dataResult = e.target.result;
+                  const workbook = XLSX.read(dataResult, { type: 'binary' });
+                  // 假设我们的数据在第一个标签
+                  const firstWorksheet = workbook.Sheets[workbook.SheetNames[0]];
+                  // XLSX自带了一个工具把导入的数据转成json
+                  const jsonArr = XLSX.utils.sheet_to_json(firstWorksheet, { header: 1 });
+                  // 通过自定义的方法处理Json,得到Excel原始数据传给后端，后端统一处理
+                  // this.importUserListExcel(jsonArr);
+                  setUploadData(biuldDataFromExcelJson(jsonArr));
+                };
+                reader.readAsArrayBuffer(file);
+                return false;
+              }
+            }
+            }
+          />
+        </Modal>
       </Spin>
     </>
   );

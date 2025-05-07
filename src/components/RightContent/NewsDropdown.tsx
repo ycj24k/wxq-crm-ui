@@ -64,12 +64,12 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
       setNotice(contentList(bizNotice?.data?.content));
       badgeFalg(bizNotice?.data?.content);
     } else {
-      request.get('/sms/business/bizNotice').then((res: any) => {
-        if (res.data.content.length > 0) {
-          setNotice(contentList(res.data.content));
-          badgeFalg(res.data.content);
-        }
-      });
+      // request.get('/sms/business/bizNotice').then((res: any) => {
+      //   if (res.data.content.length > 0) {
+      //     setNotice(contentList(res.data.content));
+      //     badgeFalg(res.data.content);
+      //   }
+      // });
     }
 
     // contentNews && badgeFalg(contentNews);
@@ -108,7 +108,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
             } else {
               const contentNewss = contentNews
                 ? // @ts-ignore
-                  JSON.parse(localStorage.getItem('contentNews')).reverse()
+                JSON.parse(localStorage.getItem('contentNews')).reverse()
                 : '';
               contentNewss[index].isConfirm = false;
 

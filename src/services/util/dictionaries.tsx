@@ -6,7 +6,7 @@ const { Option } = Select;
 class dictionaries {
   version: string | null;
   dictionariesList: never[];
-  list: any;
+  list: Array<any>;
   departmeng: any;
   contentNews: string | null;
   constructor() {
@@ -815,6 +815,33 @@ class dictionaries {
         message.success('正在拨打电话...')
       }
     })
+  }
+  async getNameByCodeAndValue(code: string, value: any): Promise<string> {
+    for (let i = 0; i < this.list.length; i++) {
+      const e = this.list[i];
+      if (e.code == code) {
+        console.log(await this.filterDataByValue(e, value))
+        return (await this.filterDataByValue(e, value)).map(x => x.name).join('-')
+      }
+    }
+    return '无'
+  }
+  async filterDataByValue(data: any, value: any): Promise<any[]> {
+    let children = data.children as any[]
+    for (let i = 0; i < children.length; i++) {
+      const e = children[i];
+      if (e.value == value) {
+        console.log(e)
+        return [e]
+      } else if (e.children) {
+        let childData = await this.filterDataByValue(e, value)
+        if (childData.length > 0) {
+          console.log([e, ...childData])
+          return [e, ...childData]
+        }
+      }
+    }
+    return [];
   }
 }
 

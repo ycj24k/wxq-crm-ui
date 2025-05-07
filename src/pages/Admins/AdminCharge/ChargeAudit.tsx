@@ -55,7 +55,12 @@ export default (props: any) => {
     chargeType = 'charge',
   } = props;
   let params: any = { enable: true };
-  let param: any = { 'auditNum-isNull': true, 'chargeIds-isNull': false, enable: true, 'isSubmit': true };
+  let param: any = {
+    'auditNum-isNull': true,
+    // 'chargeIds-isNull': false, enable: true,
+    'isSubmit': true,
+    'type-in': '0,4,5,6'
+  };
   const actionRef = useRef<ActionType>();
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
@@ -123,8 +128,22 @@ export default (props: any) => {
     request
       .get('/sms/business/bizCharge/statistics', {
         array: JSON.stringify([
-          { type: 0, ...studentTypes, 'auditNum-isNull': true, 'chargeIds-isNull': false, enable: true, 'isSubmit': true },
-          { type: 0, ...studentTypes, 'confirm': false, 'chargeIds-isNull': false, enable: true, 'isSubmit': false },
+          {
+            'type-in': '0,4,5,6',
+            ...studentTypes,
+            'auditNum-isNull': true,
+            // 'chargeIds-isNull': false, 
+            enable: true,
+            'isSubmit': true
+          },
+          {
+            'type-in': '0,4,5,6',
+            ...studentTypes,
+            'confirm': false,
+            //  'chargeIds-isNull': false, 
+            enable: true,
+            'isSubmit': false
+          },
         ]),
       })
       .then((res) => {
@@ -135,8 +154,9 @@ export default (props: any) => {
     console.log("data", data)
     let auditsParam: any[] = []
     data.forEach(x => {
-      let ids = x.chargeIds.split(',')
-      auditsParam.push(...ids)
+      // let ids = x.chargeIds.split(',')
+      // auditsParam.push(...ids)
+      auditsParam.push(x.id)
     })
     auditsParam = auditsParam.map(x => {
       return {
@@ -170,6 +190,15 @@ export default (props: any) => {
       width: 130,
       fixed: 'left',
       sorter: true,
+    },
+    {
+      title: '缴费类型',
+      dataIndex: 'type',
+      width: 120,
+      // hideInTable: true,
+      valueType: 'select',
+      key: 'type',
+      valueEnum: Dictionaries.getSearch("chargeType")
     },
     {
       title: '收费日期',
@@ -557,27 +586,35 @@ export default (props: any) => {
             size="small"
             icon={<EditOutlined />}
             onClick={async () => {
-              const list = (
-                await request.get('/sms/business/bizCharge', { 'id-in': record.chargeIds ? record.chargeIds : record.id })
-              ).data.content;
-              const orderIdList = list.map((item: { orderId: number }) => {
-                return item.orderId;
-              });
+              // const list = (
+              //   await request.get('/sms/business/bizCharge', { 'id-in': record.chargeIds ? record.chargeIds : record.id })
+              // ).data.content;
+              // const orderIdList = list.map((item: { orderId: number }) => {
+              //   return item.orderId;
+              // });
+              // const orderList = (
+              //   await request.get('/sms/business/bizOrder', { 'id-in': orderIdList.join(',') })
+              // ).data.content;
+
+              // list.forEach((items: any) => {
+              //   items.chargeId = items.id;
+              //   // delete items.id;
+              //   if (item.id == items.orderId) {
+              //     render.push({
+              //       ...item,
+              //       ...items,
+              //     });
+              //   }
+              // });
               const orderList = (
-                await request.get('/sms/business/bizOrder', { 'id-in': orderIdList.join(',') })
+                await request.get('/sms/business/bizOrder', { 'id': record.orderId })
               ).data.content;
               const render: any = [];
-
               await orderList.forEach((item: any) => {
-                list.forEach((items: any) => {
-                  items.chargeId = items.id;
-                  // delete items.id;
-                  if (item.id == items.orderId) {
-                    render.push({
-                      ...item,
-                      ...items,
-                    });
-                  }
+                render.push({
+                  ...item,
+                  ...record,
+                  chargeId: record.id
                 });
               });
               setTimeout(async () => {
@@ -596,27 +633,42 @@ export default (props: any) => {
             size="small"
             icon={<EditOutlined />}
             onClick={async () => {
-              const list = (
-                await request.get('/sms/business/bizCharge', { 'id-in': record.chargeIds })
-              ).data.content;
-              const orderIdList = list.map((item: { orderId: number }) => {
-                return item.orderId;
-              });
+              // const list = (
+              //   await request.get('/sms/business/bizCharge', { 'id-in': record.chargeIds })
+              // ).data.content;
+              // const orderIdList = list.map((item: { orderId: number }) => {
+              //   return item.orderId;
+              // });
+              // const orderList = (
+              //   await request.get('/sms/business/bizOrder', { 'id-in': orderIdList.join(',') })
+              // ).data.content;
+              // const render: any = [];
+
+              // await orderList.forEach((item: any) => {
+              //   list.forEach((items: any) => {
+              //     items.chargeId = items.id;
+              //     // delete items.id;
+              //     if (item.id == items.orderId) {
+              //       render.push({
+              //         ...item,
+              //         ...items,
+              //       });
+              //     }
+              //   });
+              // });
+              // setTimeout(async () => {
+              //   await setRenderData({ list: render });
+              //   await setChargeNewFalg(true);
+              // }, 200);
               const orderList = (
-                await request.get('/sms/business/bizOrder', { 'id-in': orderIdList.join(',') })
+                await request.get('/sms/business/bizOrder', { 'id': record.orderId })
               ).data.content;
               const render: any = [];
-
               await orderList.forEach((item: any) => {
-                list.forEach((items: any) => {
-                  items.chargeId = items.id;
-                  // delete items.id;
-                  if (item.id == items.orderId) {
-                    render.push({
-                      ...item,
-                      ...items,
-                    });
-                  }
+                render.push({
+                  ...item,
+                  ...record,
+                  chargeId: record.id
                 });
               });
               setTimeout(async () => {
@@ -632,21 +684,21 @@ export default (props: any) => {
             key={record.id}
             title="是否废除？"
             onConfirm={() => {
-              let ids = record.chargeIds.split(',')
-              ids.forEach((item) => {
-                request.post('/sms/business/bizCharge/disable/' + item).then((ress: any) => {
-                  if (ress.status == 'success') {
-                    message.success('废除成功');
-                    callbackRef();
-                  }
-                });
-              })
-              // request.post('/sms/business/bizCharge/disable/' + record.id).then((res: any) => {
-              //   if (res.status == 'success') {
-              //     message.success('废除成功');
-              //     callbackRef();
-              //   }
-              // });
+              // let ids = record.chargeIds.split(',')
+              // ids.forEach((item) => {
+              //   request.post('/sms/business/bizCharge/disable/' + item).then((ress: any) => {
+              //     if (ress.status == 'success') {
+              //       message.success('废除成功');
+              //       callbackRef();
+              //     }
+              //   });
+              // })
+              request.post('/sms/business/bizCharge/disable/' + record.id).then((res: any) => {
+                if (res.status == 'success') {
+                  message.success('废除成功');
+                  callbackRef();
+                }
+              });
             }}
             onCancel={async () => {
               const list: any = await getChargeList(record.orderId, true)
@@ -654,11 +706,11 @@ export default (props: any) => {
                 message.error('该订单还有其他缴费记录，需废除其余所有缴费记录！', 5);
                 return;
               }
-              let ids = record.chargeIds.split(',')
-              if (ids.length > 1) {
-                message.error('合并缴费不支持同步废除订单！', 5);
-                return;
-              }
+              // let ids = record.chargeIds.split(',')
+              // if (ids.length > 1) {
+              //   message.error('合并缴费不支持同步废除订单！', 5);
+              //   return;
+              // }
               request.post('/sms/business/bizCharge/disable/' + record.id).then((res: any) => {
                 if (res.status == 'success') {
                   request
@@ -696,7 +748,7 @@ export default (props: any) => {
 
   let toolbar = undefined;
 
-  params.type = type;
+  // params.type = type;
   if (studentType != 'all') {
     params.studentType = studentType;
   }
@@ -736,15 +788,21 @@ export default (props: any) => {
         SetSpingFalg(true)
         if (key == 'shenhe') {
           // params['auditType-isNull'] = true;
-          setParams({ isSubmit: true, 'auditNum-isNull': true, enable: true, 'chargeIds-isNull': false });
+          setParams({
+            isSubmit: true, 'auditNum-isNull': true, enable: true, 'type-in': '0,4,5,6'
+            //  'chargeIds-isNull': false
+          });
         } else if (key == 'true') {
-          setParams({ enable: true, confirm: true });
+          setParams({ enable: true, confirm: true, 'type-in': '0,4,5,6' });
           // params.confirm = true;
         } else if (key == 'false') {
-          setParams({ isSubmit: false, confirm: false, enable: true, 'chargeIds-isNull': false });
+          setParams({
+            isSubmit: false, confirm: false, enable: true, 'type-in': '0,4,5,6'
+            //  'chargeIds-isNull': false
+          });
           // params.confirm = false;
         } else if (key === 'enable') {
-          setParams({ enable: false });
+          setParams({ enable: false, 'type-in': '0,4,5,6' });
         }
         callbackRef();
       },
@@ -784,9 +842,9 @@ export default (props: any) => {
                 const content = (await request.get('/sms/business/bizCharge/getListOfFinance2',
                   {
                     enable: true,
-                    'confirm-isNull': true,
-                    'chargeIds-isNull': false,
-                    'type-in': '0,2',
+                    'auditNum-isNull': true,
+                    // 'chargeIds-isNull': false,
+                    'type-in': '0,2,4,5,6',
                     isSubmit: true
                   }
                 )).data

@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 import type { MenuDataItem } from '@ant-design/pro-layout';
+import { getSession } from './services/util/util';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 const IconMap = {
@@ -80,7 +81,7 @@ export async function getInitialState(): Promise<{
   };
 
   // 如果不是登录页面，执行
-  if (history.location.pathname !== loginPath) {
+  if (history.location.pathname !== loginPath && !history.location.pathname.startsWith('/public')) {
     const currentUser = await fetchUserInfo();
 
     return {
@@ -95,12 +96,15 @@ export async function getInitialState(): Promise<{
   };
 }
 
-if (location.pathname !== loginPath) {
-  if (!Socket.sockets) Socket.open();
+if (history.location.pathname !== loginPath && !history.location.pathname.startsWith('/public')) {
+  Dictionaries.get();
+  Dictionaries.getDepartmentName(47);
+  getSession()
+  //   if (!Socket.sockets) Socket.open();
 }
 
 const jurisdiction = (url: string, userUrl: [] = []) => {
-  if (url == loginPath) return;
+  if (url == loginPath || url.startsWith('/public')) return;
   let arr: any[] = [];
 
   const treeList = (arrList: []) => {
@@ -143,7 +147,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      if (!initialState?.currentUser && location.pathname !== loginPath && !location.pathname.startsWith('/public')) {
         history.push(loginPath);
       }
       // if (!localStorage.getItem('dictionariesList')) {
@@ -168,27 +172,27 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态
-    childrenRender: (children, props) => {
-      // if (initialState?.loading) return <PageLoading />;
-      return (
-        <div>
-          {children}
-          {!props.location?.pathname?.includes('/login') && (
-            <SettingDrawer
-              disableUrlParams
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState: any) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
-          )}
-        </div>
-      );
-    },
+    // childrenRender: (children, props) => {
+    //   // if (initialState?.loading) return <PageLoading />;
+    //   return (
+    //     <div>
+    //       {children}
+    //       {!props.location?.pathname?.includes('/login') && (
+    //         <SettingDrawer
+    //           disableUrlParams
+    //           enableDarkTheme
+    //           settings={initialState?.settings}
+    //           onSettingChange={(settings) => {
+    //             setInitialState((preInitialState: any) => ({
+    //               ...preInitialState,
+    //               settings,
+    //             }));
+    //           }}
+    //         />
+    //       )}
+    //     </div>
+    //   );
+    // },
     ...initialState?.settings,
   };
 };

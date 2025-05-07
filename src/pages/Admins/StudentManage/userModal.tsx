@@ -453,6 +453,7 @@ export default (props: any) => {
           rules={[{ required: true, message: '请选择咨询日期' }]}
         />
         {company === '企业名称' ? <ProFormCheckbox name="isPeer" label="是否同行" /> : ''}
+        <ProFormCheckbox name="isLive" label="是否为出镜人专属资源" />
       </ProForm.Group>
       {company === '企业名称' ? (
         <ProFormText

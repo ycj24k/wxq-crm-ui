@@ -17,6 +17,7 @@ import ProForm, { ModalForm, ProFormInstance } from '@ant-design/pro-form';
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import mammoth from 'mammoth';
 import fetchDownload from '@/services/util/fetchDownload';
+import { getCompanyRequest } from '@/services/util/util';
 type GithubIssueItem = {
   name: string;
   departmentName: string;
@@ -230,6 +231,13 @@ export default (props: any) => {
           {record.name}
         </a>
       ),
+    },
+    {
+      title: '所属公司',
+      dataIndex: 'companyId',
+      key: 'companyId',
+      valueType: 'select',
+      request: getCompanyRequest,
     },
     {
       title: '部门',

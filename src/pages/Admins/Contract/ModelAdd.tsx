@@ -28,7 +28,7 @@ export default (props: any) => {
         mobile: renderData.mobile,
         accountName: renderData.accountName,
         bank: renderData.bank,
-        chargeMethod: renderData.chargeMethod.split(','),
+        chargeMethod: renderData.chargeMethod?.split(','),
         codeFile: [
           {
             uid: '1',
@@ -50,6 +50,9 @@ export default (props: any) => {
             response: { data: renderData.sealFile },
           },
         ],
+        cusid: renderData.cusid,
+        appid: renderData.appid,
+        privateKey: renderData.privateKey,
       });
     }, 100);
 
@@ -308,6 +311,11 @@ export default (props: any) => {
           />
         </div>
       </ProForm.Group>
+      {/* <ProForm.Group>
+        <ProFormText label="民生商户号ID" name="cusid"></ProFormText>
+        <ProFormText label="民生AppID" name="appid"></ProFormText>
+      </ProForm.Group>
+      <ProFormTextArea label="民生私钥" name="privateKey"></ProFormTextArea> */}
     </ModalForm>
   );
 };

@@ -5,6 +5,7 @@ import { join } from 'path';
 import defaultSettings from './defaultSettings';
 // import proxy from './proxy';
 import routes from './routes';
+import { getInfo } from '@/services/util/util';
 
 const { REACT_APP_ENV } = process.env;
 
@@ -76,8 +77,8 @@ export default defineConfig({
   exportStatic: {},
   proxy: {
     '/sms': {
-      // target: 'http://10.168.1.11:80',
       target: 'http://10.168.1.10:80',
+      // target: getInfo(),
       changeOrigin: true,
       // pathRewrite: { '^/sms': '' },
     },

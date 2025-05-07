@@ -132,7 +132,7 @@ export default (props: any) => {
             <Descriptions.Item label="财务备注" span={3}>
               {item.description2}
             </Descriptions.Item>
-            <Descriptions.Item label="审核未通过原因" span={3}>
+            <Descriptions.Item label="审核备注" span={3}>
               {item.remark}
             </Descriptions.Item>
             <Descriptions.Item label="附件">

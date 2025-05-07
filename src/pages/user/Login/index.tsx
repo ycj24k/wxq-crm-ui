@@ -76,7 +76,7 @@ const Login: React.FC = () => {
           // }
           sessionStorage.setItem('tokenName', user.data.tokenName);
           sessionStorage.setItem('tokenValue', user.data.tokenValue);
-          await Socket.open();
+          // await Socket.open();
 
           const defaultLoginSuccessMessage = intl.formatMessage({
             id: 'pages.login.success',
@@ -351,7 +351,7 @@ const Login: React.FC = () => {
             headers[userInfo.data.tokenName] = [userInfo.data.tokenValue];
             console.log('userInfo', userInfo);
 
-            await Socket.open(userInfo.data.tokenValue);
+            // await Socket.open(userInfo.data.tokenValue);
             requests('/sms/user', { headers }).then((user) => {
               requests(
                 '/sms/user?id=' +

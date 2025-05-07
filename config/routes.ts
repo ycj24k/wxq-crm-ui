@@ -19,6 +19,22 @@
     ],
   },
   {
+    path: '/public',
+    layout: false,
+    routes: [
+      {
+        path: '/public',
+        routes: [
+          {
+            name: 'charge',
+            path: '/public/charge',
+            component: './Public/Charge',
+          },
+        ],
+      },
+    ],
+  },
+  {
     path: '/welcome',
     name: 'welcome',
     icon: 'smile',
@@ -88,6 +104,11 @@
     component: './Business/StudentManage',
   },
   {
+    name: '待支付学员',
+    path: '/business/studentmanage2',
+    component: './Business/StudentManage2',
+  },
+  {
     name: '正式学员',
     path: '/business/studentmanagetrue',
     component: './Business/StudentManageTrue',
@@ -148,6 +169,11 @@
     component: './Business/CompanyManage',
   },
   {
+    name: '待支付团组',
+    path: '/business/companymanage2',
+    component: './Business/CompanyManage2',
+  },
+  {
     name: '正式团组',
     path: '/business/companymanagetrue',
     component: './Business/CompanyManageTrue',
@@ -158,9 +184,24 @@
     component: './Business/BusinessOrder',
   },
   {
+    name: '待支付订单',
+    path: '/business/payingorder',
+    component: './Business/PayingOrder',
+  },
+  {
     name: '财务查询',
     path: '/business/businessorder/search',
     component: './Business/BusinessOrder/searchFalg',
+  },
+  {
+    name: '专属收款码未下单记录',
+    path: '/business/chargeLog',
+    component: './Business/ChargeLog',
+  },
+  {
+    name: '银行流水',
+    path: '/business/businessTransaction',
+    component: './Business/BusinessTransaction',
   },
   {
     name: '反馈中心',
@@ -256,6 +297,11 @@
     name: '二维码跳转',
     path: '/business/qrcode',
     component: './Business/QRCode',
+  },
+  {
+    name: '专属收款二维码',
+    path: '/business/exclusiveqrcode',
+    component: './Business/ExclusiveQRCode',
   },
   {
     name: '个人中心',
@@ -424,6 +470,11 @@
     icon: 'table',
     path: '/business/contract',
     component: './Business/Contract',
+  },
+  {
+    name: '银行信息',
+    path: '/admins/bank',
+    component: './Admins/Bank',
   },
   {
     name: '推荐信息配置',

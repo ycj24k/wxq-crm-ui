@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { Button, Col, message, Modal, Row, Space, Spin, Tooltip } from 'antd';
+import { Button, Col, message, Modal, Row, Space, Spin } from 'antd';
 import {
   ProFormCheckbox,
   ProFormDatePicker,
@@ -29,10 +29,10 @@ import Invoice from '@/pages/Business/Invoice/Invoice';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import Audit from './Audit';
 import CompanyOrder from '../AdminOrder/companyOrder';
-import { ActionType } from '@ant-design/pro-table';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import ChargeLog from '@/pages/Business/ChargeLog';
+import dictionaries from '@/services/util/dictionaries';
 export default (props: any, orderRef: any) => {
-  const { setModalVisible = undefined, callbackRef = undefined, renderData, admin } = props;
+  const { setModalVisible = undefined, callbackRef = undefined, renderData, admin, chargeType } = props;
 
   const { initialState } = useModel('@@initialState');
   // const actionRefs = useRef<ActionType>();
@@ -42,9 +42,12 @@ export default (props: any, orderRef: any) => {
   const [ChargeModal, setChargeModal] = useState<boolean>(false);
   const [ChargeModals, setChargeModals] = useState<boolean>(false);
   const [previewurl, setPreviewurl] = useState<any>();
+  const [thisChargeType, setThisChargeType] = useState<any>();
+  const [chargeLog, setChargeLog] = useState<any>();
   const [CardContent, setCardContent] = useState<any>();
   const [CorderVisibleFalg, setCOrderVisible] = useState<boolean>(false);
   const [order, setorder] = useState<any>(false);
+  const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
   const [invoiceFalg, setinvoiceFalg] = useState<any>([]);
   const [fapiaoFalg, setfapiaoFalgFalg] = useState<any>([]);
   const [chargeNewList, setchargeNewList] = useState<any>([]);
@@ -101,6 +104,7 @@ export default (props: any, orderRef: any) => {
   };
   useEffect(() => {
     genOrder()
+    setThisChargeType(chargeType)
     // console.log('123', getOrderCharge(idlist));
 
     // setTimeout(() => {
@@ -110,6 +114,28 @@ export default (props: any, orderRef: any) => {
     //   });
     // }, 500);
   }, []);
+  useEffect(() => {
+    if (chargeLog) {
+      setChargeLogVisible(false)
+      let chargeLists = formRef?.current?.getFieldsValue().chargeLists;
+      chargeLists[0].amount = chargeLog.amount
+      formRef?.current?.setFieldsValue({
+        chargeLogName: chargeLog.name + '的收款记录',
+        paymentTime: chargeLog.paymentTime,
+        userId: chargeLog.userId + '',
+        method: chargeLog.method + '',
+        chargeLists: chargeLists,
+      });
+      userRef?.current?.setDepartment({
+        id: chargeLog.userId,
+        name: dictionaries.getDepartmentUserName(chargeLog.userId)
+      });
+      setUserNameId({
+        id: chargeLog.userId,
+        name: dictionaries.getDepartmentUserName(chargeLog.userId)
+      })
+    }
+  }, [chargeLog]);
   const genOrder = () => {
     setspinning(true);
     const list = renderData.list;
@@ -248,12 +274,12 @@ export default (props: any, orderRef: any) => {
             chargeLists: res,
           });
           userRef?.current?.setDepartment({
-            id: fiedsValue.userId,
-            name: fiedsValue.userName,
+            id: (fiedsValue.userId + '').split(',')[0],
+            name: fiedsValue.userName.split(',')[0],
           });
           setUserNameId({
-            id: fiedsValue.userId,
-            name: fiedsValue.userName,
+            id: (fiedsValue.userId + '').split(',')[0],
+            name: fiedsValue.userName.split(',')[0],
             departmentId: fiedsValue.departmentId,
           })
         } else {
@@ -442,9 +468,11 @@ export default (props: any, orderRef: any) => {
     }
     value.userId = userNameId.id;
     value.departmentId = userNameId.departmentId;
-    value.type = renderData.type == 'orders' ? '1' : 0;
+    if (value.type == undefined) value.type = renderData.type == 'orders' ? '1' : 0;
+    if (thisChargeType == '6') value.chargeLogId = chargeLog.id
     value.chargeLists.forEach((item: any) => {
       data.push({
+        chargeLogId: value.chargeLogId,
         chargeTime: value.chargeTime,
         method: value.method,
         userId: value.userId,
@@ -482,7 +510,7 @@ export default (props: any, orderRef: any) => {
           email: item.email,
           remark: item.remark,
           cautions: item.cautions,
-          type: item.type,
+          type: item.invoiceType,
           mobile: item.mobile,
         });
       }
@@ -653,10 +681,71 @@ export default (props: any, orderRef: any) => {
       <Spin spinning={spinning}>
         <div className="scolle" style={{ overflowX: 'auto', paddingBottom: '100px' }}>
           <ProForm.Group>
+            {renderData.type == 'orders' ? <ProFormSelect
+              label="缴费类型"
+              name="type"
+              width="md"
+              request={async () =>
+                Dictionaries.getList('chargeType') as any
+              }
+              // valueEnum={{
+              //   0: '订单缴费',
+              //   1: '订单退费',
+              // }}
+              required
+              disabled
+              fieldProps={{
+                defaultValue: renderData.type == 'orders' ? ['订单退费'] : ['订单缴费'],
+              }}
+            /> :
+              <ProFormSelect
+                label="缴费类型"
+                name="type"
+                width="md"
+                request={async () =>
+                  Dictionaries.getList('chargeType')?.filter(x => ['0', '4', '5', '6'].indexOf(x.value) != -1) as any
+                }
+                fieldProps={{
+                  onChange(e) {
+                    console.log('e', e)
+                    setThisChargeType(e)
+                    formRef.current?.setFieldValue('paymentTime', undefined)
+                  }
+                }}
+                // valueEnum={{
+                //   0: '订单缴费',
+                //   1: '订单退费',
+                // }}
+                required
+                initialValue={chargeType}
+                disabled={chargeType != undefined}
+              // fieldProps={{
+              //   defaultValue: renderData.type == 'orders' ? ['订单退费'] : ['订单缴费'],
+              // }}
+              />
+            }
+            {thisChargeType == '6' && <ProFormText
+              label="收款记录"
+              name="chargeLogName"
+              width="md"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+              fieldProps={{
+                onClick: () => {
+                  setChargeLog(null)
+                  setChargeLogVisible(true)
+                  return false
+                }
+              }}
+            />}
             <ProFormSelect
               label="付款方式"
               name="method"
               width="md"
+              disabled={thisChargeType == '6'}
               request={async () => Dictionaries.getList('dict_stu_refund_type') as any}
               rules={[
                 {
@@ -665,27 +754,13 @@ export default (props: any, orderRef: any) => {
                 },
               ]}
             />
-            <ProFormSelect
-              label="缴费类型"
-              name="type"
-              width="md"
-              // request={async () => Dictionaries.getList('chargeType')}
-              valueEnum={{
-                0: '订单缴费',
-                1: '订单退费',
-              }}
-              required
-              disabled
-              fieldProps={{
-                defaultValue: renderData.type == 'orders' ? ['订单退费'] : ['订单缴费'],
-              }}
-            />
             <UserTreeSelect
               ref={userRef}
               userLabel={renderData.type == 'orders' ? '退费人' : '收费人'}
               userNames="userId"
               userPlaceholder="请输入招生老师的名字"
               setUserNameId={(e: any) => setUserNameId(e)}
+              disabled={thisChargeType == '6'}
               // setDepartId={(e: any) => setDepartId(e)}
               flag={true}
             // setFalgUser={(e: any) => setFalgUser(e)}
@@ -735,7 +810,8 @@ export default (props: any, orderRef: any) => {
               width="md"
               hidden={renderData.type == 'orders'}
               label={`${orderTitle == '收费' ? '实际到账' : orderTitle}日期`}
-              rules={[{ required: renderData.type != 'orders', message: '请填写缴费日期' }]}
+              disabled={['4', '5', '6'].indexOf(thisChargeType) != -1}
+              rules={[{ required: renderData.type != 'orders' && ['4', '5', '6'].indexOf(thisChargeType) == -1, message: '请填写缴费日期' }]}
             />
             <ProFormDateTimePicker
               name="nextPaymentTime"
@@ -980,7 +1056,7 @@ export default (props: any, orderRef: any) => {
                             <ProForm.Group>
                               <ProFormSelect
                                 label="发票种类"
-                                name="type"
+                                name="invoiceType"
                                 width="md"
                                 fieldProps={{
                                   onChange: (e) => {
@@ -1164,6 +1240,15 @@ export default (props: any, orderRef: any) => {
             renderData={{ ...order, type: 'order', orderNumber: 0, projectClassExamList: [] }}
           />
         )}
+      </Modal>
+      <Modal
+        title="选择收款记录"
+        width={1200}
+        visible={chargeLogVisible}
+        onCancel={() => setChargeLogVisible(false)}
+        footer={null}
+      >
+        <ChargeLog select={setChargeLog} />
       </Modal>
     </ProForm>
   );

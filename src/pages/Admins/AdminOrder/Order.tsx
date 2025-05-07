@@ -73,7 +73,7 @@ type GithubIssueItem = {
 };
 
 export default (props: any) => {
-  const { admins, admin, studentUserId = '', type = 0, orderId = '', orderIds = undefined, searchFalg = false, } = props;
+  const { admins, admin, studentUserId = '', type = 0, orderId = '', orderIds = undefined, searchFalg = false, searchParams } = props;
   const [CommodalVisibleFalg, setComModalVisible] = useState<boolean>(false);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
@@ -108,7 +108,8 @@ export default (props: any) => {
   }, [type]);
   useEffect(() => {
     getdataSource()
-    setparamsA(history.location.query);
+    setparamsA({ ...history.location.query, ...searchParams });
+    console.log("searchParams", searchParams)
   }, []);
   const callbackRef = () => {
     // @ts-ignore

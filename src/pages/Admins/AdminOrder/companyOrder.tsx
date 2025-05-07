@@ -438,7 +438,7 @@ export default (props: any, childRef: any) => {
     delete value.totalReceivable;
     return new Promise((resolve) => {
       request
-        .post(eidtUrl, value)
+        .post(editAll ? eidtUrl : urlGroup, value)
         .then((res: any) => {
           if (res.status == 'success') {
             message.success('操作成功');

@@ -7,6 +7,8 @@ import Dictionaries from '@/services/util/dictionaries';
 import moment, { isMoment } from 'moment';
 var num = 0;
 class httpRequest {
+  request = request;
+
   throttle(fn: () => void, delay: number | undefined) {
     var flag = true;
     return () => {
@@ -20,7 +22,7 @@ class httpRequest {
     };
   }
 
-  async baseOptions(param: any, method = 'GET', type = ''): Promise<any> {
+  async baseOptions(param: any, method = 'GET', type = '', err = true): Promise<any> {
     let tokenName = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
     let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
     let { url, data, params } = param;
@@ -43,32 +45,36 @@ class httpRequest {
     // }
     return new Promise((resolve, reject) => {
       request(url, option).then((res: any) => {
-        if (res.status === 'success' || res.status === 'pleaseRefreshDict') {
-          resolve(res);
-        } else {
-          // if (res.status == 'connectError' && num < 1) {
-          //   num++;
-          //   Socket.open();
-          //   if (url == '/sms/share/getDict') return;
+        if (err) {
+          if (res.status === 'success' || res.status === 'pleaseRefreshDict') {
+            resolve(res);
+          } else {
+            // if (res.status == 'connectError' && num < 1) {
+            //   num++;
+            //   Socket.open();
+            //   if (url == '/sms/share/getDict') return;
 
-          //   return this.baseOptions(param, method, type);
-          // }
-          if (res.status == 'loginError') {
-            history.push(loginPath);
-          }
-          if (res.status == 'seriousError') {
+            //   return this.baseOptions(param, method, type);
+            // }
+            if (res.status == 'loginError') {
+              history.push(loginPath);
+            }
+            if (res.status == 'seriousError') {
+              reject(res);
+              message.error(res.msg + '，已发送错误信息给管理员..');
+              return;
+            }
             reject(res);
-            message.error(res.msg + '，已发送错误信息给管理员..');
-            return;
+            message.error(res.msg, 5);
           }
-          reject(res);
-          message.error(res.msg, 5);
+        } else {
+          resolve(res);
         }
       });
     });
   }
 
-  async get(url: string, data: any = '', unData: any = '') {
+  async get(url: string, data: any = '', unData: any = '', buildTime: boolean = true) {
     // console.log('get', data);
     //自定义page
     if (data.current) {
@@ -90,6 +96,7 @@ class httpRequest {
       'chargeTime',
       'receiveTime',
       'dealTime',
+      'dateTime',
       // 'nextVisitDate',
       'paymentTime',
       'circulationTime',
@@ -97,13 +104,14 @@ class httpRequest {
       'certStartDate',
       'certEndDate',
       'time',
+      'date',
       'startDate',
       'endDate',
     ];
 
     //时间查询通用
     Object.keys(data).forEach((key: any) => {
-      if (TimeArr.indexOf(key) >= 0) {
+      if (buildTime && TimeArr.indexOf(key) >= 0) {
         //yyyy-MM-dd HH:mm:ss
         if (isMoment(data[key][0])) {
           data[`${key}-start`] = moment(data[key][0]).format('YYYY-MM-DD') + ' 00:00:00';

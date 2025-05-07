@@ -1,4 +1,4 @@
-import { Button, message, Modal, Spin, Steps } from 'antd';
+import { Button, message, Modal, Radio, Spin, Steps } from 'antd';
 import React, { forwardRef, useRef } from 'react';
 import { useState } from 'react';
 import CompanyOrder from './companyOrder';
@@ -12,6 +12,9 @@ import './index.less';
 import e from 'express';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import { history, useModel } from 'umi';
+import { ProFormRadio } from '@ant-design/pro-form';
+import apiRequest from '@/services/ant-design-pro/apiRequest';
+import QrcodeInfo from '../AdminCharge/QrcodeInfo';
 const { Step } = Steps;
 const { confirm } = Modal;
 export default (props: any) => {
@@ -21,7 +24,11 @@ export default (props: any) => {
   const [current, setCurrent] = useState(0);
   const [orderContent, setOrderContent] = useState<any>();
   const [orderId, setOrderId] = useState<any>();
+  const [chargeInfo, setChargeInfo] = useState<any>();
   const [loging, setloging] = useState<boolean>(false);
+  const [chargeType, setChargeType] = useState<number>();
+  const [chargeId, setChargeId] = useState<number>();
+  const [order, setOrder] = useState<any>();
   const CompanyOrders = forwardRef(CompanyOrder);
   const ChargeOrders = forwardRef(ChargeOrder);
   const ChargeNews = forwardRef(ChargeNew);
@@ -42,8 +49,42 @@ export default (props: any) => {
           ),
         },
         {
+          title: '选择缴费方式',
+          content: <Radio.Group
+            onChange={(e) => { setChargeType(e.target.value) }}
+            name="chargeType"
+            options={[
+              {
+                label: <><b>专属收款码支付</b>：学员已通过专属收款码支付，关联收款记录后需要补充部分信息</>,
+                value: 6,
+                style: { margin: '50px 150px 0px' }
+              },
+              {
+                label: <><b>扫码支付</b>：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</>,
+                value: 4,
+                style: { margin: '20px 150px 0px' }
+              },
+              {
+                label: <><b>对公打款</b>：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</>,
+                value: 5,
+                style: { margin: '20px 150px 0px' }
+              },
+              {
+                label: <><b>手动缴费</b>：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</>,
+                value: 0,
+                style: { margin: '20px 150px 0px' }
+              },
+            ]}
+          >
+            {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
+            <Radio value={1}>对公打款：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</Radio>
+            <Radio value={2}>手动缴费：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</Radio> */}
+          </Radio.Group>,
+          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+        },
+        {
           title: '缴费',
-          content: <ChargeNews ref={orderRef} renderData={orderContent} admin="step" />,
+          content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
           // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
         },
         {
@@ -64,8 +105,47 @@ export default (props: any) => {
           ),
         },
         {
+          title: '选择缴费方式',
+          content: <Radio.Group
+            onChange={(e) => { setChargeType(e.target.value) }}
+            name="chargeType"
+            options={[
+              {
+                label: <><b>专属收款码支付</b>：学员已通过专属收款码支付，关联收款记录后需要补充部分信息</>,
+                value: 6,
+                style: { margin: '50px 150px 0px' }
+              },
+              {
+                label: <><b>扫码支付</b>：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</>,
+                value: 4,
+                style: { margin: '20px 150px 0px' }
+              },
+              {
+                label: <><b>对公打款</b>：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</>,
+                value: 5,
+                style: { margin: '20px 150px 0px' }
+              },
+              {
+                label: <><b>手动缴费</b>：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</>,
+                value: 0,
+                style: { margin: '20px 150px 0px' }
+              },
+            ]}
+          >
+            {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
+            <Radio value={1}>对公打款：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</Radio>
+            <Radio value={2}>手动缴费：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</Radio> */}
+          </Radio.Group>,
+          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+        },
+        {
           title: '缴费',
-          content: <ChargeNews ref={orderRef} renderData={orderContent} admin="step" />,
+          content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
+          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+        },
+        {
+          title: '获取缴费信息',
+          content: <>{chargeInfo}</>,
           // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
         },
       ];
@@ -174,9 +254,10 @@ export default (props: any) => {
               item.orderId = item.id;
             });
             setOrderContent({ list: orderList, type: 'add' });
+            setOrder(orderList[0])
             setOrderId(res.data.join(','));
             setloging(false);
-            setCurrent(current + 1);
+            setCurrent(1);
           }
         });
       };
@@ -199,20 +280,33 @@ export default (props: any) => {
       }
     }
     if (current == 1) {
-      charge('next');
-    }
+      if (chargeType == undefined) message.error('请选择缴费方式！')
+      else {
+        setCurrent(2)
+        setTimeout(() => {
+          orderRef.current.formRefs.current.setFieldsValue({
+            type: chargeType + ""
+          })
+        }, 1000);
 
+      }
+    }
+    if (current == 2) {
+      doCharge('next');
+    }
+    // if (current == 3) {
+    // }
     // setCurrent(current + 1);
   };
 
   const prev = () => {
-    if (current + 1 >= steps.length) {
-      callbackRefs();
-      return;
-    }
-    setCurrent(current + 1);
+    // if (current + 1 >= steps.length) {
+    callbackRefs();
+    //   return;
+    // }
+    // setCurrent(current + 1);
   };
-  const charge = (type: string) => {
+  const doCharge = (type: string) => {
     const values = orderRef.current.formRefs.current.getFieldsValue();
     // console.log();
 
@@ -234,7 +328,7 @@ export default (props: any) => {
     //   setloging(false);
     //   return;
     // }
-    if (values.paymentTime === undefined) {
+    if (values.paymentTime === undefined && ['4', '5'].indexOf(values.type) == -1) {
       message.error('请填写到账日期');
       setloging(false);
       return;
@@ -269,11 +363,63 @@ export default (props: any) => {
     values.paymentTime = moment(values.paymentTime).format('YYYY-MM-DD HH:mm:ss');
     values.chargeTime = moment(values.chargeTime).format('YYYY-MM-DD HH:mm:ss');
     values.nextPaymentTime = moment(values.nextPaymentTime).format('YYYY-MM-DD HH:mm:ss');
+    // values.type = chargeType;
+    // setChargeType(() => values.type)
     orderRef.current.submitok(values).then((res: any) => {
+      // console.log('res' + res)
+      // console.log('res.data[0]' + res.data[0])
       if (res.status === 'success') {
         if (type == 'next') {
           setloging(false);
-          setCurrent(current + 1);
+          setChargeId(res.data[0])
+          if (values.type == 0) {
+            setChargeInfo(<div
+              style={{
+                textAlign: 'center',
+                marginTop: '75px',
+                fontSize: '25px'
+              }}
+            >已提交缴费，请等待财务审核</div>);
+            setCurrent(3);
+          }
+          if (values.type == 4) {
+            apiRequest.get('/sms/business/bizCharge', { id: res.data[0] }).then(charge => {
+              if (charge.status == 'success') {
+                let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+                let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+                setChargeInfo(<QrcodeInfo
+                  src={'/sms/business/bizChargeQrcode/download?id=' + charge.data.content[0].chargeQrcodeId + '&fileName=' + charge.data.content[0].file + '&' + tokenName + '=' + tokenValue}
+                  order={order}
+                  charge={charge.data.content[0]}
+                />)
+                setCurrent(3);
+              }
+            })
+          }
+          if (values.type == 5) {
+            apiRequest.get('/sms/business/bizCharge', { id: res.data[0] }).then(charge => {
+              if (charge.status == 'success') {
+                setChargeInfo(<div
+                  style={{
+                    textAlign: 'center',
+                    marginTop: '75px',
+                    fontSize: '25px'
+                  }}
+                >对公打款备注码已生成：{charge.data.content[0].code}</div>);
+                setCurrent(3);
+              }
+            })
+          }
+          if (values.type == 6) {
+            setChargeInfo(<div
+              style={{
+                textAlign: 'center',
+                marginTop: '75px',
+                fontSize: '25px'
+              }}
+            >已完成缴费</div>);
+            setCurrent(3);
+          }
         } else {
           setloging(false);
           callbackRefs();
@@ -284,7 +430,7 @@ export default (props: any) => {
   const over = () => {
     if (current == 1) {
       setloging(true);
-      charge('over');
+      doCharge('over');
     } else {
       callbackRefs();
     }

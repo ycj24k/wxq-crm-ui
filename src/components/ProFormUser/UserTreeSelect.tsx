@@ -22,7 +22,8 @@ export default forwardRef((props: any, ref) => {
     formRefs,
     userNameChange = false,
     newMedia = false,
-    recruit = true
+    recruit = true,
+    disabled = false
   } = props;
   //   const { initialState } = useModel('@@initialState');
   const [DepartmentList, setDepartments] = useState<any>(
@@ -154,6 +155,7 @@ export default forwardRef((props: any, ref) => {
                 onChangeUser(e.target.value);
               },
               defaultValue: UserNameValue,
+              disabled: disabled
             }}
             rules={[
               {
@@ -175,7 +177,7 @@ export default forwardRef((props: any, ref) => {
             // tree-select args
             required
             fieldProps={{
-              disabled: newMedia,
+              disabled: disabled || newMedia,
               status: TreeStatusU,
               onSelect: (e: any, node: any) => {
                 onSelectUser(node);

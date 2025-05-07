@@ -61,6 +61,7 @@ export default {
     发票编号: 'invoiceNum',
     发票号码: 'no',
     开票时间: 'time',
+    第三方订单号: 'num2',
   },
   RefundHeader: {
     序号: 'nums',

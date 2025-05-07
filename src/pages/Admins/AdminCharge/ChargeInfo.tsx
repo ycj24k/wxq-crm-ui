@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Empty, Descriptions, Image, Tag, Pagination } from 'antd';
+import { Empty, Descriptions, Image, Tag, Pagination, Modal } from 'antd';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import { DrawerForm } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
@@ -11,18 +11,22 @@ import ProTable from '@ant-design/pro-table';
 import ImgUrl from '@/services/util/UpDownload';
 import ChargeIframe from '@/pages/Admins/AdminCharge/ChargeIframe';
 import filter from '@/services/util/filter';
+import Paragraph from 'antd/lib/typography/Paragraph';
+import QrcodeInfo from './QrcodeInfo';
 export default (props: any) => {
   const { modalVisible, setModalVisible, renderData, setPreviewImage } = props;
-  const [order, setorder] = useState<any>(false);
-  const [charge, setcharge] = useState<any>(renderData.charge ? renderData.charge : false);
   const [totalPages, settotalPages] = useState<any>(
     renderData.totalPages ? renderData.totalPages : false,
   );
-  const [chargelist, setchargelist] = useState<any>([]);
   const [refundList, setrefundList] = useState<any>([]);
   const [imgSrc, setImgSrc] = useState();
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [isModalVisibles, setisModalVisibles] = useState<boolean>(false);
+  const [chargelist, setchargelist] = useState<any>([]);
+  const [order, setorder] = useState<any>(false);
+  const [charge, setcharge] = useState<any>(renderData.charge ? renderData.charge : false);
+  const [qrcodeVisible, setQrcodeVisible] = useState<boolean>(false);
+  const [qrcodeSrc, setQrcodeSrc] = useState<string>();
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const contents = [
     <div hidden={renderData.type == 'refund' || renderData.type == 'refundList'}>
@@ -30,6 +34,17 @@ export default (props: any) => {
       {chargelist.map((item: any, index: number) => {
         return (
           <Descriptions bordered size="small" key={index} style={{ marginBottom: '30px' }}>
+            <Descriptions.Item label="缴费编号">
+              {
+                item.num
+              }
+            </Descriptions.Item>
+            <Descriptions.Item label="第三方订单编号">
+              {
+                item.num2
+              }
+            </Descriptions.Item>
+            <Descriptions.Item label="缴费类型">{Dictionaries.getCascaderName('chargeType', item.type)}</Descriptions.Item>
             <Descriptions.Item label="收费金额">{item.amount}</Descriptions.Item>
             {/* <Descriptions.Item label="实收金额">
               {item.discount ? item.amount - item.discount : item.amount}
@@ -62,7 +77,7 @@ export default (props: any) => {
             <Descriptions.Item label="财务备注" span={3}>
               {item.description2}
             </Descriptions.Item>
-            <Descriptions.Item label="审核未通过原因" span={3}>
+            <Descriptions.Item label="审核备注" span={3}>
               {item.remark}
             </Descriptions.Item>
             <Descriptions.Item label="附件" span={3}>
@@ -83,11 +98,24 @@ export default (props: any) => {
                 })
                 : ''}
             </Descriptions.Item>
-            <Descriptions.Item label="缴费编号">
-              {
-                item.num
-              }
-            </Descriptions.Item>
+            {item.file && <Descriptions.Item label="二维码" span={3}>
+              <div className="notice-files">
+                二维码图片：{' '}
+                <a
+                  onClick={() => {
+                    look2(item);
+                  }}
+                >
+                  {item.file}
+                </a>
+              </div>
+            </Descriptions.Item>}
+            {item.code && <Descriptions.Item label="对公转账备注码" span={3}>
+              <div className="notice-files">
+                备注码：{' '}
+                <Paragraph copyable >{item.code}</Paragraph>
+              </div>
+            </Descriptions.Item>}
           </Descriptions>
         );
       })}
@@ -238,7 +266,7 @@ export default (props: any) => {
     const chargelist: any[] = [];
     const refundList: any[] = [];
     list.data.content.forEach((item: any) => {
-      if (item.type == 0) {
+      if (item.type != 1) {
         chargelist.push(item);
       } else {
         refundList.push(item);
@@ -261,6 +289,14 @@ export default (props: any) => {
         setPreviewVisible(true);
       }
     });
+  };
+  const look2 = async (item: any) => {
+    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const src = '/sms/business/bizChargeQrcode/download?id=' + item.chargeQrcodeId + '&fileName=' + item.file + '&' + tokenName + '=' + tokenValue;
+    setQrcodeSrc(src);
+    setQrcodeVisible(true)
+    setcharge(item)
   };
   return (
     <DrawerForm<{
@@ -358,6 +394,15 @@ export default (props: any) => {
           }}
         />
       )}
+      <Modal
+        visible={qrcodeVisible}
+        title="二维码信息"
+        footer={null}
+        // width={600}
+        onCancel={() => setQrcodeVisible(false)}
+      >
+        <QrcodeInfo src={qrcodeSrc} order={order} charge={charge} />
+      </Modal>
     </DrawerForm>
   );
 };

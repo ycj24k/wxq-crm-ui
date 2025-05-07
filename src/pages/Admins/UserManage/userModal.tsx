@@ -15,6 +15,8 @@ import DepartmentCard from '../Department/DepartmentCard';
 import GroupCard from './groupModal';
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+import apiRequest from '@/services/ant-design-pro/apiRequest';
+import { getCompanyRequest } from '@/services/util/util';
 export default (props: any) => {
   const [CardVisible, setCardVisible] = useState<boolean>(false);
   const [groupVisible, setGroupisible] = useState<boolean>(false);
@@ -417,6 +419,18 @@ export default (props: any) => {
               rules={[{ required: true, message: '请选择人员状态' }]}
               request={async () => Dictionaries.getList('onJobStatus') as any}
             />
+            <ProFormSelect
+              label="所属公司"
+              name="companyId"
+              width="xl"
+              initialValue={renderData.companyId}
+              request={getCompanyRequest}
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            ></ProFormSelect>
           </ProForm.Group>
           <ProForm.Group>
             <ProFormDatePicker

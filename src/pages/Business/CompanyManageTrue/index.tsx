@@ -26,11 +26,11 @@ export default () => {
       ]}
     >
       {TabListNuber == 1 ? (
-        <Student type="企业/同行机构" isFormal={true} />
+        <Student type="企业/同行机构" isFormal={true} isPay={true} />
       ) : TabListNuber == 2 ? (
-        <Student type="个人代理" isFormal={true} />
+        <Student type="个人代理" isFormal={true} isPay={true} />
       ) : (
-        <Student type="同行机构" isFormal={true} />
+        <Student type="同行机构" isFormal={true} isPay={true} />
       )}
     </PageContainer>
   );

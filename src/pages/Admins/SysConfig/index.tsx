@@ -8,7 +8,7 @@ import {
   DownOutlined,
   UpOutlined,
 } from '@ant-design/icons';
-import { Button, message, Tag, Input, Popconfirm, Switch, Spin } from 'antd';
+import { Button, message, Tag, Input, Popconfirm, Switch, Spin, Select } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -16,6 +16,8 @@ import Modals from './Modal';
 import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from '@ant-design/pro-card';
+import { getCompanyRequest } from '@/services/util/util';
+import dictionaries from '@/services/util/dictionaries';
 type GithubIssueItem = {
   value: any;
   id: number;
@@ -362,7 +364,23 @@ export default () => {
                             <div>({item.code})</div>
                           </div>
                           <div className="content" style={{ width: '170px', marginRight: '30px' }}>
-                            {item.type == 0 ? (
+                            {item.type == 1 && (
+                              <Input
+                                onChange={(e) => {
+                                  const arr = JSON.parse(JSON.stringify(IndexNum));
+                                  let values = JSON.parse(JSON.stringify(InputValue));
+                                  values[index] = e.target.value;
+                                  if (arr.indexOf(index) >= 0) {
+                                  } else {
+                                    arr.push(indexs + '-' + index);
+                                    setIndexNum(arr);
+                                  }
+                                  setInputValue(values);
+                                }}
+                                defaultValue={item.value}
+                              ></Input>
+                            )}
+                            {item.type == 2 && (
                               <Switch
                                 checkedChildren="开启"
                                 unCheckedChildren="关闭"
@@ -381,21 +399,24 @@ export default () => {
                                   });
                                 }}
                               />
-                            ) : (
-                              <Input
+                            )}
+                            {item.type == 3 && (
+                              <Select
+                                style={{ width: '170px' }}
+                                options={dictionaries.getList('bankType')}
+                                defaultValue={item.value}
                                 onChange={(e) => {
                                   const arr = JSON.parse(JSON.stringify(IndexNum));
                                   let values = JSON.parse(JSON.stringify(InputValue));
-                                  values[index] = e.target.value;
+                                  values[index] = e;
                                   if (arr.indexOf(index) >= 0) {
                                   } else {
-                                    arr.push(index);
+                                    arr.push(indexs + '-' + index);
                                     setIndexNum(arr);
                                   }
                                   setInputValue(values);
                                 }}
-                                defaultValue={item.value}
-                              ></Input>
+                              />
                             )}
                           </div>
 
@@ -464,9 +485,7 @@ export default () => {
                           )}
                           <div
                             style={{ margin: '0 20px' }}
-                            hidden={IndexNum.every((itemEvery: any) => {
-                              return itemEvery != index;
-                            })}
+                            hidden={IndexNum.indexOf(indexs + '-' + index) == -1}
                           >
                             <a
                               onClick={() => {
@@ -486,7 +505,7 @@ export default () => {
                               style={{ color: 'red', paddingLeft: '20px' }}
                               onClick={() => {
                                 const arr = JSON.parse(JSON.stringify(IndexNum));
-                                arr.splice(arr.indexOf(index), 1);
+                                arr.splice(arr.indexOf(indexs + '-' + index), 1);
                                 setIndexNum(arr);
                               }}
                             >

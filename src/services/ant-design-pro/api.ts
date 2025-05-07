@@ -12,19 +12,10 @@ export async function currentUser(options?: { [key: string]: any }) {
     sessionStorage.setItem('userInfo', JSON.stringify(user));
   }
   return {
-    name: user?.data?.name,
+    ...user.data,
     // avatar: 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
     avatar: 'http://m.imeitou.com/uploads/allimg/220713/7-220G3111245.jpg',
     userid: user.data.id,
-    departmentName: user.data.departmentName,
-    departmentId: user.data.departmentId,
-    mobile: user.data.mobile,
-    userName: user.data.userName,
-    weChat: user.data.weChat,
-    idCard: user.data.idCard,
-    sex: user.data.sex,
-    isReset: user.data.isReset,
-    ecId: user.data.ecId,
     // access: 'admin',
     // id: user.data.id,
     router: [
@@ -44,6 +35,22 @@ export async function currentUser(options?: { [key: string]: any }) {
           },
           {
             component: './404',
+          },
+        ],
+      },
+      {
+        path: '/public',
+        layout: false,
+        routes: [
+          {
+            path: '/public',
+            routes: [
+              {
+                name: 'charge',
+                path: '/public/charge',
+                component: './Public/Charge',
+              },
+            ],
           },
         ],
       },
@@ -113,16 +120,28 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/StudentManage',
               },
               {
-                name: '小程序下单学员',
-                icon: 'SolutionOutlined',
-                path: '/business/studentmanageswx',
-                component: './Business/StudentManageWx',
-              },
-              {
                 name: '潜在团组',
                 icon: 'TeamOutlined',
                 path: '/business/companymanage',
                 component: './Business/CompanyManage',
+              },
+              {
+                name: '待支付学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanage2',
+                component: './Business/StudentManage2',
+              },
+              {
+                name: '待支付团组',
+                icon: 'TeamOutlined',
+                path: '/business/companymanage2',
+                component: './Business/CompanyManage2',
+              },
+              {
+                name: '小程序下单学员',
+                icon: 'SolutionOutlined',
+                path: '/business/studentmanageswx',
+                component: './Business/StudentManageWx',
               },
               {
                 name: '推荐学员',
@@ -149,6 +168,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 name: '小程序二维码下载',
                 path: '/business/qrcode',
                 component: './Business/QRCode',
+              },
+              {
+                name: '专属收款二维码',
+                path: '/business/exclusiveqrcode',
+                component: './Business/ExclusiveQRCode',
               },
             ],
           },
@@ -218,6 +242,12 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/BusinessOrder',
               },
               {
+                name: '待支付订单',
+                icon: 'table',
+                path: '/business/payingorder',
+                component: './Business/PayingOrder',
+              },
+              {
                 name: '缴费列表',
                 path: '/business/businesscharge/list',
                 component: './Business/BusinessCharge/List',
@@ -252,6 +282,16 @@ export async function currentUser(options?: { [key: string]: any }) {
                 name: '财务查询',
                 path: '/business/businessorder/search',
                 component: './Business/BusinessOrder/searchFalg',
+              },
+              {
+                name: '专属收款码未下单记录',
+                path: '/business/chargeLog',
+                component: './Business/ChargeLog',
+              },
+              {
+                name: '银行流水',
+                path: '/business/businessTransaction',
+                component: './Business/BusinessTransaction',
               },
             ],
           },
@@ -556,24 +596,12 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'table',
             path: '/admins/contract',
             component: './Admins/Contract',
-
-            // routes: [
-            //   {
-            //     name: '系统公司',
-            //     path: '/admins/contract',
-            //     component: './Admins/Contract',
-            //   },
-            // {
-            //   name: '合同模板',
-            //   path: '/admins/contemplate',
-            //   component: './Admins/ConTemplate',
-            // },
-            // {
-            //   name: '合同列表',
-            //   path: '/admins/contractlist',
-            //   component: './Admins/ContractList',
-            // },
-            // ],
+          },
+          {
+            name: '银行信息',
+            icon: 'table',
+            path: '/admins/bank',
+            component: './Admins/Bank',
           },
           {
             name: '排班计划',
