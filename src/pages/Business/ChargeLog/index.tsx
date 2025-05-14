@@ -4,7 +4,7 @@ import dictionaries from "@/services/util/dictionaries"
 import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
 import { ProColumns } from "@ant-design/pro-table"
-import { Button, Tag } from "antd"
+import { Button, Space, Tag } from "antd"
 import { useState } from "react"
 import DownHeader from "./DownHeader"
 
@@ -12,6 +12,7 @@ import DownHeader from "./DownHeader"
 export default (props: any) => {
     const { reBuild, select, getAll = false } = props
     const [exportLoading, setExportLoading] = useState<boolean>();
+    const [selectData, setSelectData] = useState<Array<any>>();
     const param = getAll ? {} : { isUseUp: false }
     const exportNotUseUp = () => {
         setExportLoading(true)
@@ -68,17 +69,30 @@ export default (props: any) => {
             sorter: true,
             render: (text, record) => record.paymentTime
         },
-        {
-            title: '操作',
-            search: false,
-            hideInTable: !select,
-            render: (text, record) => <Button type='primary' onClick={() => select(record)}>选择</Button>
-        },
+        // {
+        //     title: '操作',
+        //     search: false,
+        //     hideInTable: !select,
+        //     render: (text, record) => <Button type='primary' onClick={() => select(record)}>选择</Button>
+        // },
     ];
     return <Tables
         columns={columns}
         request={{ url: '/sms/business/bizChargeLog' }}
         params={param}
+        rowSelection={select && {
+            onChange(id, e) {
+                setSelectData(e)
+            }
+        }}
+        tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => <Space>
+            <a onClick={onCleanSelected}>
+                取消选择
+            </a>
+            <a onClick={() => select(selectData)}>
+                绑定到缴费
+            </a>
+        </Space>}
         toolBarRender={[
             <Button icon={<ExportOutlined />} onClick={exportNotUseUp} loading={exportLoading} >导出未下单记录</Button>,
             <Button hidden={!reBuild} icon={<RedoOutlined />} onClick={reBuild} >重新生成二维码</Button>,

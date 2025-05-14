@@ -191,10 +191,13 @@ export default (props: any) => {
   };
   const placeAnOrder = (record: any) => {
     if (type == '学员' || type == '个人代理') {
-      if (!record.idCard) {
-        message.error('请先补充学员身份证后在进行下单');
-      } else if (!record.mobile) {
-        message.error('请先补充学员手机号后在进行下单');
+      // if (!record.idCard) {
+      //   message.error('请先补充学员身份证后在进行下单');
+      // } else 
+      if (!record.mobile || !record.name) {
+        message.error('请先补充学员姓名、手机号后在进行下单');
+        setRenderData({ ...record, typee: 'eidt' });
+        setModalVisible(true);
       } else {
         setRenderData({
           ...record,

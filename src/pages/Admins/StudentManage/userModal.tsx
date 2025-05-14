@@ -335,7 +335,7 @@ export default (props: any) => {
           placeholder="请输入姓名"
           rules={[
             {
-              required: true,
+              // required: true,
               pattern: new RegExp(/^\S*$/),
               message: '不能包含空格/请输入正确的用户名',
             },
@@ -378,7 +378,7 @@ export default (props: any) => {
             hidden={company === '企业名称' || type === '个人代理'}
             name="education"
             width="xs"
-            rules={[{ required: true, message: '请选择学历' }]}
+            // rules={[{ required: true, message: '请选择学历' }]}
             request={async () => Dictionaries.getList('dict_education') as any}
           />
         )}

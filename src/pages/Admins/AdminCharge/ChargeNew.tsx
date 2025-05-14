@@ -43,7 +43,7 @@ export default (props: any, orderRef: any) => {
   const [ChargeModals, setChargeModals] = useState<boolean>(false);
   const [previewurl, setPreviewurl] = useState<any>();
   const [thisChargeType, setThisChargeType] = useState<any>();
-  const [chargeLog, setChargeLog] = useState<any>();
+  const [chargeLog, setChargeLog] = useState<Array<any> | null>();
   const [CardContent, setCardContent] = useState<any>();
   const [CorderVisibleFalg, setCOrderVisible] = useState<boolean>(false);
   const [order, setorder] = useState<any>(false);
@@ -118,21 +118,21 @@ export default (props: any, orderRef: any) => {
     if (chargeLog) {
       setChargeLogVisible(false)
       let chargeLists = formRef?.current?.getFieldsValue().chargeLists;
-      chargeLists[0].amount = chargeLog.amount
+      chargeLists[0].amount = chargeLog.reduce((x, y) => x + y.amount, 0)
       formRef?.current?.setFieldsValue({
-        chargeLogName: chargeLog.name + '的收款记录',
-        paymentTime: chargeLog.paymentTime,
-        userId: chargeLog.userId + '',
-        method: chargeLog.method + '',
+        chargeLogName: chargeLog.map(x => x.name).join('、') + '的收款记录',
+        paymentTime: chargeLog[0].paymentTime,
+        userId: chargeLog[0].userId + '',
+        method: chargeLog[0].method + '',
         chargeLists: chargeLists,
       });
       userRef?.current?.setDepartment({
-        id: chargeLog.userId,
-        name: dictionaries.getDepartmentUserName(chargeLog.userId)
+        id: chargeLog[0].userId,
+        name: dictionaries.getDepartmentUserName(chargeLog[0].userId)
       });
       setUserNameId({
-        id: chargeLog.userId,
-        name: dictionaries.getDepartmentUserName(chargeLog.userId)
+        id: chargeLog[0].userId,
+        name: dictionaries.getDepartmentUserName(chargeLog[0].userId)
       })
     }
   }, [chargeLog]);
@@ -469,10 +469,10 @@ export default (props: any, orderRef: any) => {
     value.userId = userNameId.id;
     value.departmentId = userNameId.departmentId;
     if (value.type == undefined) value.type = renderData.type == 'orders' ? '1' : 0;
-    if (thisChargeType == '6') value.chargeLogId = chargeLog.id
+    if (thisChargeType == '6') value.chargeLogIds = chargeLog?.map(x => x.id).join(',')
     value.chargeLists.forEach((item: any) => {
       data.push({
-        chargeLogId: value.chargeLogId,
+        chargeLogIds: value.chargeLogIds,
         chargeTime: value.chargeTime,
         method: value.method,
         userId: value.userId,

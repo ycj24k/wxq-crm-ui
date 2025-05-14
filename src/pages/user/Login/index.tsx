@@ -379,6 +379,8 @@ const Login: React.FC = () => {
                   // const userInfo = await request.get('/sms/user');
                   // sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
                   // history.push('/user/login');
+                } else {
+                  message.error(res.msg)
                 }
               });
             });

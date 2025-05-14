@@ -44,33 +44,38 @@ class httpRequest {
     //   return this.baseOptions(param, method, type);
     // }
     return new Promise((resolve, reject) => {
-      request(url, option).then((res: any) => {
-        if (err) {
-          if (res.status === 'success' || res.status === 'pleaseRefreshDict') {
-            resolve(res);
-          } else {
-            // if (res.status == 'connectError' && num < 1) {
-            //   num++;
-            //   Socket.open();
-            //   if (url == '/sms/share/getDict') return;
+      request(url, option)
+        .then((res: any) => {
+          console.log(res);
+          if (err) {
+            if (res.status === 'success' || res.status === 'pleaseRefreshDict') {
+              resolve(res);
+            } else {
+              // if (res.status == 'connectError' && num < 1) {
+              //   num++;
+              //   Socket.open();
+              //   if (url == '/sms/share/getDict') return;
 
-            //   return this.baseOptions(param, method, type);
-            // }
-            if (res.status == 'loginError') {
-              history.push(loginPath);
-            }
-            if (res.status == 'seriousError') {
+              //   return this.baseOptions(param, method, type);
+              // }
+              if (res.status == 'loginError') {
+                history.push(loginPath);
+              }
+              if (res.status == 'seriousError') {
+                reject(res);
+                message.error(res.msg + '，已发送错误信息给管理员..');
+                return;
+              }
               reject(res);
-              message.error(res.msg + '，已发送错误信息给管理员..');
-              return;
+              message.error(res.msg, 5);
             }
-            reject(res);
-            message.error(res.msg, 5);
+          } else {
+            resolve(res);
           }
-        } else {
-          resolve(res);
-        }
-      });
+        })
+        .catch(() => {
+          message.error('系统更新中', 5);
+        });
     });
   }
 
