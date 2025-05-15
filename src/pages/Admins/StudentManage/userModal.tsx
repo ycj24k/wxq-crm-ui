@@ -55,9 +55,6 @@ export default (props: any) => {
   //判断是导入还是非导入
   const [ isImport, setIsImport ] = useState<boolean>(false);
     //保存部门列表数据
-  const [departmentList, setDepartmentList] = useState<any>([]);
-  //保存部门id
-  const [departmentId, setDepartmentId] = useState<any>([]);
 
   useEffect(() => {
     if (JSON.stringify(department) != '{}') {
@@ -301,8 +298,8 @@ export default (props: any) => {
   
         formRef.current?.setFieldsValue({
           name: newjson.学员姓名,
-          education: newjson.学历,
-          source: newjson.客户来源,
+          education: Dictionaries.getValue('dict_education',newjson.学历)||undefined,
+          source: Dictionaries.getValue('dict_source',newjson.客户来源),
           mobile: newjson.联系电话,
           weChat: newjson.微信,
           description: newjson.备注,
@@ -314,9 +311,9 @@ export default (props: any) => {
           id:dataProvider?.[0],
           name: newjson.信息所有人
         }
-        console.log(newProvider,'newProvider')
         setUserNameIds(newProvider)
         userRefs?.current?.setDepartment(newProvider);
+
   
       }
     }
@@ -324,7 +321,7 @@ export default (props: any) => {
   function onChange(value: any, selectedOptions: any) { }
   let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
   let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  let obj:any = {};
   obj[tokenName] = tokenValue;
   return (
     <ModalForm<{
@@ -346,22 +343,6 @@ export default (props: any) => {
         if (!values.QQ && !values.weChat && !values.mobile) {
           message.error('QQ、微信、电话，三种联系方式必须要添加一个', 5);
           return;
-        }
-
-        //是导入基础资料的话走这一步
-        if(isImport) {
-          const newVal = Dictionaries.getList('dict_education')
-          const cust = Dictionaries.getList('dict_source')
-          const num = newVal?.find((item: any) => item.label == values.education)?.value
-          console.log(num,'num')
-          if(num == undefined){
-            values.education = ''
-          }else{
-            values.education = num
-          }
-          const cust_val = cust?.find((item: any) => item.label == values.source)?.value
-          
-          values.source = cust_val
         }
 
         if (renderData.studentId) values.id = renderData.studentId;
