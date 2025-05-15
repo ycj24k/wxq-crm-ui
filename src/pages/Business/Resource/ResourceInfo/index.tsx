@@ -11,6 +11,8 @@ import StudentInfo from '@/pages/Admins/StudentManage/studentInfo';
 import Tables from '@/components/Tables';
 import filter from '@/services/util/filter';
 import { useModel } from 'umi';
+//添加用户
+import Modals from '@/pages/Admins/StudentManage/userModal'
 // import Modals from './Modals';
 type GithubIssueItem = {
   name: string;
@@ -43,6 +45,12 @@ export default (props: any) => {
   const [StudentIds, setStudentIds] = useState<any>([]);
   const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid).id
   const [params, setParams] = useState<any>({ departmentId: departmentId })
+  //代码迁移
+  const [isFormal, setIsFormal] = useState<boolean>(true);
+  const [parentId, setParentId] = useState<number | null>(-1);
+  const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
+  const url = isFormal ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
+
   const actionRef = useRef<ActionType>();
   const callbackRef = () => {
     // @ts-ignore
@@ -339,6 +347,25 @@ export default (props: any) => {
             >
               下载导入模板
             </a>,
+          // 新增学员
+          <Button
+          key="buttonq"
+          icon={<PlusOutlined />}
+          type="primary"
+          // hidden={order == 'order' || isFormal || recommend}
+          onClick={() => {
+            if (parentId) {
+              setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
+            } else {
+              setRenderData({ typee: 'add', newMedia: false, teacher: true });
+            }
+
+            setModalVisible(true);
+          }}
+          >
+          新建
+          </Button>,
+
             <Button
               key="button"
               hidden={TabListNuber == '2' || hidden}
@@ -390,7 +417,18 @@ export default (props: any) => {
             </Button>,
           ]}
         />
-
+        {/* 添加学员弹窗 */}
+        {modalVisibleFalg && (
+          <Modals
+            setModalVisible={() => setModalVisible(false)}
+            modalVisible={modalVisibleFalg}
+            callbackRef={() => callbackRef()}
+            renderData={renderData}
+            url={url}
+            type={'学员'}
+            sourceType={1}
+          />
+        )}
         {UploadFalg && (
           <Upload
             setModalVisible={() => setUploadVisible(false)}
