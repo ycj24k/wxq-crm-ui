@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, message, Image, Upload, Modal } from 'antd';
+import { Button, message, Image, Upload, Modal, Input } from 'antd';
+const { TextArea } = Input;
 import {
   ProFormCascader,
   ProFormDatePicker,
@@ -48,6 +49,13 @@ export default (props: any) => {
   const [userNameId2, setUserNameId2] = useState<any>();
 
   const formRef = useRef<ProFormInstance>();
+
+  //文本信息
+  const [textContent , setTextContent] = useState<string>('');
+  //判断是导入还是非导入
+  const [ isImport, setIsImport ] = useState<boolean>(false);
+    //保存部门列表数据
+
   useEffect(() => {
     if (JSON.stringify(department) != '{}') {
       console.log(department);
@@ -269,10 +277,51 @@ export default (props: any) => {
   const filter = (inputValue: string, path: any[]) => {
     return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   };
+
+    //处理输入的文本信息
+    const handleChangeText = () => {
+      setIsImport(true)
+      if(textContent != ''){
+        let text = textContent;
+        // 将文本分割成行
+        let lines = text?.split(',');
+        console.log(lines,'lines')
+        // 创建一个空对象来存储JSON数据
+        let data: Record<string, any> = {};
+        lines?.forEach(line => {
+          let [key, value] = line.split(':');
+          data[key.trim()] = value.trim();
+        });
+        // 将对象转换为JSON字符串
+        let jsonData = JSON.stringify(data);
+        let newjson = JSON.parse(jsonData)
+  
+        formRef.current?.setFieldsValue({
+          name: newjson.学员姓名,
+          education: Dictionaries.getValue('dict_education',newjson.学历)||undefined,
+          source: Dictionaries.getValue('dict_source',newjson.客户来源),
+          mobile: newjson.联系电话,
+          weChat: newjson.微信,
+          description: newjson.备注,
+          provider: newjson.信息所有人,
+        })
+        console.log(newjson.信息所有人)
+        const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
+        const newProvider = {
+          id:dataProvider?.[0],
+          name: newjson.信息所有人
+        }
+        setUserNameIds(newProvider)
+        userRefs?.current?.setDepartment(newProvider);
+
+  
+      }
+    }
+
   function onChange(value: any, selectedOptions: any) { }
   let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
   let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  let obj:any = {};
   obj[tokenName] = tokenValue;
   return (
     <ModalForm<{
@@ -305,6 +354,21 @@ export default (props: any) => {
       }}
       visible={modalVisible}
     >
+            <TextArea
+        rows={5} 
+        value={textContent}
+        style={{ marginBottom: '20px' }} 
+        onChange={(e) => setTextContent(e.target.value)} 
+        placeholder="请输入或者粘贴基础信息" 
+      />
+      
+      <Button
+        style={{ marginBottom: '20px' }}
+        onClick={() => {
+            handleChangeText()
+          }
+        }
+      >导入基础信息</Button>
       <ProForm.Group>
         <ProFormSelect
           label="学员类型"
