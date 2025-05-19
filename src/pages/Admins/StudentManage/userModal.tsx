@@ -29,7 +29,7 @@ let content: any = null;
 export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [company, setCompany] = useState('学员姓名');
-  const { modalVisible, setModalVisible, callbackRef, url, type } = props;
+  const { modalVisible, setModalVisible, callbackRef, url, type, sourceType } = props;
   let { renderData } = props;
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [Student, setStudentId] = useState<any>(null);
@@ -51,10 +51,11 @@ export default (props: any) => {
   const formRef = useRef<ProFormInstance>();
 
   //文本信息
-  const [textContent , setTextContent] = useState<string>('');
-  //判断是导入还是非导入
-  const [ isImport, setIsImport ] = useState<boolean>(false);
-    //保存部门列表数据
+  const [textContent, setTextContent] = useState<string>('');
+  //保存部门列表数据
+  const [departmentList, setDepartmentList] = useState<any>([]);
+  //保存部门id
+  const [departmentId, setDepartmentId] = useState<any>([]);
 
   useEffect(() => {
     if (JSON.stringify(department) != '{}') {
@@ -158,7 +159,20 @@ export default (props: any) => {
         setUserNameIds(data)
       }
     }
+    getDepartment()
   }, []);
+  //获取部门
+  const getDepartment = async () => {
+    const contentList: any = await request.get('/sms/share/getDepartment', {
+      _isGetAll: true,
+    });
+    let targetID = contentList.data[0].id
+    const targetData = contentList.data.find((item: any) => item.parentId === targetID)
+    const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID || item.parentId === -1) : [];
+    console.log(contentList.data, '=====>contentList.data')
+    console.log(result, '=====>result')
+    setDepartmentList(result)
+  }
   // useEffect(() => {
   // console.log(JSON.stringify(userNameId))
   // if (renderData.typee == 'add' && userNameId) {
@@ -230,98 +244,108 @@ export default (props: any) => {
       }
     });
 
-    let url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
-    let data = renderData.newMedia ? [value] : value
-    const callBackFn = (res) => {
-      if (res.status == 'success') {
-        if (renderData.typee == 'eidt') {
-          let dataValue: any = {
-            id: renderData.id,
-            project: value.project,
-            studentSource: value.source,
-            consultationTime: value.consultationTime,
-            provider: userNameIds.id
+    if (sourceType == 1) {
+      let data = renderData.newMedia ? [value] : value
+      request.post2('/sms/business/bizStudent/addCirculationRepository', { departmentId }, [data])
+      message.success('操作成功');
+      setModalVisible();
+      callbackRef();
+      return
+    } else {
+      let url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
+      let data = renderData.newMedia ? [value] : value
+      const callBackFn = (res) => {
+        if (res.status == 'success') {
+          if (renderData.typee == 'eidt') {
+            let dataValue: any = {
+              id: renderData.id,
+              project: value.project,
+              studentSource: value.source,
+              consultationTime: value.consultationTime,
+              provider: userNameIds.id
+            }
+            request.post('/sms/business/bizStudentUser', dataValue);
           }
-          request.post('/sms/business/bizStudentUser', dataValue);
+          message.success('操作成功');
+          setModalVisible();
+          callbackRef();
+          return true
+
         }
-        message.success('操作成功');
-        setModalVisible();
-        callbackRef();
-        return true
-
       }
+      return new Promise((resolve) => {
+        if (renderData.newMedia) {
+          request
+            .postAll(url, data)
+            .then((res: any) => {
+              resolve(callBackFn(res))
+            })
+            .catch((err: any) => {
+              resolve(true);
+            });
+        } else {
+          request
+            .post(url, data)
+            .then((res: any) => {
+              resolve(callBackFn(res))
+            })
+            .catch((err: any) => {
+              resolve(true);
+            });
+        }
+
+      });
     }
-    return new Promise((resolve) => {
-      if (renderData.newMedia) {
-        request
-          .postAll(url, data)
-          .then((res: any) => {
-            resolve(callBackFn(res))
-          })
-          .catch((err: any) => {
-            resolve(true);
-          });
-      } else {
-        request
-          .post(url, data)
-          .then((res: any) => {
-            resolve(callBackFn(res))
-          })
-          .catch((err: any) => {
-            resolve(true);
-          });
-      }
 
-    });
+
   };
   const filter = (inputValue: string, path: any[]) => {
     return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   };
 
-    //处理输入的文本信息
-    const handleChangeText = () => {
-      setIsImport(true)
-      if(textContent != ''){
-        let text = textContent;
-        // 将文本分割成行
-        let lines = text?.split(',');
-        console.log(lines,'lines')
-        // 创建一个空对象来存储JSON数据
-        let data: Record<string, any> = {};
-        lines?.forEach(line => {
-          let [key, value] = line.split(':');
-          data[key.trim()] = value.trim();
-        });
-        // 将对象转换为JSON字符串
-        let jsonData = JSON.stringify(data);
-        let newjson = JSON.parse(jsonData)
-  
-        formRef.current?.setFieldsValue({
-          name: newjson.学员姓名,
-          education: Dictionaries.getValue('dict_education',newjson.学历)||undefined,
-          source: Dictionaries.getValue('dict_source',newjson.客户来源),
-          mobile: newjson.联系电话,
-          weChat: newjson.微信,
-          description: newjson.备注,
-          provider: newjson.信息所有人,
-        })
-        console.log(newjson.信息所有人)
-        const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
-        const newProvider = {
-          id:dataProvider?.[0],
-          name: newjson.信息所有人
-        }
-        setUserNameIds(newProvider)
-        userRefs?.current?.setDepartment(newProvider);
+  //处理输入的文本信息
+  const handleChangeText = () => {
+    if (textContent != '') {
+      let text = textContent;
+      // 将文本分割成行
+      let lines = text?.split(',');
+      console.log(lines, 'lines')
+      // 创建一个空对象来存储JSON数据
+      let data: Record<string, any> = {};
+      lines?.forEach(line => {
+        let [key, value] = line.split(':');
+        data[key.trim()] = value.trim();
+      });
+      // 将对象转换为JSON字符串
+      let jsonData = JSON.stringify(data);
+      let newjson = JSON.parse(jsonData)
 
-  
+      formRef.current?.setFieldsValue({
+        name: newjson.学员姓名,
+        education: Dictionaries.getValue('dict_education', newjson.学历) || undefined,
+        source: Dictionaries.getValue('dict_source', newjson.客户来源),
+        mobile: newjson.联系电话,
+        weChat: newjson.微信,
+        description: newjson.备注,
+        provider: newjson.信息所有人,
+      })
+      console.log(newjson.信息所有人)
+      const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
+      const newProvider = {
+        id: dataProvider?.[0],
+        name: newjson.信息所有人
       }
+      setUserNameIds(newProvider)
+      userRefs?.current?.setDepartment(newProvider);
+
+
     }
+  }
 
   function onChange(value: any, selectedOptions: any) { }
   let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
   let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj:any = {};
+  let obj: any = {};
   obj[tokenName] = tokenValue;
   return (
     <ModalForm<{
@@ -354,21 +378,22 @@ export default (props: any) => {
       }}
       visible={modalVisible}
     >
-            <TextArea
-        rows={5} 
+      <TextArea
+        rows={5}
         value={textContent}
-        style={{ marginBottom: '20px' }} 
-        onChange={(e) => setTextContent(e.target.value)} 
-        placeholder="请输入或者粘贴基础信息" 
+        style={{ marginBottom: '20px' }}
+        onChange={(e) => setTextContent(e.target.value)}
+        placeholder="请输入或者粘贴基础信息"
       />
-      
+
       <Button
         style={{ marginBottom: '20px' }}
         onClick={() => {
-            handleChangeText()
-          }
+          handleChangeText()
+        }
         }
       >导入基础信息</Button>
+      
       <ProForm.Group>
         <ProFormSelect
           label="学员类型"
@@ -432,7 +457,29 @@ export default (props: any) => {
             ]}
           />
         ) : null}
+
+        {sourceType == 1 ? (
+          <ProFormSelect
+            label="部门"
+            name="departmentId"
+            width={326}
+            options={departmentList.map((item: any) => ({
+              label: item.name,
+              value: item.id,
+            }))}
+            fieldProps={{
+              //使用onChange onBlur
+              onChange: (value) => {
+                setDepartmentId(value)
+                return value
+              },
+            }}
+
+          // request={async () => Dictionaries.getList('dict_source') as any}
+          />
+        ) : null}
       </ProForm.Group>
+      
       <ProForm.Group>
         {company === '企业名称' || type === '个人代理' ? (
           ''
