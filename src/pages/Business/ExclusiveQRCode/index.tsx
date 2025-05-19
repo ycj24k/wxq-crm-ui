@@ -14,6 +14,7 @@ export default () => {
     const { initialState } = useModel('@@initialState');
     const [src, setSrc] = useState<string>()
     const [companyName, setCompanyName] = useState<string>()
+
     const get = (param: object = {}, reload = false) => {
         apiRequest.get('/sms/business/bizFile/chargeQRCode', param).then(res => {
             let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
@@ -90,5 +91,6 @@ export default () => {
                 </ProCard>
             </ProCard>
         </PageContainer>
+        
     )
 }

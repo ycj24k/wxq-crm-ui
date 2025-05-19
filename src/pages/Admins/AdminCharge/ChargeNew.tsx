@@ -1248,7 +1248,7 @@ export default (props: any, orderRef: any) => {
         onCancel={() => setChargeLogVisible(false)}
         footer={null}
       >
-        <ChargeLog select={setChargeLog} />
+        <ChargeLog select={setChargeLog} type={1} />
       </Modal>
     </ProForm>
   );
