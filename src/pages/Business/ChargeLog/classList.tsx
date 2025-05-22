@@ -23,7 +23,7 @@ export default (props: any) => {
     const [userNameIds, setUserNameIds] = useState<any>();
     const formRef = useRef<ProFormInstance>();
 
-
+    //posForm表单初始值
     const typeClass = [{
         project: Dictionaries.getCascaderValue('dict_reg_job', renderData.project),
         JobClassExam: '',
@@ -59,13 +59,14 @@ export default (props: any) => {
     };
 
     const handleChangeProject = (e: any, index: number) => {
-        
+        console.log(e,index, '====>')
     }
     //获取班型
     const getJobClassExam = async () => {
         let res = await request.get(
             '/sms/business/bizChargeStandard?project=' + renderData.project + '&useNum=0&_size=999&enable=true',
         )
+        //将请求到的班型解析成需要下拉的数据
         projectClassExamListFn(res.data.content)
     }
 
@@ -88,9 +89,11 @@ export default (props: any) => {
                 }),
             });
         });
+        
         setJobClassExam(arr)
         return arr;
     }
+    //页面进入初始调用获取班型
     useEffect(() => {
         getJobClassExam()
     }, [renderData.project])
