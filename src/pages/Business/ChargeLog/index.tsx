@@ -5,7 +5,7 @@ import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
 import { ProColumns } from "@ant-design/pro-table"
 import { Button, Space, Tag, Modal, Row, Col } from "antd"
-import { useState, useRef, forwardRef } from "react"
+import { useState, useRef } from "react"
 import { useModel } from 'umi';
 import DownHeader from "./DownHeader"
 import StudentMessage from "./studentMessage"
@@ -20,11 +20,6 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import ClassList from "./classList"
 import PayWay from "./payWay"
-import CompanyOrder from "@/pages/Admins/AdminOrder/companyOrder"
-const CompanyOrders = forwardRef(CompanyOrder);
-
-
-
 
 export default (props: any) => {
     const { initialState } = useModel('@@initialState');
@@ -36,8 +31,6 @@ export default (props: any) => {
     const [studentModal, setStudentModal] = useState<boolean>(false)
     //下单弹窗
     const [isPayModalOpen, setIsPayModalOpen] = useState<boolean>(false)
-    //存储数据
-    const [renderData, setRenderData] = useState<Array<any>>()
     //存储表单数据
     const [tableData, setTableData] = useState<Array<any>>([])
 
@@ -47,8 +40,9 @@ export default (props: any) => {
     const [userNameId, setUserNameId] = useState<any>();
     const [userNameIds, setUserNameIds] = useState<any>();
     const [userNameId2, setUserNameId2] = useState<any>();
+    const [totalReceivable, setTotalReceivable] = useState<number>(0);
     const formRef = useRef<ProFormInstance>();
-    const childRef = useRef();
+    const classListRef = useRef<{ getFormValues: () => Promise<any> }>(null);
 
     const param = getAll ? {} : { isUseUp: false }
     const exportNotUseUp = () => {
@@ -171,6 +165,23 @@ export default (props: any) => {
             render: (text, record) => <Button type='primary' onClick={() => QuickOrder(record)}>快捷下单</Button>
         },
     ];
+
+    const handlePayOrder = async () => {
+        try {
+            // 获取 classList 组件的表单值
+            const classListValues = await classListRef.current?.getFormValues();
+            console.log('ClassList form values:', classListValues);
+            
+            // 获取主表单的值
+            const formValues = formRef.current?.getFieldsValue();
+            console.log('Main form values:', formValues);
+            
+            // 这里可以添加提交逻辑
+            // 例如调用API提交数据
+        } catch (error) {
+            console.error('Error in handlePayOrder:', error);
+        }
+    }
     return <>
         <Tables
             columns={columns}
@@ -215,7 +226,7 @@ export default (props: any) => {
             width={1200}
             open={isPayModalOpen}
             onCancel={() => setIsPayModalOpen(false)}
-            onOk={() => { }}
+            onOk={() => { handlePayOrder() }}
         >
             <ProForm
                 formRef={formRef}
@@ -276,8 +287,7 @@ export default (props: any) => {
                         fieldProps={{
                             options: Dictionaries.getCascader('dict_reg_job'),
                             showSearch: { filter },
-                            onSearch: (value) => console.log(value),
-                            // defaultValue: ['0', '00'],
+                            onSearch: (value) => console.log(value)
                         }}
                     />
                     <UserTreeSelect
@@ -287,9 +297,7 @@ export default (props: any) => {
                         userNames="userId"
                         userPlaceholder="请输入招生老师"
                         setUserNameId={(e: any) => setUserNameId(e)}
-                        // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
-                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                     <UserTreeSelect
                         ref={userRefs}
@@ -298,9 +306,7 @@ export default (props: any) => {
                         userNames="provider"
                         userPlaceholder="请输入信息提供人"
                         setUserNameId={(e: any) => setUserNameIds(e)}
-                        // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
-                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                     <UserTreeSelect
                         ref={userRef2}
@@ -318,9 +324,7 @@ export default (props: any) => {
                         newMedia={false}
                         userPlaceholder="请输入信息所有人"
                         setUserNameId={(e: any) => setUserNameId2(e)}
-                        // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
-                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                 </ProForm.Group>
             </ProForm>
@@ -340,8 +344,21 @@ export default (props: any) => {
                     （1）如果你的收费金额大于了收费标准，请在订单优惠金额里填写多收金额的负数。
                 </Col>
             </Row>
-            
-            <ClassList renderData={selectStudentData} />
+            <ClassList 
+                ref={classListRef}
+                renderData={selectStudentData}
+                onTotalPriceChange={(price: number) => {
+                    setTotalReceivable(price);
+                    formRef.current?.setFieldsValue({
+                        totalReceivable: price
+                    });
+                }}
+                onTotalQuantityChange={(quantity: number) => {
+                    formRef.current?.setFieldsValue({
+                        quantity: quantity
+                    });
+                }}
+            />
             <PayWay />
         </Modal>
     </>

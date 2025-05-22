@@ -18,6 +18,7 @@ export default (props: any) => {
     //显示收款记录
     const [showGetPay, setShowGetPay] = useState<number>(0)
     const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+    const [userNameId, setUserNameId] = useState<any>();
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
     return <>
         <ProCard
@@ -89,7 +90,7 @@ export default (props: any) => {
                         userLabel={'收费人'}
                         userNames="userId"
                         userPlaceholder="请选择收费人"
-                        // setUserNameId={(e: any) => setUserNameId(e)}
+                        setUserNameId={(e: any) => setUserNameId(e)}
                         // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
                     // setFalgUser={(e: any) => setFalgUser(e)}
