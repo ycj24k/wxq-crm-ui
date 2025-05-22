@@ -1,4 +1,4 @@
-import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useModel } from 'umi';
 import { Button, Col, Form, Input, message, Row, Space, Spin } from 'antd';
 import { ProFormGroup, ProFormInstance, ProFormList, ProFormTreeSelect } from '@ant-design/pro-form';
@@ -20,6 +20,8 @@ import ProCard from '@ant-design/pro-card';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import Modal from 'antd/lib/modal/Modal';
 import ClassList from '@/pages/Business/ClassList';
+
+
 
 let content: any = null;
 let quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -109,6 +111,8 @@ export default (props: any, childRef: any) => {
     });
   }, [quantity, comNumber, discountOrder]);
   useEffect(() => {
+    console.log(renderData, 'renderData======renderData')
+
     if (renderData.type == 'order' && renderData.orderNumber === 0) {
       // renderData.provider = renderData.provider + ''
       ++renderData.orderNumber;
@@ -142,6 +146,9 @@ export default (props: any, childRef: any) => {
           discountRemark: item.discountRemark,
           provider: { "value": renderData.provider },
         });
+
+        console.log(list,'list==========>list')
+
       });
       setTimeout(async () => {
         formRef?.current?.setFieldsValue({
@@ -262,6 +269,8 @@ export default (props: any, childRef: any) => {
   const filter = (inputValue: string, path: any[]) => {
     return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   };
+
+  //通过value值获取班型方法
   function projectClassExamListFn(data: any) {
     let arr: { label: string; value: any }[] = [];
     data.forEach((item: any) => {
@@ -691,6 +700,7 @@ export default (props: any, childRef: any) => {
                               const a = JSON.parse(e);
                               const arr2 = JSON.parse(JSON.stringify(comNumber));
                               const b = formRef?.current?.getFieldValue('standards');
+                              //console.log(b,'b=====>b')
                               b[index].receivable = a.receivable;
                               // b[index].examAmount = a.examAmount;
                               arr2[index] = a.receivable;

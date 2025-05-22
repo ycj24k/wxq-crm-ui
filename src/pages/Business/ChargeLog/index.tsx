@@ -1,40 +1,55 @@
 import Tables from "@/components/Tables"
 import apiRequest from "@/services/ant-design-pro/apiRequest"
-import dictionaries from "@/services/util/dictionaries"
+import Dictionaries from "@/services/util/dictionaries"
 import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
-import Dictionaries from "@/services/util/dictionaries"
 import { ProColumns } from "@ant-design/pro-table"
-import { Button, Space, Tag, Modal } from "antd"
-import { useState } from "react"
+import { Button, Space, Tag, Modal, Row, Col } from "antd"
+import { useState, useRef, forwardRef } from "react"
+import { useModel } from 'umi';
 import DownHeader from "./DownHeader"
+import StudentMessage from "./studentMessage"
+import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import {
-    ProFormCheckbox,
-    ProFormDatePicker,
-    ProFormGroup,
-    ProFormInstance,
-    ProFormList,
+    ProFormCascader,
+    ProFormInstance
 } from '@ant-design/pro-form';
 import ProForm, {
     ProFormText,
-    ProFormTextArea,
-    ProFormDigit,
-    ProFormDateTimePicker,
     ProFormSelect,
 } from '@ant-design/pro-form';
+import ClassList from "./classList"
+import PayWay from "./payWay"
+import CompanyOrder from "@/pages/Admins/AdminOrder/companyOrder"
+const CompanyOrders = forwardRef(CompanyOrder);
+
+
 
 
 export default (props: any) => {
-    //type 0:原页面 1:缴费
+    const { initialState } = useModel('@@initialState');
     const { reBuild, select, getAll = false, type = 0 } = props
     const [exportLoading, setExportLoading] = useState<boolean>();
     const [selectData, setSelectData] = useState<Array<any>>();
-    //选择缴费弹窗
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const [selectStudentData, setSelectStudentData] = useState<any>();
+    //学生详情下单
+    const [studentModal, setStudentModal] = useState<boolean>(false)
     //下单弹窗
     const [isPayModalOpen, setIsPayModalOpen] = useState<boolean>(false)
-    //缴费关联人员表格信息
-    const [dataSourceAboutPeoplePay, setdataSourceAboutPeoplePay] = useState<Array<any>>();
+    //存储数据
+    const [renderData, setRenderData] = useState<Array<any>>()
+    //存储表单数据
+    const [tableData, setTableData] = useState<Array<any>>([])
+
+    const userRef: any = useRef(null);
+    const userRefs: any = useRef(null);
+    const userRef2: any = useRef(null);
+    const [userNameId, setUserNameId] = useState<any>();
+    const [userNameIds, setUserNameIds] = useState<any>();
+    const [userNameId2, setUserNameId2] = useState<any>();
+    const formRef = useRef<ProFormInstance>();
+    const childRef = useRef();
+
     const param = getAll ? {} : { isUseUp: false }
     const exportNotUseUp = () => {
         setExportLoading(true)
@@ -43,84 +58,64 @@ export default (props: any) => {
             setExportLoading(false)
         })
     }
-    //获取表格数据
-    const getTableStudentData = (data: string) => {
-        apiRequest.get('/sms/business/bizStudentUser', { mobile: data }).then(res => {
-            setdataSourceAboutPeoplePay(res.data.content)
-        })
+    const filter = (inputValue: string, path: any[]) => {
+        return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
+    };
+
+    //快捷下单弹窗
+    const QuickOrder = (record: any) => {
+        setStudentModal(true)
+        setTableData(record)
+        
     }
-    //快捷下单按钮事件
-    const quickOrder = (record: any) => {
-        setIsModalOpen(true)
-        getTableStudentData(record.phone)
-    }
-    //关闭弹窗
-    const handleClose = () => {
-        setIsModalOpen(false)
-    }
-    //关闭下单弹窗
-    const handleClosePay = () => {
-        setIsPayModalOpen(false)
-    }
-    //绑定到缴费
-    const bindPay = () => {
+    //下单确认
+    const handleSureOrder = () => {
+        console.log(selectStudentData,'tableData====>')
         setIsPayModalOpen(true)
+        setTimeout(() => {
+            formRef.current?.setFieldsValue({
+                name: selectStudentData.name,
+                mobile: selectStudentData.mobile,
+                idCard: selectStudentData.idCard,
+                source: selectStudentData.source.toString(),
+                project: Dictionaries.getCascaderValue('dict_reg_job', selectStudentData.project)
+            })
+            let data = {}
+            let datas = {
+                id: selectStudentData.userId,
+                name: selectStudentData.userName
+            }
+            let data2 = {}
+            if (selectStudentData.provider) {
+                data = {
+                    id: selectStudentData.provider,
+                    name: selectStudentData.providerName
+                }
+            } else {
+                data = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            if (selectStudentData.owner) {
+                data2 = {
+                    id: selectStudentData.owner,
+                    name: selectStudentData.ownerName ? selectStudentData.ownerName : '无'
+                }
+            } else {
+                data2 = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            userRef?.current?.setDepartment(datas);
+            userRefs?.current?.setDepartment(data);
+            userRef2?.current?.setDepartment(data2);
+            setUserNameId(datas)
+            setUserNameIds(data)
+            setUserNameId2(data2)
+        }, 100)
     }
-    //快捷下单columns
-    const quickColumns: ProColumns<any>[] = [
-        {
-            title: '学员姓名',
-            dataIndex: 'name'
-        },
-        {
-            title: '学员手机号',
-            dataIndex: 'mobile'
-        },
-        {
-            title: '项目总称',
-            dataIndex: 'parentProjects',
-            key: 'parentProjects',
-            sorter: true,
-            valueType: 'select',
-            fieldProps: {
-                options: Dictionaries.getList('dict_reg_job'),
-                mode: 'tags',
-            },
-            width: 180,
-            render: (text, record) => (
-                <span key="parentProjects">
-                    {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
-                </span>
-            ),
-        },
-        {
-            title: '咨询岗位',
-            dataIndex: 'project-in',
-            // search: false,
-            sorter: true,
-            key: 'project-in',
-            valueType: 'select',
-            fieldProps: {
-                options: Dictionaries.getCascader('dict_reg_job'),
-                mode: 'tags',
-            },
-            render: (text, record) => (
-                <span>{Dictionaries.getCascaderName('dict_reg_job', record.project)}</span>
-            ),
-        },
-        {
-            title: '所属老师',
-            dataIndex: 'userName'
-        },
-        {
-            title: '信息提供人',
-            dataIndex: 'providerName'
-        },
-        {
-            title: '信息所有人',
-            dataIndex: 'ownerName'
-        }
-    ]
     const columns: ProColumns<any>[] = [
         {
             title: '收款编号',
@@ -139,7 +134,7 @@ export default (props: any) => {
             dataIndex: 'method',
             valueType: 'select',
             sorter: true,
-            valueEnum: dictionaries.getSearch('dict_stu_refund_type')
+            valueEnum: Dictionaries.getSearch('dict_stu_refund_type')
         },
         {
             title: '收费人',
@@ -172,59 +167,45 @@ export default (props: any) => {
         {
             title: '操作',
             search: false,
-            hideInTable: !(type == 0),
-            render: (text, record) => <Button type='primary' onClick={() => { quickOrder(record) }}>快捷下单</Button>
+            hideInTable: type !== 0,
+            render: (text, record) => <Button type='primary' onClick={() => QuickOrder(record)}>快捷下单</Button>
         },
     ];
-    return <><Tables
-        columns={columns}
-        request={{ url: '/sms/business/bizChargeLog' }}
-        params={param}
-        rowSelection={type == 1 && {
-            onChange(id, e) {
-                setSelectData(e)
-            }
-        }}
-        tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => <Space>
-            <a onClick={onCleanSelected}>
-                取消选择
-            </a>
-            <a onClick={() => select(selectData)}>
-                绑定到缴费
-            </a>
-        </Space>}
-        toolBarRender={[
-            <Button icon={<ExportOutlined />} onClick={exportNotUseUp} loading={exportLoading} >导出未下单记录</Button>,
-            <Button hidden={!reBuild} icon={<RedoOutlined />} onClick={reBuild} >重新生成二维码</Button>,
-        ]}
-    />
-        {/* 选择缴费弹窗 */}
+    return <>
+        <Tables
+            columns={columns}
+            request={{ url: '/sms/business/bizChargeLog' }}
+            params={param}
+            rowSelection={type !== 0 && {
+                onChange(id, e) {
+                    setSelectData(e)
+                }
+            }}
+            tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => <Space>
+                <a onClick={onCleanSelected}>
+                    取消选择
+                </a>
+                <a onClick={() => select(selectData)}>
+                    绑定到缴费
+                </a>
+            </Space>}
+            toolBarRender={[
+                <Button icon={<ExportOutlined />} onClick={exportNotUseUp} loading={exportLoading} >导出未下单记录</Button>,
+                <Button hidden={!reBuild} icon={<RedoOutlined />} onClick={reBuild} >重新生成二维码</Button>,
+            ]}
+        />
+
+        {/* 查询学员信息弹窗 */}
         <Modal
-            title="选择缴费"
             width={1200}
-            open={isModalOpen}
-            onCancel={handleClose}
-            footer={null}
+            title="选择学员缴费"
+            open={studentModal}
+            onCancel={() => setStudentModal(false)}
+            onOk={handleSureOrder}
         >
-            <Tables
-                dataSource={dataSourceAboutPeoplePay} columns={quickColumns}
-                rowSelection={{
-                    onSelect: (record) => {
-                        console.log(record, 'e======>')
-                    }
-                }}
-                tableAlertOptionRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => <Space>
-                    <a onClick={onCleanSelected}>
-                        取消选择
-                    </a>
-                    <a onClick={() => { bindPay() }}>
-                        绑定到缴费
-                    </a>
-                </Space>}
-                toolBarRender={[
-                    <Button icon={<ExportOutlined />} onClick={exportNotUseUp} loading={exportLoading} >导出未下单记录</Button>,
-                    <Button hidden={!reBuild} icon={<RedoOutlined />} onClick={reBuild} >重新生成二维码</Button>,
-                ]}
+            <StudentMessage
+                select={setSelectStudentData}
+                tableData={tableData}
             />
         </Modal>
 
@@ -233,14 +214,17 @@ export default (props: any) => {
             title="下单"
             width={1200}
             open={isPayModalOpen}
-            onCancel={handleClosePay}
-            footer={null}
+            onCancel={() => setIsPayModalOpen(false)}
+            onOk={() => { }}
         >
-            <ProForm>
+            <ProForm
+                formRef={formRef}
+                submitter={false}
+            >
                 <ProForm.Group>
                     <ProFormText
-                        name="studentName"
-                        width="sm"
+                        name="name"
+                        width={300}
                         label="学员姓名"
                         placeholder="请输入姓名"
                         disabled
@@ -248,7 +232,7 @@ export default (props: any) => {
 
                     <ProFormText
                         name="className"
-                        width="sm"
+                        width={300}
                         label="班级"
                         placeholder="请选择班级"
                     // disabled
@@ -263,56 +247,102 @@ export default (props: any) => {
                         width="sm"
                     />
                     <ProFormText
-                        name="studentName"
+                        name="mobile"
                         width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
+                        label="手机号码"
+                        placeholder="请输入手机号码"
                         disabled
                     />
                     <ProFormText
-                        name="studentName"
+                        name="idCard"
                         width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
+                        label="身份证号"
+                        placeholder="请输入身份证号码"
                         disabled
                     />
-                    <ProFormText
-                        name="studentName"
+                    <ProFormSelect
+                        label="客户来源"
+                        name="source"
                         width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
-                        disabled
+                        rules={[{ required: true, message: '请选择客户来源' }]}
+                        request={async () => Dictionaries.getList('dict_source') as any}
                     />
-                    <ProFormText
-                        name="studentName"
+                    <ProFormCascader
                         width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
-                        disabled
+                        name="project"
+                        placeholder="咨询报考岗位"
+                        label="报考岗位"
+                        rules={[{ required: true, message: '请选择报考岗位' }]}
+                        fieldProps={{
+                            options: Dictionaries.getCascader('dict_reg_job'),
+                            showSearch: { filter },
+                            onSearch: (value) => console.log(value),
+                            // defaultValue: ['0', '00'],
+                        }}
                     />
-                    <ProFormText
-                        name="studentName"
-                        width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
-                        disabled
+                    <UserTreeSelect
+                        ref={userRef}
+                        width={300}
+                        userLabel={'招生老师'}
+                        userNames="userId"
+                        userPlaceholder="请输入招生老师"
+                        setUserNameId={(e: any) => setUserNameId(e)}
+                        // setDepartId={(e: any) => setDepartId(e)}
+                        flag={true}
+                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
-                    <ProFormText
-                        name="studentName"
-                        width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
-                        disabled
+                    <UserTreeSelect
+                        ref={userRefs}
+                        width={300}
+                        userLabel={'信息提供人'}
+                        userNames="provider"
+                        userPlaceholder="请输入信息提供人"
+                        setUserNameId={(e: any) => setUserNameIds(e)}
+                        // setDepartId={(e: any) => setDepartId(e)}
+                        flag={true}
+                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
-                    <ProFormText
-                        name="studentName"
-                        width="sm"
-                        label="学员姓名"
-                        placeholder="请输入姓名"
-                        disabled
+                    <UserTreeSelect
+                        ref={userRef2}
+                        width={300}
+                        userLabel={'信息所有人'}
+                        filter={(e: Array<any>) => {
+                            e.unshift({
+                                title: '无',
+                                userId: -1,
+                                value: '-1'
+                            })
+                            return e;
+                        }}
+                        userNames="owner"
+                        newMedia={false}
+                        userPlaceholder="请输入信息所有人"
+                        setUserNameId={(e: any) => setUserNameId2(e)}
+                        // setDepartId={(e: any) => setDepartId(e)}
+                        flag={true}
+                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                 </ProForm.Group>
             </ProForm>
+            <Row
+                style={{
+                    width: '1100px',
+                    backgroundColor: '#d9edf7',
+                    border: '1px solid #bce8f1',
+                    padding: '20px',
+                    marginBottom: '20px',
+                }}
+            >
+                <Col span={2} style={{ color: 'red' }}>
+                    注意：
+                </Col>
+                <Col span={22}>
+                    （1）如果你的收费金额大于了收费标准，请在订单优惠金额里填写多收金额的负数。
+                </Col>
+            </Row>
+            
+            <ClassList renderData={selectStudentData} />
+            <PayWay />
         </Modal>
     </>
 
