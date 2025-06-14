@@ -64,7 +64,7 @@ export function getSession() {
 }
 
 export async function getCompanyRequest() {
-  return (await apiRequest.get('/sms/contract/conCompany', { _isGetAll: true })).data.content?.map((e: any) => {
+  return (await apiRequest.get('/sms/share/getCompany')).data?.map((e: any) => {
     return {
       label: e.name,
       value: e.id + ''

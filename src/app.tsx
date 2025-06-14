@@ -98,7 +98,7 @@ export async function getInitialState(): Promise<{
 
 if (history.location.pathname !== loginPath && !history.location.pathname.startsWith('/public')) {
   Dictionaries.get();
-  Dictionaries.getDepartmentName(47);
+  // Dictionaries.getDepartmentName(47);
   getSession()
   //   if (!Socket.sockets) Socket.open();
 }

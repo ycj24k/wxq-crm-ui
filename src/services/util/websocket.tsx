@@ -67,7 +67,7 @@ class Socket {
             sessionStorage.setItem('bizNotice', JSON.stringify(bizNotice));
           }
           Dictionaries.get();
-          Dictionaries.getDepartmentName(47);
+          // Dictionaries.getDepartmentName(47);
           getSession()
         }
         this.falg = false;

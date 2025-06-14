@@ -7,13 +7,15 @@ class dictionaries {
   version: string | null;
   dictionariesList: never[];
   list: Array<any>;
-  departmeng: any;
+  department: any;
+  depart: any;
   contentNews: string | null;
   constructor() {
     this.dictionariesList = [];
     this.version = localStorage.getItem('version');
     this.list = JSON.parse(localStorage.getItem('dictionariesList') as any);
-    this.departmeng = '';
+    this.department = JSON.parse(localStorage.getItem('Department') as any);
+    this.depart = JSON.parse(localStorage.getItem('Depart') as any);
     this.contentNews = JSON.parse(localStorage.getItem('contentNews') as any);
   }
   //获取、储存字典
@@ -21,8 +23,17 @@ class dictionaries {
     request.get('/sms/share/getDict').then((res: any) => {
       localStorage.removeItem('dictionariesList');
       this.dictionariesList = res.data;
-
       localStorage.setItem('dictionariesList', JSON.stringify(res.data));
+    });
+    request.get('/sms/share/getDepartmentAndUser').then((res) => {
+      this.department = res.data;
+      localStorage.setItem('Department', JSON.stringify(res.data));
+      return;
+    });
+    request.get('/sms/share/getDepartment').then((res) => {
+      this.depart = res.data;
+      localStorage.setItem('Depart', JSON.stringify(res.data));
+      return;
     });
   }
   //获取通知
@@ -57,37 +68,47 @@ class dictionaries {
     if (value == -1) {
       return ['无']
     } else {
-      let list = JSON.parse(localStorage.getItem('Department') as string);
-      if (!list) {
-        request.get('/sms/share/getDepartmentAndUser').then((res) => {
-          localStorage.setItem('Department', JSON.stringify(res.data));
-          this.getDepartmentName(value);
-          return;
-        });
-      }
-      let departments: any = [];
+      let list = JSON.parse(localStorage.getItem('Depart') as string);
+      // if (!list) {
+      //   request.get('/sms/share/getDepartmentAndUser').then((res) => {
+      //     localStorage.setItem('Department', JSON.stringify(res.data));
+      //     this.getDepartmentName(value);
+      //     return;
+      //   });
+      // }
+      // let departments: any = [];
 
-      function getParentId(list: any, id: any) {
-        for (let i in list) {
-          if (list[i].id === id) {
-            return [list[i]];
-          }
-          if (list[i].children != null) {
-            let node: any = getParentId(list[i].children, id);
-            if (node !== undefined) {
-              return node.concat(list[i]);
-            }
-          }
+      return (function getParent(list: any[], id: number) {
+        const res: any[] = []
+        let e = list.find(x => x.id == id)
+        res.push(e)
+        if (e.parentId && e.parentId != -1) {
+          res.push(...getParent(list, e.parentId))
         }
-      }
-      const department = getParentId(list, value);
-      department?.forEach((item: any, index: number) => {
-        if (item.departmentName) {
-          departments.push(item.departmentName);
-        }
-      });
+        return res
+      })(list, value).map(x => x.name)
 
-      return departments;
+      // function getParentId(list: any, id: any) {
+      //   for (let i in list) {
+      //     if (list[i].id === id) {
+      //       return [list[i]];
+      //     }
+      //     if (list[i].children != null) {
+      //       let node: any = getParentId(list[i].children, id);
+      //       if (node !== undefined) {
+      //         return node.concat(list[i]);
+      //       }
+      //     }
+      //   }
+      // }
+      // const department = getParentId(list, value);
+      // department?.forEach((item: any, index: number) => {
+      //   if (item.departmentName) {
+      //     departments.push(item.departmentName);
+      //   }
+      // });
+
+      // return departments;
     }
 
   }

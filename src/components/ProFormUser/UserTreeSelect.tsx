@@ -16,7 +16,7 @@ export default forwardRef((props: any, ref) => {
     setDepartId = () => { },
     setFalgUser = () => { },
     flag = false,
-    enable = false,
+    enable = true,
     filter = (e: Array<any>) => e,
     userName,
     formRefs,

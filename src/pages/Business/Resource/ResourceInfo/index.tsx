@@ -44,7 +44,7 @@ export default (props: any) => {
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [TabListNuber, setTabListNuber] = useState<any>('1');
   const [StudentIds, setStudentIds] = useState<any>([]);
-  const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid).id
+  const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid as number)?.id
   const [params, setParams] = useState<any>({ departmentId: departmentId })
   //代码迁移
   const [isFormal, setIsFormal] = useState<boolean>(true);

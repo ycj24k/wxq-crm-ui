@@ -41,7 +41,7 @@ export default (props: any) => {
   const [ModbileListVisible, setModbileListVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
   let [department, setDepartment] = useState<any>({});
-  
+
   const userRef: any = useRef(null);
   const userRefs: any = useRef(null);
   const userRef2: any = useRef(null);
@@ -391,7 +391,7 @@ export default (props: any) => {
         }
         }
       >导入基础信息</Button>
-      
+
       <ProForm.Group>
         <ProFormSelect
           label="学员类型"
@@ -482,7 +482,7 @@ export default (props: any) => {
           />
         ) : null}
       </ProForm.Group>
-      
+
       <ProForm.Group>
         {company === '企业名称' || type === '个人代理' ? (
           ''
