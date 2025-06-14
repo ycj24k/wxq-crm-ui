@@ -154,6 +154,8 @@ export default (props: any) => {
         setUserNameId(data)
         userRef2?.current?.setDepartment(data);
         setUserNameId2(data)
+        userRefs?.current?.setDepartment(data)
+        setUserNameIds(data)
       }
       if (renderData?.newMedia) {
         userRefs?.current?.setDepartment(data);
@@ -328,15 +330,15 @@ export default (props: any) => {
         mobile: newjson.联系电话,
         weChat: newjson.微信,
         description: newjson.其他说明,
-        provider: newjson.信息提供人,
+        owner: newjson.信息所有人,
       })
-      const dataProvider = Dictionaries.getUserId(newjson.信息提供人)
+      const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
       const newProvider = {
         id: dataProvider?.[0],
-        name: newjson.信息提供人
+        name: newjson.信息所有人
       }
-      setUserNameIds(newProvider)
-      userRefs?.current?.setDepartment(newProvider);
+      setUserNameId2(newProvider)
+      userRef2?.current?.setDepartment(newProvider);
     }
   }
 
@@ -584,7 +586,11 @@ export default (props: any) => {
       ) : (
         ''
       )}
-      <UserTreeSelect
+
+
+
+{sourceType !== 1 ? (
+        <UserTreeSelect
         ref={userRef}
         userLabel={'招生老师'}
         userNames="userId"
@@ -595,11 +601,15 @@ export default (props: any) => {
         flag={true}
       // setFalgUser={(e: any) => setFalgUser(e)}
       />
+      ) : (
+        ''
+      )}
+      
       <UserTreeSelect
         ref={userRefs}
         userLabel={'信息提供人'}
         userNames="provider"
-        newMedia={sourceType == 1}
+        // newMedia={sourceType == 1}
         userPlaceholder="请输入信息提供人"
         setUserNameId={(e: any) => setUserNameIds(e)}
         // setDepartId={(e: any) => setDepartId(e)}
