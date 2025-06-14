@@ -7,6 +7,7 @@ declare namespace API {
     avatar?: string;
     userid?: number;
     departmentId?: number;
+    companyId?: number;
     sex?: any;
     userid?: string;
     email?: string;

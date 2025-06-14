@@ -102,18 +102,28 @@ export default (props: any, orderRef: any) => {
       agent: department.name,
     });
   };
-  useEffect(() => {
-    genOrder()
-    setThisChargeType(chargeType)
-    // console.log('123', getOrderCharge(idlist));
+  // useEffect(() => {
+  //   genOrder()
+  //   setThisChargeType(chargeType)
+  //   const companyId = initialState?.currentUser?.companyId
+  //   // console.log(111, companyId)
+  //   request.get('/sms/share/getBank').then(banks => {
+  //     // console.log(222, banks)
+  //     const bank = banks.data.find((x: any) => x.companyId == companyId)
+  //     // setTimeout(() => {
+  //       formRef.current?.setFieldValue('method', bank.method?.toString())
+  //     // }, 500)
+  //     // console.log(333, bank.method)
+  //   })
+  //   // console.log('123', getOrderCharge(idlist));
 
-    // setTimeout(() => {
-    //   setchargeNewList(chargeList);
-    //   formRef?.current?.setFieldsValue({
-    //     chargeLists: chargeList,
-    //   });
-    // }, 500);
-  }, []);
+  //   // setTimeout(() => {
+  //   //   setchargeNewList(chargeList);
+  //   //   formRef?.current?.setFieldsValue({
+  //   //     chargeLists: chargeList,
+  //   //   });
+  //   // }, 500);
+  // }, []);
   useEffect(() => {
     if (chargeLog) {
       setChargeLogVisible(false)
@@ -242,7 +252,8 @@ export default (props: any, orderRef: any) => {
       });
     };
     asyncList(list).then((res) => {
-      setTimeout(() => {
+      // setTimeout(() => {
+      (async function a() {
         setspinning(false);
         setchargeNewList(res);
         const fiedsValue = renderData.list[0];
@@ -264,6 +275,19 @@ export default (props: any, orderRef: any) => {
         // });
         fiedsValue.type = fiedsValue.type != null ? fiedsValue.type + '' : fiedsValue.type;
         fiedsValue.method = fiedsValue.method != null ? fiedsValue.method + '' : fiedsValue.method;
+        if (fiedsValue.method == undefined) {
+          const companyId = initialState?.currentUser?.companyId
+          // console.log(111, companyId)
+          const banks = (await request.get('/sms/share/getBank')).data
+          // .then(banks => {
+          // console.log(222, banks)
+          const bank = banks.find((x: any) => x.companyId == companyId)
+          // setTimeout(() => {
+          fiedsValue.method = bank.method?.toString()
+          // }, 500)
+          // console.log(333, bank.method)
+          // })
+        }
         console.log('renderData.list[0]', renderData.list[0]);
         console.log('res', res);
         console.log('fiedsValue', fiedsValue);
@@ -291,7 +315,8 @@ export default (props: any, orderRef: any) => {
           userRef?.current?.setDepartment(department);
           setUserNameId(department)
         }
-      }, 500);
+        // }, 500);
+      })()
     });
   }
   useEffect(() => {
@@ -412,6 +437,8 @@ export default (props: any, orderRef: any) => {
     formRef?.current?.setFieldsValue({
       chargeTime: moment().format('YYYY-MM-DD HH:mm:ss'),
     });
+    genOrder()
+    setThisChargeType(chargeType)
   }, []);
 
   const filter = (inputValue: string, path: any[]) => {
@@ -810,8 +837,8 @@ export default (props: any, orderRef: any) => {
               width="md"
               hidden={renderData.type == 'orders'}
               label={`${orderTitle == '收费' ? '实际到账' : orderTitle}日期`}
-              disabled={['4', '5', '6'].indexOf(thisChargeType) != -1}
-              rules={[{ required: renderData.type != 'orders' && ['4', '5', '6'].indexOf(thisChargeType) == -1, message: '请填写缴费日期' }]}
+              disabled={['4', '6'].indexOf(thisChargeType) != -1}
+              rules={[{ required: renderData.type != 'orders' && ['4', '6'].indexOf(thisChargeType) == -1, message: '请填写缴费日期' }]}
             />
             <ProFormDateTimePicker
               name="nextPaymentTime"

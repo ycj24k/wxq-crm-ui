@@ -1,5 +1,5 @@
 import { Button, message, Modal, Radio, Spin, Steps } from 'antd';
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useRef, useEffect } from 'react';
 import { useState } from 'react';
 import CompanyOrder from './companyOrder';
 import ChargeOrder from '../AdminCharge/ChargeOrder';
@@ -15,6 +15,7 @@ import { history, useModel } from 'umi';
 import { ProFormRadio } from '@ant-design/pro-form';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import QrcodeInfo from '../AdminCharge/QrcodeInfo';
+import dictionaries from '@/services/util/dictionaries';
 const { Step } = Steps;
 const { confirm } = Modal;
 export default (props: any) => {
@@ -29,126 +30,120 @@ export default (props: any) => {
   const [chargeType, setChargeType] = useState<number>();
   const [chargeId, setChargeId] = useState<number>();
   const [order, setOrder] = useState<any>();
+  // const [steps, setSteps] = useState<any[]>([]);
   const CompanyOrders = forwardRef(CompanyOrder);
   const ChargeOrders = forwardRef(ChargeOrder);
   const ChargeNews = forwardRef(ChargeNew);
   const childRef = useRef() as any;
   const orderRef = useRef() as any;
-  const steps =
-    renderData.type === 1
-      ? [
-        {
-          title: '下单',
-          content: (
-            <CompanyOrders
-              ref={childRef}
-              renderData={renderData}
-              // callbackRef={() => callbackRef()}
-              admin="step"
-            />
-          ),
-        },
-        {
-          title: '选择缴费方式',
-          content: <Radio.Group
-            onChange={(e) => { setChargeType(e.target.value) }}
-            name="chargeType"
-            options={[
-              {
-                label: <><b>专属收款码支付</b>：学员已通过专属收款码支付，关联收款记录后需要补充部分信息</>,
-                value: 6,
-                style: { margin: '50px 150px 0px' }
-              },
-              {
-                label: <><b>扫码支付</b>：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</>,
-                value: 4,
-                style: { margin: '20px 150px 0px' }
-              },
-              {
-                label: <><b>对公打款</b>：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</>,
-                value: 5,
-                style: { margin: '20px 150px 0px' }
-              },
-              {
-                label: <><b>手动缴费</b>：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</>,
-                value: 0,
-                style: { margin: '20px 150px 0px' }
-              },
-            ]}
-          >
-            {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
+  // const chargeTypeOptions = [
+  //   {
+  //     label: <><b>专属收款码支付</b>：学员已通过专属收款码支付，关联收款记录后需要补充部分信息</>,
+  //     value: 6,
+  //     style: { margin: '50px 150px 0px' }
+  //   },
+  //   {
+  //     label: <><b>对公打款</b>：直接转账到公司公账银行卡账户</>,
+  //     value: 5,
+  //     style: { margin: '20px 150px 0px' }
+  //   },
+  //   {
+  //     label: <><b>其他缴费</b>：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</>,
+  //     value: 0,
+  //     style: { margin: '20px 150px 0px' }
+  //   },
+  //   {
+  //     label: <><b>订单支付</b>：先生成订单再给学员扫码支出</>,
+  //     value: 4,
+  //     style: { margin: '20px 150px 0px' }
+  //   },
+  // ]
+  // useEffect(() => {
+  let chargeTypeOptions = dictionaries.list.find(x => x.code == "chargeType").children.filter((x: any) => ['0', '4', '5', '6'].includes(x.value)).map((x: any) =>
+  ({
+    style: { margin: '20px 150px 0px', display: 'block' },
+    label: <><b>{x.name}</b>{x.description && '：' + x.description}</>,
+    value: x.value,
+    sort: x.sort,
+  })
+  ).sort((x: any, y: any) => x.sort - y.sort) || [{}]
+  // chargeTypeOptions[0].style = { margin: '50px 150px 0px' }
+  console.log("chargeTypeOptions", dictionaries.list)
+  console.log("chargeTypeOptions", chargeTypeOptions)
+  let steps = (renderData.type === 1
+    ? [
+      {
+        title: '下单',
+        content: (
+          <CompanyOrders
+            ref={childRef}
+            renderData={renderData}
+            // callbackRef={() => callbackRef()}
+            admin="step"
+          />
+        ),
+      },
+      {
+        title: '选择缴费方式',
+        content: <Radio.Group
+          onChange={(e) => { setChargeType(e.target.value) }}
+          name="chargeType"
+          options={chargeTypeOptions}
+        >
+          {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
             <Radio value={1}>对公打款：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</Radio>
             <Radio value={2}>手动缴费：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</Radio> */}
-          </Radio.Group>,
-          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
-        },
-        {
-          title: '缴费',
-          content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
-          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
-        },
-        {
-          title: '添加学员',
-          content: <Order orderId={orderId} type="1" orderIds={[orderId]} />,
-        },
-      ]
-      : [
-        {
-          title: '下单',
-          content: (
-            <CompanyOrders
-              ref={childRef}
-              renderData={renderData}
-              // callbackRef={() => callbackRef()}
-              admin="step"
-            />
-          ),
-        },
-        {
-          title: '选择缴费方式',
-          content: <Radio.Group
-            onChange={(e) => { setChargeType(e.target.value) }}
-            name="chargeType"
-            options={[
-              {
-                label: <><b>专属收款码支付</b>：学员已通过专属收款码支付，关联收款记录后需要补充部分信息</>,
-                value: 6,
-                style: { margin: '50px 150px 0px' }
-              },
-              {
-                label: <><b>扫码支付</b>：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</>,
-                value: 4,
-                style: { margin: '20px 150px 0px' }
-              },
-              {
-                label: <><b>对公打款</b>：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</>,
-                value: 5,
-                style: { margin: '20px 150px 0px' }
-              },
-              {
-                label: <><b>手动缴费</b>：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</>,
-                value: 0,
-                style: { margin: '20px 150px 0px' }
-              },
-            ]}
-          >
-            {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
+        </Radio.Group>,
+        // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+      },
+      {
+        title: '缴费',
+        content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
+        // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+      },
+      {
+        title: '添加学员',
+        content: <Order orderId={orderId} type="1" orderIds={[orderId]} />,
+      },
+    ]
+    : [
+      {
+        title: '下单',
+        content: (
+          <CompanyOrders
+            ref={childRef}
+            renderData={renderData}
+            // callbackRef={() => callbackRef()}
+            admin="step"
+          />
+        ),
+      },
+      {
+        title: '选择缴费方式',
+        content: <Radio.Group
+          onChange={(e) => { setChargeType(e.target.value) }}
+          name="chargeType"
+          options={chargeTypeOptions}
+        >
+          {/* <Radio value={0}>扫码支付：填写缴费信息后生成二维码，把二维码发送给学员，学员扫码支付</Radio>
             <Radio value={1}>对公打款：填写缴费信息后生成备注码，把备注码发送给学员，学员对公打款时将备注码填写入备注中，需等待财务关联打款</Radio>
             <Radio value={2}>手动缴费：填写缴费信息事需要上传学员支付截图，需等待财务审核确认</Radio> */}
-          </Radio.Group>,
-          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
-        },
-        {
-          title: '缴费',
-          content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
-          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
-        },
-        {
-          title: '获取缴费信息',
-          content: <>{chargeInfo}</>,
-          // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
-        },
-      ];
+        </Radio.Group>,
+        // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+      },
+      {
+        title: '缴费',
+        content: <ChargeNews ref={orderRef} renderData={orderContent} chargeType={chargeType?.toString()} admin="step" />,
+        // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+      },
+      {
+        title: '获取缴费信息',
+        content: <>{chargeInfo}</>,
+        // content: <ChargeOrders ref={orderRef} renderData={orderContent} admin="step" />,
+      },
+    ])
+  // }, [])
+
   const callbackRefs = () => {
     setModalVisible(false);
     callbackRef();
@@ -450,7 +445,7 @@ export default (props: any) => {
             <Step key={item.title} title={item.title} />
           ))}
         </Steps>
-        <div className="steps-content">{steps[current].content}</div>
+        <div className="steps-content">{steps[current]?.content}</div>
         <div className="steps-action" style={{ textAlign: 'right' }}>
           {current > 0 && (
             <Button style={{ margin: '0 8px' }} onClick={() => prev()}>

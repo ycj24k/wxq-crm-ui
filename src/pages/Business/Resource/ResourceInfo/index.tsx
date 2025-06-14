@@ -43,7 +43,7 @@ export default (props: any) => {
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [TabListNuber, setTabListNuber] = useState<any>('1');
   const [StudentIds, setStudentIds] = useState<any>([]);
-  const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid).id
+  const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid as number)?.id
   const [params, setParams] = useState<any>({ departmentId: departmentId })
   //代码迁移
   const [isFormal, setIsFormal] = useState<boolean>(true);
@@ -347,24 +347,24 @@ export default (props: any) => {
             >
               下载导入模板
             </a>,
-          // 新增学员
-          <Button
-          key="buttonq"
-          icon={<PlusOutlined />}
-          type="primary"
-          // hidden={order == 'order' || isFormal || recommend}
-          onClick={() => {
-            if (parentId) {
-              setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
-            } else {
-              setRenderData({ typee: 'add', newMedia: false, teacher: true });
-            }
+            // 新增学员
+            <Button
+              key="buttonq"
+              icon={<PlusOutlined />}
+              type="primary"
+              // hidden={order == 'order' || isFormal || recommend}
+              onClick={() => {
+                if (parentId) {
+                  setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
+                } else {
+                  setRenderData({ typee: 'add', newMedia: false, teacher: true });
+                }
 
-            setModalVisible(true);
-          }}
-          >
-          新建
-          </Button>,
+                setModalVisible(true);
+              }}
+            >
+              新建
+            </Button>,
 
             <Button
               key="button"
