@@ -32,6 +32,7 @@ type GithubIssueItem = {
   project: string;
   code: any;
   receiveDate: any;
+  studentStatus: string
 };
 
 export default (props: any) => {
@@ -232,6 +233,14 @@ export default (props: any) => {
       hideInTable: true,
     },
     {
+      title: '当前学员状态',
+      dataIndex: 'studentStatus',
+      valueType: 'select',
+      filters: true,
+      valueEnum: Dictionaries.getSearch('visitStatus'),
+      render: (text, record) => <span>{Dictionaries.getName('visitStatus', record.studentStatus)}</span>
+    },
+    {
       title: '操作',
       valueType: 'option',
       width: 260,
@@ -326,7 +335,7 @@ export default (props: any) => {
           actionRef={actionRef}
           toolbar={TabListNuber != '7' ? toolbar : undefined}
           request={{
-            url: '/sms/business/bizStudentUser',
+            url: '/sms/business/bizStudentUser/circulationStudent',
             params: { source: TabListNuber, 'userId-isNull': true, ...params },
             sortList: sortList,
           }}
@@ -347,24 +356,24 @@ export default (props: any) => {
             >
               下载导入模板
             </a>,
-          // 新增学员
-          <Button
-          key="buttonq"
-          icon={<PlusOutlined />}
-          type="primary"
-          // hidden={order == 'order' || isFormal || recommend}
-          onClick={() => {
-            if (parentId) {
-              setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
-            } else {
-              setRenderData({ typee: 'add', newMedia: false, teacher: true });
-            }
+            // 新增学员
+            <Button
+              key="buttonq"
+              icon={<PlusOutlined />}
+              type="primary"
+              // hidden={order == 'order' || isFormal || recommend}
+              onClick={() => {
+                if (parentId) {
+                  setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
+                } else {
+                  setRenderData({ typee: 'add', newMedia: false, teacher: true });
+                }
 
-            setModalVisible(true);
-          }}
-          >
-          新建
-          </Button>,
+                setModalVisible(true);
+              }}
+            >
+              新建
+            </Button>,
 
             <Button
               key="button"

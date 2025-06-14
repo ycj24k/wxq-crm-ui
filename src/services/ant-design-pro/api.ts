@@ -306,6 +306,12 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/Resource/ResourceInfo',
               },
               {
+                name: '资源转化看板',
+                icon: 'table',
+                path: '/business/resource/transformation',
+                component: './Business/Resource/transformation',
+              },
+              {
                 name: '流转资源看板',
                 icon: 'table',
                 path: '/business/resource/statistics',

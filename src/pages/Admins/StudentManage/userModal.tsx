@@ -41,6 +41,7 @@ export default (props: any) => {
   const [ModbileListVisible, setModbileListVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
   let [department, setDepartment] = useState<any>({});
+  
   const userRef: any = useRef(null);
   const userRefs: any = useRef(null);
   const userRef2: any = useRef(null);
@@ -326,19 +327,16 @@ export default (props: any) => {
         source: Dictionaries.getValue('dict_source', newjson.客户来源),
         mobile: newjson.联系电话,
         weChat: newjson.微信,
-        description: newjson.备注,
-        provider: newjson.信息所有人,
+        description: newjson.其他说明,
+        provider: newjson.信息提供人,
       })
-      console.log(newjson.信息所有人)
-      const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
+      const dataProvider = Dictionaries.getUserId(newjson.信息提供人)
       const newProvider = {
         id: dataProvider?.[0],
-        name: newjson.信息所有人
+        name: newjson.信息提供人
       }
       setUserNameIds(newProvider)
       userRefs?.current?.setDepartment(newProvider);
-
-
     }
   }
 
@@ -474,7 +472,12 @@ export default (props: any) => {
                 return value
               },
             }}
-
+            rules={[
+              {
+                required: true,
+                message: '部门必须选择',
+              },
+            ]}
           // request={async () => Dictionaries.getList('dict_source') as any}
           />
         ) : null}
@@ -585,7 +588,7 @@ export default (props: any) => {
         ref={userRef}
         userLabel={'招生老师'}
         userNames="userId"
-        newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+        //newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
         userPlaceholder="请输入招生老师"
         setUserNameId={(e: any) => setUserNameId(e)}
         // setDepartId={(e: any) => setDepartId(e)}
@@ -596,7 +599,7 @@ export default (props: any) => {
         ref={userRefs}
         userLabel={'信息提供人'}
         userNames="provider"
-        newMedia={renderData?.newMedia && !(renderData.typee == 'eidt')}
+        newMedia={sourceType == 1}
         userPlaceholder="请输入信息提供人"
         setUserNameId={(e: any) => setUserNameIds(e)}
         // setDepartId={(e: any) => setDepartId(e)}

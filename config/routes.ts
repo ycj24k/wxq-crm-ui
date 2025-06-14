@@ -84,6 +84,12 @@
     component: './Business/Resource/Statistics',
   },
   {
+    name: '流转资源看板',
+    icon: 'table',
+    path: '/business/resource/transformation',
+    component: './Business/Resource/transformation',
+  },
+  {
     name: '领取记录',
     path: '/business/receive',
     component: './Business/Receive',

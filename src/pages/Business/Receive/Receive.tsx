@@ -1,8 +1,6 @@
 import Tables from '@/components/Tables';
-import { PageContainer } from '@ant-design/pro-layout';
 import { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
-import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
 import { useRef, useState } from 'react';
 import StudentInfo from '@/pages/Admins/StudentManage/studentInfo';
@@ -16,6 +14,7 @@ type GithubIssueItem = {
   creatorName: string;
   studentId: number;
   studentUserId: number;
+  studentStatus: string;
 };
 export default (props: any) => {
   const { studentUserId = null } = props;
@@ -93,6 +92,15 @@ export default (props: any) => {
     {
       title: '创建人',
       dataIndex: 'creatorName',
+    },
+    //0,1,2
+    {
+      title: '当前学员状态',
+      dataIndex: 'studentStatus',
+      valueType: 'select',
+      filters: true,
+      valueEnum: Dictionaries.getSearch('visitStatus'),
+      render: (text, record) => <span>{Dictionaries.getName('visitStatus', record.studentStatus)}</span>
     },
   ];
   let params: any = {};

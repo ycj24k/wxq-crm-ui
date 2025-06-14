@@ -4,12 +4,14 @@ import Dictionaries from "@/services/util/dictionaries"
 import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
 import { ProColumns } from "@ant-design/pro-table"
-import { Button, Space, Tag, Modal, Row, Col } from "antd"
-import { useState, useRef } from "react"
+import { Button, Space, Tag, Modal, Row, Col, message } from "antd"
+import { useState, useRef, useEffect } from "react"
 import { useModel } from 'umi';
 import DownHeader from "./DownHeader"
 import StudentMessage from "./studentMessage"
+import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+import SchoolList from '@/pages/Business/ClassList'
 import {
     ProFormCascader,
     ProFormInstance
@@ -31,8 +33,13 @@ export default (props: any) => {
     const [studentModal, setStudentModal] = useState<boolean>(false)
     //下单弹窗
     const [isPayModalOpen, setIsPayModalOpen] = useState<boolean>(false)
-    //存储表单数据
-    const [tableData, setTableData] = useState<Array<any>>([])
+    //存储根据电话号码查询的数据
+    const [phoneTableData, setPhoneTableData] = useState<Array<any>>([])
+    //存储支付信息
+    const [payMessage, setPayMessage] = useState<any>({})
+    //选择班级
+    const [ClassFalg, setClassFalg] = useState<boolean>(false);
+    const [classRef, setClassRef] = useState<any>({});
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -41,10 +48,25 @@ export default (props: any) => {
     const [userNameIds, setUserNameIds] = useState<any>();
     const [userNameId2, setUserNameId2] = useState<any>();
     const [totalReceivable, setTotalReceivable] = useState<number>(0);
-    const formRef = useRef<ProFormInstance>();
-    const classListRef = useRef<{ getFormValues: () => Promise<any> }>(null);
 
+
+
+    const formRef = useRef<ProFormInstance>();
+    const classListRef = useRef<{ handleChangeData: (data: any) => any[] }>(null);
+    const payWayRef = useRef<{
+        getFormValues: () => Promise<any>;
+        addPayWayItem?: () => void;
+        removePayWayItem?: (index: number) => void;
+        resetPayWay: () => void;
+    }>(null);
+    useEffect(() => {
+        formRef?.current?.setFieldsValue({
+            classId: classRef.id,
+            className: classRef.name,
+        });
+    }, [classRef])
     const param = getAll ? {} : { isUseUp: false }
+
     const exportNotUseUp = () => {
         setExportLoading(true)
         apiRequest.get('/sms/business/bizChargeLog', { isUseUp: false, _isGetAll: true }).then(res => {
@@ -58,27 +80,52 @@ export default (props: any) => {
 
     //快捷下单弹窗
     const QuickOrder = (record: any) => {
-        setStudentModal(true)
-        setTableData(record)
-        
+        setPayMessage(record)
+        apiRequest.get('/sms/business/bizStudentUser', { mobile: record.phone }).then(res => {
+            if (res.data.content.length === 0) {
+                setTimeout(() => {
+                    formRef.current?.setFieldsValue({
+                        name: record.name,
+                        mobile: record.phone,
+                        idCard: record.idCard
+                    })
+                }, 500)
+                setIsPayModalOpen(true)
+            } else {
+                setStudentModal(true)
+                setPhoneTableData(res.data.content)
+            }
+        })
+    }
+    //下单取消
+    const handleCancelIsPay = () => {
+        // 重置支付方式组件
+        if (payWayRef.current) {
+            payWayRef.current.resetPayWay();
+        }
+        setIsPayModalOpen(false)
     }
     //下单确认
     const handleSureOrder = () => {
-        console.log(selectStudentData,'tableData====>')
         setIsPayModalOpen(true)
         setTimeout(() => {
             formRef.current?.setFieldsValue({
                 name: selectStudentData.name,
                 mobile: selectStudentData.mobile,
                 idCard: selectStudentData.idCard,
+                owner: selectStudentData.owner,
+                provider: selectStudentData.provider,
+                userId: selectStudentData.userId,
                 source: selectStudentData.source.toString(),
                 project: Dictionaries.getCascaderValue('dict_reg_job', selectStudentData.project)
             })
+
             let data = {}
             let datas = {
                 id: selectStudentData.userId,
                 name: selectStudentData.userName
             }
+
             let data2 = {}
             if (selectStudentData.provider) {
                 data = {
@@ -91,6 +138,7 @@ export default (props: any) => {
                     id: initialState?.currentUser?.userid,
                 }
             }
+
             if (selectStudentData.owner) {
                 data2 = {
                     id: selectStudentData.owner,
@@ -102,6 +150,7 @@ export default (props: any) => {
                     id: initialState?.currentUser?.userid,
                 }
             }
+
             userRef?.current?.setDepartment(datas);
             userRefs?.current?.setDepartment(data);
             userRef2?.current?.setDepartment(data2);
@@ -109,6 +158,7 @@ export default (props: any) => {
             setUserNameIds(data)
             setUserNameId2(data2)
         }, 100)
+        setStudentModal(false)
     }
     const columns: ProColumns<any>[] = [
         {
@@ -162,25 +212,69 @@ export default (props: any) => {
             title: '操作',
             search: false,
             hideInTable: type !== 0,
-            render: (text, record) => <Button type='primary' onClick={() => QuickOrder(record)}>快捷下单</Button>
+            render: (text, record) => <Button type='primary' disabled={record.isUseUp == true} onClick={() => QuickOrder(record)}>快捷下单</Button>
         },
     ];
-
+    //确认下单
     const handlePayOrder = async () => {
-        try {
-            // 获取 classList 组件的表单值
-            const classListValues = await classListRef.current?.getFormValues();
-            console.log('ClassList form values:', classListValues);
-            
-            // 获取主表单的值
-            const formValues = formRef.current?.getFieldsValue();
-            console.log('Main form values:', formValues);
-            
-            // 这里可以添加提交逻辑
-            // 例如调用API提交数据
-        } catch (error) {
-            console.error('Error in handlePayOrder:', error);
+        const studentValues = await formRef.current?.validateFields();
+        const updateFieldWithUserId = (fieldValue: any, fieldName: keyof typeof studentValues) => {
+            if (fieldValue) {
+                const ids = Dictionaries.getUserId(fieldValue.label);
+                studentValues[fieldName] = ids[0];
+            }
+        };
+        let studentMsg = {}
+        if (phoneTableData.length === 0) {
+            // 修改 project 数组，只保留第一项并转换为字符串
+            if (Array.isArray(studentValues.project)) {
+                studentValues.project = String(studentValues.project[0]);
+            }
+            // 将 selectStudentData.type 添加到 studentValues 中
+            if (selectStudentData && selectStudentData.type !== undefined) {
+                studentValues.type = selectStudentData.type;
+            }
+            studentValues.type = 0
+            updateFieldWithUserId(studentValues.userId, 'userId');
+            updateFieldWithUserId(studentValues.owner, 'owner');
+            updateFieldWithUserId(studentValues.provider, 'provider');
+            studentMsg = studentValues
+        } else {
+            const studentValues = await formRef.current?.validateFields();
+            // 修改 project 数组，只保留第一项并转换为字符串
+            if (Array.isArray(studentValues.project)) {
+                studentValues.project = String(studentValues.project[0]);
+            }
+            // 将 selectStudentData.type 添加到 studentValues 中
+            if (selectStudentData && selectStudentData.type !== undefined) {
+                studentValues.type = selectStudentData.type;
+            }
+            studentMsg = studentValues
         }
+        const classListValues = await classListRef.current?.getFormValues();
+        const processedUsers = Dictionaries.filterByValue(classListValues)
+        const payWayValues = await payWayRef.current?.getFormValues();
+        //根据processedUsers数组长度创建auditsParam数组
+        let auditsParam: any = processedUsers.map((order: any, index: number) => ({
+            "student": studentMsg,
+            "order": order,
+            "charge": payWayValues[index]
+        }));
+        request
+            .postAll('/sms/business/bizOrder/intelligence', auditsParam)
+            .then((res: any) => {
+                if (res.status == 'success') {
+                    message.success('操作成功');
+                    // 重置支付方式组件
+                    if (payWayRef.current) {
+                        payWayRef.current.resetPayWay();
+                    }
+                    setIsPayModalOpen(false);
+                    setStudentModal(false);
+                } else {
+                    message.error(res.msg)
+                }
+            })
     }
     return <>
         <Tables
@@ -216,7 +310,7 @@ export default (props: any) => {
         >
             <StudentMessage
                 select={setSelectStudentData}
-                tableData={tableData}
+                phoneTableData={phoneTableData}
             />
         </Modal>
 
@@ -225,7 +319,7 @@ export default (props: any) => {
             title="下单"
             width={1200}
             open={isPayModalOpen}
-            onCancel={() => setIsPayModalOpen(false)}
+            onCancel={() => handleCancelIsPay()}
             onOk={() => { handlePayOrder() }}
         >
             <ProForm
@@ -238,7 +332,7 @@ export default (props: any) => {
                         width={300}
                         label="学员姓名"
                         placeholder="请输入姓名"
-                        disabled
+                        disabled={selectStudentData}
                     />
 
                     <ProFormText
@@ -246,6 +340,9 @@ export default (props: any) => {
                         width={300}
                         label="班级"
                         placeholder="请选择班级"
+                        fieldProps={{
+                            onClick: () => { setClassFalg(true) }
+                        }}
                     // disabled
                     />
                     <ProFormText hidden={true} name="classId" />
@@ -262,19 +359,21 @@ export default (props: any) => {
                         width="sm"
                         label="手机号码"
                         placeholder="请输入手机号码"
-                        disabled
+                        disabled={selectStudentData}
                     />
                     <ProFormText
                         name="idCard"
                         width="sm"
                         label="身份证号"
                         placeholder="请输入身份证号码"
-                        disabled
+                        rules={[{ required: true, message: '请填写身份证号' }]}
+                        disabled={selectStudentData}
                     />
                     <ProFormSelect
                         label="客户来源"
                         name="source"
                         width="sm"
+                        disabled={selectStudentData}
                         rules={[{ required: true, message: '请选择客户来源' }]}
                         request={async () => Dictionaries.getList('dict_source') as any}
                     />
@@ -283,6 +382,7 @@ export default (props: any) => {
                         name="project"
                         placeholder="咨询报考岗位"
                         label="报考岗位"
+                        disabled={selectStudentData}
                         rules={[{ required: true, message: '请选择报考岗位' }]}
                         fieldProps={{
                             options: Dictionaries.getCascader('dict_reg_job'),
@@ -296,7 +396,9 @@ export default (props: any) => {
                         userLabel={'招生老师'}
                         userNames="userId"
                         userPlaceholder="请输入招生老师"
-                        setUserNameId={(e: any) => setUserNameId(e)}
+                        disabled={selectStudentData}
+                        setUserNameId={(e: any) => setUserNameId(e.value)}
+                        //setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
                     />
                     <UserTreeSelect
@@ -305,13 +407,15 @@ export default (props: any) => {
                         userLabel={'信息提供人'}
                         userNames="provider"
                         userPlaceholder="请输入信息提供人"
-                        setUserNameId={(e: any) => setUserNameIds(e)}
+                        disabled={selectStudentData}
+                        setUserNameId={(e: any) => setUserNameIds(e.value)}
                         flag={true}
                     />
                     <UserTreeSelect
                         ref={userRef2}
                         width={300}
                         userLabel={'信息所有人'}
+                        disabled={selectStudentData}
                         filter={(e: Array<any>) => {
                             e.unshift({
                                 title: '无',
@@ -323,7 +427,7 @@ export default (props: any) => {
                         userNames="owner"
                         newMedia={false}
                         userPlaceholder="请输入信息所有人"
-                        setUserNameId={(e: any) => setUserNameId2(e)}
+                        setUserNameId={(e: any) => setUserNameId2(e.value)}
                         flag={true}
                     />
                 </ProForm.Group>
@@ -344,7 +448,7 @@ export default (props: any) => {
                     （1）如果你的收费金额大于了收费标准，请在订单优惠金额里填写多收金额的负数。
                 </Col>
             </Row>
-            <ClassList 
+            <ClassList
                 ref={classListRef}
                 renderData={selectStudentData}
                 onTotalPriceChange={(price: number) => {
@@ -358,9 +462,33 @@ export default (props: any) => {
                         quantity: quantity
                     });
                 }}
+                onAddClassType={() => {
+                    // 调用 payWay 组件的添加方法
+                    payWayRef.current?.addPayWayItem?.();
+                }}
+                onRemoveClassType={(index: number) => {
+                    // 调用 payWay 组件的删除方法
+                    if (payWayRef.current) {
+                        const payWayComponent = payWayRef.current as any;
+                        if (payWayComponent.removePayWayItem) {
+                            payWayComponent.removePayWayItem(index);
+                        }
+                    }
+                }}
             />
-            <PayWay />
+
+            <PayWay renderData={selectStudentData} payMessage={payMessage} ref={payWayRef} />
+        </Modal>
+        {/* 班级选择 */}
+        <Modal
+            open={ClassFalg}
+            width={1200}
+            onOk={() => setClassFalg(false)}
+            onCancel={() => setClassFalg(false)}
+            footer={null}
+        >
+            <SchoolList setClassRef={setClassRef}
+                setClassFalg={() => setClassFalg(false)} />
         </Modal>
     </>
-
 }

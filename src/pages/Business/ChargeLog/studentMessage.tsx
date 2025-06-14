@@ -1,29 +1,10 @@
 import Tables from "@/components/Tables"
-import apiRequest from "@/services/ant-design-pro/apiRequest"
 import Dictionaries from "@/services/util/dictionaries"
 import { ProColumns } from "@ant-design/pro-table"
-import { useEffect, useState } from "react"
 
 
 export default (props: any) => {
-    const { tableData, select } = props;
-    //缴费关联人员表格信息
-    const [dataSourceAboutPeoplePay, setdataSourceAboutPeoplePay] = useState<Array<any>>();
-    //关注表格是否有数据
-    const [haveData, setHaveData] = useState<boolean>(false)
-
-    useEffect(() => {
-        getTableStudentData(tableData.phone)
-    }, [tableData.phone])
-    //获取表格数据
-    const getTableStudentData = (data: string) => {
-        apiRequest.get('/sms/business/bizStudentUser', { mobile: data }).then(res => {
-            setdataSourceAboutPeoplePay(res.data.content)
-            if(res.data.content.length === 0) {
-                setHaveData(true)
-            }
-        })
-    }
+    const { select, phoneTableData } = props;
     //快捷下单columns
     const quickColumns: ProColumns<any>[] = [
         {
@@ -82,8 +63,9 @@ export default (props: any) => {
     return <>
         <Tables
             search={false}
-            dataSource={dataSourceAboutPeoplePay} columns={quickColumns}
+            dataSource={phoneTableData} columns={quickColumns}
             rowSelection={{
+                type:'radio',
                 onSelect: select
             }}
         />

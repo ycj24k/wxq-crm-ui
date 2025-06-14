@@ -56,7 +56,7 @@ export default (props: any) => {
       });
       statisticsDatas = statisticsDatas - sourcecontent.data[index]
     });
-    console.log(data);
+    console.log(data,'======>');
     PieData = [...data, { type: '其他', sales: statisticsDatas }]
     // setcheckedValue(checkedValues);
     setPieSource(PieData)

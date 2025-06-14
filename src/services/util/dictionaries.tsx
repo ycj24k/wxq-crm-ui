@@ -843,6 +843,38 @@ class dictionaries {
     }
     return [];
   }
+  filterByValue(data: any) {
+    return data.users.map((user: any) => {
+      // 解析 JobClassExam JSON
+      const jobClassData = user.JobClassExam
+        ? JSON.parse(user.JobClassExam)
+        : { classType: 0, examType: 0, classYear: 0, project: '' };
+
+      // 处理 project 数组
+      const projectId = Array.isArray(user.project)
+        ? user.project[user.project.length - 1]
+        : user.project;
+
+      // 处理 provider 对象
+      const providerValue = user.provider && typeof user.provider === 'object'
+        ? user.provider.value
+        : user.provider;
+
+      return {
+        classType: jobClassData.classType || 0,
+        classYear: jobClassData.classYear || 0,
+        examType: jobClassData.examType || 0,
+        project: projectId,
+        provider: providerValue,
+        quantity: user.quantity || 0,
+        receivable: user.receivable || 0,
+        source: user.source || '0',
+        discount: user.discount || 0,
+        discountRemark: user.discountRemark || '',
+        studentUserId: user.studentUserId || 0
+      };
+    });
+  }
 }
 
 export default new dictionaries();
