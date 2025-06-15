@@ -378,21 +378,28 @@ export default (props: any) => {
       }}
       visible={modalVisible}
     >
-      <TextArea
-        rows={5}
-        value={textContent}
-        style={{ marginBottom: '20px' }}
-        onChange={(e) => setTextContent(e.target.value)}
-        placeholder="请输入或者粘贴基础信息"
-      />
 
-      <Button
-        style={{ marginBottom: '20px' }}
-        onClick={() => {
-          handleChangeText()
-        }
-        }
-      >导入基础信息</Button>
+{sourceType == 1 ? (
+          <TextArea
+          rows={5}
+          value={textContent}
+          style={{ marginBottom: '20px' }}
+          onChange={(e) => setTextContent(e.target.value)}
+          placeholder="请输入或者粘贴基础信息"
+        />
+        ) : null}
+
+{sourceType == 1 ? (
+          <Button
+          style={{ marginBottom: '20px' }}
+          onClick={() => {
+            handleChangeText()
+          }
+          }
+        >导入基础信息</Button>
+        ) : null}
+
+      
 
       <ProForm.Group>
         <ProFormSelect

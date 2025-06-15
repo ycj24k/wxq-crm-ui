@@ -12,6 +12,7 @@ import StudentMessage from "./studentMessage"
 import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import SchoolList from '@/pages/Business/ClassList'
+import './index.less'
 import {
     ProFormCascader,
     ProFormInstance
@@ -37,6 +38,10 @@ export default (props: any) => {
     const [phoneTableData, setPhoneTableData] = useState<Array<any>>([])
     //存储支付信息
     const [payMessage, setPayMessage] = useState<any>({})
+    //选择新建学员或选择学员弹窗
+    const [ChooseStudent, setChooseStudent] = useState<boolean>(false);
+    //保存新建学员时数据
+    const [studentInfo, setStudentInfo] = useState<any>([])
     //选择班级
     const [ClassFalg, setClassFalg] = useState<boolean>(false);
     const [classRef, setClassRef] = useState<any>({});
@@ -77,12 +82,28 @@ export default (props: any) => {
     const filter = (inputValue: string, path: any[]) => {
         return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
     };
+    //新建学员
+    const addStudent = () => {
+        setTimeout(() => {
+            formRef.current?.setFieldsValue({
+                name: studentInfo.name,
+                mobile: studentInfo.phone,
+                idCard: studentInfo.idCard
+            })
+        }, 500)
+        setIsPayModalOpen(true)
+        setIsPayModalOpen(true)
+    }
+    const chooseStudent = () => {
 
+    }
     //快捷下单弹窗
     const QuickOrder = (record: any) => {
         setPayMessage(record)
         apiRequest.get('/sms/business/bizStudentUser', { mobile: record.phone }).then(res => {
             if (res.data.content.length === 0) {
+                // setStudentInfo(record)
+                // setChooseStudent(true)
                 setTimeout(() => {
                     formRef.current?.setFieldsValue({
                         name: record.name,
@@ -489,6 +510,22 @@ export default (props: any) => {
         >
             <SchoolList setClassRef={setClassRef}
                 setClassFalg={() => setClassFalg(false)} />
+        </Modal>
+
+        <Modal
+            open={ChooseStudent}
+            onOk={() => setChooseStudent(false)}
+            onCancel={() => setChooseStudent(false)}
+            footer={null}
+        >
+            <div className="student-message">
+                <div className="student-message-title">根据手机号未能匹配到学员</div>
+                <div className="student-btn">
+                    <Button type="primary" onClick={() => addStudent()}>新建学员</Button>
+                    <Button type="primary" onClick={() => chooseStudent()} style={{ marginLeft: '20px' }}>选择学员</Button>
+                </div>
+            </div>
+
         </Modal>
     </>
 }
