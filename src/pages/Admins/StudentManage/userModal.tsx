@@ -24,6 +24,7 @@ import { history, useModel } from 'umi';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import ModbileListOrder from './ModbileListOrder';
+import { Typography } from 'antd';
 const { confirm } = Modal;
 let content: any = null;
 export default (props: any) => {
@@ -322,6 +323,7 @@ export default (props: any) => {
       // 将对象转换为JSON字符串
       let jsonData = JSON.stringify(data);
       let newjson = JSON.parse(jsonData)
+      console.log(newjson,'newjson')
 
       formRef.current?.setFieldsValue({
         name: newjson.学员姓名,
@@ -329,7 +331,7 @@ export default (props: any) => {
         source: Dictionaries.getValue('dict_source', newjson.客户来源),
         mobile: newjson.联系电话,
         weChat: newjson.微信,
-        description: newjson.其他说明,
+        description: newjson.备注,
         owner: newjson.信息所有人,
       })
       const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
@@ -379,27 +381,54 @@ export default (props: any) => {
       visible={modalVisible}
     >
 
-{sourceType == 1 ? (
-          <TextArea
-          rows={5}
+      {sourceType == 1 ? (
+        <TextArea
+          rows={7}
           value={textContent}
           style={{ marginBottom: '20px' }}
           onChange={(e) => setTextContent(e.target.value)}
-          placeholder="请输入或者粘贴基础信息"
+          placeholder={`示例模板:
+学员姓名:张三777,
+联系电话:18682478670,
+客户来源:视频号,
+信息所有人:周韦标,
+备注:现在在线
+点击下方复制示例模板`}
         />
-        ) : null}
+      ) : null}
 
-{sourceType == 1 ? (
+      {sourceType == 1 ? (
+        <div style={{ display: 'flex'}}>
           <Button
-          style={{ marginBottom: '20px' }}
-          onClick={() => {
-            handleChangeText()
-          }
-          }
-        >导入基础信息</Button>
-        ) : null}
+            style={{ marginBottom: '20px' }}
+            onClick={() => {
+              handleChangeText()
+            }
+            }
+          >导入基础信息</Button>
 
-      
+<div>
+        <Typography.Paragraph id='copy' style={{ display: 'none' }} copyable={{ text: `学员姓名:张三777,
+联系电话:18682478670,
+客户来源:视频号,
+信息所有人:周韦标,
+备注:现在在线` }}>
+        复制模板
+      </Typography.Paragraph>
+        <Button
+          type="primary"
+          style={{ marginBottom: '20px',marginLeft: '20px' }}
+          onClick={() => { 
+            const copyText = document.getElementById('copy')?.getElementsByTagName('div')[0];
+            if (copyText) {
+              message.success('内容已复制到粘贴板');
+              copyText?.click();
+            }
+          }}
+        >复制示例</Button></div>
+        </div>
+        
+      ) : null}
 
       <ProForm.Group>
         <ProFormSelect
@@ -596,22 +625,22 @@ export default (props: any) => {
 
 
 
-{sourceType !== 1 ? (
+      {sourceType !== 1 ? (
         <UserTreeSelect
-        ref={userRef}
-        userLabel={'招生老师'}
-        userNames="userId"
-        //newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
-        userPlaceholder="请输入招生老师"
-        setUserNameId={(e: any) => setUserNameId(e)}
-        // setDepartId={(e: any) => setDepartId(e)}
-        flag={true}
-      // setFalgUser={(e: any) => setFalgUser(e)}
-      />
+          ref={userRef}
+          userLabel={'招生老师'}
+          userNames="userId"
+          //newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+          userPlaceholder="请输入招生老师"
+          setUserNameId={(e: any) => setUserNameId(e)}
+          // setDepartId={(e: any) => setDepartId(e)}
+          flag={true}
+        // setFalgUser={(e: any) => setFalgUser(e)}
+        />
       ) : (
         ''
       )}
-      
+
       <UserTreeSelect
         ref={userRefs}
         userLabel={'信息提供人'}

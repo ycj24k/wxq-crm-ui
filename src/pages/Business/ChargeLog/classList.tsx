@@ -67,7 +67,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                     receivable: 0,
                     discount: 0,
                     discountRemark: '',
-                    source: ''
+                    //source: ''
                 }]
             });
             return;
@@ -93,7 +93,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 quantity: item.quantity || 1,
                 receivable: item.receivable || 0,
                 discount: item.discount || 0,
-                source: item.source + '',
+                source: item.source ? item.source.toString() : undefined,
                 discountRemark: item.discountRemark || '',
                 provider: { "value": renderData.provider },
                 studentUserId: item.id || null
@@ -272,7 +272,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             Dictionaries.getCascaderValue('dict_reg_job', renderData.project) :
                             [],
                         quantity: 1,
-                        source: renderData?.source?.toString() || renderData?.source + '',
+                        source: renderData?.source ? renderData.source.toString() : undefined,
                         provider: {
                             value: renderData?.provider ?? null
                         },
@@ -384,6 +384,10 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                 marginBlockEnd: 8,
                             }}
                         >
+                            <ProForm
+                                submitter={false}
+                                // formRef={classListFormRef}
+                            >
                             <ProFormGroup key={index}>
                                 <ProForm.Group>
                                     {/* 报考岗位下拉框，无条件渲染 */}
@@ -400,6 +404,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             // onSearch: (value) => console.log(value)
                                         }}
                                     />
+
                                     {/* 班型选择，有条件渲染 */}
                                     {JobClassExam[index] ? (<>
                                         <ProFormSelect
@@ -503,6 +508,11 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             width="sm"
                                             rules={[{ required: true, message: '请选择订单来源' }]}
                                             request={async () => Dictionaries.getList('dict_source') as any}
+                                            allowClear={true}
+                                            fieldProps={{
+                                                showSearch: true,
+                                                placeholder: '请选择订单来源',
+                                            }}
                                         />
                                         <ProFormDigit
                                             name="discount"
@@ -573,6 +583,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
 
                                 </ProForm.Group>
                             </ProFormGroup>
+                            </ProForm>
                         </ProCard>
                     );
                 }}

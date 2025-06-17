@@ -12,6 +12,7 @@ import StudentMessage from "./studentMessage"
 import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import SchoolList from '@/pages/Business/ClassList'
+import AllStudent from './allStudentlist'
 import './index.less'
 import {
     ProFormCascader,
@@ -29,6 +30,7 @@ export default (props: any) => {
     const { reBuild, select, getAll = false, type = 0 } = props
     const [exportLoading, setExportLoading] = useState<boolean>();
     const [selectData, setSelectData] = useState<Array<any>>();
+    const [studentlistmessage, setStudentlistmessage] = useState<any>();
     const [selectStudentData, setSelectStudentData] = useState<any>();
     //学生详情下单
     const [studentModal, setStudentModal] = useState<boolean>(false)
@@ -42,6 +44,8 @@ export default (props: any) => {
     const [ChooseStudent, setChooseStudent] = useState<boolean>(false);
     //保存新建学员时数据
     const [studentInfo, setStudentInfo] = useState<any>([])
+    //查询所有学员弹窗
+    const [allStudent, setAllStudent] = useState<boolean>(false);
     //选择班级
     const [ClassFalg, setClassFalg] = useState<boolean>(false);
     const [classRef, setClassRef] = useState<any>({});
@@ -84,34 +88,35 @@ export default (props: any) => {
     };
     //新建学员
     const addStudent = () => {
-        setTimeout(() => {
-            formRef.current?.setFieldsValue({
-                name: studentInfo.name,
-                mobile: studentInfo.phone,
-                idCard: studentInfo.idCard
-            })
-        }, 500)
+        // setTimeout(() => {
+        //     formRef.current?.setFieldsValue({
+        //         name: studentInfo.name,
+        //         mobile: studentInfo.phone,
+        //         idCard: studentInfo.idCard
+        //     })
+        // }, 500)
         setIsPayModalOpen(true)
         setIsPayModalOpen(true)
     }
     const chooseStudent = () => {
-
+        setAllStudent(true)
     }
     //快捷下单弹窗
     const QuickOrder = (record: any) => {
         setPayMessage(record)
         apiRequest.get('/sms/business/bizStudentUser', { mobile: record.phone }).then(res => {
             if (res.data.content.length === 0) {
-                // setStudentInfo(record)
-                // setChooseStudent(true)
-                setTimeout(() => {
-                    formRef.current?.setFieldsValue({
-                        name: record.name,
-                        mobile: record.phone,
-                        idCard: record.idCard
-                    })
-                }, 500)
-                setIsPayModalOpen(true)
+                setStudentInfo(record)
+                setChooseStudent(true)
+                //旧代码注释
+                // setTimeout(() => {
+                //     formRef.current?.setFieldsValue({
+                //         name: record.name,
+                //         mobile: record.phone,
+                //         idCard: record.idCard
+                //     })
+                // }, 500)
+                // setIsPayModalOpen(true)
             } else {
                 setStudentModal(true)
                 setPhoneTableData(res.data.content)
@@ -126,32 +131,31 @@ export default (props: any) => {
         }
         setIsPayModalOpen(false)
     }
-    //下单确认
-    const handleSureOrder = () => {
+    const handleChooseStudentMessageOrder = () => {
         setIsPayModalOpen(true)
         setTimeout(() => {
             formRef.current?.setFieldsValue({
-                name: selectStudentData.name,
-                mobile: selectStudentData.mobile,
-                idCard: selectStudentData.idCard,
-                owner: selectStudentData.owner,
-                provider: selectStudentData.provider,
-                userId: selectStudentData.userId,
-                source: selectStudentData.source.toString(),
-                project: Dictionaries.getCascaderValue('dict_reg_job', selectStudentData.project)
+                name: studentlistmessage.name,
+                mobile: studentlistmessage.mobile,
+                idCard: studentlistmessage.idCard,
+                owner: studentlistmessage.owner,
+                provider: studentlistmessage.provider,
+                userId: studentlistmessage.userId,
+                source: studentlistmessage.source.toString(),
+                project: Dictionaries.getCascaderValue('dict_reg_job', studentlistmessage.project)
             })
 
             let data = {}
             let datas = {
-                id: selectStudentData.userId,
-                name: selectStudentData.userName
+                id: studentlistmessage.userId,
+                name: studentlistmessage.userName
             }
 
             let data2 = {}
-            if (selectStudentData.provider) {
+            if (studentlistmessage.provider) {
                 data = {
-                    id: selectStudentData.provider,
-                    name: selectStudentData.providerName
+                    id: studentlistmessage.provider,
+                    name: studentlistmessage.providerName
                 }
             } else {
                 data = {
@@ -160,10 +164,66 @@ export default (props: any) => {
                 }
             }
 
-            if (selectStudentData.owner) {
+            if (studentlistmessage.owner) {
                 data2 = {
-                    id: selectStudentData.owner,
-                    name: selectStudentData.ownerName ? selectStudentData.ownerName : '无'
+                    id: studentlistmessage.owner,
+                    name: studentlistmessage.ownerName ? studentlistmessage.ownerName : '无'
+                }
+            } else {
+                data2 = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+
+            userRef?.current?.setDepartment(datas);
+            userRefs?.current?.setDepartment(data);
+            userRef2?.current?.setDepartment(data2);
+            setUserNameId(datas)
+            setUserNameIds(data)
+            setUserNameId2(data2)
+        }, 100)
+        setAllStudent(false)
+        setStudentModal(false)
+    }
+    //下单确认
+    const handleSureOrder = () => {
+        setIsPayModalOpen(true)
+        setTimeout(() => {
+            formRef.current?.setFieldsValue({
+                name: studentlistmessage.name,
+                mobile: studentlistmessage.mobile,
+                idCard: studentlistmessage.idCard,
+                owner: studentlistmessage.owner,
+                provider: studentlistmessage.provider,
+                userId: studentlistmessage.userId,
+                source: studentlistmessage.source.toString(),
+                project: Dictionaries.getCascaderValue('dict_reg_job', studentlistmessage.project)
+            })
+
+            let data = {}
+            let datas = {
+                id: studentlistmessage.userId,
+                name: studentlistmessage.userName
+            }
+
+            let data2 = {}
+            if (studentlistmessage.provider) {
+                data = {
+                    id: studentlistmessage.provider,
+                    name: studentlistmessage.providerName
+                }
+            } else {
+                data = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+
+            if (studentlistmessage.owner) {
+                data2 = {
+                    id: studentlistmessage.owner,
+                    name: studentlistmessage.ownerName ? studentlistmessage.ownerName : '无'
                 }
             } else {
                 data2 = {
@@ -252,8 +312,8 @@ export default (props: any) => {
                 studentValues.project = String(studentValues.project[0]);
             }
             // 将 selectStudentData.type 添加到 studentValues 中
-            if (selectStudentData && selectStudentData.type !== undefined) {
-                studentValues.type = selectStudentData.type;
+            if (studentlistmessage && studentlistmessage.type !== undefined) {
+                studentValues.type = studentlistmessage.type;
             }
             studentValues.type = 0
             updateFieldWithUserId(studentValues.userId, 'userId');
@@ -267,8 +327,8 @@ export default (props: any) => {
                 studentValues.project = String(studentValues.project[0]);
             }
             // 将 selectStudentData.type 添加到 studentValues 中
-            if (selectStudentData && selectStudentData.type !== undefined) {
-                studentValues.type = selectStudentData.type;
+            if (studentlistmessage && studentlistmessage.type !== undefined) {
+                studentValues.type = studentlistmessage.type;
             }
             studentMsg = studentValues
         }
@@ -330,11 +390,10 @@ export default (props: any) => {
             onOk={handleSureOrder}
         >
             <StudentMessage
-                select={setSelectStudentData}
+                select={setStudentlistmessage}
                 phoneTableData={phoneTableData}
             />
         </Modal>
-
         {/* 下单弹窗 */}
         <Modal
             title="下单"
@@ -471,7 +530,7 @@ export default (props: any) => {
             </Row>
             <ClassList
                 ref={classListRef}
-                renderData={selectStudentData}
+                renderData={studentlistmessage}
                 onTotalPriceChange={(price: number) => {
                     setTotalReceivable(price);
                     formRef.current?.setFieldsValue({
@@ -498,7 +557,7 @@ export default (props: any) => {
                 }}
             />
 
-            <PayWay renderData={selectStudentData} payMessage={payMessage} ref={payWayRef} />
+            <PayWay renderData={studentlistmessage} payMessage={payMessage} ref={payWayRef} />
         </Modal>
         {/* 班级选择 */}
         <Modal
@@ -511,7 +570,7 @@ export default (props: any) => {
             <SchoolList setClassRef={setClassRef}
                 setClassFalg={() => setClassFalg(false)} />
         </Modal>
-
+        {/* 选择学员还是新增学员*/}
         <Modal
             open={ChooseStudent}
             onOk={() => setChooseStudent(false)}
@@ -526,6 +585,18 @@ export default (props: any) => {
                 </div>
             </div>
 
+        </Modal>
+        {/* 查询所有待支付学员以及潜在学员 */}
+        <Modal
+            open={allStudent}
+            width={1200}
+            title="选择学员"
+            onOk={handleChooseStudentMessageOrder}
+            onCancel={() => setAllStudent(false)}
+        >
+            <AllStudent
+                StudentMessage={setStudentlistmessage}
+            />
         </Modal>
     </>
 }
