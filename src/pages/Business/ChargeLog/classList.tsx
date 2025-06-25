@@ -22,6 +22,7 @@ let comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 interface ClassListMethods {
     getFormValues: () => Promise<any>;
+    resetForm: () => void;
 }
 
 
@@ -38,7 +39,43 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
 
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
-            return formRef.current?.getFieldsValue();
+            try {
+                // 执行表单验证
+                const values = await formRef.current?.validateFields();
+                return values;
+            } catch (error) {
+                // 显示验证错误信息
+                if (error && error.errorFields) {
+                    // 获取第一个错误信息并显示
+                    const firstError = error.errorFields[0];
+                    message.error(firstError.errors[0] || '表单验证失败');
+                } else {
+                    message.error('表单验证失败，请检查表单填写是否完整');
+                }
+                // 重新抛出错误，确保调用方知道验证失败
+                throw error;
+            }
+        },
+        resetForm: () => {
+            // 重置表单数据
+            formRef.current?.resetFields();
+            // 重置状态
+            setTotalPrice(0);
+            setTotalQuantity(0);
+            // 重置班型数据
+            setJobClassExam([]);
+            // 保留第一行，但重置其值
+            const initialUsers = [{
+                project: [],
+                quantity: 1,
+                receivable: 0,
+                discount: 0,
+                discountRemark: '',
+                source: ''
+            }];
+            formRef.current?.setFieldsValue({
+                users: initialUsers
+            });
         }
     }));
     const [userNameId, setUserNameId] = useState<any>();
@@ -55,10 +92,8 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     });
   }, [userNameId])
     useEffect(() => {
-        console.log(renderData, 'renderData======renderData')
         // 即使renderData不存在或不包含project字段，也继续初始化
         if (!renderData) {
-            console.warn('renderData缺失');
             // 初始化一个空的用户列表，确保表单能够正常显示
             formRef?.current?.setFieldsValue({
                 users: [{
@@ -384,10 +419,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                 marginBlockEnd: 8,
                             }}
                         >
-                            <ProForm
-                                submitter={false}
-                                // formRef={classListFormRef}
-                            >
+                            
                             <ProFormGroup key={index}>
                                 <ProForm.Group>
                                     {/* 报考岗位下拉框，无条件渲染 */}
@@ -583,7 +615,6 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
 
                                 </ProForm.Group>
                             </ProFormGroup>
-                            </ProForm>
                         </ProCard>
                     );
                 }}

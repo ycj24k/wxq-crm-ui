@@ -46,6 +46,8 @@ export default (props: any) => {
     const [studentInfo, setStudentInfo] = useState<any>([])
     //查询所有学员弹窗
     const [allStudent, setAllStudent] = useState<boolean>(false);
+    //
+    const [confirmLoading, setConfirmLoading] = useState(false);
     //选择班级
     const [ClassFalg, setClassFalg] = useState<boolean>(false);
     const [classRef, setClassRef] = useState<any>({});
@@ -68,6 +70,7 @@ export default (props: any) => {
         removePayWayItem?: (index: number) => void;
         resetPayWay: () => void;
     }>(null);
+    //选择班级信息
     useEffect(() => {
         formRef?.current?.setFieldsValue({
             classId: classRef.id,
@@ -95,7 +98,6 @@ export default (props: any) => {
         //         idCard: studentInfo.idCard
         //     })
         // }, 500)
-        setIsPayModalOpen(true)
         setIsPayModalOpen(true)
     }
     const chooseStudent = () => {
@@ -132,6 +134,10 @@ export default (props: any) => {
         setIsPayModalOpen(false)
     }
     const handleChooseStudentMessageOrder = () => {
+        handleSureOrder()
+    }
+    //下单确认
+    const handleSureOrder = () => {
         setIsPayModalOpen(true)
         setTimeout(() => {
             formRef.current?.setFieldsValue({
@@ -141,7 +147,7 @@ export default (props: any) => {
                 owner: studentlistmessage.owner,
                 provider: studentlistmessage.provider,
                 userId: studentlistmessage.userId,
-                source: studentlistmessage.source.toString(),
+                source: studentlistmessage.studentSource.toString(),
                 project: Dictionaries.getCascaderValue('dict_reg_job', studentlistmessage.project)
             })
 
@@ -184,61 +190,6 @@ export default (props: any) => {
             setUserNameId2(data2)
         }, 100)
         setAllStudent(false)
-        setStudentModal(false)
-    }
-    //下单确认
-    const handleSureOrder = () => {
-        setIsPayModalOpen(true)
-        setTimeout(() => {
-            formRef.current?.setFieldsValue({
-                name: studentlistmessage.name,
-                mobile: studentlistmessage.mobile,
-                idCard: studentlistmessage.idCard,
-                owner: studentlistmessage.owner,
-                provider: studentlistmessage.provider,
-                userId: studentlistmessage.userId,
-                source: studentlistmessage.source.toString(),
-                project: Dictionaries.getCascaderValue('dict_reg_job', studentlistmessage.project)
-            })
-
-            let data = {}
-            let datas = {
-                id: studentlistmessage.userId,
-                name: studentlistmessage.userName
-            }
-
-            let data2 = {}
-            if (studentlistmessage.provider) {
-                data = {
-                    id: studentlistmessage.provider,
-                    name: studentlistmessage.providerName
-                }
-            } else {
-                data = {
-                    name: initialState?.currentUser?.name,
-                    id: initialState?.currentUser?.userid,
-                }
-            }
-
-            if (studentlistmessage.owner) {
-                data2 = {
-                    id: studentlistmessage.owner,
-                    name: studentlistmessage.ownerName ? studentlistmessage.ownerName : '无'
-                }
-            } else {
-                data2 = {
-                    name: initialState?.currentUser?.name,
-                    id: initialState?.currentUser?.userid,
-                }
-            }
-
-            userRef?.current?.setDepartment(datas);
-            userRefs?.current?.setDepartment(data);
-            userRef2?.current?.setDepartment(data2);
-            setUserNameId(datas)
-            setUserNameIds(data)
-            setUserNameId2(data2)
-        }, 100)
         setStudentModal(false)
     }
     const columns: ProColumns<any>[] = [
@@ -298,43 +249,99 @@ export default (props: any) => {
     ];
     //确认下单
     const handlePayOrder = async () => {
-        const studentValues = await formRef.current?.validateFields();
-        const updateFieldWithUserId = (fieldValue: any, fieldName: keyof typeof studentValues) => {
-            if (fieldValue) {
-                const ids = Dictionaries.getUserId(fieldValue.label);
-                studentValues[fieldName] = ids[0];
-            }
-        };
+        setConfirmLoading(true)
+        //const studentValues = await formRef.current?.validateFields();
+        let studentValues: any;
         let studentMsg = {}
-        if (phoneTableData.length === 0) {
-            // 修改 project 数组，只保留第一项并转换为字符串
-            if (Array.isArray(studentValues.project)) {
-                studentValues.project = String(studentValues.project[0]);
+        try {
+            studentValues = await formRef.current?.validateFields();
+            const updateFieldWithUserId = (fieldValue: any, fieldName: keyof typeof studentValues) => {
+                if (fieldValue) {
+                    const ids = Dictionaries.getUserId(fieldValue.label);
+                    studentValues[fieldName] = ids[0];
+                }
+            };
+            if (phoneTableData.length === 0) {
+                // 修改 project 数组，只保留第一项并转换为字符串
+                if (Array.isArray(studentValues.project)) {
+                    studentValues.project = String(studentValues.project[0]);
+                }
+                // 将 selectStudentData.type 添加到 studentValues 中
+                if (studentlistmessage && studentlistmessage.type !== undefined) {
+                    studentValues.type = studentlistmessage.type;
+                }
+                studentValues.type = 0
+                updateFieldWithUserId(studentValues.userId, 'userId');
+                updateFieldWithUserId(studentValues.owner, 'owner');
+                updateFieldWithUserId(studentValues.provider, 'provider');
+                studentMsg = studentValues
+            } else {
+                const studentValues = await formRef.current?.validateFields();
+                // 修改 project 数组，只保留第一项并转换为字符串
+                if (Array.isArray(studentValues.project)) {
+                    studentValues.project = String(studentValues.project[0]);
+                }
+                // 将 selectStudentData.type 添加到 studentValues 中
+                if (studentlistmessage && studentlistmessage.type !== undefined) {
+                    studentValues.type = studentlistmessage.type;
+                }
+                studentMsg = studentValues
             }
-            // 将 selectStudentData.type 添加到 studentValues 中
-            if (studentlistmessage && studentlistmessage.type !== undefined) {
-                studentValues.type = studentlistmessage.type;
-            }
-            studentValues.type = 0
-            updateFieldWithUserId(studentValues.userId, 'userId');
-            updateFieldWithUserId(studentValues.owner, 'owner');
-            updateFieldWithUserId(studentValues.provider, 'provider');
-            studentMsg = studentValues
-        } else {
-            const studentValues = await formRef.current?.validateFields();
-            // 修改 project 数组，只保留第一项并转换为字符串
-            if (Array.isArray(studentValues.project)) {
-                studentValues.project = String(studentValues.project[0]);
-            }
-            // 将 selectStudentData.type 添加到 studentValues 中
-            if (studentlistmessage && studentlistmessage.type !== undefined) {
-                studentValues.type = studentlistmessage.type;
-            }
-            studentMsg = studentValues
+        } catch (error) {
+            setConfirmLoading(false)
+            return
         }
-        const classListValues = await classListRef.current?.getFormValues();
+
+
+        //const classListValues = await classListRef.current?.getFormValues();
+        // 2. 验证班级列表表单
+        let classListValues;
+        try {
+            classListValues = await classListRef.current?.getFormValues();
+            if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
+                message.error('请至少添加一个班级信息');
+                setConfirmLoading(false)
+                return;
+            }
+
+            // 验证每个班级信息是否完整
+            for (let i = 0; i < classListValues.users.length; i++) {
+                const user = classListValues.users[i];
+                if (!user.project || user.project.length === 0) {
+                    message.error(`第${i + 1}个班级的报考岗位不能为空`);
+                    setConfirmLoading(false)
+                    return;
+                }
+                if (!user.JobClassExam) {
+                    message.error(`第${i + 1}个班级的班型选择不能为空`);
+                    setConfirmLoading(false)
+                    return;
+                }
+                if (!user.source) {
+                    message.error(`第${i + 1}个班级的订单来源不能为空`);
+                    setConfirmLoading(false)
+                    return;
+                }
+                // 其他必填字段的验证...
+            }
+        } catch (error) {
+            // ClassList组件内的验证错误已经被处理并显示
+            setConfirmLoading(false)
+            return;
+        }
+
         const processedUsers = Dictionaries.filterByValue(classListValues)
-        const payWayValues = await payWayRef.current?.getFormValues();
+        //const payWayValues = await payWayRef.current?.getFormValues();
+        let payWayValues: any;
+        try {
+            payWayValues = await payWayRef.current?.getFormValues();
+        } catch (error) {
+            setConfirmLoading(false)
+            return;
+        }
+
+
+
         //根据processedUsers数组长度创建auditsParam数组
         let auditsParam: any = processedUsers.map((order: any, index: number) => ({
             "student": studentMsg,
@@ -346,13 +353,33 @@ export default (props: any) => {
             .then((res: any) => {
                 if (res.status == 'success') {
                     message.success('操作成功');
-                    // 重置支付方式组件
+                    setConfirmLoading(false)
+                    // 重置所有表单数据
+                    // 1. 重置学生表单
+                    formRef.current?.resetFields();
+
+                    // 2. 重置班级列表表单
+                    if (classListRef.current) {
+                        classListRef.current.resetForm();
+                    }
+
+                    // 3. 重置支付方式组件
                     if (payWayRef.current) {
                         payWayRef.current.resetPayWay();
                     }
+
+                    // 4. 重置所有相关状态变量
+                    setPhoneTableData([]);
+                    setPayMessage({});
+                    setStudentlistmessage(undefined);
+                    setSelectStudentData(undefined);
+                    setTotalReceivable(0);
+                    setClassRef({});
+
                     setIsPayModalOpen(false);
                     setStudentModal(false);
                 } else {
+                    setConfirmLoading(false)
                     message.error(res.msg)
                 }
             })
@@ -399,6 +426,7 @@ export default (props: any) => {
             title="下单"
             width={1200}
             open={isPayModalOpen}
+            confirmLoading={confirmLoading}
             onCancel={() => handleCancelIsPay()}
             onOk={() => { handlePayOrder() }}
         >

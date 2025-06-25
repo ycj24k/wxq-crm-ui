@@ -126,6 +126,8 @@ export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [userNameId, setUserNameId] = useState<any>();
   let [department, setDepartment] = useState<any>({});
+
+  const [isShowMedium , setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
   const url = isFormal ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
   const formRef = useRef<ProFormInstance>();
@@ -963,6 +965,8 @@ export default (props: any) => {
               }
 
               setModalVisible(true);
+              //新建或者新建新媒体学员导入的显示隐藏
+              setShowisShowMedium(false)
             }}
           >
             新建
@@ -980,6 +984,8 @@ export default (props: any) => {
               }
 
               setModalVisible(true);
+              //新建或者新建新媒体学员导入的显示隐藏
+              setShowisShowMedium(true)
             }}
           >
             新建新媒体学员
@@ -1139,6 +1145,7 @@ export default (props: any) => {
           setModalVisible={() => setModalVisible(false)}
           modalVisible={modalVisibleFalg}
           callbackRef={() => callbackRef()}
+          isShowMedium={isShowMedium}
           renderData={renderData}
           url={url}
           type={type}

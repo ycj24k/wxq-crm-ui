@@ -84,6 +84,12 @@
     component: './Business/Resource/Statistics',
   },
   {
+    name: '题库设置',
+    path: '/business/question',
+    component: './Business/Question',
+  },
+
+  {
     name: '流转资源看板',
     icon: 'table',
     path: '/business/resource/transformation',

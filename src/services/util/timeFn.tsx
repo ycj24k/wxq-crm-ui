@@ -100,6 +100,11 @@ const DownTable = (
           str = (data.percent * 100) + '%'
         }
       }
+      if(type == 'refund'  && data.ownerName != null && data.percent != null){
+        if (data.percent != null) {
+          str = (data.percent * 100) + '%'
+        }
+      }
       return str;
     },
     percentAmount: (data: any) => {
@@ -107,6 +112,11 @@ const DownTable = (
       if (type == 'charge' && data.ownerName != null && data.percent != null) {
         if (data.percent != null) {
           str = data.percent * data.amount
+        }
+      }
+      if(type == 'refund'  && data.ownerName != null && data.percent != null){
+        if (data.percent != null) {
+          str = data.percent * data.amount 
         }
       }
       return str;
@@ -215,7 +225,18 @@ const DownTable = (
     confirmTime: (data: any) => {
       return moment(data.confirmTime).format('YYYY-MM-DD');
     },
+    auditTimeNext: (data: any) => {
+      let str = ''
+      if(type == 'refund') str = moment(data.auditTime).format('YYYY-MM-DD');
+      return str
+    },
     chargeTime: (data: any) => {
+      let str = ''
+      if (data.chargeTime) str = moment(data.chargeTime).format('YYYY-MM-DD');
+      return str
+    },
+    //收费日期
+    changeTime: (data: any) => {
       let str = ''
       if (data.chargeTime) str = moment(data.chargeTime).format('YYYY-MM-DD');
       return str
@@ -320,8 +341,25 @@ const DownTable = (
       let str = ''
       if (data.departmentId) {
         let depart = await Dictionaries.getDepartmentName(data.departmentId);
+        console.log(depart,'depart')
         const departs = await depart.splice(0, depart.length - 1).reverse();
         str = departs.join('-')
+      }
+
+      return str;
+    },
+    //上级部门
+    updepartmentId: async (data: any) => {
+      let str = ''
+      if (data.departmentId) {
+        let depart = await Dictionaries.getDepartmentName(data.departmentId);
+        console.log(depart,'depart====>')
+        console.log(depart.length,'depart.length')
+        const departs = await depart[depart.length - 2];
+        str = departs
+        //const departs = await depart.splice(0, depart.length - 1).reverse();
+        // const departs = await depart[1]
+        // str = departs
       }
 
       return str;

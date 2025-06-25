@@ -119,6 +119,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
     const [userNameIds, setUserNameIds] = useState<{ [key: number]: any }>({});
     const [chargeType, setChargeType] = useState<string>('6');
 
+
     // 删除支付方式
     // const removePayWayItem = (index: number) => {
     //     if (payWayList.length > 1) {
@@ -212,6 +213,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                             name="type"
                             width="md"
                             initialValue={chargeType}
+                            // isAddStudent
                             disabled={chargeType == '6'}
                             request={async () =>
                                 Dictionaries.getList('chargeType')?.filter(x => ['0', '4', '5', '6'].indexOf(x.value) != -1) as any

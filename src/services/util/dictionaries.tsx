@@ -896,6 +896,99 @@ class dictionaries {
       };
     });
   }
+
+  getNameById(array: any, id: string) {
+    const item = array.find((entry: any) => entry.id === id);
+    return item ? item.title : null;
+  }
+  getNameBySubject(array: any, id: string) {
+    const item = array.find((entry: any) => entry.id === id);
+    return item ? item.subjectName : null;
+  }
+  getNameBySubjectName(array: any, id: string) {
+    const item = array.find((entry: any) => entry.value === id);
+    return item ? item.label : null;
+  }
+
+  findAncestorsName(id: string, data: any) {
+    let result: any = [];
+
+    function recursiveSearch(currentId: string, dataArray: any) {
+      for (let item of dataArray) {
+        if (item.id === currentId) {
+          if (item.name) {
+            result.unshift(item.name); // 将找到的名称添加到结果数组的开头
+          }
+          if (item.parentId !== "-1") {
+            recursiveSearch(item.parentId, data); // 递归查找上级
+          }
+          return;
+        }
+        if (item.children) {
+          recursiveSearch(currentId, item.children); // 递归查找子节点
+        }
+      }
+    }
+
+    recursiveSearch(id, data);
+    let newResult = result.join('/');
+    return newResult;
+  }
+
+  // 修改数据
+  addLabelToChildren(items: any[]) {
+    return items.map((item: any) => {
+      const result = {
+        ...item,
+        label: item.name,
+        value: item.id
+      };
+
+      if (item.children && item.children.length > 0) {
+        result.children = this.addLabelToChildren(item.children);
+      }
+
+      return result;
+    });
+  };
+
+
+  findNodePath(treeData: any[], targetId: string, path: string[] = []): string[] | null {
+    for (const node of treeData) {
+      // 创建当前路径
+      const currentPath = [...path, node.label];
+
+      // 如果找到目标节点
+      if (node.value === targetId) {
+        return currentPath;
+      }
+
+      // 如果有子节点，递归查找
+      if (node.children && node.children.length) {
+        const result = this.findNodePath(node.children, targetId, currentPath);
+        if (result) return result;
+      }
+    }
+    return null;
+  };
+
+  // 递归查找节点的完整路径
+  findFullPath(data: any[], targetId: string): string[] | null {
+    for (const item of data) {
+      if (item.value === targetId) {
+        return [item.label];
+      }
+      if (item.children) {
+        const childPath = this.findFullPath(item.children, targetId);
+        if (childPath) {
+          return [item.label, ...childPath];
+        }
+      }
+    }
+    return null;
+  };
+
+
 }
 
 export default new dictionaries();

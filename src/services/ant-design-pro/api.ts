@@ -214,6 +214,12 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/ClassList',
               },
               {
+                name: '题库设置',
+                icon: 'table',
+                path: '/business/question',
+                component: './Business/Question',
+              },
+              {
                 name: '消息管理',
                 path: '/business/message',
                 component: './Business/Message',

@@ -277,6 +277,7 @@ export default (props: any) => {
       valueType: 'treeSelect',
       request: async () => departmentTree,
       render: (text, record) => {
+        //打包的时候放出来
         return <>{Dictionaries.getDepartmentName(record.departmentId).reverse().slice(1).join('-')}</>
       }
     },
@@ -1206,7 +1207,7 @@ export default (props: any) => {
                       if (chargeType == 'refundList' || chargeType == 'refund') {
                         DownTable(res.data, DownHeader.PayHeader, '退费信息', 'refund');
                       } else {
-                        DownTable(res.data, DownHeader.PayHeader, '缴费', 'charge');
+                        DownTable(res.data, DownHeader.jiaoPayHeader, '缴费', 'charge');
                       }
                     }
                   });

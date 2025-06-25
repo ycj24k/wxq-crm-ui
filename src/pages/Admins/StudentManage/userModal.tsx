@@ -30,7 +30,8 @@ let content: any = null;
 export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [company, setCompany] = useState('学员姓名');
-  const { modalVisible, setModalVisible, callbackRef, url, type, sourceType } = props;
+  const { modalVisible, setModalVisible, callbackRef, url, type, sourceType, isShowMedium } = props;
+  console.log(isShowMedium, 'isShowMedium')
   let { renderData } = props;
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [Student, setStudentId] = useState<any>(null);
@@ -309,39 +310,94 @@ export default (props: any) => {
 
   //处理输入的文本信息
   const handleChangeText = () => {
-    if (textContent != '') {
-      let text = textContent;
-      // 将文本分割成行
-      let lines = text?.split(',');
-      console.log(lines, 'lines')
-      // 创建一个空对象来存储JSON数据
-      let data: Record<string, any> = {};
-      lines?.forEach(line => {
-        let [key, value] = line.split(':');
-        data[key.trim()] = value.trim();
-      });
-      // 将对象转换为JSON字符串
-      let jsonData = JSON.stringify(data);
-      let newjson = JSON.parse(jsonData)
-      console.log(newjson,'newjson')
-
-      formRef.current?.setFieldsValue({
-        name: newjson.学员姓名,
-        education: Dictionaries.getValue('dict_education', newjson.学历) || undefined,
-        source: Dictionaries.getValue('dict_source', newjson.客户来源),
-        mobile: newjson.联系电话,
-        weChat: newjson.微信,
-        description: newjson.备注,
-        owner: newjson.信息所有人,
-      })
-      const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
-      const newProvider = {
-        id: dataProvider?.[0],
-        name: newjson.信息所有人
+    let text = textContent;
+    return text.trim().split('\n').reduce((acc: any, line) => {
+      // 使用正则匹配键值对（兼容中文冒号"："和英文冒号":"）
+      const match = line.match(/^([^:：]+)[:：](.+)$/);
+      if (match) {
+        const key = match[1].trim();
+        // 去除值末尾的标点（逗号/句号）和空格
+        const value = match[2].trim().replace(/[,.]$/, '');
+        acc[key] = value;
       }
-      setUserNameId2(newProvider)
-      userRef2?.current?.setDepartment(newProvider);
-    }
+      // 手机号正则（11位数字，1开头）
+      const phoneRegex = /^1[3-9]\d{9}$/;
+      // 微信号正则（6-20位，包含字母、数字、下划线或减号）
+      const wechatRegex = /^[a-zA-Z][-_a-zA-Z0-9]{5,19}$/;
+      console.log(acc.联系方式, 'acc.联系方式')
+      if (phoneRegex.test(acc.联系方式)) {
+        formRef.current?.setFieldsValue({
+          mobile: acc.联系方式,
+          weChat:''
+        })
+      } else if (wechatRegex.test(acc.联系方式)) {
+        formRef.current?.setFieldsValue({
+          weChat: acc.联系方式,
+          mobile:''
+        })
+      }
+      formRef.current?.setFieldsValue({
+        name: acc.学员姓名,
+        education: Dictionaries.getValue('dict_education', acc.学历) || undefined,
+        source: Dictionaries.getValue('dict_source', acc.客户来源),
+        description: acc.备注,
+        owner: acc.出镜人,
+      })
+      const dataProvider = Dictionaries.getUserId(acc.出镜人)
+      if(acc.出镜人 === '无'){
+        const newProvider = {
+          id: '-1',
+          name: acc.出镜人
+        }
+        setUserNameId2(newProvider)
+        userRef2?.current?.setDepartment(newProvider);
+      }else {
+        const newProvider = {
+          id: dataProvider?.[0],
+          name: acc.出镜人
+        }
+        setUserNameId2(newProvider)
+        userRef2?.current?.setDepartment(newProvider);
+      }
+      
+    
+      return acc;
+    }, {});
+
+
+    // if (textContent != '') {
+    //   let text = textContent;
+    //   // 将文本分割成行
+    //   let lines = text?.split(',');
+    //   console.log(lines, 'lines')
+    //   // 创建一个空对象来存储JSON数据
+    //   let data: Record<string, any> = {};
+    //   lines?.forEach(line => {
+    //     let [key, value] = line.split(':');
+    //     data[key.trim()] = value.trim();
+    //   });
+    //   // 将对象转换为JSON字符串
+    //   let jsonData = JSON.stringify(data);
+    //   let newjson = JSON.parse(jsonData)
+    //   console.log(newjson, 'newjson')
+
+    //   formRef.current?.setFieldsValue({
+    //     name: newjson.学员姓名,
+    //     education: Dictionaries.getValue('dict_education', newjson.学历) || undefined,
+    //     source: Dictionaries.getValue('dict_source', newjson.客户来源),
+    //     mobile: newjson.联系电话,
+    //     weChat: newjson.微信,
+    //     description: newjson.备注,
+    //     owner: newjson.信息所有人,
+    //   })
+    //   const dataProvider = Dictionaries.getUserId(newjson.信息所有人)
+    //   const newProvider = {
+    //     id: dataProvider?.[0],
+    //     name: newjson.信息所有人
+    //   }
+    //   setUserNameId2(newProvider)
+    //   userRef2?.current?.setDepartment(newProvider);
+    // }
   }
 
   function onChange(value: any, selectedOptions: any) { }
@@ -381,54 +437,56 @@ export default (props: any) => {
       visible={modalVisible}
     >
 
-      {sourceType == 1 ? (
-        <TextArea
-          rows={7}
-          value={textContent}
-          style={{ marginBottom: '20px' }}
-          onChange={(e) => setTextContent(e.target.value)}
-          placeholder={`示例模板:
+
+      {isShowMedium ? (
+        <div>
+          <TextArea
+            rows={7}
+            value={textContent}
+            style={{ marginBottom: '20px' }}
+            onChange={(e) => setTextContent(e.target.value)}
+            placeholder={`示例模板:
 学员姓名:张三777,
 联系电话:18682478670,
 客户来源:视频号,
 信息所有人:周韦标,
 备注:现在在线
 点击下方复制示例模板`}
-        />
-      ) : null}
+          />
 
-      {sourceType == 1 ? (
-        <div style={{ display: 'flex'}}>
-          <Button
-            style={{ marginBottom: '20px' }}
-            onClick={() => {
-              handleChangeText()
-            }
-            }
-          >导入基础信息</Button>
+          <div style={{ display: 'flex' }}>
+            <Button
+              style={{ marginBottom: '20px' }}
+              onClick={() => {
+                handleChangeText()
+              }
+              }
+            >导入基础信息</Button>
 
-<div>
-        <Typography.Paragraph id='copy' style={{ display: 'none' }} copyable={{ text: `学员姓名:张三777,
+            <div>
+              <Typography.Paragraph id='copy' style={{ display: 'none' }} copyable={{
+                text: `学员姓名:张三777,
 联系电话:18682478670,
 客户来源:视频号,
 信息所有人:周韦标,
 备注:现在在线` }}>
-        复制模板
-      </Typography.Paragraph>
-        <Button
-          type="primary"
-          style={{ marginBottom: '20px',marginLeft: '20px' }}
-          onClick={() => { 
-            const copyText = document.getElementById('copy')?.getElementsByTagName('div')[0];
-            if (copyText) {
-              message.success('内容已复制到粘贴板');
-              copyText?.click();
-            }
-          }}
-        >复制示例</Button></div>
+                复制模板
+              </Typography.Paragraph>
+              <Button
+                type="primary"
+                style={{ marginBottom: '20px', marginLeft: '20px' }}
+                onClick={() => {
+                  const copyText = document.getElementById('copy')?.getElementsByTagName('div')[0];
+                  if (copyText) {
+                    message.success('内容已复制到粘贴板');
+                    copyText?.click();
+                  }
+                }}
+              >复制示例</Button></div>
+          </div>
         </div>
-        
       ) : null}
+
 
       <ProForm.Group>
         <ProFormSelect
@@ -624,22 +682,17 @@ export default (props: any) => {
       )}
 
 
-
-      {sourceType !== 1 ? (
-        <UserTreeSelect
-          ref={userRef}
-          userLabel={'招生老师'}
-          userNames="userId"
-          //newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
-          userPlaceholder="请输入招生老师"
-          setUserNameId={(e: any) => setUserNameId(e)}
-          // setDepartId={(e: any) => setDepartId(e)}
-          flag={true}
-        // setFalgUser={(e: any) => setFalgUser(e)}
-        />
-      ) : (
-        ''
-      )}
+      <UserTreeSelect
+        ref={userRef}
+        userLabel={'招生老师'}
+        userNames="userId"
+        newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+        userPlaceholder="请输入招生老师"
+        setUserNameId={(e: any) => setUserNameId(e)}
+        // setDepartId={(e: any) => setDepartId(e)}
+        flag={true}
+      // setFalgUser={(e: any) => setFalgUser(e)}
+      />
 
       <UserTreeSelect
         ref={userRefs}

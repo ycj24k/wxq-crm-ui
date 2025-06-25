@@ -34,6 +34,8 @@ export default (props: any) => {
   const CompanyOrders = forwardRef(CompanyOrder);
   const ChargeOrders = forwardRef(ChargeOrder);
   const ChargeNews = forwardRef(ChargeNew);
+  //防止重复提交
+  const [submit, setSubmit] = useState<boolean>(false)
   const childRef = useRef() as any;
   const orderRef = useRef() as any;
   // const chargeTypeOptions = [
@@ -287,6 +289,7 @@ export default (props: any) => {
       }
     }
     if (current == 2) {
+      setSubmit(true)
       doCharge('next');
     }
     // if (current == 3) {
@@ -314,6 +317,7 @@ export default (props: any) => {
     if (values.discount) {
       if (values.discountRemark === undefined) {
         message.error('请填写优惠原因');
+        setSubmit(false)
         setloging(false);
         return;
       }
@@ -325,6 +329,7 @@ export default (props: any) => {
     // }
     if (values.paymentTime === undefined && ['4', '5'].indexOf(values.type) == -1) {
       message.error('请填写到账日期');
+      setSubmit(false)
       setloging(false);
       return;
     }
@@ -335,6 +340,7 @@ export default (props: any) => {
     // }
     if (values.method === undefined) {
       message.error('请填写付款方式');
+      setSubmit(false)
       setloging(false);
       return;
     }
@@ -365,6 +371,7 @@ export default (props: any) => {
       // console.log('res.data[0]' + res.data[0])
       if (res.status === 'success') {
         if (type == 'next') {
+          setSubmit(false)
           setloging(false);
           setChargeId(res.data[0])
           if (values.type == 0) {
@@ -380,6 +387,7 @@ export default (props: any) => {
           if (values.type == 4) {
             apiRequest.get('/sms/business/bizCharge', { id: res.data[0] }).then(charge => {
               if (charge.status == 'success') {
+                setSubmit(false)
                 let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
                 let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
                 setChargeInfo(<QrcodeInfo
@@ -394,6 +402,7 @@ export default (props: any) => {
           if (values.type == 5) {
             apiRequest.get('/sms/business/bizCharge', { id: res.data[0] }).then(charge => {
               if (charge.status == 'success') {
+                setSubmit(false)
                 setChargeInfo(<div
                   style={{
                     textAlign: 'center',
@@ -406,6 +415,7 @@ export default (props: any) => {
             })
           }
           if (values.type == 6) {
+            setSubmit(false)
             setChargeInfo(<div
               style={{
                 textAlign: 'center',
@@ -416,6 +426,7 @@ export default (props: any) => {
             setCurrent(3);
           }
         } else {
+          setSubmit(false)
           setloging(false);
           callbackRefs();
         }
@@ -458,7 +469,7 @@ export default (props: any) => {
             </Button>
           )} */}
           {current < steps.length - 1 && (
-            <Button type="primary" onClick={() => next()}>
+            <Button  type="primary" loading={submit}  onClick={() => next()}>
               下一步
             </Button>
           )}
