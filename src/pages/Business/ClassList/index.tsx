@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons';
 import MessageModal from './MessageModal';
 import WxMessage from './WxMessage';
+import NewWxMessage from './newWxMessage'
 import Upload from '@/services/util/upload';
 import Modals from './Modal';
 import Plan from './Plan';
@@ -23,7 +24,6 @@ import ClassInfo from './ClassInfo';
 import SignUpStudent from '../SignUpStudent/index';
 import ClassMessageModal from './ClassMessageModal';
 import CallLogs from './CallLogs'
-import e from 'express';
 type GithubIssueItem = {
   name: string;
   classType: string;
@@ -464,14 +464,23 @@ export default (props: any = null) => {
             renderData={renderData}
           />
         )}
-        {WXMessageVisible && (
+        {/* {WXMessageVisible && (
           <WxMessage
             modalVisible={WXMessageVisible}
             setModalVisible={() => setWXMessageVisible(false)}
             callbackRef={() => callbackRef()}
             renderData={renderData}
           />
+        )} */}
+        {WXMessageVisible && (
+          <NewWxMessage
+            modalVisible={WXMessageVisible}
+            setModalVisible={() => setWXMessageVisible(false)}
+            callbackRef={() => callbackRef()}
+            renderData={renderData}
+          />
         )}
+
         {modalInfo && (
           <ClassInfo
             modalVisible={modalInfo}

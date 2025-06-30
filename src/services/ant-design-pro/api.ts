@@ -213,12 +213,18 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/classlist',
                 component: './Business/ClassList',
               },
-              {
-                name: '题库设置',
-                icon: 'table',
-                path: '/business/question',
-                component: './Business/Question',
-              },
+              // {
+              //   name: '题库设置',
+              //   icon: 'table',
+              //   path: '/business/question',
+              //   component: './Business/Question',
+              // },
+              // {
+              //   name: '开通记录',
+              //   icon: 'table',
+              //   path: '/business/openquestionrecord',
+              //   component: './Business/OpenquestionRecord',
+              // },
               {
                 name: '消息管理',
                 path: '/business/message',

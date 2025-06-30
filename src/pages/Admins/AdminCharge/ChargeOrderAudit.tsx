@@ -37,6 +37,7 @@ export default (props: any) => {
     setPreviewImage,
     setPreviewVisible,
   } = props;
+  console.log(renderData,'renderData======')
   // const url = '/sms/business/bizCharge/edit';
   const { initialState } = useModel('@@initialState');
   const [falg, setFalg] = useState<boolean>(false);
@@ -614,8 +615,18 @@ export default (props: any) => {
           ]}
         />
         <ProFormDigit
-          label={`业绩金额` + orderAmountTitle}
+          label={`退费业绩金额` + orderAmountTitle}
           name="performanceAmount"
+          width="sm"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        />
+        <ProFormDigit
+          label="退费提成金额"
+          name="commissionBase"
           width="sm"
           rules={[
             {

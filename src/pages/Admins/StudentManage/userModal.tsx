@@ -447,9 +447,9 @@ export default (props: any) => {
             onChange={(e) => setTextContent(e.target.value)}
             placeholder={`示例模板:
 学员姓名:张三777,
-联系电话:18682478670,
+联系方式:18682478670,
 客户来源:视频号,
-信息所有人:周韦标,
+出镜人:周韦标,
 备注:现在在线
 点击下方复制示例模板`}
           />
@@ -466,9 +466,9 @@ export default (props: any) => {
             <div>
               <Typography.Paragraph id='copy' style={{ display: 'none' }} copyable={{
                 text: `学员姓名:张三777,
-联系电话:18682478670,
+联系方式:18682478670,
 客户来源:视频号,
-信息所有人:周韦标,
+出镜人:周韦标,
 备注:现在在线` }}>
                 复制模板
               </Typography.Paragraph>

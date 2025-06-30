@@ -38,6 +38,10 @@ export default (props: any) => {
             )
         },
         {
+            title: '手机号',
+            dataIndex: 'mobile',
+        },
+        {
             title: '确认时间',
             dataIndex: 'confirmTime',
             width: 120,

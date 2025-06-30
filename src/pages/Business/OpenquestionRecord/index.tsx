@@ -1,18 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  PlusOutlined
-} from '@ant-design/icons';
-import {
-  Button,
-  message,
-  Popconfirm,
-} from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import requestApi from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import Tables from '@/components/Tables';
 import filter from '@/services/util/filter';
-import AddModals from './projectAdd'
 import { ProFormInstance } from '@ant-design/pro-form';
 type GithubIssueItem = {
   name: string;
@@ -31,9 +22,6 @@ export default (props: any) => {
   } = props;
 
   const actionRef = useRef<ActionType>();
-  const [AddModalsVisible, setAddModalsVisible] = useState<boolean>(false);
-  //传递数据
-  const [renderData, setRenderData] = useState<any>(null);
   //存储小程序列表
   const [SmallProgram, setSmallProgram] = useState<any>([]);
   const [Subjectlist, setSubjectList] = useState<any>([]);
@@ -41,12 +29,11 @@ export default (props: any) => {
   const [Course, setCourselist] = useState<any>([]);
   const [productType, setProroductType] = useState<string>('01')
   const [columns, setColumns] = useState<ProColumns<GithubIssueItem>[]>([]);
-  const url = '/sms/business/bizQuestionAccredit';
+  const url = '/sms/business/bizQuestionAccreditLog';
   const formRef = useRef<ProFormInstance>();
   useEffect(() => {
     callbackRef();
   }, [type]);
-
   useEffect(() => {
     setColumns([...columns.filter((item:any) => item.dataIndex != 'productId'),{
       title: '题库/课程',
@@ -58,10 +45,7 @@ export default (props: any) => {
       fieldProps: {
         showSearch: true,
         filterTreeNode: (input: string, option: any) =>
-          option.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0,
-        onChange: (value: any) => {
-          console.log(value,'value')
-        }
+          option.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0
       },
       request: async () => {
         try {
@@ -107,6 +91,7 @@ export default (props: any) => {
       }
     },])
   }, [productType]);
+
   useEffect(() => {
     (async function init() {
       let SmallProgram = (await getSmallProgram())
@@ -142,8 +127,6 @@ export default (props: any) => {
             onChange: (value: string) => {
               // 更新productType状态
               setProroductType(value);
-              // 重置productId字段
-              formRef.current?.setFieldValue('productId', undefined);
             }
           }
         },
@@ -158,12 +141,41 @@ export default (props: any) => {
           fieldProps: {
             showSearch: true,
             filterTreeNode: (input: string, option: any) =>
-              option.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0,
-            onChange: (value: any) => {
-              console.log(value,'value')
+              option.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          },
+          request: async () => {
+            try {
+              if (productType === '01') {
+                try {
+                  if (Questionlist && Questionlist.length > 0) {
+                    return Questionlist;
+                  } else {
+                    const data = await getQuestionBankList();
+                    return data || [];
+                  }
+                } catch (error) {
+                  return [];
+                }
+              }
+
+              if (productType === '02') {
+                try {
+                  // 直接使用已经存储的课程数据，如果没有则重新获取
+                  if (Course && Course.length > 0) {
+                    return Course;
+                  } else {
+                    const data = await getCourselist();
+                    return data || [];
+                  }
+                } catch (error) {
+                  return [];
+                }
+              }
+              return [];
+            } catch (error) {
+              return [];
             }
           },
-          request: async () => Questionlist,
           dependencies: ['type'], // 依赖于表单中的type字段
           render: (text, record) => {
             if (record.type == '02') {
@@ -230,47 +242,17 @@ export default (props: any) => {
           ),
         },
         {
-          title: '操作',
-          valueType: 'option',
-          width: 260,
-          key: 'options',
-          fixed: 'right',
-          render: (text, record, _, action) => (
-            <>
-              <a
-                type="primary"
-                key="looks"
-                style={{ marginRight: '15px', marginBottom: '8px' }}
-                onClick={() => {
-                  setRenderData({ ...record, typeEdit: '1' })
-                  setAddModalsVisible(true);
-                }}
-              >
-                编辑
-              </a>,
-              <Popconfirm
-                key="deletePop"
-                title="是否确定删除？"
-                style={{ marginRight: '15px', marginBottom: '8px' }}
-                onConfirm={() => {
-                  requestApi.delete('/sms/business/bizQuestionAccredit', { id: record.id }).then((res: any) => {
-                    if (res.status == 'success') {
-                      message.success('删除成功');
-                      callbackRef();
-                    }
-                  });
-                }}
-                okText="删除"
-                cancelText="取消"
-              >
-                <a key="deletes" style={{ color: 'red' }}>
-                  删除
-                </a>
-              </Popconfirm>
-            </>
-
-          )
+          title: '联系电话',
+          key: 'mobile',
+          dataIndex: 'mobile',
+          sorter: true,
         },
+        {
+          title: '订单编号',
+          key: 'orderNum',
+          dataIndex: 'orderNum',
+          sorter: true,
+        }
       ]);
     })()
   }, [])
@@ -375,35 +357,8 @@ export default (props: any) => {
         rowClassName={highlightRow}
         toolbar={toolbar}
         request={{ url: url }}
-        // rowSelection={{
-        //   onChange: () => { },
-        // }}
-        toolBarRender={[
-          <Button
-            key="buttonq"
-            icon={<PlusOutlined />}
-            type="primary"
-            onClick={() => {
-              setAddModalsVisible(true)
-              setRenderData({ typeEdit: '0' })
-            }}
-          >
-            新建
-          </Button>
-        ]}
       />
 
-      {AddModalsVisible && (
-        <AddModals
-          setModalVisible={() => setAddModalsVisible(false)}
-          modalVisible={AddModalsVisible}
-          Course={Course}
-          Questionlist={Questionlist}
-          Subjectlist={Subjectlist}
-          renderData={renderData}
-          callbackRef={() => callbackRef()}
-        />
-      )}
     </>
   );
 };

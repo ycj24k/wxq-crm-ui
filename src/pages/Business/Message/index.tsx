@@ -10,7 +10,8 @@ import { useState } from "react";
 
 type GithubIssueItem = {
     name: string;
-    batchId: number
+    batchId: number;
+    createTime: string;
 };
 export default (props: any) => {
     const { classId } = props
@@ -34,6 +35,16 @@ export default (props: any) => {
             dataIndex: 'confirmQuantity',
             width: 120
         },
+        {
+            title: '发送时间',
+            key: 'createTime',
+            dataIndex: 'createTimes',
+            valueType: 'dateRange',
+            sorter: true,
+            render: (text, record) => (
+              <span>{record.createTime}</span>
+            ),
+          },
         {
             title: '操作',
             width: 100,

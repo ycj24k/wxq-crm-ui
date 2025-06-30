@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-    message
-} from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import Tables from '@/components/Tables';
 // import IsVerifyModel from './isVerifyModel';
