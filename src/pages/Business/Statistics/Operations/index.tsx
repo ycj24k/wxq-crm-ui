@@ -290,7 +290,7 @@ export default () => {
             _isGetAll: true
         }
         const content = (await request.get('/sms/business/bizCharge/getListOfFinance3', data)).data
-        DownTable(content, DownHeaders.PayHeader, '缴费信息', 'charge');
+        DownTable(content, DownHeaders.jiaoPayHeader, '缴费信息', 'charge');
     }
     return (
         <PageContainer>

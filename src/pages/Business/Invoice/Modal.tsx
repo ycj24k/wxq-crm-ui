@@ -250,6 +250,26 @@ export default (props: any) => {
                                                                 });
                                                             }
                                                         }
+                                                        if (renderDataInvoice.editType == 'edit') {
+                                                            let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                            let fromValue = fromValues[index]
+                                                            if (fromValue.surplusAmount < fromValue.usedAmount) {
+                                                                Modal.info({
+                                                                    title: '注意！当前开票金额大于剩余可开票金额！',
+                                                                    icon: <ExclamationCircleFilled />,
+                                                                    onOk() {
+
+                                                                        let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                                        let fromValue = fromValues[index]
+                                                                        delete fromValue.usedAmount
+
+                                                                        fromValues[index] = fromValue
+                                                                        formRefInvoice.current?.setFieldValue('chargeList', fromValues)
+
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
                                                     }
                                                 }}
                                             />

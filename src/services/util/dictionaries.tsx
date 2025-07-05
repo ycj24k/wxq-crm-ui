@@ -69,24 +69,30 @@ class dictionaries {
       return ['无']
     } else {
       let list = JSON.parse(localStorage.getItem('Depart') as string);
-      // if (!list) {
-      //   request.get('/sms/share/getDepartmentAndUser').then((res) => {
-      //     localStorage.setItem('Department', JSON.stringify(res.data));
-      //     this.getDepartmentName(value);
-      //     return;
-      //   });
-      // }
-      // let departments: any = [];
+      if (!list) {
+        return ['无数据'];
+      }
 
-      return (function getParent(list: any[], id: number) {
-        const res: any[] = []
-        let e = list.find(x => x.id == id)
-        res.push(e)
-        if (e.parentId && e.parentId != -1) {
-          res.push(...getParent(list, e.parentId))
+      function getParent(list: any[], id: number): any[] {
+        const res: any[] = [];
+        const e = list.find(x => x.id == id);
+        
+        if (!e) {
+          return res; // 如果找不到对应的部门，返回空数组
         }
-        return res
-      })(list, value).map(x => x.name)
+
+        res.push(e);
+        if (e.parentId && e.parentId !== -1) {
+          res.push(...getParent(list, e.parentId));
+        }
+        return res;
+      }
+
+      const departments = getParent(list, value);
+      if (departments.length === 0) {
+        return ['未找到部门'];
+      }
+      return departments.map(x => x.name);
 
       // function getParentId(list: any, id: any) {
       //   for (let i in list) {

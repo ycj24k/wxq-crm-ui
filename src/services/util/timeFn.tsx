@@ -341,7 +341,6 @@ const DownTable = (
       let str = ''
       if (data.departmentId) {
         let depart = await Dictionaries.getDepartmentName(data.departmentId);
-        console.log(depart,'depart')
         const departs = await depart.splice(0, depart.length - 1).reverse();
         str = departs.join('-')
       }
@@ -353,8 +352,6 @@ const DownTable = (
       let str = ''
       if (data.departmentId) {
         let depart = await Dictionaries.getDepartmentName(data.departmentId);
-        console.log(depart,'depart====>')
-        console.log(depart.length,'depart.length')
         const departs = await depart[depart.length - 2];
         str = departs
         //const departs = await depart.splice(0, depart.length - 1).reverse();

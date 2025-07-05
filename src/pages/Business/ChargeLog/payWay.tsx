@@ -94,15 +94,22 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
             userRefs.current = {};
             setUserNameIds({});
 
+
             // 重置其他状态
             setChargeType('6');
 
             // 设置第一个表单的初始值
             setTimeout(() => {
                 if (formRefs.current[0]) {
-                    const initialValues = { 
+                    const initialValues = {
                         chargeTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-                        type: '6'
+                        type: '6',
+                        chargeLogName: '',
+                        paymentTime: '',
+                        userId: payMessage?.userId + '',
+                        method: '',
+                        chargeLogIds: '',
+                        amount: '',
                     };
 
                     if (renderData?.departmentId) {

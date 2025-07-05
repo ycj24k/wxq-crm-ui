@@ -91,13 +91,19 @@ export default (props: any) => {
     };
     //新建学员
     const addStudent = () => {
-        // setTimeout(() => {
-        //     formRef.current?.setFieldsValue({
-        //         name: studentInfo.name,
-        //         mobile: studentInfo.phone,
-        //         idCard: studentInfo.idCard
-        //     })
-        // }, 500)
+        setTimeout(() => {
+            let data = {}
+            data = {
+                name: initialState?.currentUser?.name,
+                id: initialState?.currentUser?.userid,
+            }
+            userRef?.current?.setDepartment(data);
+            userRefs?.current?.setDepartment(data);
+            userRef2?.current?.setDepartment(data);
+            setUserNameId(data)
+            setUserNameIds(data)
+            setUserNameId2(data)
+        }, 500)
         setIsPayModalOpen(true)
     }
     const chooseStudent = () => {
@@ -357,6 +363,9 @@ export default (props: any) => {
                     // 重置所有表单数据
                     // 1. 重置学生表单
                     formRef.current?.resetFields();
+                    userRef?.current?.setDepartment({});
+                    userRefs?.current?.setDepartment({});
+                    userRef2?.current?.setDepartment({});
 
                     // 2. 重置班级列表表单
                     if (classListRef.current) {
@@ -377,10 +386,15 @@ export default (props: any) => {
                     setClassRef({});
 
                     setIsPayModalOpen(false);
+                    setChooseStudent(false);
                     setStudentModal(false);
+                    //window.location.reload()
                 } else {
-                    setConfirmLoading(false)
                     message.error(res.msg)
+                }
+            }).catch((err) => {
+                if (err.status == 'error') {
+                    setConfirmLoading(false)
                 }
             })
     }

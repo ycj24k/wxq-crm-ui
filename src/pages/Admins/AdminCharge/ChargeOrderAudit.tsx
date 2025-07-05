@@ -243,6 +243,7 @@ export default (props: any) => {
 
     if (renderData.type == '1') {
       value.agent = department.id;
+      value.chargeTime = moment(value.chargeTime).format('YYYY-MM-DD HH:mm:ss'),
       value.paymentTime = value.chargeTime;
       value.userId = userNameId.id;
       value.userName = userNameId.name;
@@ -362,7 +363,11 @@ export default (props: any) => {
                 }
                 formRef.current?.validateFieldsReturnFormatValue?.().then(async (values) => {
                   console.log('校验表单并返回格式化后的所有数据：', values);
-                  await submitok(values, 'audit');
+                  const data = {
+                    ...values,
+                    chargeTime: moment(values.chargeTime).format('YYYY-MM-DD HH:mm:ss'),
+                  };
+                  await submitok(data, 'audit');
                 });
               }}
               key="edit"
@@ -700,6 +705,9 @@ export default (props: any) => {
           name="chargeTime"
           fieldProps={{
             showTime: false,
+            onChange:(e) => {
+              console.log(e)
+            }
           }}
           width="md"
           label={`${orderTitle}日期`}

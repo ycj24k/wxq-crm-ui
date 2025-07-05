@@ -83,16 +83,16 @@
     path: '/business/resource/statistics',
     component: './Business/Resource/Statistics',
   },
-  // {
-  //   name: '题库设置',
-  //   path: '/business/question',
-  //   component: './Business/Question',
-  // },
-  // {
-  //   name: '开通记录',
-  //   path: '/business/openquestionrecord',
-  //   component: './Business/OpenquestionRecord',
-  // },
+  {
+    name: '题库设置',
+    path: '/business/question',
+    component: './Business/Question',
+  },
+  {
+    name: '开通记录',
+    path: '/business/openquestionrecord',
+    component: './Business/OpenquestionRecord',
+  },
   {
     name: '流转资源看板',
     icon: 'table',

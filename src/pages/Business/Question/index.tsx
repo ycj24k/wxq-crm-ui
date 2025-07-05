@@ -65,7 +65,7 @@ export default (props: any) => {
       },
       request: async () => {
         try {
-          if (productType === '01') {
+          if (productType === '02') {
             try {
               if (Questionlist && Questionlist.length > 0) {
                 return Questionlist;
@@ -78,7 +78,7 @@ export default (props: any) => {
             }
           }
 
-          if (productType === '02') {
+          if (productType === '03') {
             try {
               if (Course && Course.length > 0) {
                 return Course;
@@ -97,10 +97,10 @@ export default (props: any) => {
       },
       dependencies: ['type'], // 依赖于表单中的type字段
       render: (text, record) => {
-        if (record.type == '02') {
+        if (record.type == '03') {
           return Dictionaries.getNameById(Course, record.productId)
         }
-        if (record.type == '01') {
+        if (record.type == '02') {
           return Dictionaries.findAncestorsName(record.productId, Questionlist)
         }
         return '无'
@@ -135,8 +135,8 @@ export default (props: any) => {
           key: 'type',
           valueType: 'select',
           valueEnum: {
-            '01': '题库',
-            '02': '课程',
+            '02': '题库',
+            '03': '课程',
           },
           fieldProps: {
             onChange: (value: string) => {
@@ -166,10 +166,10 @@ export default (props: any) => {
           request: async () => Questionlist,
           dependencies: ['type'], // 依赖于表单中的type字段
           render: (text, record) => {
-            if (record.type == '02') {
+            if (record.type == '03') {
               return Dictionaries.getNameById(Course, record.productId)
             }
-            if (record.type == '01') {
+            if (record.type == '02') {
               return Dictionaries.findAncestorsName(record.productId, Questionlist)
             }
             return '无'

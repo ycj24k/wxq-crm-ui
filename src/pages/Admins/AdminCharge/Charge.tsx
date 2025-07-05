@@ -106,6 +106,7 @@ export default (props: any) => {
   const [uploadFormVisible, setUploadFormVisible] = useState<boolean>(false);
   const [uploadData, setUploadData] = useState<any>();
   const [fromDataList, setFromDataList] = useState<any>({});
+  const [loading, setLoading] = useState<boolean>(false);
   const url = '/sms/business/bizCharge';
   const url2 = '/sms/business/bizStudentUser';
   const ChargeNews = forwardRef(ChargeNew);
@@ -1189,12 +1190,12 @@ export default (props: any) => {
             >
               下载退费申请书模板(两个--企业和个人)
             </a>,
-            <a onClick={async () => {
-              console.log('actionRef', actionRef);
+            <Button loading={loading} onClick={async () => {
               if (isEmpty(fromDataList)) {
                 message.error('请选择条件!')
                 return
               } else {
+                setLoading(true)
                 // const data = {
                 //   enable: true,
                 //   'type-in': '0,2',
@@ -1205,18 +1206,22 @@ export default (props: any) => {
                   .then((res) => {
                     if (res.status == 'success') {
                       if (chargeType == 'refundList' || chargeType == 'refund') {
+                        setLoading(false)
                         DownTable(res.data, DownHeader.PayHeader, '退费信息', 'refund');
                       } else {
+                        setLoading(false)
                         DownTable(res.data, DownHeader.jiaoPayHeader, '缴费', 'charge');
                       }
                     }
+                  }).catch(err => {
+                    setLoading(false)
                   });
                 // const content = (await request.get('/sms/business/bizCharge/getListOfFinance2', fromDataList)).data
                 // DownTable(content, DownHeader.PayHeader, '缴费信息', 'charge');
               }
             }}>
               条件导出
-            </a>
+            </Button>
           ]}
         />
 
