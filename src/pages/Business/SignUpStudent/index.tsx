@@ -103,6 +103,11 @@ export default (props: any) => {
   const [checkFalg, setcheckFalg] = useState<boolean>(false);
   const [WXMessageVisible, setWXMessageVisible] = useState(false);
   const [certVisible, setCertVisible] = useState(false);
+  //二维码弹窗
+  const [qrcodeVisible, setQrcodeVisible] = useState(false);
+  //保存二维码图片
+  const [qrcodeSrc, setQrcodeSrc] = useState<string>();
+
   const [jobFalg, setJobFalg] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<any>([]);
   const [selectedIds, setSelectedIds] = useState<any>([]);
@@ -150,6 +155,27 @@ export default (props: any) => {
     }
 
   }
+
+  //打开二维码弹窗
+  const handleOpenQrCode = async (data: any) => {
+    const res = await request.get('/sms/business/bizField/orderField', {
+      orderId: data.id,
+      valueType: 0,
+      _isGetAll: true,
+      _orderBy: 'fieldStandardId',
+      _direction: 'asc'
+    });
+    if (res.data.content.length === 0) {
+      message.error('暂无报名资料数据')
+    } else {
+      setQrcodeVisible(true);
+      let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+      let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+      const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + data.id  + '&' + tokenName + '=' + tokenValue;
+      setQrcodeSrc(src)
+    }
+  }
+
   const menu = (
     <Menu
       items={[
@@ -731,6 +757,12 @@ export default (props: any) => {
             >
               证书
             </a>
+            <a
+              style={{ marginLeft: '10px' }}
+              onClick={() => { handleOpenQrCode(record) }}
+            >
+              二维码
+            </a>
             {/* <Popconfirm
               title="服务完结"
               okText="完结"
@@ -1135,6 +1167,18 @@ export default (props: any) => {
             renderData={renderData}
           />
         )}
+        <Modal
+          title="提交资料二维码"
+          open={qrcodeVisible}
+          width={500}
+          onCancel={() => setQrcodeVisible(false)}
+          footer={null}
+          destroyOnClose
+        >
+
+          <img style={{ width:'400px', height: '400px' }} src={qrcodeSrc} />
+        </Modal>
+
         <Modal
           title="编辑证书"
           open={certVisible}

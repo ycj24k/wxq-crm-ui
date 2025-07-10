@@ -149,6 +149,7 @@ export default (props: any) => {
                 if (values.type == '02') {
                     productID = values.productId.value
                 }
+
                 if (values.type == '03') {
                     productID = values.productId
                 }
@@ -157,7 +158,6 @@ export default (props: any) => {
                     productId: productID,
                     project: values.project[1],
                 };
-                console.log(submitData,'submitData')
                 if (loading) return
                 else setLoading(true)
                 message.loading("加载中", 0)

@@ -145,6 +145,13 @@ export default (props: any) => {
               // 重置productId字段
               formRef.current?.setFieldValue('productId', undefined);
             }
+          },
+          render: (text, record) => {
+            if(record.type == '02'){
+              return <span>题库</span>
+            }else if(record.type == '03'){
+              return <span>课程</span>
+            }
           }
         },
 
@@ -175,17 +182,17 @@ export default (props: any) => {
             return '无'
           }
         },
-        {
-          title: '科目',
-          dataIndex: 'subjectId',
-          key: 'subjectId',
-          sorter: true,
-          valueType: 'select',
-          request: async () => Subjectlist,
-          // render:(text, record) => {
-          //   return Dictionaries.getNameBySubjectName(Subjectlist,record.subjectId)
-          // }
-        },
+        // {
+        //   title: '科目',
+        //   dataIndex: 'subjectId',
+        //   key: 'subjectId',
+        //   sorter: true,
+        //   valueType: 'select',
+        //   request: async () => Subjectlist,
+        //   render:(text, record) => {
+        //     return Dictionaries.getNameBySubjectName(Subjectlist,record.subjectId)
+        //   }
+        // },
         {
           title: '项目总称',
           dataIndex: 'parentProjects',
@@ -247,7 +254,7 @@ export default (props: any) => {
                 }}
               >
                 编辑
-              </a>,
+              </a>
               <Popconfirm
                 key="deletePop"
                 title="是否确定删除？"
@@ -294,6 +301,7 @@ export default (props: any) => {
   //获取科目
   const getSubjectlist = async () => {
     const res = await requestApi.get('/sms/business/bizQuestionAccredit/getCourseSubjectList/0/0');
+    console.log(res,'科目------>科目')
     if (res && res.data) {
       let newArr1 = res.data.map((item: any) => {
         return {

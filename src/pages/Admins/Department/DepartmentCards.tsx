@@ -39,6 +39,22 @@ export default (props: any) => {
     });
     return data;
   };
+  
+  // 递归过滤掉 isDel < 0 的节点
+  const filterDeletedNodes = (data:any) => {
+    return data.filter((item:any) => item.isDel >= 0) // 保留 isDel >= 0 的节点
+      .map((item:any) => {
+        // 如果有子节点，递归处理子节点
+        if (item.children && item.children.length) {
+          return {
+            ...item,
+            children: filterDeletedNodes(item.children)
+          };
+        }
+        return item;
+      });
+  }
+
 
   const contentTree = async () => {
     const contentList: any = await request.get('/sms/share/getDepartment', {
@@ -46,6 +62,8 @@ export default (props: any) => {
     });
     let arr: any = [];
     let arr2 = contentList.data.reverse();
+    arr2 = filterDeletedNodes(arr2);
+
     arr2.forEach((item: any) => {
       arr.push({ title: item.name, key: item.id });
     });
@@ -81,7 +99,6 @@ export default (props: any) => {
       }
     });
     // console.log('arr', arr);
-
     return arr;
   };
   return (

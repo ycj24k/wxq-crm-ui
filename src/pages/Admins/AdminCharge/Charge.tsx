@@ -1078,13 +1078,14 @@ export default (props: any) => {
             return (
               <Space size={24}>
                 <span>
-                  <a style={{ marginInlineStart: 8 }} onClick={onCleanSelected}>
+                  <Button type='primary' style={{ marginInlineStart: 8 }} onClick={onCleanSelected}>
                     取消选择
-                  </a>
+                  </Button>
                 </span>
-                <a hidden={!!setModalsCharge}
+                <Button loading={loading} type='primary' hidden={!!setModalsCharge}
                   onClick={() => {
                     // setcheckFalg(true);
+                    setLoading(true)
                     if (chargeType == 'refundList' || chargeType == 'refund') {
                       request
                         .get('/sms/business/bizCharge/getListOfFinance', {
@@ -1092,6 +1093,7 @@ export default (props: any) => {
                         })
                         .then((res) => {
                           if (res.status == 'success') {
+                            setLoading(false)
                             DownTable(res.data, DownHeader.RefundHeader, '退费信息', 'refund');
                           }
                         });
@@ -1102,7 +1104,7 @@ export default (props: any) => {
                   }}
                 >
                   导出数据
-                </a>
+                </Button>
                 <Popconfirm
                   title="是否批量不计算业绩？"
                   onConfirm={() => {
@@ -1115,10 +1117,10 @@ export default (props: any) => {
                   okText="不算"
                   cancelText="取消"
                 >
-                  <a hidden={!!setModalsCharge}
+                  <Button type='primary' hidden={!!setModalsCharge}
                   >
                     不计算业绩
-                  </a>
+                  </Button>
                 </Popconfirm>
                 <Popconfirm
                   title="是否批量计算业绩？"
@@ -1132,10 +1134,10 @@ export default (props: any) => {
                   okText="算"
                   cancelText="取消"
                 >
-                  <a hidden={!!setModalsCharge}
+                  <Button type='primary' hidden={!!setModalsCharge}
                   >
                     计算业绩
-                  </a>
+                  </Button>
                 </Popconfirm>
                 <a
                   hidden={!setModalsCharge}
