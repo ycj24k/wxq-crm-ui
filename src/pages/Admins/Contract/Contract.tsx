@@ -313,6 +313,7 @@ export default (props: any) => {
         columns={columns}
         className="Contract"
         request={{ url: '/sms/contract/conCompany' }}
+        search={{ defaultCollapsed: true, labelWidth: 150, defaultColsNumber: 10 }}
         toolBarRender={[
           <Button
             key="button"

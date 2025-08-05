@@ -589,7 +589,8 @@ export default (props: any) => {
         className="xibao"
         search={{
           labelWidth: 120,
-          defaultCollapsed: false,
+          defaultCollapsed: true,
+          defaultColsNumber: 6,
         }}
         request={{ url: url, params: Params, sortList: sortList }}
         toolbar={toolbar}

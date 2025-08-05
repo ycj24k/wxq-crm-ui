@@ -7,6 +7,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import Modals from './Modal';
 import request from '@/services/ant-design-pro/apiRequest';
 import UserManageCard from '../Department/UserManageCard';
+//import MenuManageCard from '../MenusManger/UserManageCard';
+import MenuManageCard from '../MenusManger/MenuTree';
 import ModalRole from './ModalRole';
 type GithubIssueItem = {
   url: string;
@@ -18,8 +20,10 @@ type GithubIssueItem = {
   method: string;
   userList: any[];
   permissionList: any[];
+  menuList:any[];
 };
 let content: any = null;
+let menuContentlist: any = null;
 let roleContent: any = null;
 let roleContent2: any = null;
 export default () => {
@@ -28,6 +32,13 @@ export default () => {
   const [modalsVisible, setModalsVisible] = useState<boolean>(false);
   const [renderData, setRenderData] = useState<object>({});
   const [CardVisible, setCardVisible] = useState<boolean>(false);
+  //菜单权限
+  const [MenuVisible, setMenuVisible] = useState<boolean>(false);
+  //菜单列表
+  const [MenuContent, setMenuContent] = useState<any>();
+  //菜单数据
+  const [menuRenderData, setMenuRenderData] = useState<any>();
+
   const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
   let [department, setDepartment] = useState<any>();
   const [CardContent, setCardContent] = useState<any>();
@@ -125,6 +136,46 @@ export default () => {
         </Button>
       ),
     },
+
+    // {
+    //   title: '授权菜单',
+    //   dataIndex: 'menu',
+    //   colSpan: 2,
+    //   search: false,
+    //   hideInTable: TabListNuber == '1' ? false : true,
+    //   ellipsis: true,
+    //   tip: '过长会自动收缩',
+    // },
+    // {
+    //   width: 120,
+    //   colSpan: 0,
+    //   hideInTable: TabListNuber == '1' ? false : true,
+    //   search: false,
+    //   render: (text, record, _, action) => (
+    //     <Button
+    //       size="small"
+    //       type="primary"
+    //       icon={<PlusOutlined />}
+    //       onClick={async () => {
+    //         if (!menuContentlist) {
+    //           menuContentlist = await request.get('/sms/system/sysMenu/tree');
+    //         }
+    //         const arr: any = [];
+    //         record.menuList.forEach((item: any) => {
+    //           arr.push(item.name);
+    //         });
+    //         //setDepartment(arr);
+    //         setMenuRenderData(record)
+    //         setMenuContent({ menuContentlist: menuContentlist.data });
+    //         setMenuVisible(true)
+    //       }}
+    //     >
+    //       授权菜单
+    //     </Button>
+    //   ),
+    // },
+
+
     {
       title: '备注',
       dataIndex: 'description',
@@ -132,6 +183,8 @@ export default () => {
       ellipsis: true,
       tip: '备注过长会自动收缩',
     },
+
+
 
     {
       title: '操作',
@@ -214,6 +267,7 @@ export default () => {
             roleContent.data.content.forEach((item: any) => {
               const userNameRole: any[] = [];
               const permission: any[] = [];
+              const menu: any[] = [];
               departmentsList.push({ name: item.userName, id: item.userId });
               if (item.userList) {
                 item.userList.forEach((items: any) => {
@@ -224,8 +278,14 @@ export default () => {
                     permission.push(items.name);
                   });
                 }
+                if(item.menuList) {
+                  item.menuList.forEach((items: any) => {
+                    menu.push(items.name);
+                  });
+                }
                 item.userName = userNameRole.join(',');
                 item.permission = permission.join(',');
+                item.menu = menu.join(',');
               }
             });
             setDepartment(departmentsList);
@@ -372,6 +432,8 @@ export default () => {
           url={url}
         />
       )}
+
+      {/* 人员信息 */}
       {modalsVisible && (
         <ModalRole
           modalVisible={modalsVisible}
@@ -395,6 +457,17 @@ export default () => {
           departments={department}
         />
       )}
+
+      {MenuVisible && (
+        <MenuManageCard
+          MenuVisible={MenuVisible}
+          MenuContent={menuContentlist}
+          menuRenderData={menuRenderData}
+          callbackRef={() => callbackRef()}
+          setMenuVisible={() => setMenuVisible(false)}
+        />
+      )}
+
     </PageContainer>
   );
 };

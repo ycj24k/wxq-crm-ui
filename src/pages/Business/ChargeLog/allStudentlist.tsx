@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
+import { Button, Badge } from 'antd'
 import Tables from '@/components/Tables';
 // import IsVerifyModel from './isVerifyModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
 import './index.less'
+import { PlusOutlined } from '@ant-design/icons';
 type GithubIssueItem = {
     name: string;
     mobile: string;
@@ -39,16 +41,10 @@ type GithubIssueItem = {
 };
 export default (props: any) => {
     const {
-        admin,
         type,
         isFormal = false,
-        isPay = null,
-        parentId = null,
-        companyStudent = null,
-        recommend = false,
-        userIds = false,
-        source = false,
-        StudentMessage
+        StudentMessage,
+        setOrderModalVisible
     } = props;
     const actionRef = useRef<ActionType>();
     const [paramsA, setparamsA] = useState<any>({});
@@ -172,6 +168,18 @@ export default (props: any) => {
                 request={
                     { url: url, params: params, sortList: sortList }
                 }
+                toolBarRender={[
+                    <Button
+                      key="ordere"
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() => {
+                        setOrderModalVisible(true);
+                      }}
+                    >
+                      新建学员
+                    </Button>
+                ]}
                 rowSelection={{
                     type:'radio',
                     onSelect: StudentMessage

@@ -14,6 +14,7 @@ export default () => {
     const { initialState } = useModel('@@initialState');
     const [src, setSrc] = useState<string>()
     const [companyName, setCompanyName] = useState<string>()
+    const [num, setNum] = useState<string>('isTrue')
 
     const get = (param: object = {}, reload = false) => {
         apiRequest.get('/sms/business/bizFile/chargeQRCode', param).then(res => {
@@ -87,7 +88,7 @@ export default () => {
                         xxl: 16,
                     }}
                 >
-                    <ChargeLog reBuild={reBuild} getAll={true} />
+                    <ChargeLog reBuild={reBuild} getAll={true} showBtn={true} num={num}/>
                 </ProCard>
             </ProCard>
         </PageContainer>

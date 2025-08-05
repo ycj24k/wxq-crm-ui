@@ -1,7 +1,7 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import {
   PlusOutlined,
-  CloseOutlined,
+  FormOutlined,
   EditOutlined,
   AccountBookOutlined,
   DeleteOutlined,
@@ -12,7 +12,6 @@ import {
   Button,
   Tag,
   Space,
-  Divider,
   Popconfirm,
   message,
   Spin,
@@ -22,9 +21,6 @@ import {
   Drawer,
 } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
-import { PageContainer } from '@ant-design/pro-layout';
-import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import StudentOrder from './studentOrder';
@@ -37,9 +33,9 @@ import ChargeInfo from '../AdminCharge/ChargeInfo';
 import { history } from 'umi';
 import ChargeIframe from '../AdminCharge/ChargeIframe';
 import CompanyStudentClass from './CompanyStudentClass';
+import StudentList from './StudentList';
 import Tables from '@/components/Tables';
 import Upload from '@/services/util/upload';
-import style from './index.less';
 import filter from '@/services/util/filter';
 const { confirm } = Modal;
 type GithubIssueItem = {
@@ -73,7 +69,18 @@ type GithubIssueItem = {
 };
 
 export default (props: any) => {
-  const { admins, admin, studentUserId = '', type = 0, orderId = '', orderIds = undefined, searchFalg = false, searchParams } = props;
+  const { 
+    admins, 
+    admin, 
+    studentUserId = '', 
+    type = 0, 
+    orderId = '', 
+    orderIds = undefined, 
+    searchFalg = false, 
+    searchParams, 
+    showType, 
+    showStudentBtn 
+  } = props;
   const [CommodalVisibleFalg, setComModalVisible] = useState<boolean>(false);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
@@ -84,6 +91,9 @@ export default (props: any) => {
   const [ChargeNewsVisibleFalg, setChargeNewsVisibleFalg] = useState<boolean>(false);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
   const [ChargeInfoVisibleFalg, setChargeInfoVisible] = useState<boolean>(false);
+  //学员下单
+  const [StudentVisibleFalg, setStudentVisible] = useState<boolean>(false);
+
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [renderData, setRenderData] = useState<any>(null);
   const [previewImage, setPreviewImage] = useState<any>();
@@ -182,14 +192,18 @@ export default (props: any) => {
   };
   const columns: ProColumns<GithubIssueItem>[] = [
     {
+      width: 120,
       title: '订单编号',
       dataIndex: 'num',
       sorter: true,
+      fixed: 'left',
     },
     {
+      width: 100,
       title: '学员/企业',
       dataIndex: 'studentName',
       sorter: true,
+      fixed: 'left',
       // width: 100,
       // search: false,
       render: (text, record) => (
@@ -231,30 +245,35 @@ export default (props: any) => {
       sorter: true,
     },
     {
+      width: 100,
       title: '订单金额',
       dataIndex: 'totalReceivable',
       sorter: true,
       search: false,
     },
     {
+      width: 100,
       title: '订单实际应收金额',
       dataIndex: 'actualReceivable',
       sorter: true,
       search: false,
     },
     {
+      width: 100,
       title: '累计实收',
       sorter: true,
       dataIndex: 'charge',
       search: false,
     },
     {
+      width: 100,
       title: '累计优惠',
       sorter: true,
       dataIndex: 'discount',
       search: false,
     },
     {
+      width: 80,
       title: '欠费',
       dataIndex: 'arrears',
       sorter: true,
@@ -262,6 +281,7 @@ export default (props: any) => {
       render: (text, record) => <span style={{ color: 'red' }}>{record.arrears}</span>,
     },
     {
+      width: 120,
       title: '订单来源',
       dataIndex: 'source',
       valueType: 'select',
@@ -273,6 +293,7 @@ export default (props: any) => {
       render: (text, record) => <span>{Dictionaries.getName('dict_source', record.source)}</span>,
     },
     {
+      width: 100,
       title: '项目总称',
       dataIndex: 'parentProjects',
       key: 'parentProjects',
@@ -282,7 +303,6 @@ export default (props: any) => {
         options: Dictionaries.getList('dict_reg_job'),
         showSearch: { filter },
       },
-      width: 180,
       render: (text, record) => (
         <span key="parentProjects">
           {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
@@ -290,6 +310,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '报考岗位',
       dataIndex: 'project',
       sorter: true,
@@ -314,6 +335,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '报考人数',
       dataIndex: 'quantity',
       sorter: true,
@@ -321,6 +343,7 @@ export default (props: any) => {
     },
 
     {
+      width: 80,
       title: '备注',
       dataIndex: 'description',
       search: false,
@@ -329,6 +352,7 @@ export default (props: any) => {
       tip: '备注过长会自动收缩',
     },
     {
+      width: 100,
       title: '下单时间',
       key: 'createTime',
       sorter: true,
@@ -341,6 +365,7 @@ export default (props: any) => {
       // hideInSearch: true,
     },
     {
+      width: 120,
       title: '缴费状态',
       dataIndex: 'status',
       // search: false,
@@ -371,6 +396,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '报考岗位',
       // dataIndex: 'classType',
       search: false,
@@ -389,6 +415,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '班级类型',
       dataIndex: 'classType',
       search: false,
@@ -421,6 +448,7 @@ export default (props: any) => {
       },
     },
     {
+      width: 100,
       title: '班型年限',
       dataIndex: 'classYear',
       search: false,
@@ -510,6 +538,7 @@ export default (props: any) => {
               key="editable"
               type="primary"
               size="small"
+              hidden={showType == 'refund'}
               icon={<EditOutlined />}
               className="tablebut"
               onClick={async () => {
@@ -564,7 +593,7 @@ export default (props: any) => {
             cancelText="取消"
           >
             <Button
-              hidden={record.parentId != '-1'}
+              hidden={record.parentId != '-1' || showType == 'refund'}
               key="delete"
               size="small"
               type="primary"
@@ -580,6 +609,7 @@ export default (props: any) => {
               size="small"
               type="primary"
               className="tablebut"
+              hidden={showType == 'refund'}
               icon={<ProfileOutlined />}
               onClick={async () => {
                 SetSpingFalg(true);
@@ -888,7 +918,7 @@ export default (props: any) => {
           admins ? <Tables
             columns={columns}
             className="Order"
-            scroll={{ x: 1500 }}
+            scroll={{ x: 2500 }}
             actionRef={actionRef}
             cardBordered
             dataSource={dataSourceList}
@@ -896,7 +926,7 @@ export default (props: any) => {
           /> : <Tables
             columns={columns}
             className="Order"
-            scroll={{ x: 1500 }}
+            scroll={{ x: 2500 }}
             actionRef={actionRef}
             cardBordered
             request={{ url: url, params: { ...params, ...paramsA }, sortList }}
@@ -938,6 +968,17 @@ export default (props: any) => {
               );
             }}
             toolBarRender={[
+              // <Button
+              //   key="ordere"
+              //   type="primary"
+              //   hidden={showStudentBtn == 'hiddenBtn'}
+              //   icon={<FormOutlined />}
+              //   onClick={() => {
+              //     setStudentVisible(true)
+              //   }}
+              // >
+              //   学员下单
+              // </Button>,
               <Button
                 key="ordere"
                 type="primary"
@@ -1087,6 +1128,17 @@ export default (props: any) => {
             setPreviewVisible={() => setPreviewVisible(true)}
           />
         )}
+
+        {/* 学员下单 */}
+        {StudentVisibleFalg && (
+          <StudentList
+            setModalVisible={() => setStudentVisible(false)}
+            modalVisible={StudentVisibleFalg}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+          />
+        )}
+
         {UploadFalg && (
           <Upload
             setModalVisible={() => setUploadVisible(false)}

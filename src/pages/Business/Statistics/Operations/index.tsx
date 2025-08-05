@@ -134,6 +134,9 @@ export default () => {
             key: 'amount',
             width: 160,
             dataIndex: "amount",
+            render: (text, record) => (
+                <span>{(record.amount).toFixed(2)}</span>
+            )
         },
         {
             title: '成交率',

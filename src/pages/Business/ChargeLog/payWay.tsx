@@ -3,7 +3,8 @@ import ProForm, {
     ProFormDateTimePicker,
     ProFormSelect,
     ProFormInstance,
-    ProFormDigit
+    ProFormDigit,
+    ProFormTextArea
 } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from '@ant-design/pro-card';
@@ -19,6 +20,7 @@ interface PayWayMethods {
 
 const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
     const { renderData, payMessage } = props;
+    console.log(renderData,'paywayRenderData')
     const [payWayList, setPayWayList] = useState<number[]>([0]); // 用于管理多个支付方式表单
     const formRefs = useRef<{ [key: number]: ProFormInstance }>({});
 
@@ -379,12 +381,11 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 }
                             ]}
                         />
-                        {/* <ProFormTextArea
+                        <ProFormTextArea
                             width={1100}
-                            label={renderData.type != 'orders' ? '备注' : '退款原因'}
+                            label="备注"
                             name="description"
-                            rules={[{ required: true }]}
-                        /> */}
+                        />
 
                     </ProForm.Group>
                 </ProForm>

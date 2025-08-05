@@ -50,7 +50,7 @@ import Invoice from '@/pages/Business/Invoice/Invoice';
 import ChargeNew from './ChargeNew';
 import * as XLSX from 'XLSX';
 import { biuldDataFromExcelJson } from '@/services/util/util';
-import TextArea from 'antd/lib/input/TextArea';
+import StudentOrders from '@/pages/Admins/StudentManage/StudentOrder';
 
 export default (props: any) => {
   const {
@@ -60,6 +60,7 @@ export default (props: any) => {
     type = '0',
     auditType = '',
     chargeType = 'charge',
+    chargeBtn,
     chargeTypes,
     setChargeModal,
     setChargeInfo,
@@ -88,6 +89,9 @@ export default (props: any) => {
   const actionRef = useRef<ActionType>();
   const formRefa = useRef<ProFormInstance>();
   const departmentTree = Dictionaries.getDepartmentTree();
+
+  const [StudentOrderOpen, setStudentOrderOpen] = useState<boolean>(false);
+
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
   const [refundVisible, setRefundVisible] = useState<boolean>(false);
@@ -197,7 +201,7 @@ export default (props: any) => {
     {
       title: '编号',
       dataIndex: 'num',
-      width: 130,
+      width: 100,
       fixed: 'left',
       sorter: true,
       // render: (text, record) => (
@@ -220,7 +224,7 @@ export default (props: any) => {
     {
       title: '缴费类型',
       dataIndex: 'type',
-      width: 120,
+      width: 100,
       // hideInTable: true,
       valueType: 'select',
       key: 'type',
@@ -274,7 +278,7 @@ export default (props: any) => {
     {
       title: '收费部门',
       dataIndex: 'departmentId-in',
-      width: 130,
+      width: 100,
       valueType: 'treeSelect',
       request: async () => departmentTree,
       render: (text, record) => {
@@ -404,7 +408,7 @@ export default (props: any) => {
         options: Dictionaries.getList('dict_reg_job'),
         showSearch: { filter },
       },
-      width: 150,
+      width: 120,
       render: (text, record) => (
         <span key="parentProjects">
           {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
@@ -455,7 +459,7 @@ export default (props: any) => {
     {
       title: '考试类型',
       sorter: true,
-      width: 80,
+      width: 100,
       dataIndex: 'examType',
       valueEnum: Dictionaries.getSearch('dict_exam_type'),
       render: (text, record) => <>{Dictionaries.getName('dict_exam_type', record.examType)}</>,
@@ -464,7 +468,7 @@ export default (props: any) => {
       title: chargeType == 'chargeList' ? '收费金额' : '退费金额',
       dataIndex: 'amount',
       sorter: true,
-      width: 80,
+      width: 100,
       search: false,
     },
     // {
@@ -1065,11 +1069,13 @@ export default (props: any) => {
             setFromDataList(e)
           }}
           loding={(e) => setSwitchLoding(e)}
-          search={{ defaultCollapsed: false, labelWidth: 120 }}
+          search={{ defaultCollapsed: true, labelWidth: 120, defaultColsNumber: 10 }}
           rowSelection={{
             // 注释该行则默认不显示下拉选项
             selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
             onChange: (e, selectedRows) => {
+              //console.log(selectedRows,'selectedRows')
+              setRenderData(selectedRows[0])
               // setStudentIds(e);
             },
             preserveSelectedRowKeys: true
@@ -1177,7 +1183,19 @@ export default (props: any) => {
               }}
             >
               导入对公转账流水
-            </Button>
+            </Button>,
+            // <a
+            //   onClick={() => {
+            //     if (!renderData) {
+            //       message.error('没有选择学员!')
+            //     } else {
+            //       setRenderData({ ...renderData, chargeType: '1', Type:'refund',chargeBtn });
+            //       setStudentOrderOpen(true);
+            //     }
+            //   }}
+            // >
+            //   申请退费
+            // </a>
             , <a
               hidden={chargeType != 'refundList' && chargeType != 'refund'}
               download="汇德退费申请表协议版（未下单直接退款模板）"
@@ -1275,6 +1293,18 @@ export default (props: any) => {
             />
           )} */}
         </Drawer>
+
+
+        {StudentOrderOpen && (
+          <StudentOrders
+            setModalVisible={() => setStudentOrderOpen(false)}
+            modalVisible={StudentOrderOpen}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+            //placeAnOrder={(e: any) => placeAnOrder(e)}
+          />
+        )}
+
 
         {modalVisibleFalg && (
           <ChargeInfo

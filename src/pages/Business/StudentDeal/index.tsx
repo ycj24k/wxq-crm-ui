@@ -101,6 +101,19 @@ export default () => {
             hideInTable: true,
         },
         {
+            width:110,
+            title: '现所属老师',
+            dataIndex: 'userName',
+        },
+        {
+            title: '录入时所属老师',
+            dataIndex: 'firstUserName',
+        },
+        {
+            title: '信息提供人',
+            dataIndex: 'providerName',
+        },
+        {
             title: 'QQ',
             dataIndex: 'QQ',
             key: 'QQ',
@@ -144,7 +157,7 @@ export default () => {
                 options: Dictionaries.getList('dict_reg_job'),
                 mode: 'tags',
             },
-            width: 180,
+            width: 110,
             render: (text, record) => (
                 <span key="parentProjects">
                     {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
@@ -179,6 +192,7 @@ export default () => {
             ),
         },
         {
+            width:100,
             title: '客户来源',
             dataIndex: 'studentSource',
             valueType: 'select',
@@ -190,18 +204,7 @@ export default () => {
                 <span>{Dictionaries.getName('dict_source', record.studentSource)}</span>
             ),
         },
-        {
-            title: '现所属老师',
-            dataIndex: 'userName',
-        },
-        {
-            title: '录入时所属老师',
-            dataIndex: 'firstUserName',
-        },
-        {
-            title: '信息提供人',
-            dataIndex: 'providerName',
-        },
+        
         {
             title: '成交日期',
             key: 'dealTime',
@@ -248,6 +251,7 @@ export default () => {
             ),
         },
         {
+            width:100,
             title: '成交项目',
             dataIndex: 'dealParentProjects',
             key: 'dealParentProjects',
@@ -256,7 +260,6 @@ export default () => {
                 options: Dictionaries.getList('dict_reg_job'),
                 mode: 'tags',
             },
-            width: 180,
             render: (text, record) => (
                 <span key="dealParentProjects">
                     {record.dealProject ? Dictionaries.getCascaderAllName('dict_reg_job', record.dealProject) : '-'}
@@ -264,6 +267,7 @@ export default () => {
             ),
         },
         {
+            width:100,
             title: '成交岗位',
             dataIndex: 'dealProject-in',
             key: 'dealProject-in',
@@ -297,7 +301,8 @@ export default () => {
                 scroll={{ x: 1500 }}
                 search={{
                     labelWidth: 120,
-                    defaultCollapsed: false,
+                    defaultCollapsed: true,
+                    defaultColsNumber: 10
                 }}
                 rowClassName={""}
                 onReset={() => {

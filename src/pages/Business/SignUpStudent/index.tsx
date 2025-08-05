@@ -29,6 +29,7 @@ import Return from '../Servicerecord/Return';
 import JobAssociation from '@/pages/Admins/JobAssociation';
 import MessageModal from '@/pages/Business/ClassList/MessageModal';
 import WxMessage from '../ClassList/WxMessage';
+import AddQuestion from '@/pages/Business/Question/projectAdd';
 import './index.less';
 import filter from '@/services/util/filter';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -107,6 +108,8 @@ export default (props: any) => {
   const [qrcodeVisible, setQrcodeVisible] = useState(false);
   //保存二维码图片
   const [qrcodeSrc, setQrcodeSrc] = useState<string>();
+  //开通题库
+  const [AddModalsVisible, setAddModalsVisible] = useState<boolean>(false);
 
   const [jobFalg, setJobFalg] = useState<boolean>(false);
   const [selectedRows, setSelectedRows] = useState<any>([]);
@@ -171,9 +174,15 @@ export default (props: any) => {
       setQrcodeVisible(true);
       let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
       let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-      const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + data.id  + '&' + tokenName + '=' + tokenValue;
+      const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + data.id + '&' + tokenName + '=' + tokenValue;
       setQrcodeSrc(src)
     }
+  }
+
+  //开通题库
+  const handleOpenQuestion = (record: any) => {
+    setAddModalsVisible(true)
+    setRenderData({ typeEdit: '1', record: record.id })
   }
 
   const menu = (
@@ -240,10 +249,10 @@ export default (props: any) => {
       ),
     },
     {
+      width: 110,
       title: '班级',
       dataIndex: 'className',
       sorter: true,
-      width: 140,
       hideInTable: classId,
       render: (text, record) => (
         <a
@@ -257,30 +266,31 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '报考班型',
       dataIndex: 'classType',
       sorter: true,
-      width: 80,
       valueEnum: Dictionaries.getSearch('dict_class_type'),
       render: (text, record) => <>{Dictionaries.getName('dict_class_type', record.classType)}</>,
     },
     {
+      width: 100,
       title: '班型年限',
       sorter: true,
       dataIndex: 'classYear',
-      width: 80,
       valueEnum: Dictionaries.getSearch('dict_class_year'),
       render: (text, record) => <>{Dictionaries.getName('dict_class_year', record.classYear)}</>,
     },
     {
+      width: 100,
       title: '考试类型',
       sorter: true,
       dataIndex: 'examType',
-      width: 80,
       valueEnum: Dictionaries.getSearch('dict_exam_type'),
       render: (text, record) => <>{Dictionaries.getName('dict_exam_type', record.examType)}</>,
     },
     {
+      width: 140,
       title: '项目总称',
       dataIndex: 'parentProjects',
       key: 'parentProjects',
@@ -290,7 +300,6 @@ export default (props: any) => {
         options: Dictionaries.getList('dict_reg_job'),
         showSearch: { filter },
       },
-      width: 150,
       render: (text, record) => (
         <span key="parentProjects">
           {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
@@ -303,7 +312,7 @@ export default (props: any) => {
       // search: false,
       key: 'project',
       sorter: true,
-      width: 180,
+      width: 120,
       valueType: 'cascader',
       fieldProps: {
         options: Dictionaries.getCascader('dict_reg_job'),
@@ -345,7 +354,7 @@ export default (props: any) => {
       sorter: true,
       // search: false,
       filters: true,
-      width: 60,
+      width: 120,
       filterMultiple: false,
       valueType: 'select',
       valueEnum: {
@@ -383,7 +392,7 @@ export default (props: any) => {
       sorter: true,
       // search: false,
       filters: true,
-      width: 60,
+      width: 120,
       hideInTable: !classId,
       filterMultiple: false,
       valueType: 'select',
@@ -410,7 +419,7 @@ export default (props: any) => {
       dataIndex: 'isComplete',
       sorter: true,
       // search: false,
-      width: 60,
+      width: 120,
       filters: true,
       filterMultiple: false,
       valueType: 'select',
@@ -436,7 +445,7 @@ export default (props: any) => {
       title: '审核',
       dataIndex: 'isSubmit',
       sorter: true,
-      width: 60,
+      width: 80,
       // search: false,
       filters: true,
       hideInTable: Params.isServed,
@@ -490,7 +499,7 @@ export default (props: any) => {
       title: '缴费',
       dataIndex: 'status',
       sorter: true,
-      width: 60,
+      width: 80,
       // search: false,
       filters: true,
       filterMultiple: false,
@@ -521,7 +530,7 @@ export default (props: any) => {
       title: '招生老师',
       dataIndex: 'userName',
       sorter: true,
-      width: 80,
+      width: 100,
     },
     // {
     //   title: '是否确认考试',
@@ -612,7 +621,7 @@ export default (props: any) => {
     {
       title: '导出次数',
       dataIndex: 'exportNum',
-      width: 60,
+      width: 100,
       sorter: true,
       render: (text, record) => (
         <span key="exportNum">{record.exportNum ? record.exportNum : 0}</span>
@@ -757,11 +766,17 @@ export default (props: any) => {
             >
               证书
             </a>
+            <Divider type="vertical" />
             <a
-              style={{ marginLeft: '10px' }}
               onClick={() => { handleOpenQrCode(record) }}
             >
               二维码
+            </a>
+            <Divider type="vertical" />
+            <a
+              onClick={() => { handleOpenQuestion(record) }}
+            >
+              开通题库
             </a>
             {/* <Popconfirm
               title="服务完结"
@@ -995,7 +1010,12 @@ export default (props: any) => {
           actionRef={actionRef}
           cardBordered
           request={{ url: url, params: Params, sortList: sortList }}
-          search={{ defaultCollapsed: false }}
+          search={{ defaultCollapsed: true, defaultColsNumber: 10 }}
+          rowClassName={""}
+          // onReset={() => {
+          //   setparamsA({});
+          // }}
+          toolbar={toolbar}
           rowKey="id"
           toolbar={toolbar}
           // search={orderId ? false : true}
@@ -1176,8 +1196,18 @@ export default (props: any) => {
           destroyOnClose
         >
 
-          <img style={{ width:'400px', height: '400px' }} src={qrcodeSrc} />
+          <img style={{ width: '400px', height: '400px' }} src={qrcodeSrc} />
         </Modal>
+
+        {/* 开通题库 */}
+        {AddModalsVisible && (
+          <AddQuestion
+            setModalVisible={() => setAddModalsVisible(false)}
+            modalVisible={AddModalsVisible}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+          />
+        )}
 
         <Modal
           title="编辑证书"

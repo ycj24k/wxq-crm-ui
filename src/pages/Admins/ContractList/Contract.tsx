@@ -77,14 +77,17 @@ export default (props: any) => {
       dataIndex: 'num',
       width: 130,
       sorter: true,
+      fixed: 'left'
     },
     {
+      width: 100,
       title: '合同名称',
       dataIndex: 'name',
       sorter: true,
     },
     {
       title: '学员姓名',
+      width: 100,
       dataIndex: 'studentName',
       render: (text, record) => (
         <a
@@ -100,6 +103,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '学员类型',
       dataIndex: 'type',
       filters: true,
@@ -119,6 +123,7 @@ export default (props: any) => {
       render: (text, record) => <span>{Dictionaries.getName('studentType', record.type)}</span>,
     },
     {
+      width: 100,
       title: '项目总称',
       dataIndex: 'parentProjects',
       key: 'parentProjects',
@@ -128,7 +133,6 @@ export default (props: any) => {
         options: Dictionaries.getList('dict_reg_job'),
         showSearch: { filter },
       },
-      width: 180,
       render: (text, record) => (
         <span key="parentProjects">
           {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
@@ -136,6 +140,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '对应项目',
       dataIndex: 'project',
       // search: false,
@@ -152,20 +157,24 @@ export default (props: any) => {
     },
 
     {
+      width: 100,
       title: '合同金额',
       dataIndex: 'amount',
     },
     {
+      width: 100,
       title: '签署老师',
       dataIndex: 'userName',
     },
     {
+      width: 90,
       title: '备注',
       dataIndex: 'description',
       ellipsis: true,
       tip: '过长会自动收缩',
     },
     {
+      width: 100,
       title: '签署状态',
       dataIndex: 'isFinish',
       filters: true,
@@ -186,6 +195,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '签署时间',
       key: 'otherSignTime',
       dataIndex: 'otherSignTime',
@@ -198,6 +208,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '归档状态',
       dataIndex: 'filingNum',
       filters: true,
@@ -224,6 +235,7 @@ export default (props: any) => {
       sorter: true,
     },
     {
+      width: 100,
       title: '审核时间',
       key: 'auditTime',
       dataIndex: 'auditTime',
@@ -234,6 +246,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '创建时间',
       key: 'createTime',
       dataIndex: 'createTime',
@@ -244,6 +257,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '合同状态',
       key: 'isRepealed',
       dataIndex: 'isRepealed',
@@ -256,6 +270,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '查看',
       dataIndex: 'options',
       search: false,
@@ -342,7 +357,7 @@ export default (props: any) => {
         actionRef={actionRef}
         columns={columns}
         request={{ url: '/sms/contract/conContract', params: params }}
-        search={{ defaultCollapsed: false }}
+        search={{ defaultCollapsed: true, defaultColsNumber: 10 }}
         scroll={{ x: 1500 }}
         rowSelection={{
           // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom

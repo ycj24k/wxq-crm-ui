@@ -29,7 +29,7 @@ export default () => {
         },
       ]}
     >
-      <Charge type="1" studentType={TabListNuber} chargeType="refundList" />
+      <Charge type="1" studentType={TabListNuber} chargeType="refundList" chargeBtn="hiddenBtn"/>
     </PageContainer>
   );
 };

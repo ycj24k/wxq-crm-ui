@@ -66,7 +66,7 @@ export default (props: any) => {
     {
       title: '姓名',
       dataIndex: 'name',
-      // width: 100,
+      width: 100,
       sorter: true,
       fixed: 'left',
       render: (text, record) => (
@@ -126,6 +126,7 @@ export default (props: any) => {
       title: '学员类型',
       dataIndex: 'type',
       valueType: 'select',
+      width:130,
       sorter: true,
       order: 9,
       filters: true,
@@ -200,6 +201,7 @@ export default (props: any) => {
     },
     {
       title: '当前所在部门',
+      width: 120,
       sorter: true,
       dataIndex: 'departmentId',
       search: false,
@@ -237,13 +239,14 @@ export default (props: any) => {
       dataIndex: 'studentStatus',
       valueType: 'select',
       filters: true,
+      width:120,
       valueEnum: Dictionaries.getSearch('visitStatus'),
       render: (text, record) => <span>{Dictionaries.getName('visitStatus', record.studentStatus)}</span>
     },
     {
       title: '操作',
       valueType: 'option',
-      width: 260,
+      width: 200,
       key: 'options',
       fixed: 'right',
       render: (text, record, _, action) => (
@@ -339,7 +342,7 @@ export default (props: any) => {
             params: { source: TabListNuber, 'userId-isNull': true, ...params },
             sortList: sortList,
           }}
-          search={hidden ? false : { defaultCollapsed: false }}
+          search={hidden ? false : { defaultCollapsed: true, defaultColsNumber: 10 }}
           rowSelection={{
             // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
             // 注释该行则默认不显示下拉选项

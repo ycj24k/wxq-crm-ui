@@ -86,7 +86,7 @@ export default (props: any) => {
                     return
                 }
                 setExportLoading(true)
-                apiRequest.get('/sms/business/bizTransaction', { dateTime: exportData, _isGetAll: true }).then(res => {
+                apiRequest.get('/sms/business/bizTransaction', { dateTime: exportData, _isGetAll: true, _orderBy: 'dateTime', _direction: 'asc' }).then(res => {
                     DownTable(res.data.content, DownHeader.transaction, '交易流水', 'transaction')
                     setExportLoading(false)
                 })

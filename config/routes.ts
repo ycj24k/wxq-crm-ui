@@ -88,6 +88,11 @@
     path: '/business/question',
     component: './Business/Question',
   },
+  // {
+  //   name:'下单专页',
+  //   path: '/business/orderpage',
+  //   component: './Business/OrderPage',
+  // },
   {
     name: '开通记录',
     path: '/business/openquestionrecord',
@@ -155,6 +160,11 @@
     component: './Business/SignUpStudent',
   },
   {
+    name: '报名团组',
+    path: '/business/teamstudent',
+    component: './Business/TeamStudent',
+  },
+  {
     name: '发票信息',
     path: '/business/invoice',
     component: './Business/Invoice',
@@ -209,6 +219,7 @@
     path: '/business/businessorder/search',
     component: './Business/BusinessOrder/searchFalg',
   },
+
   {
     name: '专属收款码未下单记录',
     path: '/business/chargeLog',
@@ -413,6 +424,18 @@
     component: './Admins/Department',
   },
   {
+    name: '权限管理',
+    icon: 'table',
+    path: '/admins/menusmanger',
+    component: './Admins/MenusManger',
+  },
+  // {
+  //   name: '菜单管理',
+  //   icon: 'table',
+  //   path: '/admins/menusmanger',
+  //   component: './Admins/MenusManger',
+  // },
+  {
     name: '订单列表',
     icon: 'table',
     path: '/admins/adminOrder',
@@ -498,6 +521,16 @@
     component: './Admins/Recommend',
   },
   {
+    name: '有效期配置',
+    path: '/admins/expirationdate',
+    component: './Admins/ExpirationDate'
+  },
+  // {
+  //   name: '有效期配置',
+  //   path: '/admins/expiration',
+  //   component: './Admins/Expiration'
+  // },
+  {
     name: '新媒体排班表',
     path: '/admins/scheduling',
     component: './Admins/Scheduling',
@@ -513,6 +546,16 @@
     icon: 'table',
     path: '/admins/jobassociation',
     component: './Admins/JobAssociation',
+  },
+  {
+    name: '专属码申请退款审核',
+    path: '/business/refundreview',
+    component: './Business/RefundReview',
+  },
+  {
+    name:'专属码未支付申请退款',
+    path:'/business/exclusiveqrcoderefund',
+    component:'./Business/ExclusiveQRCodeRefund',
   },
   {
     name: '报考资料',

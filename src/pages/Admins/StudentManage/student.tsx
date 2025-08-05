@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   PlusOutlined,
   SearchOutlined,
-  EditOutlined,
-  AccountBookOutlined,
-  DeleteOutlined,
   UserAddOutlined,
   ApiOutlined,
   FormOutlined,
-  UploadOutlined,
   DownloadOutlined,
   PhoneOutlined,
 } from '@ant-design/icons';
@@ -16,25 +12,19 @@ import {
   Button,
   Tag,
   Modal,
-  Divider,
   Popconfirm,
   message,
-  Table,
   Space,
-  Dropdown,
-  Menu,
   Tooltip,
 } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
-import moment from 'moment';
 // import DownTable from '@/services/util/timeFn';
 import Dictionaries from '@/services/util/dictionaries';
 import Modals from './userModal';
+import FollowModal from './followModal';
 import StudentInfo from './studentInfo';
 import StudentOrder from '../AdminOrder/studentOrder';
-import CompanyOrder from '../AdminOrder/companyOrder';
 import StepsOrder from '../AdminOrder/StepsOrder';
 import AddModals from '../AdminReturnVisit/addModals';
 import Upload from '@/services/util/upload';
@@ -45,6 +35,7 @@ import CompanyContract from '../Contract/CompanyContract';
 import ChargeIframe from '../AdminCharge/ChargeIframe';
 import Tables from '@/components/Tables';
 import IsVerifyModel from './isVerifyModel';
+import ContractModel from './ContractModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
 import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
@@ -68,12 +59,10 @@ type GithubIssueItem = {
   isFormal: boolean;
   createTime: any;
   consultationTime: any;
-  lastDealTime: any;
   circulationTime: any;
   presentationTime: any;
   idCard: string;
   project: string;
-  percent: number;
   userId: number;
   code: any;
   visitTime: any;
@@ -82,7 +71,6 @@ type GithubIssueItem = {
   ownerName: string;
   percent: number;
 };
-let content: any = null;
 export default (props: any) => {
   const {
     order = '',
@@ -102,7 +90,9 @@ export default (props: any) => {
 
   const actionRef = useRef<ActionType>();
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
+  const [followVisibleFalg, setFollowVisible] = useState<boolean>(false);
   const [ContractSFalg, setContractSVisible] = useState<boolean>(false);
+  const [contract, setContract] = useState<boolean>(false);
   const [IsVerifyModelFalg, setIsVerifyModelVisible] = useState<boolean>(false);
   const [CompanyContractFalg, setCompanyContractVisible] = useState<boolean>(false);
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
@@ -127,7 +117,7 @@ export default (props: any) => {
   const [userNameId, setUserNameId] = useState<any>();
   let [department, setDepartment] = useState<any>({});
 
-  const [isShowMedium , setShowisShowMedium] = useState<boolean>(false)
+  const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
   const url = isFormal ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
   const formRef = useRef<ProFormInstance>();
@@ -220,6 +210,8 @@ export default (props: any) => {
   };
   const columns: ProColumns<GithubIssueItem>[] = [
     {
+      width: 100,
+      fixed: 'left',
       title: type ? type : '学员/企业',
       dataIndex: 'name',
       align: 'center',
@@ -257,87 +249,12 @@ export default (props: any) => {
       ),
     },
     {
-      title: '企业负责人',
-      dataIndex: 'chargePersonName',
-      key: 'chargePersonName',
-      hideInTable: type == '学员' ? true : false,
-    },
-    {
-      title: '上次回访时间',
-      search: false,
-      align: 'center',
-      hideInTable: isFormal || recommend,
-      render: (text, record) => (
-        <span>{record.visitTime}</span>
-      ),
-    },
-    // {
-    //   title: '未下单天数',
-    //   align: 'center',
-    //   search: false,
-    //   hideInTable: isFormal || recommend,
-    //   render: (text, record) => <span>{record.dealDate}天</span>,
-    // },
-    {
-      title: '性别',
-      dataIndex: 'sex',
-      // width: 80,
-      // search: false,
-      valueType: 'select',
-      key: 'sex',
-      valueEnum: {
-        false: '男',
-        true: '女',
-      },
-      render: (text, record) => (
-        <span>{record.sex == null ? '未知' : record.sex ? '女' : '男'}</span>
-      ),
-    },
-    {
-      title: '是否是同行企业',
-      dataIndex: 'isPeer',
-      // width: 80,
-      // search: false,
-      valueType: 'select',
-      key: 'isPeer',
-      valueEnum: {
-        false: '否',
-        true: '是',
-      },
-      hideInTable: true,
-    },
-    {
-      title: '项目总称',
-      dataIndex: 'parentProjects',
-      key: 'parentProjects',
-      sorter: true,
-      valueType: 'select',
-      fieldProps: {
-        options: Dictionaries.getList('dict_reg_job'),
-        mode: 'tags',
-      },
-      width: 180,
-      render: (text, record) => (
-        <span key="parentProjects">
-          {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
-        </span>
-      ),
-    },
-    {
-      title: '咨询岗位',
-      dataIndex: 'project-in',
-      // search: false,
-      sorter: true,
-      key: 'project-in',
-      valueType: 'select',
-      fieldProps: {
-        options: Dictionaries.getCascader('dict_reg_job'),
-        showSearch: { filter },
-        mode: 'tags',
-      },
-      render: (text, record) => (
-        <span>{Dictionaries.getCascaderName('dict_reg_job', record.project)}</span>
-      ),
+      title: '微信号',
+      dataIndex: 'weChat',
+      key: 'weChat',
+      hideInTable: isFormal,
+      width: 85,
+      render: (text, record) => <span style={{ userSelect: 'none' }}>{record.weChat}</span>,
     },
     {
       title: '手机号',
@@ -358,13 +275,112 @@ export default (props: any) => {
         </a></div>),
     },
     {
-      title: '微信号',
-      dataIndex: 'weChat',
-      key: 'weChat',
-      hideInTable: isFormal,
-      width: 100,
-      render: (text, record) => <span style={{ userSelect: 'none' }}>{record.weChat}</span>,
+      width: 90,
+      title: '所属老师',
+      dataIndex: 'userName',
     },
+    {
+      width: 100,
+      title: '信息所有人',
+      dataIndex: 'ownerName',
+      render: (text, record) => <div>{record.ownerName}<span>{record.ownerName && '(' + (record.percent * 100) + '%)'}</span></div>,
+      // search: true,
+      // key: 'ownerName',
+      // hideInTable: !recommend,
+    },
+    {
+      width: 100,
+      title: '信息提供人',
+      dataIndex: 'providerName',
+    },
+    {
+      width: 100,
+      title: '客户来源',
+      dataIndex: 'studentSource',
+      valueType: 'select',
+      key: 'studentSource',
+      filters: true,
+      filterMultiple: false,
+      valueEnum: Dictionaries.getSearch('dict_source'),
+      render: (text, record) => (
+        <span>{Dictionaries.getName('dict_source', record.studentSource)}</span>
+      ),
+    },
+    {
+      width: 100,
+      title: '咨询岗位',
+      dataIndex: 'project-in',
+      // search: false,
+      sorter: true,
+      key: 'project-in',
+      valueType: 'select',
+      fieldProps: {
+        options: Dictionaries.getCascader('dict_reg_job'),
+        showSearch: { filter },
+        mode: 'tags',
+      },
+      render: (text, record) => (
+        <span>{Dictionaries.getCascaderName('dict_reg_job', record.project)}</span>
+      ),
+    },
+    {
+      width: 100,
+      title: '企业负责人',
+      dataIndex: 'chargePersonName',
+      key: 'chargePersonName',
+      hideInTable: type == '学员' ? true : false,
+    },
+    {
+      width: 100,
+      title: '上次回访时间',
+      search: false,
+      align: 'center',
+      hideInTable: isFormal || recommend,
+      render: (text, record) => (
+        <span>{record.visitTime}</span>
+      ),
+    },
+    // {
+    //   title: '未下单天数',
+    //   align: 'center',
+    //   search: false,
+    //   hideInTable: isFormal || recommend,
+    //   render: (text, record) => <span>{record.dealDate}天</span>,
+    // },
+    {
+      title: '性别',
+      dataIndex: 'sex',
+      width: 70,
+      // search: false,
+      valueType: 'select',
+      key: 'sex',
+      valueEnum: {
+        false: '男',
+        true: '女',
+      },
+      render: (text, record) => (
+        <span>{record.sex == null ? '未知' : record.sex ? '女' : '男'}</span>
+      ),
+    },
+    {
+      title: '项目总称',
+      dataIndex: 'parentProjects',
+      key: 'parentProjects',
+      sorter: true,
+      valueType: 'select',
+      fieldProps: {
+        options: Dictionaries.getList('dict_reg_job'),
+        mode: 'tags',
+      },
+      width: 100,
+      render: (text, record) => (
+        <span key="parentProjects">
+          {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
+        </span>
+      ),
+    },
+
+
     {
       title: 'QQ',
       dataIndex: 'qq',
@@ -383,6 +399,19 @@ export default (props: any) => {
       title: '信用代码',
       dataIndex: 'code',
       key: 'code',
+      hideInTable: true,
+    },
+    {
+      title: '是否是同行企业',
+      dataIndex: 'isPeer',
+      // width: 80,
+      // search: false,
+      valueType: 'select',
+      key: 'isPeer',
+      valueEnum: {
+        false: '否',
+        true: '是',
+      },
       hideInTable: true,
     },
     {
@@ -406,19 +435,9 @@ export default (props: any) => {
     //   // valueEnum: Dictionaries.getSearch('studentType'),
     //   // render: (text, record) => <span>{Dictionaries.getName('studentType', record.type)}</span>,
     // },
+
     {
-      title: '客户来源',
-      dataIndex: 'studentSource',
-      valueType: 'select',
-      key: 'studentSource',
-      filters: true,
-      filterMultiple: false,
-      valueEnum: Dictionaries.getSearch('dict_source'),
-      render: (text, record) => (
-        <span>{Dictionaries.getName('dict_source', record.studentSource)}</span>
-      ),
-    },
-    {
+      width: 100,
       title: '资源类型',
       dataIndex: 'source',
       valueType: 'select',
@@ -438,6 +457,7 @@ export default (props: any) => {
     //   hideInTable: !recommend,
     // },
     {
+      width: 100,
       title: '接收信息负责人',
       dataIndex: 'userName',
       key: 'userNames',
@@ -445,6 +465,7 @@ export default (props: any) => {
       hideInTable: !recommend,
     },
     {
+      width: 110,
       title: '信息提供人所占业绩比例(%)',
       sorter: true,
       dataIndex: 'percent',
@@ -461,6 +482,7 @@ export default (props: any) => {
     //   render: (text, record) => <span>{record.receiveNum > 0 ? '是' : '否'}</span>,
     // },
     {
+      width: 100,
       title: '领取时间',
       key: 'receiveTime',
       dataIndex: 'circulationTime',
@@ -472,6 +494,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '介绍时间',
       key: 'createTime',
       dataIndex: 'createTimes',
@@ -483,6 +506,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '下单时间',
       key: 'lastDealTime',
       dataIndex: 'lastDealTime',
@@ -500,6 +524,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '创建时间',
       key: 'createTime',
       dataIndex: 'createTime',
@@ -511,6 +536,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '咨询时间',
       key: 'consultationTime',
       dataIndex: 'consultationTime',
@@ -535,24 +561,9 @@ export default (props: any) => {
       hideInTable: true
     },
 
-    {
-      title: '所属老师',
-      dataIndex: 'userName',
-    },
-    {
-      title: '信息所有人',
-      dataIndex: 'ownerName',
-      render: (text, record) => <div>{record.ownerName}<span>{record.ownerName && '(' + (record.percent * 100) + '%)'}</span></div>,
-      // search: true,
-      // key: 'ownerName',
-      // hideInTable: !recommend,
-    },
-    {
-      title: '信息提供人',
-      dataIndex: 'providerName',
-    },
 
     {
+      width: 100,
       title: '备注',
       dataIndex: 'description',
       key: 'descriptions',
@@ -680,6 +691,17 @@ export default (props: any) => {
                   >
                     下单
                   </a>
+
+                  <a
+                    type="primary"
+                    hidden={isFormal}
+                    onClick={() => {
+                      setFollowVisible(true)
+                      setRenderData({ ...record });
+                    }}
+                  >
+                    跟进记录
+                  </a>
                 </Space>
               </div>
               <Space>
@@ -696,7 +718,7 @@ export default (props: any) => {
                     <a
                       style={{ color: 'red' }}
                       onClick={() => {
-                        setRenderData({ ...record, chargeType: '1' });
+                        setRenderData({ ...record, chargeType: '1', showStudent: false });
                         setStudentOrderOpen(true);
                       }}
                     >
@@ -819,10 +841,11 @@ export default (props: any) => {
         actionRef={actionRef}
         formRef={formRef}
         cardBordered
-        scroll={{ x: 1500 }}
+        scroll={{ x: 1800 }}
         search={{
-          labelWidth: 120,
-          defaultCollapsed: false,
+          labelWidth: 'auto',
+          defaultCollapsed: true,
+          defaultColsNumber: 10
         }}
         rowClassName={highlightRow}
         onReset={() => {
@@ -1047,7 +1070,70 @@ export default (props: any) => {
           // >
           //   新建推荐学员
           // </Button>,
+          // <Button
+          //   key="buttons"
+          //   icon={<FormOutlined />}
+          //   type="primary"
+          //   hidden={!isFormal}
+          //   onClick={async () => {
+          //     const status = (await request.get('/sms/share/isVerify')).data;
+          //     const autoSign = (await request.get('/sms/share/isVerifyAutoSign')).data;
+          //     if (status && autoSign) {
+          //       if (initialState?.currentUser?.idCard) {
+          //         if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
+          //           message.error('请选择一位学员签署合同!');
+          //           return;
+          //         }
+          //         setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
+          //         if (!selectedRowsList[0]?.idCard) {
+          //           message.error('请先补充学员/负责人的身份证信息！');
+          //           // setRenderData({ ...record, typee: 'eidt' });
+          //           setModalVisible(true);
+          //           return;
+          //         }
+
+          //         if (
+          //           selectedRowsList[0].type == 1 &&
+          //           !selectedRowsList[0].codeFile
+          //           // !selectedRowsList[0].powerAttorneyFile
+          //         ) {
+          //           Modal.info({
+          //             title: '尚未上传企业授权信息!',
+          //             content: <p>请先补充信息在签署合同</p>,
+          //             okText: '补充',
+          //             onOk: () => {
+          //               setCompanyContractVisible(true);
+          //             },
+          //           });
+          //           return;
+          //         }
+
+          //         setContractSVisible(true);
+          //       } else {
+          //         message.error('请先完善您的身份证信息后再签署合同！');
+          //       }
+          //     } else {
+          //       setRenderData([status, autoSign]);
+          //       setIsVerifyModelVisible(true);
+          //       // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
+          //       // const urls = (await request.post('/sms/share/verify')).data;
+          //       // setpreviewImage(urls);
+          //       // setPreviewVisible(true);
+          //     }
+          //   }}
+          // >
+          //   合同签署
+          // </Button>,
           <Button
+            // key="buttons"
+            // icon={<FormOutlined />}
+            // type="primary"
+            // hidden={!isFormal}
+            // onClick={async () => {
+            //   setContract(true);
+            // }}
+
+
             key="buttons"
             icon={<FormOutlined />}
             type="primary"
@@ -1139,6 +1225,16 @@ export default (props: any) => {
           </Button>,
         ]}
       />
+      {/* 回访记录 */}
+      {followVisibleFalg && (
+        <FollowModal
+          setModalVisible={() => setFollowVisible(false)}
+          modalVisible={followVisibleFalg}
+          renderData={renderData}
+          url="/sms/business/bizReturnVisit/findOne"
+          callbackRef={() => callbackRef()}
+        />
+      )}
 
       {modalVisibleFalg && (
         <Modals
@@ -1256,6 +1352,14 @@ export default (props: any) => {
           setCardVisible={() => setCardVisible(false)}
           setDepartment={(e: any) => setDepartment(e)}
           departments={[department]}
+        />
+      )}
+      {/* 合同签署 */}
+      {contract && (
+        <ContractModel
+          modalVisible={contract}
+          setModalVisible={() => setContract(false)}
+          renderData={renderData}
         />
       )}
       {IsVerifyModelFalg && (

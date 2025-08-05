@@ -152,6 +152,8 @@ export default (props: any) => {
     if (value.groupId) value.groupId = groupment.id;
     if (!value.departmentId) delete value.departmentId;
     if (!value.groupId) delete value.groupId;
+    if (!value.percent) value.percent = 20;
+    console.log(value.percent)
     //presenter
     if (userNameId) value.presenter = userNameId.id
     delete value.userId
@@ -179,6 +181,7 @@ export default (props: any) => {
     if (value.status == 3) {
       value.enable = false
     }
+    console.log(value,'value--------->')
     return new Promise((resolve) => {
       request
         .post(url, value)
@@ -218,6 +221,7 @@ export default (props: any) => {
         },
       }}
       onFinish={async (values) => {
+        console.log(values)
         if (renderData.id && renderData.type != 'addUser') values.id = renderData.id;
         if (!values.groupId) values.groupId = -1
         await submitok(values);
@@ -431,6 +435,20 @@ export default (props: any) => {
                 },
               ]}
             ></ProFormSelect>
+            <ProFormText
+              name="percent"
+              width="md"
+              label="出镜人分成"
+              placeholder="请输入出镜人分成（不填默认20%）"
+            />
+            {/* <ProFormSelect
+              label="选择项目"
+              showSearch
+              name="project"
+              width="md"
+              rules={[{ required: true, message: '请选择项目' }]}
+              request={async () => Dictionaries.getList('dict_reg_job') as any}
+            /> */}
           </ProForm.Group>
           <ProForm.Group>
             <ProFormDatePicker

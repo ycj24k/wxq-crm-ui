@@ -4,9 +4,6 @@ import ProvideUser from "./ProvideUser"
 
 
 export default () => {
-
-
-
     return <PageContainer>
         <ProvideUser />
     </PageContainer>

@@ -4,6 +4,8 @@ const { Title, Paragraph, Text } = Typography;
 import Order from '../AdminOrder/Order';
 export default (props: any) => {
   const { setModalVisible, modalVisible, renderData, callbackRef, placeAnOrder } = props;
+
+  console.log(renderData ,'dnmd')
   const chargeType = renderData.chargeType == '0' ? '缴费' : '退费';
   const gotoDingdan = (number: number) => {
     if (number == 0) {
@@ -39,7 +41,7 @@ export default (props: any) => {
       footer={null}
       width={1500}
     >
-      <Order studentUserId={renderData.id} type={renderData.type} />
+      <Order studentUserId={renderData.id} type={renderData.type} showType={renderData.Type} showStudentBtn={renderData.chargeBtn} />
     </Modal>
   );
 };

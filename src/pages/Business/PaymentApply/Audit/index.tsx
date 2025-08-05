@@ -60,26 +60,31 @@ export default (props: any) => {
   };
   const columns: ProColumns<GithubIssueItem>[] = [
     {
+      width: 80,
       title: '编号',
       dataIndex: 'num',
       sorter: true,
     },
     {
+      width: 100,
       title: '申请部门',
       dataIndex: 'departmentName',
       sorter: true,
     },
     {
+      width:90,
       title: '申请人',
       dataIndex: 'userName',
       sorter: true,
     },
     {
+      width:100,
       title: '收款单位',
       dataIndex: 'payee',
       sorter: true,
     },
     {
+      width:100,
       title: '付款明细',
       dataIndex: 'details',
       // search: false,
@@ -88,12 +93,14 @@ export default (props: any) => {
       // tip: '过长会自动收缩',
     },
     {
+      width:100,
       title: '付款金额',
       dataIndex: 'amount',
       sorter: true,
       // search: false,
     },
     {
+      width:90,
       title: '负责人',
       dataIndex: 'chargePersonName',
       sorter: true,
@@ -115,6 +122,7 @@ export default (props: any) => {
       render: (text, record) => <span>{record.paymentTime}</span>,
     },
     {
+      width: 100,
       title: '有无发票',
       dataIndex: 'hasInvoice',
       search: false,
@@ -129,6 +137,7 @@ export default (props: any) => {
       // tip: '过长会自动收缩',
     },
     {
+      width: 100,
       title: '审核状态',
       dataIndex: 'confirm',
       sorter: true,
@@ -145,6 +154,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '审核建议',
       dataIndex: 'remark',
       search: false,
@@ -153,6 +163,7 @@ export default (props: any) => {
       // tip: '过长会自动收缩',
     },
     {
+      width: 90,
       title: '审核人',
       dataIndex: 'auditor',
       search: false,
@@ -366,7 +377,8 @@ export default (props: any) => {
         className="PaymentAudit"
         search={{
           labelWidth: 120,
-          defaultCollapsed: false,
+          defaultCollapsed: true,
+          defaultColsNumber: 6
         }}
         request={{ url: '/sms/business/bizPaymentApply', params: params, sortList: sortList }}
         toolbar={{

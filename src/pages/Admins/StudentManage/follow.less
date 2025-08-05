@@ -1,0 +1,112 @@
+.ant-modal-body {
+    margin-left: 0px;
+}
+
+.header_top {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    line-height: 40px;
+
+    p {
+        margin-left: 20px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+}
+
+.table_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 40px;
+    background-color: #fafafa;
+}
+
+.header_content_top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 40px;
+}
+
+
+.header_bottom {
+    width: 100%;
+    margin-top: 20px;
+
+    .table_header {
+        height: 60px;
+        line-height: 60px;
+        font-size: 20px;
+        text-align: center;
+        font-weight: bold;
+        display: flex;
+
+        div {
+            width: 20%;
+            color: rgba(0, 0, 0, 0.85);
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+    }
+
+    .table_content {
+        //height: 60px;
+
+        .header_content_top {
+            height: 60px;
+            line-height: 60px;
+            font-size: 16px;
+            text-align: center;
+            display: flex;
+            justify-content: space-around;
+            //border: 1px solid black;
+            margin-bottom: 5px;
+
+            div {
+                width: 20%;
+                overflow: hidden; //超出的文本隐藏
+                text-overflow: ellipsis; //溢出用省略号显示
+                white-space: nowrap; // 默认不换行；
+            }
+        }
+
+        .header_content {
+            width: 100%;
+            height: 120px;
+
+            .content_top {
+                width: 100%;
+                height: 30px;
+                line-height: 30px;
+                box-sizing: border-box;
+                padding: 0px 20px 0px 20px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .content_middle{
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0px 20px 0px 20px;
+            }
+            .content_bottom{
+                width: 100%;
+                box-sizing: border-box;
+                display: flex;
+                justify-content: space-between;
+                padding: 0px 20px 0px 20px;
+            }
+        }
+
+    }
+}
+.header_search{
+    width: 100%;
+    height: 60px;
+    display: flex;
+}

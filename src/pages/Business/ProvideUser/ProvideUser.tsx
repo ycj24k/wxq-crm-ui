@@ -57,6 +57,29 @@ export default () => {
             key: 'chargePersonName',
         },
         {
+            title: '所属老师',
+            dataIndex: 'userName',
+        },
+        {
+            title: '信息提供人',
+            dataIndex: 'providerName',
+        },
+        {
+            title: '咨询岗位',
+            dataIndex: 'project',
+            // search: false,
+            sorter: true,
+            key: 'project',
+            valueType: 'cascader',
+            fieldProps: {
+                options: Dictionaries.getCascader('dict_reg_job'),
+                showSearch: { filter },
+            },
+            render: (text, record) => (
+                <span>{Dictionaries.getCascaderName('dict_reg_job', record.project)}</span>
+            ),
+        },
+        {
             title: '性别',
             dataIndex: 'sex',
             valueType: 'select',
@@ -99,21 +122,7 @@ export default () => {
                 </span>
             ),
         },
-        {
-            title: '咨询岗位',
-            dataIndex: 'project',
-            // search: false,
-            sorter: true,
-            key: 'project',
-            valueType: 'cascader',
-            fieldProps: {
-                options: Dictionaries.getCascader('dict_reg_job'),
-                showSearch: { filter },
-            },
-            render: (text, record) => (
-                <span>{Dictionaries.getCascaderName('dict_reg_job', record.project)}</span>
-            ),
-        },
+
         {
             title: '手机号',
             dataIndex: 'mobile',
@@ -136,6 +145,7 @@ export default () => {
         //   // render: (text, record) => <span>{Dictionaries.getName('studentType', record.type)}</span>,
         // },
         {
+            width: 100,
             title: '客户来源',
             dataIndex: 'studentSource',
             valueType: 'select',
@@ -148,6 +158,7 @@ export default () => {
             ),
         },
         {
+            width:100,
             title: '资源类型',
             dataIndex: 'source',
             valueType: 'select',
@@ -198,14 +209,7 @@ export default () => {
             ),
         },
 
-        {
-            title: '所属老师',
-            dataIndex: 'userName',
-        },
-        {
-            title: '信息提供人',
-            dataIndex: 'providerName',
-        },
+
 
         {
             title: '备注',
@@ -218,7 +222,7 @@ export default () => {
         {
             title: '操作',
             valueType: 'option',
-            width: 260,
+            width: 180,
             key: 'options',
             fixed: 'right',
             render: (text, record, _, action) => (
@@ -297,8 +301,7 @@ export default () => {
                 className="provideuser"
                 request={{ url, sortList, params }}
                 toolbar={toolbar}
-                search={{ defaultCollapsed: false, labelWidth: 150 }}
-
+                search={{ defaultCollapsed: true, labelWidth: 150, defaultColsNumber: 10 }}
                 toolBarRender={[
 
                 ]}

@@ -22,6 +22,7 @@ export default {
         "原始金额": "originalAmount",
         "结算金额": "settlementAmount",
         "产品类型": "productType",
-        "交易日期时间": "dateTime"
+        "交易日期时间": "dateTime",
+        "姓名": "studentName"
     }
 }

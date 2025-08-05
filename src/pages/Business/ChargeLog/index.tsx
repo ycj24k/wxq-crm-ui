@@ -4,19 +4,22 @@ import Dictionaries from "@/services/util/dictionaries"
 import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
 import { ProColumns } from "@ant-design/pro-table"
-import { Button, Space, Tag, Modal, Row, Col, message } from "antd"
+import { Button, Space, Tag, Modal, Row, Col, message, Popconfirm } from "antd"
 import { useState, useRef, useEffect } from "react"
 import { useModel } from 'umi';
 import DownHeader from "./DownHeader"
 import StudentMessage from "./studentMessage"
 import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import SchoolList from '@/pages/Business/ClassList'
 import AllStudent from './allStudentlist'
 import './index.less'
 import {
+    ModalForm,
     ProFormCascader,
-    ProFormInstance
+    ProFormInstance,
+    ProFormUploadDragger
 } from '@ant-design/pro-form';
 import ProForm, {
     ProFormText,
@@ -27,7 +30,8 @@ import PayWay from "./payWay"
 
 export default (props: any) => {
     const { initialState } = useModel('@@initialState');
-    const { reBuild, select, getAll = false, type = 0 } = props
+    const { reBuild, select, getAll = false, type = 0 , showBtn, num} = props
+    console.log(num,'num======>')
     const [exportLoading, setExportLoading] = useState<boolean>();
     const [selectData, setSelectData] = useState<Array<any>>();
     const [studentlistmessage, setStudentlistmessage] = useState<any>();
@@ -51,6 +55,8 @@ export default (props: any) => {
     //选择班级
     const [ClassFalg, setClassFalg] = useState<boolean>(false);
     const [classRef, setClassRef] = useState<any>({});
+    //申请退费
+    const [refund, setRefund] = useState<boolean>(false);
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -60,6 +66,10 @@ export default (props: any) => {
     const [userNameId2, setUserNameId2] = useState<any>();
     const [totalReceivable, setTotalReceivable] = useState<number>(0);
 
+    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    let obj = {};
+    obj[tokenName] = tokenValue;
 
 
     const formRef = useRef<ProFormInstance>();
@@ -77,8 +87,22 @@ export default (props: any) => {
             className: classRef.name,
         });
     }, [classRef])
-    const param = getAll ? {} : { isUseUp: false }
 
+    //confirm: true, isRefund:true
+    //const param = getAll ? {} : { isUseUp: false }
+    let param = null
+    if(num == 'isTrue'){
+        console.log(num,'num->>>>>>>')
+        param = { isRefund:false, isUseup:false, enable:true }
+    }
+    if(!num){
+        param = getAll ? {} : { isUseUp: false }
+    }
+    // if(getAll){
+    //     param = {}
+    // }else{
+    //    param = { isUseUp: false }
+    // }
     const exportNotUseUp = () => {
         setExportLoading(true)
         apiRequest.get('/sms/business/bizChargeLog', { isUseUp: false, _isGetAll: true }).then(res => {
@@ -103,6 +127,10 @@ export default (props: any) => {
             setUserNameId(data)
             setUserNameIds(data)
             setUserNameId2(data)
+            formRef.current?.setFieldsValue({
+                name: payMessage.name,
+                mobile: payMessage.phone,
+            })
         }, 500)
         setIsPayModalOpen(true)
     }
@@ -111,6 +139,7 @@ export default (props: any) => {
     }
     //快捷下单弹窗
     const QuickOrder = (record: any) => {
+        console.log(record, 'record------->')
         setPayMessage(record)
         apiRequest.get('/sms/business/bizStudentUser', { mobile: record.phone }).then(res => {
             if (res.data.content.length === 0) {
@@ -198,6 +227,10 @@ export default (props: any) => {
         setAllStudent(false)
         setStudentModal(false)
     }
+    //申请退费
+    const handleRefound = () => {
+        setRefund(true)
+    }
     const columns: ProColumns<any>[] = [
         {
             title: '收款编号',
@@ -250,7 +283,37 @@ export default (props: any) => {
             title: '操作',
             search: false,
             hideInTable: type !== 0,
-            render: (text, record) => <Button type='primary' disabled={record.isUseUp == true} onClick={() => QuickOrder(record)}>快捷下单</Button>
+            render: (text, record) => (
+                <>
+                    <Button type='primary' hidden={!showBtn} disabled={record.isUseUp == true} onClick={() => QuickOrder(record)}>快捷下单</Button>
+                    <Popconfirm
+                        style={{ marginBottom: 5 }}
+                        key={record.id}
+                        title="是否确认废除？"
+                        onConfirm={() => {
+                            request.post(`/sms/business/bizChargeLog/disable/${record.id}`).then((res: any) => {
+                                if (res.status == 'success') {
+                                    message.success('废除成功');
+                                }
+                            });
+                        }}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <Button
+                            type="primary"
+                            size="small"
+                            danger
+                            hidden={showBtn}
+                        >
+                            废除
+                        </Button>
+
+                    </Popconfirm>
+                    {/* <Button type="primary" style={{ marginTop: '5px' }} hidden={record.isUseUp == true} danger onClick={() => handleRefound(record)}>申请退款</Button> */}
+                </>
+
+            )
         },
     ];
     //确认下单
@@ -304,6 +367,7 @@ export default (props: any) => {
         let classListValues;
         try {
             classListValues = await classListRef.current?.getFormValues();
+            console.log(classListValues.description,'classListValues')
             if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
                 message.error('请至少添加一个班级信息');
                 setConfirmLoading(false)
@@ -336,7 +400,8 @@ export default (props: any) => {
             return;
         }
 
-        const processedUsers = Dictionaries.filterByValue(classListValues)
+        const processedUsers = Dictionaries.filterByValue(classListValues,classListValues.description)
+        console.log(processedUsers, 'processedUsers')
         //const payWayValues = await payWayRef.current?.getFormValues();
         let payWayValues: any;
         try {
@@ -354,6 +419,7 @@ export default (props: any) => {
             "order": order,
             "charge": payWayValues[index]
         }));
+        console.log(auditsParam,'auditsParam')
         request
             .postAll('/sms/business/bizOrder/intelligence', auditsParam)
             .then((res: any) => {
@@ -640,5 +706,95 @@ export default (props: any) => {
                 StudentMessage={setStudentlistmessage}
             />
         </Modal>
+
+        {/* 退费申请弹窗 */}
+        <ModalForm
+            title="退费申请"
+            visible={refund}
+            width={600}
+            formRef={formRef}
+            onFinish={async (values) => {
+                if (values.filess) {
+                    let arr: any[] = [];
+                    values.filess.forEach((item: any) => {
+                        arr.push(item.response.data);
+                    });
+                    delete values.filess;
+                    values.files = arr.join(',');
+                    console.log(values,'values-----ModalForm,')
+                }
+            }}
+            modalProps={{
+                destroyOnClose: true,
+                onCancel: () => {
+                    setRefund(false);
+                },
+            }}
+        >
+            <a
+              download="汇德退费申请书模板（两个--企业和个人）"
+              href="./template/汇德退费申请书模板（两个--企业和个人）.doc"
+            >
+              下载退费申请书模板(两个--企业和个人)
+            </a>,
+            <ProFormUploadDragger
+                width="xl"
+                label="上传附件"
+                name="filess"
+                action="/sms/business/bizNotice/upload"
+                fieldProps={{
+                    multiple: true,
+                    headers: {
+                        ...obj,
+                    },
+                    listType: 'picture',
+                    onRemove: (e:any) => { },
+                    beforeUpload: (file:any) => {
+                        console.log('file', file);
+                    },
+                    onPreview: async (file: any) => {
+                        console.log('file', file);
+
+                        if (!file.url && !file.preview) {
+                            console.log('1');
+
+                            //   file.preview = await getBase64(file.originFileObj);
+                        }
+                        // setPreviewImage(file.url || file.preview);
+                        // setPreviewVisible(true);
+                    },
+                    onChange: (info:any) => {
+                        const { status } = info.file;
+                        if (status !== 'uploading') {
+                        }
+                        if (status === 'done') {
+                            message.success(`${info.file.name} 上传成功.`);
+                        } else if (status === 'error') {
+                            message.error(`${info.file.name} 上传失败.`);
+                        }
+                    },
+                }}
+            />
+        </ModalForm>
+
+
+        {/* <Modal
+            open={refund}
+            width={1200}
+            title="申请退费"
+            onOk={handleChooseStudentMessageOrder}
+            onCancel={() => setRefund(false)}
+        >
+            <a download="下载退费申请书模板" href="./template/新学员导入模板.xlsx" key="ordera">
+                下载退费申请书模板
+            </a>
+            <UploadDragger
+                width={1100}
+                label="上传附件"
+                name="files"
+                action="/sms/business/bizCharge/upload"
+                fileUrl={'/sms/business/bizCharge/download'}
+            />
+        </Modal> */}
     </>
 }

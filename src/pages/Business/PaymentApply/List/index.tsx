@@ -70,7 +70,7 @@ export default (props: any) => {
     {
       title: '编号',
       dataIndex: 'num',
-      width: 130,
+      width: 100,
       sorter: true,
     },
     {
@@ -80,6 +80,7 @@ export default (props: any) => {
       sorter: true,
     },
     {
+      width:80,
       title: '申请人',
       dataIndex: 'userName',
       sorter: true,
@@ -99,12 +100,14 @@ export default (props: any) => {
       sorter: true,
     },
     {
+      width:100,
       title: '付款金额',
       dataIndex: 'amount',
       sorter: true,
       // search: false,
     },
     {
+      width: 80,
       title: '负责人',
       dataIndex: 'chargePersonName',
       sorter: true,
@@ -189,6 +192,7 @@ export default (props: any) => {
       ),
     },
     {
+      width: 100,
       title: '有无发票',
       dataIndex: 'hasInvoice',
       search: false,
@@ -291,7 +295,8 @@ export default (props: any) => {
         cardBordered
         search={{
           labelWidth: 120,
-          defaultCollapsed: false,
+          defaultCollapsed: true,
+          defaultColsNumber: 6,
         }}
         rowSelection={{
           onChange: (e, selectedRows) => {

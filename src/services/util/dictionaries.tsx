@@ -870,7 +870,7 @@ class dictionaries {
     }
     return [];
   }
-  filterByValue(data: any) {
+  filterByValue(data: any,description:string) {
     return data.users.map((user: any) => {
       // 解析 JobClassExam JSON
       const jobClassData = user.JobClassExam
@@ -887,7 +887,15 @@ class dictionaries {
         ? user.provider.value
         : user.provider;
 
+      // 处理来源
+      const newScour = this.getValue('dict_source', user.source)
+      // 处理信息提供人provider
+      //console.log(this.getUserId('王芳')[0])
+      //const newProvider = this.getUserId(user.provider)[0]
+
+
       return {
+        description:description,
         classType: jobClassData.classType || 0,
         classYear: jobClassData.classYear || 0,
         examType: jobClassData.examType || 0,
@@ -895,10 +903,20 @@ class dictionaries {
         provider: providerValue,
         quantity: user.quantity || 0,
         receivable: user.receivable || 0,
-        source: user.source || '0',
+        source: newScour || '0',
         discount: user.discount || 0,
         discountRemark: user.discountRemark || '',
         studentUserId: user.studentUserId || 0
+      };
+    });
+  }
+
+  filterByValuePay(data: any) {
+    return data.users.map((user: any) => {
+      const userIdValue = user.userId && typeof user.provider === 'object' ? this.getUserId(user.userId.label) : user.userId;
+
+      return {
+        userId:userIdValue
       };
     });
   }

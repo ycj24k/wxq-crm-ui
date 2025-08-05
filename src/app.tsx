@@ -25,6 +25,8 @@ import {
   DashboardOutlined,
   AreaChartOutlined,
   SettingOutlined,
+  FieldTimeOutlined,
+  ExceptionOutlined
 } from '@ant-design/icons';
 import defaultSettings from '../config/defaultSettings';
 import type { MenuDataItem } from '@ant-design/pro-layout';
@@ -48,6 +50,8 @@ const IconMap = {
   ClusterOutlined: <ClusterOutlined />,
   SolutionOutlined: <SolutionOutlined />,
   DashboardOutlined: <DashboardOutlined />,
+  FieldTimeOutlined: <FieldTimeOutlined />,
+  ExceptionOutlined:<ExceptionOutlined />
 };
 /** 获取用户信息比较慢的时候会展示一个 loading */
 export const initialStateConfig = {
@@ -144,6 +148,84 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
 
     footerRender: () => <Footer />,
+
+
+
+
+    // // 自定义菜单项渲染
+    // menuItemRender: (menuItemProps, defaultDom) => {
+    //   // 获取当前路径
+    //   const { location } = history;
+    //   const { path } = menuItemProps;
+
+    //   // 判断当前菜单项是否被选中
+    //   const isSelected = location.pathname === path || location.pathname.startsWith(path + '/');
+
+    //   // 使用更可靠的方法判断菜单位置
+    //   // 检查DOM结构中的父元素类名来确定是顶部菜单还是侧边栏菜单
+    //   const isTopMenu = menuItemProps.isUrl !== true && !menuItemProps.pro_layout_parentKeys?.length;
+
+    //   // 基本样式 - 移除可能导致文字位置变化的属性
+    //   const baseStyle = {
+    //     height: '100%',
+    //     transition: 'all 0.3s',
+    //   };
+
+    //   if (isSelected) {
+    //     // 为选中的菜单项添加自定义类名
+    //     const className = isTopMenu
+    //       ? 'ant-pro-menu-item-link selected-top-menu'
+    //       : 'ant-pro-menu-item-link selected-side-menu';
+
+    //     return (
+    //       <Link
+    //         to={menuItemProps.path || '/'}
+    //         style={baseStyle}
+    //         className={className}
+    //       >
+    //         {defaultDom}
+    //       </Link>
+    //     );
+    //   }
+
+    //   // 非选中状态
+    //   return (
+    //     <Link
+    //       to={menuItemProps.path || '/'}
+    //       style={baseStyle}
+    //       className="ant-pro-menu-item-link"
+    //     >
+    //       {defaultDom}
+    //     </Link>
+    //   );
+    // },
+
+    // // 自定义子菜单渲染
+    // subMenuItemRender: (item, defaultDom) => {
+    //   // 获取当前路径
+    //   const { location } = history;
+    //   const { path } = item;
+
+    //   // 判断当前菜单项是否被选中或者其子菜单是否被选中
+    //   const isSelected = location.pathname === path || location.pathname.startsWith(path + '/');
+
+    //   return (
+    //     <div
+    //       style={{
+    //         color: isSelected ? '#ccc' : undefined,
+    //         width: '100%',
+    //         transition: 'color 0.3s',
+    //       }}
+    //     >
+    //       {defaultDom}
+    //     </div>
+    //   );
+    // },
+
+
+
+
+
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
@@ -163,7 +245,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     },
     menuHeaderRender: undefined,
     menu: {
-      autoClose: true,
+      autoClose: true, //需要修改为false
       locale: false,
       request: async () => {
         return loopMenuItem(initialState?.currentUser?.router);

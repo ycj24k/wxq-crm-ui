@@ -87,24 +87,30 @@ export default (props: any) => {
     }
     const columns: ProColumns<API.Invoice>[] = [
         {
+            width: 85,
             title: '创建人',
             dataIndex: 'userName',
-            sorter: true
+            sorter: true,
+            fixed:'left'
         },
         {
+            width: 100,
             title: "学员姓名",
             dataIndex: 'studentName',
-            sorter: true
+            sorter: true,
         },
         {
+            width: 100,
             title: "发票编号",
             dataIndex: 'num'
         },
         {
+            width: 100,
             title: "发票号码",
             dataIndex: 'no'
         },
         {
+            width: 100,
             title: "开票时间",
             valueType: 'dateRange',
             dataIndex: 'time',
@@ -114,16 +120,19 @@ export default (props: any) => {
             )
         },
         {
+            width: 100,
             title: "缴费编号",
             dataIndex: 'chargeNum',
             sorter: true
         },
         {
+            width: 100,
             title: '发票抬头',
             dataIndex: 'title',
             sorter: true
         },
         {
+            width: 100,
             title: '商品种类',
             dataIndex: 'productType',
             sorter: true,
@@ -137,23 +146,27 @@ export default (props: any) => {
         //     sorter: true
         // },
         {
+            width: 100,
             title: '发票金额',
             dataIndex: 'amount',
             sorter: true
         },
         {
+            width: 100,
             title: '发票备注',
             ellipsis: true,
             dataIndex: 'remark',
             sorter: true
         },
         {
+            width: 100,
             title: '注意事项',
             ellipsis: true,
             dataIndex: 'cautions',
             sorter: true
         },
         {
+            width: 100,
             title: '创建时间',
             dataIndex: 'createTime',
             valueType: 'dateRange',
@@ -171,6 +184,7 @@ export default (props: any) => {
         //     ),
         // },
         {
+            width: 100,
             title: '是否已完结',
             dataIndex: 'isOver',
             sorter: true,
@@ -179,6 +193,7 @@ export default (props: any) => {
             ),
         },
         {
+            width: 100,
             title: '审核状态',
             dataIndex: 'auditConfirm',
             sorter: true,
@@ -201,6 +216,7 @@ export default (props: any) => {
             },
         },
         {
+            width: 100,
             title: '审核人',
             dataIndex: 'auditor',
         },
@@ -216,6 +232,7 @@ export default (props: any) => {
             ),
         },
         {
+            width: 100,
             title: '发票种类',
             dataIndex: 'type',
             sorter: true,
@@ -224,23 +241,27 @@ export default (props: any) => {
             )
         },
         {
+            width: 90,
             title: '开户行',
             dataIndex: 'bank',
             sorter: true,
             hideInTable: true
         },
         {
+            width: 90,
             title: '账号',
             dataIndex: 'account',
             sorter: true,
             hideInTable: true
         },
         {
+            width: 90,
             title: '电话',
             dataIndex: 'mobile',
             sorter: true
         },
         {
+            width: 90,
             title: '地址',
             dataIndex: 'address',
             sorter: true,
@@ -506,7 +527,8 @@ export default (props: any) => {
                 request={{ url: '/sms/business/bizInvoice', sortList: sortList, params }}
                 search={chargeId || inWin ? false : {
                     labelWidth: 120,
-                    defaultCollapsed: false,
+                    defaultCollapsed: true,
+                    defaultColsNumber: 10
                 }}
                 toolbar={chargeId ? false : toolbar}
                 toolBarRender={chargeId ? false : toolBarRender}

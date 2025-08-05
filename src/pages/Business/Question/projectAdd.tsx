@@ -10,6 +10,7 @@ import ProForm, {
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import requestApi from '@/services/ant-design-pro/apiRequest';
+import request from '@/services/ant-design-pro/apiRequest';
 
 export default (props: any) => {
     const { renderData, Subjectlist } = props;
@@ -161,26 +162,50 @@ export default (props: any) => {
                 if (loading) return
                 else setLoading(true)
                 message.loading("加载中", 0)
-                requestApi
-                    .post('/sms/business/bizQuestionAccredit', submitData)
-                    .then((res: any) => {
-                        setLoading(false)
-                        if (res.status == 'success') {
-                            message.destroy()
-                            message.success('操作成功');
-                            setModalVisible();
-                            callbackRef();
-                            return true;
-                        } else {
-                            message.error(res.msg)
+                if (renderData?.record) {
+                    console.log('有record')
+                    request
+                        .postAll(`/sms/business/bizOrder/questionAccredit/${renderData.record}`, submitData)
+                        .then((res: any) => {
+                            setLoading(false)
+                            if (res.status == 'success') {
+                                message.destroy()
+                                message.success('操作成功');
+                                setModalVisible();
+                                callbackRef();
+                                return true;
+                            } else {
+                                message.error(res.msg)
+                                return false;
+                            }
+                        })
+                        .catch((err: any) => {
+                            setLoading(false)
+                            message.error('操作失败')
                             return false;
-                        }
-                    })
-                    .catch((err: any) => {
-                        setLoading(false)
-                        message.error(err)
-                        return false;
-                    });
+                        });
+                } else {
+                    requestApi
+                        .post('/sms/business/bizQuestionAccredit', submitData)
+                        .then((res: any) => {
+                            setLoading(false)
+                            if (res.status == 'success') {
+                                message.destroy()
+                                message.success('操作成功');
+                                setModalVisible();
+                                callbackRef();
+                                return true;
+                            } else {
+                                message.error(res.msg)
+                                return false;
+                            }
+                        })
+                        .catch((err: any) => {
+                            setLoading(false)
+                            message.error(err)
+                            return false;
+                        });
+                }
             }}
         >
             <ProForm.Group>

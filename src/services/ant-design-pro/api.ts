@@ -5,6 +5,47 @@ import request1 from './apiRequest';
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
+
+  // const convertToRoutes = (menuData: any[], level = 1) => {
+  //   return menuData.map(item => {
+  //     const route: any = {
+  //       path: item.code,
+  //       name: item.name,
+  //       component: item.path,
+  //       key: item.id || item.code,
+  //       // 只为二级菜单添加图标
+  //       ...(level === 2 ? { icon: item.icon || 'table' } : {}),
+  //       // 添加选中状态相关的属性
+  //       exact: true, // 精确匹配路由
+  //       activeMenu: item.code, // 添加activeMenu属性，用于控制菜单选中状态
+  //     };
+      
+  //     // 确保每个菜单项有唯一的key
+  //     if (item.children && item.children.length > 0) {
+  //       route.routes = convertToRoutes(item.children, level + 1);
+  //       // 使用menu属性来控制菜单行为，而不是flatMenu
+  //       route.menu = {
+  //         hideChildren: false, // 不隐藏子菜单
+  //         defaultOpen: true, // 默认展开子菜单
+  //       };
+        
+  //       // 为父级菜单添加选中状态控制
+  //       if (level === 1) {
+  //         route.activeMenuParent = true; // 标记为父级菜单，当子菜单被选中时也高亮显示
+  //       }
+  //     }
+      
+  //     return route;
+  //   });
+  // }
+
+
+  // const loginRouter = await request1.get('/sms/user/getMenus');
+  // // 添加对loginRouter.data为null的检查
+  // let newRouter = loginRouter.data ? convertToRoutes(loginRouter.data) : [];
+  
+
+
   // const user: any = await request1.get('/sms/user');
   let user: any = JSON.parse(sessionStorage.getItem('userInfo') as string);
   if (!user) {
@@ -22,14 +63,30 @@ export async function currentUser(options?: { [key: string]: any }) {
       {
         path: '/user',
         layout: false,
+        exact: true,
+        activeMenu: '/user',
+        activeMenuParent: true,
+        menu: {
+          hideChildren: false,
+          defaultOpen: true,
+        },
         routes: [
           {
             path: '/user',
+            exact: true,
+            activeMenu: '/user',
+            activeMenuParent: true,
+            menu: {
+              hideChildren: false,
+              defaultOpen: true,
+            },
             routes: [
               {
                 name: 'login',
                 path: '/user/login',
                 component: './user/Login',
+                exact: true,
+                activeMenu: '/user/login',
               },
             ],
           },
@@ -41,14 +98,30 @@ export async function currentUser(options?: { [key: string]: any }) {
       {
         path: '/public',
         layout: false,
+        exact: true,
+        activeMenu: '/public',
+        activeMenuParent: true,
+        menu: {
+          hideChildren: false,
+          defaultOpen: true,
+        },
         routes: [
           {
             path: '/public',
+            exact: true,
+            activeMenu: '/public',
+            activeMenuParent: true,
+            menu: {
+              hideChildren: false,
+              defaultOpen: true,
+            },
             routes: [
               {
                 name: 'charge',
                 path: '/public/charge',
                 component: './Public/Charge',
+                exact: true,
+                activeMenu: '/public/charge',
               },
             ],
           },
@@ -59,6 +132,8 @@ export async function currentUser(options?: { [key: string]: any }) {
         name: '首页',
         // icon: 'smile',
         component: './Welcome',
+        exact: true, // 添加精确匹配
+        activeMenu: '/welcome', // 添加activeMenu属性
         // routes: [
         //   {
         //     name: '工作台',
@@ -74,6 +149,9 @@ export async function currentUser(options?: { [key: string]: any }) {
       //   path: '/list',
       //   component: './TableList',
       // },
+
+      //...(newRouter || []), // 使用展开运算符添加动态路由，并确保在newRouter为null或undefined时使用空数组
+
       {
         name: '学员管理',
         path: '/business',
@@ -164,6 +242,11 @@ export async function currentUser(options?: { [key: string]: any }) {
               //   path: '/business/provide/resource',
               //   component: './Business/ProvideUser/Resource',
               // },
+              // {
+              //   name:'下单专页',
+              //   path: '/business/orderpage',
+              //   component: './Business/OrderPage',
+              // },
               {
                 name: '小程序二维码下载',
                 path: '/business/qrcode',
@@ -174,6 +257,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/exclusiveqrcode',
                 component: './Business/ExclusiveQRCode',
               },
+              {
+                name:'专属码未支付申请退款',
+                path:'/business/exclusiveqrcoderefund',
+                component:'./Business/ExclusiveQRCodeRefund',
+              }
             ],
           },
           {
@@ -209,21 +297,24 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/SignUpStudent',
               },
               {
-                name: '班级管理',
-                path: '/business/classlist',
-                component: './Business/ClassList',
+                name: '报名团组',
+                path: '/business/teamstudent',
+                component: './Business/TeamStudent'
               },
               {
                 name: '题库设置',
-                icon: 'table',
                 path: '/business/question',
                 component: './Business/Question',
               },
               {
                 name: '开通记录',
-                icon: 'table',
                 path: '/business/openquestionrecord',
                 component: './Business/OpenquestionRecord',
+              },
+              {
+                name: '班级管理',
+                path: '/business/classlist',
+                component: './Business/ClassList',
               },
               {
                 name: '消息管理',
@@ -296,6 +387,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/BusinessOrder/searchFalg',
               },
               {
+                name: '专属码申请退款审核',
+                path: '/business/refundreview',
+                component: './Business/RefundReview',
+              },
+              {
                 name: '专属收款码未下单记录',
                 path: '/business/chargeLog',
                 component: './Business/ChargeLog',
@@ -316,12 +412,6 @@ export async function currentUser(options?: { [key: string]: any }) {
                 icon: 'table',
                 path: '/business/resource/info',
                 component: './Business/Resource/ResourceInfo',
-              },
-              {
-                name: '资源转化看板',
-                icon: 'table',
-                path: '/business/resource/transformation',
-                component: './Business/Resource/transformation',
               },
               {
                 name: '流转资源看板',
@@ -452,7 +542,6 @@ export async function currentUser(options?: { [key: string]: any }) {
           },
         ],
       },
-
       {
         path: '/department',
         name: '部门看板',
@@ -536,7 +625,6 @@ export async function currentUser(options?: { [key: string]: any }) {
           },
         ],
       },
-
       {
         name: '管理员管理',
         // icon: 'UserOutlined',
@@ -555,6 +643,12 @@ export async function currentUser(options?: { [key: string]: any }) {
             path: '/admins/department',
             component: './Admins/Department',
           },
+          // {
+          //   name: '菜单管理',
+          //   icon: 'ClusterOutlined',
+          //   path: '/admins/menusmanger',
+          //   component: './Admins/MenusManger',
+          // },
           {
             name: '角色管理',
             icon: 'TeamOutlined',
@@ -628,20 +722,35 @@ export async function currentUser(options?: { [key: string]: any }) {
             component: './Admins/Scheduling',
           },
           {
+            name: '有效期配置',
+            path: '/admins/expirationdate',
+            icon: 'FieldTimeOutlined',
+            component: './Admins/ExpirationDate'
+          },
+          // {
+          //   name: '有效期配置',
+          //   path: '/admins/expiration',
+          //   component: './Admins/Expiration'
+          // },
+          {
             name: '推荐学员配置',
             path: '/admins/recommends',
             icon: 'ReadOutlined',
             component: './Admins/Recommend',
-          },
+          }
         ],
       },
 
       {
         path: '/',
         redirect: '/welcome',
+        exact: true,
+        activeMenu: '/',
       },
       {
         component: './404',
+        exact: true,
+        activeMenu: '/404',
       },
     ],
   };

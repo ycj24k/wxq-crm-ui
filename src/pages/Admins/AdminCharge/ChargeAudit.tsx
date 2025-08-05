@@ -79,6 +79,8 @@ export default (props: any) => {
   const [ChargeNewFalg, setChargeNewFalg] = useState<boolean>(false);
   const [exportLoading, setExportLoading] = useState<boolean>(false);
   const [Badges, setBadges] = useState<any>([0, 0]);
+
+  const [restore, setRestore] = useState<boolean>(false);
   const url = '/sms/business/bizCharge';
   const url2 = '/sms/business/bizStudentUser';
   const formRefa = useRef<ProFormInstance>();
@@ -187,7 +189,7 @@ export default (props: any) => {
     {
       title: '缴费编号',
       dataIndex: 'num',
-      width: 130,
+      width: 110,
       fixed: 'left',
       sorter: true,
     },
@@ -246,33 +248,14 @@ export default (props: any) => {
       ),
     },
     {
-      title: '是否是同行企业',
-      dataIndex: 'isPeer',
-      // width: 80,
-      // search: false,
-      valueType: 'select',
-      key: 'isPeer',
-      valueEnum: {
-        false: '否',
-        true: '是',
-      },
-      hideInTable: true,
-    },
-    {
-      title: '项目总称',
-      dataIndex: 'parentProjects',
-      key: 'parentProjects',
+      title: '收费方式',
+      dataIndex: 'method',
+      width: 100,
       sorter: true,
-      valueType: 'cascader',
-      fieldProps: {
-        options: Dictionaries.getList('dict_reg_job'),
-        showSearch: { filter },
-      },
-      width: 180,
+      valueType: 'select',
+      valueEnum: Dictionaries.getSearch('dict_stu_refund_type'),
       render: (text, record) => (
-        <span key="parentProjects">
-          {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
-        </span>
+        <span>{Dictionaries.getCascaderName('dict_stu_refund_type', record.method)}</span>
       ),
     },
     {
@@ -301,9 +284,40 @@ export default (props: any) => {
       ),
     },
     {
+      title: '是否是同行企业',
+      dataIndex: 'isPeer',
+      // width: 80,
+      // search: false,
+      valueType: 'select',
+      key: 'isPeer',
+      valueEnum: {
+        false: '否',
+        true: '是',
+      },
+      hideInTable: true,
+    },
+    {
+      title: '项目总称',
+      dataIndex: 'parentProjects',
+      key: 'parentProjects',
+      sorter: true,
+      valueType: 'cascader',
+      fieldProps: {
+        options: Dictionaries.getList('dict_reg_job'),
+        showSearch: { filter },
+      },
+      width: 120,
+      render: (text, record) => (
+        <span key="parentProjects">
+          {Dictionaries.getCascaderAllName('dict_reg_job', record.project)}
+        </span>
+      ),
+    },
+
+    {
       title: '考试类型',
       sorter: true,
-      width: 80,
+      width: 100,
       dataIndex: 'examType',
       valueEnum: Dictionaries.getSearch('dict_exam_type'),
       render: (text, record) => <>{Dictionaries.getName('dict_exam_type', record.examType)}</>,
@@ -312,7 +326,7 @@ export default (props: any) => {
       title: '收费金额',
       dataIndex: 'amount',
       sorter: true,
-      width: 80,
+      width: 100,
       search: false,
     },
     // {
@@ -322,24 +336,14 @@ export default (props: any) => {
     //   dataIndex: 'discount',
     //   search: false,
     // },
-    {
-      title: '收费方式',
-      dataIndex: 'method',
-      width: 80,
-      sorter: true,
-      valueType: 'select',
-      valueEnum: Dictionaries.getSearch('dict_stu_refund_type'),
-      render: (text, record) => (
-        <span>{Dictionaries.getCascaderName('dict_stu_refund_type', record.method)}</span>
-      ),
-    },
+
     {
       title: '备注',
       dataIndex: 'description',
       search: false,
       // ellipsis: true,
       sorter: true,
-      width: 150,
+      width: 110,
       // tip: '备注过长会自动收缩',
     },
     {
@@ -362,14 +366,14 @@ export default (props: any) => {
     {
       title: '信息所有人',
       dataIndex: 'ownerName',
-      width: 80,
+      width: 110,
       render: (text, record) => <div>{record.ownerName}<span>{record.ownerName && '(' + (record.percent * 100) + '%)'}</span></div>,
       // search: false,
       sorter: true,
     },
     {
       title: '发票信息',
-      width: 80,
+      width: 100,
       sorter: true,
       dataIndex: 'hasInvoice',
       render: (text, record) => (
@@ -428,7 +432,7 @@ export default (props: any) => {
     {
       title: '审核建议',
       dataIndex: 'remark',
-      width: 150,
+      width: 100,
       search: false,
       // ellipsis: true,
       sorter: true,
@@ -439,7 +443,7 @@ export default (props: any) => {
       title: '审核状态',
       dataIndex: 'confirm',
       filters: true,
-      width: 100,
+      width: 120,
       sorter: true,
       hideInTable: type == '1',
       filterMultiple: false,
@@ -731,12 +735,41 @@ export default (props: any) => {
               type="primary"
               key="delete"
               size="small"
+              hidden={restore}
               // hidden={Params.confirm === false}
               danger
               icon={<DeleteOutlined />}
             >
               废除
             </Button>
+
+          </Popconfirm>
+
+
+
+          <Popconfirm
+            style={{ marginBottom: 5 }}
+            key={record.id}
+            title="是否恢复？"
+            onConfirm={() => {
+              request.post(`/sms/business/bizCharge/enable/${record.id}`).then((res: any) => {
+                if (res.status == 'success') {
+                  message.success('恢复成功');
+                  callbackRef();
+                }
+              });
+            }}
+            okText="恢复订单"
+            cancelText="取消恢复"
+          >
+            <Button
+              type="primary"
+              size="small"
+              hidden={!restore}
+            >
+              恢复订单
+            </Button>
+
           </Popconfirm>
 
 
@@ -792,8 +825,10 @@ export default (props: any) => {
             isSubmit: true, 'auditNum-isNull': true, enable: true, 'type-in': '0,4,5,6'
             //  'chargeIds-isNull': false
           });
+          setRestore(false)
         } else if (key == 'true') {
           setParams({ enable: true, confirm: true, 'type-in': '0,4,5,6' });
+          setRestore(false)
           // params.confirm = true;
         } else if (key == 'false') {
           setParams({
@@ -801,8 +836,11 @@ export default (props: any) => {
             //  'chargeIds-isNull': false
           });
           // params.confirm = false;
+          setRestore(false)
         } else if (key === 'enable') {
           setParams({ enable: false, 'type-in': '0,4,5,6' });
+          setRestore(true)
+          console.log('123123')
         }
         callbackRef();
       },
@@ -824,7 +862,7 @@ export default (props: any) => {
           scroll={{ x: 1500 }}
           request={{ url: url, params: params, sortList: sortList }}
           toolbar={toolbar}
-          search={{ defaultCollapsed: false, labelWidth: 120 }}
+          search={{ defaultCollapsed: true, labelWidth: 120, defaultColsNumber: 10 }}
           pagesizes={100}
           rowSelection={{
             // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
