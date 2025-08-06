@@ -48,6 +48,7 @@ export default () => {
         formRef?.current?.setFieldValue('timeRange', time)
     }, [])
     useEffect(() => {
+        //console.log(initialState.currentUser.departmentId,'initialState-----')
         userList([Dictionaries.getDepartmentList(initialState?.currentUser?.userid)])
 
     }, [time, timeLength])
@@ -341,6 +342,7 @@ export default () => {
             startTime: time[0],
             endTime: time[1],
             userIdList: ids
+            //departmentId: initialState?.currentUser?.departmentId
         })).data
         const data2 = (await request.get('/sms/business/bizStudent/statistics/user', {
             startTime: changeDate(time[0]),

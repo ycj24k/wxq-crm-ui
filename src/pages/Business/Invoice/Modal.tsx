@@ -10,6 +10,7 @@ import InvoiceRemarks from './InvoiceRemarks';
 const { confirm } = Modal;
 export default (props: any) => {
     const { renderDataInvoice, ModalsVisible, setModalsVisible, callbackRef, setAddInvoiceVisible } = props;
+    console.log(renderDataInvoice,'renderDataInvoice=======>')
     const formRefInvoice = useRef<ProFormInstance>();
     const [invoiceFalg, setinvoiceFalg] = useState<any>(true);
     const [hasAccount, setHasAccount] = useState<any>(false);
@@ -160,6 +161,7 @@ export default (props: any) => {
                 maskClosable: false,
             }}
             onFinish={async (value) => {
+                //console.log(value,'value======>')
                 await submits(value);
             }}
             submitter={{
@@ -283,6 +285,7 @@ export default (props: any) => {
                         </ProFormList>
                     </ProForm.Group>
                 </div>
+
                 <div hidden={(steps == 1 && ChargeList.length == 0)}>
                     <ProForm.Group title="税票信息">
                         <InvoiceRemarks />
@@ -380,10 +383,10 @@ export default (props: any) => {
                                 hidden={hasAccount}
                                 name="hasAccount"
                                 layout="vertical"
-                                label=" "
                                 options={['填写账号信息']}
                                 fieldProps={{
                                     onChange: (e) => {
+                                        console.log(e)
                                         if (e.length > 0) {
                                             setinvoiceFalg(false);
                                         } else {

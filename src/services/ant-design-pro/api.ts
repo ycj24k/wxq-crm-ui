@@ -192,6 +192,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/StudentManages',
               },
               {
+                name:'开具发票',
+                path: '/business/invoicelist',
+                component: './Business/InvoiceList',
+              },
+              {
                 name: '潜在学员',
                 icon: 'SolutionOutlined',
                 path: '/business/studentmanage',
@@ -257,11 +262,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/exclusiveqrcode',
                 component: './Business/ExclusiveQRCode',
               },
-              {
-                name:'专属码未支付申请退款',
-                path:'/business/exclusiveqrcoderefund',
-                component:'./Business/ExclusiveQRCodeRefund',
-              }
+              // {
+              //   name:'专属码未支付申请退款',
+              //   path:'/business/exclusiveqrcoderefund',
+              //   component:'./Business/ExclusiveQRCodeRefund',
+              // }
             ],
           },
           {
@@ -344,6 +349,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/businessorder',
                 component: './Business/BusinessOrder',
               },
+              // {
+              //   name: '补缴下单',
+              //   path: '/business/supplementary',
+              //   component: './Business/Supplementary',
+              // },
               {
                 name: '待支付订单',
                 icon: 'table',
@@ -386,11 +396,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/businessorder/search',
                 component: './Business/BusinessOrder/searchFalg',
               },
-              {
-                name: '专属码申请退款审核',
-                path: '/business/refundreview',
-                component: './Business/RefundReview',
-              },
+              // {
+              //   name: '专属码申请退款审核',
+              //   path: '/business/refundreview',
+              //   component: './Business/RefundReview',
+              // },
               {
                 name: '专属收款码未下单记录',
                 path: '/business/chargeLog',

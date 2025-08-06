@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Tables from "@/components/Tables"
+import { useModel } from 'umi';
 import ProForm, {
     ModalForm,
     type ProFormInstance,
@@ -7,22 +8,31 @@ import ProForm, {
     ProFormDatePicker,
     ProFormTextArea,
     ProFormSelect,
-    ProFormUploadDragger
+    ProFormUploadDragger,
+    ProFormText
 } from '@ant-design/pro-form';
+
 import { ProColumns } from "@ant-design/pro-table"
 import './follow.less'
 import { Button, message, Modal, Input, Space } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+import request from '@/services/ant-design-pro/apiRequest';
 const { Search } = Input;
 
 
 export default (props: any) => {
-    const { modalVisible, setModalVisible, callbackRef, renderData } = props;
+    const { modalVisible, setModalVisible, renderData, url } = props;
+    console.log(url, 'renderData')
+    console.log(renderData, 'renderData')
+    const { initialState } = useModel('@@initialState');
     const [followModal, setFollowModal] = useState<boolean>(false);
-    const [userNameIds, setUserNameIds] = useState<number>(0);
-
+    //const [userNameIds, setUserNameIds] = useState<number>(0);
+    const [followList, setFollowList] = useState<any>([])
     const [expandedItems, setExpandedItems] = useState<number[]>([]);
+    //编辑时的id
+    const [editId, setEditId] = useState<string>('');
+    //展开收起
     const toggleExpand = (id: number) => {
         if (expandedItems.includes(id)) {
             setExpandedItems(expandedItems.filter(item => item !== id));
@@ -30,9 +40,34 @@ export default (props: any) => {
             setExpandedItems([...expandedItems, id]);
         }
     };
+    //编辑
+    const handleEdit = (item: any) => {
+        setEditId(item.id)
+        setTimeout(() => {
+            formRef?.current?.setFieldsValue({
+                content: item.content,
+                project: Dictionaries.getCascaderValue('dict_reg_job', item.project),
+                type: Dictionaries.getName('dict_c_type', item.type),
+                intention: Dictionaries.getName('dict_intention_level', item.intention),
+                createTime: item.createTime,
+                nextVisitDate: item.nextVisitDate
+            });
+        }, 100);
+        setFollowModal(true)
+    }
+    useEffect(() => {
+        getFollow()
+    }, [url])
 
-    const url = '/sms/business/bizReturnVisit/findOne'
-    console.log(renderData, 'studentId')
+    const param = { studentUserId: renderData.id }
+    const getFollow = async () => {
+        const res = await request.get(url, param)
+        setFollowList(res.data.content)
+    }
+    const search = async (val: string) => {
+        const res = await request.get(url, { content: val, studentUserId: renderData.id })
+        setFollowList(res.data.content)
+    }
     const formRef = useRef<ProFormInstance>();
     const userRefs: any = useRef(null);
 
@@ -46,43 +81,14 @@ export default (props: any) => {
         console.error('Token value is null');
     }
 
-    const [followList, setFollowList] = useState<any>([
-        {
-            id: 1,
-            name: '电话沟通',
-            project: '土建中级-一建',
-            followContent: '沟通内容dshauiofhaofjaosifiaofhahf',
-            followTime: '2025-08-07 10:30:22',
-            followPeople: '张三',
-            followStatus: '已完成',
-            nextTime: '2025-08-07 10:30:22'
-        },
-        {
-            id: 2,
-            name: '电话沟通',
-            project: '土建中级-一建',
-            followContent: '沟通内容',
-            followTime: '2025-08-07 10:30:22',
-            followPeople: '张三',
-            followStatus: '已完成',
-            nextTime: '2025-08-07 10:30:22'
-        },
-        {
-            name: '电话沟通',
-            project: '土建中级-一建',
-            followContent: '沟通内容',
-            followTime: '2025-08-07 10:30:22',
-            followPeople: '张三',
-            followStatus: '已完成',
-            nextTime: '2025-08-07 10:30:22'
-        }
-    ])
 
 
 
-    // const handleAddfollow = () => {
-    //     setFollowModal(true)
-    // }
+
+    const handleAddfollow = () => {
+        console.log(editId)
+        setFollowModal(true)
+    }
     // const columns: ProColumns<any>[] = [
     //     {
     //         title: '沟通类型',
@@ -143,19 +149,34 @@ export default (props: any) => {
                     <p>联系电话：{renderData.mobile}</p>
                     <p>微信号：{renderData.weChat || '未填写'}</p>
                 </div>
-                {/* <div className='header_top'>
-                    <p>姓名：{renderData.name}</p>
-                    <p>联系电话：{renderData.mobile}</p>
-                    <p>微信号：{renderData.weChat || '未填写'}</p>
-                </div> */}
                 <div className='header_search'>
-                    <Search style={{ width: '200px',marginLeft: '20px'}} placeholder="input search text" enterButton />
-                    <ProFormSelect
-                        name="type"
-                        width="xl"
-                        placeholder={'请选择沟通类型'}
-                        request={async () => Dictionaries.getList('dict_c_type') as any}
-                    />
+                    <div className='search_left'>
+                        <Search style={{ width: '200px', marginLeft: '20px' }} placeholder="输入跟进内容" onSearch={search} enterButton />
+                        <ProFormSelect
+                            style={{ width: '200px', marginTop: '24px' }}
+                            name="type"
+                            width="xl"
+                            placeholder={'请选择沟通类型'}
+                            fieldProps={{
+                                onChange: async (val: string) => {
+                                    if (!val) {
+                                        const res = await request.get(url, { studentUserId: renderData.id })
+                                        setFollowList(res.data.content)
+                                    } else {
+                                        const res = await request.get(url, { type: val, studentUserId: renderData.id })
+                                        setFollowList(res.data.content)
+                                    }
+                                }
+                            }}
+                            request={async () => Dictionaries.getList('dict_c_type') as any}
+                        />
+                    </div>
+                    <div className='search_right'>
+                        <Button key="ordere"
+                            type="primary"
+                            onClick={handleAddfollow}>添加跟进记录</Button>
+                    </div>
+
                 </div>
                 <div className='header_bottom'>
                     <div className='table_header'>
@@ -164,7 +185,6 @@ export default (props: any) => {
                         <div>跟进内容</div>
                         <div>跟进时间</div>
                         <div>跟进人</div>
-                        <div>跟进状态</div>
                         <div>下次跟进时间</div>
                         <div>操作</div>
                     </div>
@@ -173,28 +193,26 @@ export default (props: any) => {
                             return (
                                 <div>
                                     <div className='header_content_top'>
-                                        <div>{item.name}</div>
-                                        <div>{item.project}</div>
-                                        <div>{item.followContent}</div>
-                                        <div>{item.followTime}</div>
-                                        <div>{item.followPeople}</div>
-                                        <div>{item.followStatus}</div>
-                                        <div>{item.nextTime}</div>
-                                        <div onClick={() => toggleExpand(item.id)}>{expandedItems.includes(item.id) ? '收起' : '详情'}</div>
+                                        <div>{Dictionaries.getName('dict_c_type', item.type)}</div>
+                                        <div>{Dictionaries.getCascaderName('dict_reg_job', item.project)}</div>
+                                        <div>{item.content}</div>
+                                        <div>{item.createTime}</div>
+                                        <div>{item.userName}</div>
+                                        <div>{item.nextVisitDate}</div>
+                                        <div>
+                                            <a onClick={() => toggleExpand(item.id)}>{expandedItems.includes(item.id) ? '收起' : '详情'}</a>,
+                                            <a onClick={() => handleEdit(item)}>编辑</a>
+                                        </div>
                                     </div>
                                     {expandedItems.includes(item.id) && (
                                         <div className='header_content'>
                                             <div className='content_top'>
-                                                <div>沟通项目：{item.project}</div>
-                                                <div>跟进人：{item.followPeople}</div>
+                                                <div>沟通项目：{Dictionaries.getCascaderName('dict_reg_job', item.project)}</div>
+                                                <div>跟进人：{item.userName}</div>
+                                                <div>下次跟进时间：{item.nextVisitDate}</div>
+                                                <div>沟通类型：{Dictionaries.getName('dict_c_type', item.type)}</div>
                                             </div>
-                                            <div className='content_middle'>沟通内容：{item.followContent}</div>
-                                            <div className='content_bottom'>
-                                                <div>已完成</div>
-                                                <div>下次跟进时间：2025-08-07 10:30:22</div>
-                                                <div>跟进人：张三</div>
-                                                <div>沟通类型：电话沟通</div>
-                                            </div>
+                                            <div className='content_middle'>沟通内容：{item.content}</div>
                                         </div>
                                     )}
                                 </div>
@@ -223,34 +241,53 @@ export default (props: any) => {
                 name: string;
                 company: string;
             }>
-                title={renderData.types == 'edit' ? '编辑有效期' : '新建有效期'}
+                title={editId ? '编辑' : '新建'}
                 formRef={formRef}
                 visible={followModal}
                 width={1000}
                 autoFocusFirstInput
                 modalProps={{
-                    onCancel: () => setFollowModal(false),
+                    onCancel: () => {
+                        setFollowModal(false)
+                        setEditId('')
+                    },
                     destroyOnClose: true,
                 }}
-            // onFinish={async (values: any) => {
-            //     if (values.project) values.project = values.project[values.project.length - 1];
-            //     console.log(values, 'values')
-
-            //     if (renderData.types == 'edit') values.id = renderData.id;
-            //     request
-            //         .post(url, values)
-            //         .then((res: any) => {
-            //             if (res.status == 'success') {
-            //                 message.success('操作成功');
-            //                 setModalVisible();
-            //                 callbackRef();
-            //             }
-            //             return true;
-            //         })
-            //         .catch((err: any) => {
-            //             return true;
-            //         });
-            // }}
+                onFinish={async (values: any) => {
+                    if (values.project) values.project = values.project[values.project.length - 1];
+                    values.studentUserId = renderData.id;
+                    values.updateBy = initialState?.currentUser?.userid;
+                    if (values.filess) {
+                        let arr: any[] = [];
+                        values.filess.forEach((item: any) => {
+                            arr.push(item.response.data);
+                        });
+                        delete values.filess;
+                        values.file = arr.join(',');
+                        console.log(values.files)
+                    }
+                    values.files = values.files
+                    console.log(values, 'values')
+                    setEditId('')
+                    if (editId) {
+                        values.id = editId;
+                        values.type = Dictionaries.getValue('dict_c_type',values.type)
+                        values.intention = Dictionaries.getValue('dict_intention_level',values.intention)
+                    } 
+                    request
+                        .post(url, values)
+                        .then((res: any) => {
+                            if (res.status == 'success') {
+                                message.success('操作成功');
+                                setFollowModal(false);
+                                getFollow()
+                            }
+                            return true;
+                        })
+                        .catch((err: any) => {
+                            return true;
+                        });
+                }}
             >
                 <ProForm.Group>
                     <ProFormCascader
@@ -282,7 +319,7 @@ export default (props: any) => {
                         request={async () => Dictionaries.getList('dict_intention_level') as any}
                     />
                     <ProFormDatePicker
-                        name="consultationTime"
+                        name="createTime"
                         fieldProps={{
                             showTime: { format: 'HH:mm:ss' },
                             format: 'YYYY-MM-DD HH:mm:ss',
@@ -292,27 +329,32 @@ export default (props: any) => {
                         rules={[{ required: true, message: '请选择跟进时间' }]}
                     />
                     <ProFormDatePicker
-                        name="consultationTime"
+                        name="nextVisitDate"
                         fieldProps={{
                             showTime: { format: 'HH:mm:ss' },
                             format: 'YYYY-MM-DD HH:mm:ss',
                         }}
                         width="sm"
                         label={`下次跟进时间`}
-                        rules={[{ required: true, message: '请选择下次跟进时间' }]}
                     />
-                    <UserTreeSelect
+                    <ProFormText
+                        label="跟进人"
+                        name="updateBy"
+                        width="md"
+                        fieldProps={{ value: initialState?.currentUser?.name, readOnly: true }}
+                    />
+                    {/* <UserTreeSelect
                         ref={userRefs}
                         width="sm"
-                        userLabel={'信息提供人'}
+                        userLabel={'跟进人'}
                         userNames="provider"
                         // newMedia={sourceType == 1}
-                        userPlaceholder="请输入信息提供人"
+                        userPlaceholder="跟进人"
                         setUserNameId={(e: any) => setUserNameIds(e)}
                         // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
                     // setFalgUser={(e: any) => setFalgUser(e)}
-                    />
+                    /> */}
                     <ProFormUploadDragger
                         width="xl"
                         label="上传附件"
@@ -347,7 +389,7 @@ export default (props: any) => {
                             },
                         }}
                     />
-                    <ProFormTextArea width={800} label="跟进内容" name="description" rules={[{ required: true }]} />
+                    <ProFormTextArea width={800} label="跟进内容" name="content" rules={[{ required: true }]} />
                 </ProForm.Group>
             </ModalForm>
         </>

@@ -613,6 +613,9 @@ export default (props: any) => {
                     renderData={renderDataInvoice}
                 />
             )}
+
+
+            {/* 新增发票信息 */}
             {ModalsVisible && (
                 <Modal
                     renderDataInvoice={renderDataInvoice}
@@ -622,6 +625,8 @@ export default (props: any) => {
                     setAddInvoiceVisible={() => setAddInvoiceVisible(true)}
                 />
             )}
+
+            
             {addInvoiceVisible && (
                 <AddInvoice
                     renderData={renderDataInvoice}

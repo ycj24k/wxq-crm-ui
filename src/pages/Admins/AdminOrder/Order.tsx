@@ -69,18 +69,20 @@ type GithubIssueItem = {
 };
 
 export default (props: any) => {
-  const { 
-    admins, 
-    admin, 
-    studentUserId = '', 
-    type = 0, 
-    orderId = '', 
-    orderIds = undefined, 
-    searchFalg = false, 
-    searchParams, 
-    showType, 
-    showStudentBtn 
+  const {
+    admins,
+    admin,
+    studentUserId = '',
+    type = 0,
+    orderId = '',
+    orderIds = undefined,
+    searchFalg = false,
+    searchParams,
+    showType,
+    showStudentBtn,
+    orderType
   } = props;
+  console.log(orderType, 'orderType')
   const [CommodalVisibleFalg, setComModalVisible] = useState<boolean>(false);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
@@ -505,7 +507,40 @@ export default (props: any) => {
           <Tooltip placement="topLeft" title={'订单缴费'}>
             <Button
               key="jiaofei"
-              hidden={record.parentId != '-1'}
+              hidden={record.parentId != '-1' || orderType != 'sp'}
+              size="small"
+              type="primary"
+              icon={<AccountBookOutlined />}
+              className="tablebut"
+              onClick={async () => {
+                const list = await getChargeList(record.id, true);
+                if (list.length > 0 && list.every((item: any) => item.confirm !== true)) {
+                  showConfirm(
+                    { title: '该订单尚有缴费未审核！', content: '点击确定继续缴费' },
+                    () => {
+                      let orders: any = record;
+                      orders.orderId = record.id;
+                      setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
+                      setChargeNewsVisibleFalg(true);
+                    },
+                  );
+                } else {
+                  let orders: any = record;
+                  orders.orderId = record.id;
+                  setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
+                  setChargeNewsVisibleFalg(true);
+                }
+              }}
+            >
+              补缴下单
+            </Button>
+          </Tooltip>
+
+
+          <Tooltip placement="topLeft" title={'订单缴费'}>
+            <Button
+              key="jiaofei"
+              hidden={record.parentId != '-1' || orderType == 'sp'}
               size="small"
               type="primary"
               icon={<AccountBookOutlined />}
@@ -538,7 +573,7 @@ export default (props: any) => {
               key="editable"
               type="primary"
               size="small"
-              hidden={showType == 'refund'}
+              hidden={showType == 'refund' || orderType == 'sp'}
               icon={<EditOutlined />}
               className="tablebut"
               onClick={async () => {
@@ -566,7 +601,7 @@ export default (props: any) => {
               setRenderData({ ...record, type: 'orders', orderNumber: 0 });
               setChargeOrderVisible(true);
             }}
-            hidden={record.parentId != '-1'}
+            hidden={record.parentId != '-1' || orderType == 'sp'}
             icon={<AccountBookOutlined />}
             className="tablebut"
             danger
@@ -593,7 +628,7 @@ export default (props: any) => {
             cancelText="取消"
           >
             <Button
-              hidden={record.parentId != '-1' || showType == 'refund'}
+              hidden={record.parentId != '-1' || showType == 'refund' || orderType == 'sp'}
               key="delete"
               size="small"
               type="primary"
