@@ -88,11 +88,11 @@
     path: '/business/question',
     component: './Business/Question',
   },
-  // {
-  //   name:'下单专页',
-  //   path: '/business/orderpage',
-  //   component: './Business/OrderPage',
-  // },
+  {
+    name:'下单专页',
+    path: '/business/orderpage',
+    component: './Business/OrderPage',
+  },
   {
     name: '开通记录',
     path: '/business/openquestionrecord',

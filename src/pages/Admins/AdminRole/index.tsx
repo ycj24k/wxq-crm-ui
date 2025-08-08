@@ -256,7 +256,9 @@ export default () => {
             params: {
               current?: any;
               page?: number;
-            } = {},
+            } = {
+              
+            },
             sort,
             filter,
           ) => {

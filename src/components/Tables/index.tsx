@@ -33,6 +33,7 @@ type propsType = {
   | undefined;
   tableAlertOptionRender?: AlertRenderType<Record<string, any>> | undefined;
   onReset?: (() => void) | undefined;
+  onDataSourceChange?: (() => void) | undefined;
   search?: any;
   beforeSearchSubmit?: any;
   onSubmit?: ((params: any) => void) | undefined;

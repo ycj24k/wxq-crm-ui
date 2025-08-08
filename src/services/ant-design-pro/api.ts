@@ -247,11 +247,11 @@ export async function currentUser(options?: { [key: string]: any }) {
               //   path: '/business/provide/resource',
               //   component: './Business/ProvideUser/Resource',
               // },
-              // {
-              //   name:'下单专页',
-              //   path: '/business/orderpage',
-              //   component: './Business/OrderPage',
-              // },
+              {
+                name:'下单专页',
+                path: '/business/orderpage',
+                component: './Business/OrderPage',
+              },
               {
                 name: '小程序二维码下载',
                 path: '/business/qrcode',
