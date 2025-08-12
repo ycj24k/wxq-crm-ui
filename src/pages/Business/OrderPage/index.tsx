@@ -11,7 +11,7 @@ import ProForm, {
     ProFormTextArea
 } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
-import { Button, Modal, Radio, RadioChangeEvent, } from 'antd';
+import { Button, message, Modal, Radio, RadioChangeEvent, } from 'antd';
 import { useRef, useState } from 'react';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -19,13 +19,21 @@ import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import OrderClassType from './orderClassType'
 import OrderPayWay from './orderPayWay'
+import MenuManageCard from './MenuTree'
+import { useModel } from 'umi';
+
 export default () => {
     const formRef = useRef<ProFormInstance>();
+    const { initialState } = useModel('@@initialState');
     const [findStudent, setFindStudent] = useState<boolean>(false)
     const [modalStudentInfo, setModalStudentInfo] = useState<boolean>(false)
     const [modalOrderVisible, setModalOrderVisible] = useState<boolean>(false)
+    //const [studentInfo, setStudentInfo] = useState<any>({});
+    const [MenuVisible, setMenuVisible] = useState<boolean>(false);
+    const [renderData, setRenderData] = useState<any>({});
     const [type, setType] = useState<string>('0')
     const [steps, setSteps] = useState<any>(1)
+    const [backProject, setBackProject] = useState<any>([])
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -44,6 +52,65 @@ export default () => {
     }>(null);
     const setRadio = (e: RadioChangeEvent) => {
         setSteps(e.target.value)
+    }
+    const getProject = async () => {
+        const res = await request.get('/sms/commonProjects')
+        setBackProject(res.data)
+    }
+    const handleOrder = (record: any) => {
+        console.log(record, 'record')
+        setModalStudentInfo(true)
+        setTimeout(() => {
+            formRef?.current?.setFieldsValue({
+                name: record.name,
+                idCard: record.idCard,
+                weChat: record.weChat,
+                mobile: record.mobile,
+                type: record.type.toString(),
+                source: record.studentSource.toString(),
+                project: Dictionaries.getCascaderValue('dict_reg_job', record.project),
+            })
+
+            let data = {}
+            let datas = {
+                id: record.userId,
+                name: record.userName
+            }
+            let data2 = {}
+            if (record.provider) {
+                data = {
+                    id: record.provider,
+                    name: record.providerName
+                }
+            } else {
+                data = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            if (record.owner) {
+                data2 = {
+                    id: record.owner,
+                    name: record.ownerName ? record.ownerName : '无'
+                }
+            } else {
+                data2 = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            userRef?.current?.setDepartment(datas);
+            userRefs?.current?.setDepartment(data);
+            userRef2?.current?.setDepartment(data2);
+            setUserNameId(datas)
+            setUserNameIds(data)
+            setUserNameId2(data2)
+        }, 100)
+    }
+    //设置常用报考项目
+    const handleSetProject = () => {
+        getProject()
+        setMenuVisible(true)
     }
     let params: any = {
         isPay: true,
@@ -351,7 +418,7 @@ export default () => {
             render: (text, record, _, action) => (
                 //order为选择学员时所用，parentId为企业添加学员时所用
                 <>
-                    <Button type='primary'>下单</Button>
+                    <Button type='primary' onClick={() => handleOrder(record)}>下单</Button>
                 </>
             ),
         },
@@ -426,9 +493,10 @@ export default () => {
             >
                 <p>学员资料不存在，请完善资料后再下单</p>
             </Modal>
+
             <ModalForm
                 visible={modalStudentInfo}
-                title="新建表单"
+                title="学员信息"
                 width={1000}
                 layout='horizontal'
                 formRef={formRef}
@@ -450,10 +518,18 @@ export default () => {
                     } else {
                         console.log('未提交共享分成数据或当前未启用共享功能');
                     }
+                    if (values.project) values.project = values.project[values.project.length - 1];
+                    if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
+                    if (values.userId) values.userId = Dictionaries.getUserId(values.userId.label)[0]
+                    if (values.provider) values.provider = Dictionaries.getUserId(values.provider.label)[0]
+                    if (userNameId) values.userId = userNameId.id
+                    if (userNameIds) values.provider = userNameIds.id
+                    if (userNameId2) values.owner = userNameId2.id
+                    setRenderData(values)
                     return true;
                 }}
             >
-                <Button type='primary' style={{ marginBottom: '15px' }}>设置常用报考项目</Button>
+                <Button type='primary' style={{ marginBottom: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>
                 <ProForm.Group>
                     <ProFormSelect
                         label="学员类型"
@@ -480,6 +556,20 @@ export default () => {
                     <ProFormText
                         width="md"
                         name="mobile"
+                        label={'手机号码'}
+                        placeholder="请输入手机号码"
+                    />
+                    <ProFormText
+                        width="md"
+                        name="weChat"
+                        label={'微信号码'}
+                        placeholder="请输入微信号码"
+                    />
+                </ProForm.Group>
+                <ProForm.Group>
+                    <ProFormText
+                        width="md"
+                        name="idCard"
                         label="身份证号"
                         placeholder="请输入身份证号"
                         rules={[{ required: true, message: '请输入身份证号' }]}
@@ -506,6 +596,7 @@ export default () => {
                             // onSearch: (value) => console.log(value)
                         }}
                     />
+
                     <UserTreeSelect
                         ref={userRef}
                         userLabel={'招生老师'}
@@ -529,17 +620,22 @@ export default () => {
                         }}
                         userNames="owner"
                         newMedia={false}
-                        userPlaceholder="请输入信息所有人"
+                        userPlaceholder="请输入出镜人"
                         setUserNameId={(e: any) => setUserNameId2(e)}
+                        // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
+                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                     <UserTreeSelect
                         ref={userRefs}
                         userLabel={'信息提供人'}
                         userNames="provider"
+                        // newMedia={sourceType == 1}
                         userPlaceholder="请输入信息提供人"
                         setUserNameId={(e: any) => setUserNameIds(e)}
+                        // setDepartId={(e: any) => setDepartId(e)}
                         flag={true}
+                    // setFalgUser={(e: any) => setFalgUser(e)}
                     />
                 </ProForm.Group>
                 <ProFormTextArea
@@ -620,13 +716,82 @@ export default () => {
                     },
                     maskClosable: false,
                 }}
-                onFinish={async (values) => { 
-                    let classListValues = {}
-                    classListValues = await classListRef.current?.getFormValues();
-                    console.log(classListValues,'classListValues')
+                onFinish={async (values) => {
+                    console.log(renderData, 'values')
+                    let classListValues;
+                    try {
+                        classListValues = await classListRef.current?.getFormValues();
+                        if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
+                            message.error('请至少添加一个班级信息');
+                            return;
+                        }
+                        // 验证每个班级信息是否完整
+                        for (let i = 0; i < classListValues.users.length; i++) {
+                            const user = classListValues.users[i];
+                            if (!user.project || user.project.length === 0) {
+                                message.error(`第${i + 1}个班级的报考岗位不能为空`);
+                                return;
+                            }
+                            if (!user.JobClassExam) {
+                                message.error(`第${i + 1}个班级的班型选择不能为空`);
+                                return;
+                            }
+                            if (!user.source) {
+                                message.error(`第${i + 1}个班级的订单来源不能为空`);
+                                return;
+                            }
+                        }
+                    } catch (error) {
+                        return;
+                    }
+                    const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
+
+                    let payWayValues: any;
+                    try {
+                        payWayValues = await payWayRef.current?.getFormValues();
+                    } catch (error) {
+                        return;
+                    }
+
+                    console.log(processedUsers)
+                    console.log(payWayValues)
+
+                    let auditsParam: any = processedUsers.map((order: any, index: number) => ({
+                        "student": renderData,
+                        "order": order,
+                        "charge": payWayValues[index]
+                    }));
+                    console.log(auditsParam, 'auditsParam')
+                    request
+                        .postAll('/sms/business/bizOrder/intelligence', auditsParam)
+                        .then((res: any) => {
+                            if (res.status == 'success') {
+                                message.success('操作成功');
+                                // 重置所有表单数据
+                                // 1. 重置学生表单
+                                formRef.current?.resetFields();
+                                userRef?.current?.setDepartment({});
+                                userRefs?.current?.setDepartment({});
+                                userRef2?.current?.setDepartment({});
+                                setModalOrderVisible(false)
+                                // 2. 重置班级列表表单
+                                if (classListRef.current) {
+                                    classListRef.current.resetForm();
+                                }
+
+                                // 3. 重置支付方式组件
+                                if (payWayRef.current) {
+                                    payWayRef.current.resetPayWay();
+                                }
+                            } else {
+                                message.error(res.msg)
+                            }
+                        }).catch((err) => { })
+
                 }}
             >
                 <OrderClassType
+                    renderData={renderData}
                     ref={classListRef}
                     onTotalQuantityChange={(quantity: number) => {
                         formRef.current?.setFieldsValue({
@@ -648,6 +813,14 @@ export default () => {
                     }} />
                 <OrderPayWay ref={payWayRef} />
             </ModalForm>
+
+            {MenuVisible && (
+                <MenuManageCard
+                    MenuVisible={MenuVisible}
+                    backProject={backProject}
+                    setMenuVisible={() => setMenuVisible(false)}
+                />
+            )}
         </PageContainer>
     );
 };

@@ -1,7 +1,7 @@
 
 import { PageContainer } from '@ant-design/pro-layout';
 import ProCard from '@ant-design/pro-card';
-import { Radio, Button, RadioChangeEvent, Drawer, Modal, Checkbox } from 'antd';
+import { Radio, Button, RadioChangeEvent, Drawer, Modal, Checkbox, message } from 'antd';
 import request from '@/services/ant-design-pro/apiRequest';
 import ProForm, {
     ProFormDigit,
@@ -25,18 +25,22 @@ export default () => {
     const [ChargeList, setChargeList] = useState<any>([]);
     const [hasAccount, setHasAccount] = useState<any>(false);
     const [invoiceFalg, setinvoiceFalg] = useState<any>(true);
+    const [invoicelist, setInvoicelist] = useState<any>([])
     let [ChargeLists, setChargeLists] = useState<any>([]);
+    const [checked, setChecked] = useState(false)
     const formRefInvoice = useRef<ProFormInstance>();
     const formRefInvoiceelse = useRef<ProFormInstance>();
 
     const setRadio = (e: RadioChangeEvent) => {
         setSteps(e.target.value)
     }
-    const onChange = (e: any) => {
+    const onChangeCheckbox = (e: any) => {
         if (e.target.checked == true) {
             setinvoiceFalg(false);
+            setChecked(true)
         } else {
             setinvoiceFalg(true);
+            setChecked(false)
         }
     }
     const handleChargeList = (list: any[]) => {
@@ -65,6 +69,24 @@ export default () => {
         formRefInvoice.current?.setFieldsValue({ title, productType, taxCode, amount, email, remark, cautions, type, bank, account, mobile, address, chargeAccount, price, quantity })
 
     }
+
+    useEffect(() => {
+        getTitleName()
+    }, [])
+
+    const getTitleName = async () => {
+        const res = await request.get('/sms/business/bizInvoice', { enable: true, _orderBy:'createTime' })
+        console.log(res.data.content)
+        let newArr = res.data.content.map((item: any) => {
+            return {
+                ...item,
+                label: item.title,
+                value: item.id
+            }
+        })
+        console.log(newArr)
+        setInvoicelist(newArr)
+    }
     useEffect(() => {
         if (ChargeList.length > 0) {
             setFromValue({ chargeAccount: ChargeList[0].method + '' })
@@ -88,14 +110,14 @@ export default () => {
         try {
             // 验证第一个表单
             await formRefInvoice.current?.validateFields();
-            
+
             // 验证第二个表单
             await formRefInvoiceelse.current?.validateFields();
-            
+
             // 合并表单值
             const invoiceValues = formRefInvoice.current?.getFieldsValue();
             const invoiceElseValues = formRefInvoiceelse.current?.getFieldsValue();
-            
+
             // 根据条件删除不需要的字段
             if (invoiceFalg) {
                 delete invoiceElseValues.bank;
@@ -103,16 +125,52 @@ export default () => {
                 delete invoiceElseValues.mobile;
                 delete invoiceElseValues.address;
             }
-            
+
             const combinedValues = {
                 ...invoiceValues,
                 ...invoiceElseValues
             };
-            
-            console.log('表单验证通过，合并后的值:', combinedValues);
-            
+            if (combinedValues?.chargeList) {
+                combinedValues.chargeList.forEach((item: any) => {
+                    item.amount = item.usedAmount
+                    delete item.uamount
+                    delete item.num
+                    delete item.usedAmount
+                    delete item.surplusAmount
+                })
+            } else {
+                combinedValues.chargeList = []
+            }
+            let newType = 0
+            if(combinedValues.type == '普票'){
+                newType = 0
+            }
+            if(combinedValues.type == '专票'){
+                newType = 1
+            }
+            let newCombinedValues = {
+                ...combinedValues,
+                type:newType,
+                chargeAccount: Dictionaries.getValue('dict_stu_refund_type', combinedValues.chargeAccount),
+                productType: Dictionaries.getValue('invoiceProductType', combinedValues.productType),
+            }
+            console.log(newCombinedValues)
+            let url = '/sms/business/bizInvoice'
+            return new Promise(async (resolve) => {
+                request
+                    .postAll(url, newCombinedValues)
+                    .then((res: any) => {
+                        if (res.status == 'success') {
+                            message.success('操作成功');
+                            resolve(res);
+                        }
+                    })
+                    .catch((err: any) => {
+                        resolve(true);
+                    });
+            });
             // 在这里添加提交逻辑（如API调用）
-            
+
         } catch (error) {
             console.error('表单验证失败:', error);
             Modal.error({
@@ -222,7 +280,50 @@ export default () => {
                                 submitter={false}
                             >
                                 <ProForm.Group>
-                                    <ProFormText name="title" label="发票抬头" width="lg" rules={[{ required: true }]} />
+                                    {/* <ProFormText name="title" label="发票抬头" width="lg" rules={[{ required: true }]} /> */}
+                                    <ProFormSelect
+                                        label="发票抬头"
+                                        showSearch
+                                        name="title"
+                                        width="md"
+                                        options={invoicelist}
+                                        rules={[{ required: true }]}
+                                        fieldProps={{
+                                            onChange: (value) => {
+                                                const selectedItem = invoicelist.find((item: any) => item.value === value);
+                                                console.log(selectedItem, '选中项的完整值');
+                                                let invoiceType = ''
+                                                if(selectedItem.type == '0'){
+                                                    invoiceType = '普票'
+                                                }
+                                                if(selectedItem.type == '1'){
+                                                    invoiceType = '专票'
+                                                    setChecked(true)
+                                                    setinvoiceFalg(false);
+                                                    setHasAccount(true)
+                                                }
+                                                setTimeout(() => {
+                                                    formRefInvoiceelse?.current?.setFieldsValue({
+                                                        title: selectedItem.label,
+                                                        productType: Dictionaries.getName('invoiceProductType', selectedItem.productType),
+                                                        chargeAccount: Dictionaries.getName('dict_stu_refund_type', selectedItem.chargeMethod),
+                                                        price: selectedItem.price,
+                                                        quantity: selectedItem.quantity,
+                                                        taxCode: selectedItem.taxCode,
+                                                        amount: selectedItem.amount,
+                                                        email: selectedItem.email,
+                                                        remark: selectedItem.remark,
+                                                        cautions: selectedItem.cautions,
+                                                        type: invoiceType,
+                                                        bank: selectedItem.bank,
+                                                        account: selectedItem.account,
+                                                        mobile: selectedItem.mobile,
+                                                        address: selectedItem.address
+                                                    });
+                                                }, 100)
+                                            }
+                                        }}
+                                    />
                                     <ProFormSelect
                                         label="商品种类"
                                         name="productType"
@@ -297,19 +398,22 @@ export default () => {
                                         rules={[{ required: true }]}
                                         fieldProps={{
                                             onChange: (e) => {
+                                                console.log(e)
                                                 if (e == 0) {
                                                     setinvoiceFalg(true);
                                                     setHasAccount(false)
+                                                    setChecked(false)
                                                 } else {
                                                     setinvoiceFalg(false);
                                                     setHasAccount(true)
+                                                    setChecked(true)
                                                 }
                                             },
                                         }}
                                         initialValue="0"
                                         request={async () => Dictionaries.getList('invoiceType') as any}
                                     />
-                                    <Checkbox style={{ marginTop: '35px' }} disabled={hasAccount} onChange={onChange}>填写账号信息</Checkbox>
+                                    <Checkbox style={{ marginTop: '35px' }} checked={checked} disabled={hasAccount} onChange={onChangeCheckbox}>填写账号信息</Checkbox>
 
                                     {/* <ProFormCheckbox.Group
                                         hidden={hasAccount}

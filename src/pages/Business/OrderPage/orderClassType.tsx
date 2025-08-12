@@ -7,7 +7,8 @@ import {
     ProFormDigit,
     ProFormText,
     ProFormInstance,
-    ProFormTreeSelect
+    ProFormTreeSelect,
+    ProFormTextArea
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
 import Dictionaries from '@/services/util/dictionaries';
@@ -36,7 +37,7 @@ interface ClassListProps {
 
 const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType } = props;
-
+    console.log(renderData, 'renderData======>')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -91,6 +92,8 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             provider: userNameId?.id,
         });
     }, [userNameId])
+
+
     useEffect(() => {
         // 即使renderData不存在或不包含project字段，也继续初始化
         if (!renderData) {
@@ -123,18 +126,20 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             }
             quantitys[index] = item.quantity || 1;
             comNumbers[index] = item.receivable || 0;
+            let scoreName = Dictionaries.getName('dict_source', item.source)
             list.push({
                 project: item.project ? Dictionaries.getCascaderValue('dict_reg_job', item.project) : [],
                 quantity: item.quantity || 1,
                 receivable: item.receivable || 0,
                 discount: item.discount || 0,
-                source: item.studentSource ? Dictionaries.getName('dict_source', item.studentSource) : undefined,
-                // source: item.source ? item.source.toString() : undefined,
+                source: scoreName,
                 discountRemark: item.discountRemark || '',
-                provider: { "value": renderData.provider },
+                provider: { "value": item.provider },
+                // { "value": renderData.provider },
                 studentUserId: item.id || null
             });
         });
+
 
         setTimeout(async () => {
             formRef?.current?.setFieldsValue({
@@ -143,7 +148,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 quantity: quantitys.length > 0 ? eval(quantitys.join('+')) : 1,
                 project: renderData.project ? Dictionaries.getCascaderValue('dict_reg_job', renderData.project) : [],
                 users: list,
-                provider: renderData.provider,
+                provider: renderData.provider
             });
 
             if (renderData.provider && renderData.providerName) {
@@ -308,7 +313,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             Dictionaries.getCascaderValue('dict_reg_job', renderData.project) :
                             [],
                         quantity: 1,
-                        source: renderData?.source ? renderData.source.toString() : undefined,
+                        source: renderData && renderData.studentSource ? Dictionaries.getName('dict_source', renderData.studentSource) : undefined,
                         provider: {
                             value: renderData?.provider ?? null
                         },
@@ -620,7 +625,13 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                     );
                 }}
             >
+
             </ProFormList>
+            <ProFormTextArea
+                width={1100}
+                label={'备注'}
+                name="description"
+            />
         </ProForm>
     );
 })

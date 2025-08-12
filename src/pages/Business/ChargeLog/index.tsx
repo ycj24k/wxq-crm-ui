@@ -92,7 +92,6 @@ export default (props: any) => {
     //const param = getAll ? {} : { isUseUp: false }
     let param = null
     if(num == 'isTrue'){
-        console.log(num,'num->>>>>>>')
         param = { isRefund:false, isUseup:false, enable:true }
     }
     if(!num){
@@ -163,9 +162,9 @@ export default (props: any) => {
     //下单取消
     const handleCancelIsPay = () => {
         // 重置支付方式组件
-        if (payWayRef.current) {
-            payWayRef.current.resetPayWay();
-        }
+        // if (payWayRef.current) {
+        //     payWayRef.current.resetPayWay();
+        // }
         setIsPayModalOpen(false)
     }
     const handleChooseStudentMessageOrder = () => {
@@ -491,6 +490,7 @@ export default (props: any) => {
         {/* 查询学员信息弹窗 */}
         <Modal
             width={1200}
+            maskClosable={false}
             title="选择学员缴费"
             open={studentModal}
             onCancel={() => setStudentModal(false)}
@@ -504,6 +504,7 @@ export default (props: any) => {
         {/* 下单弹窗 */}
         <Modal
             title="下单"
+            maskClosable={false}
             width={1200}
             open={isPayModalOpen}
             confirmLoading={confirmLoading}

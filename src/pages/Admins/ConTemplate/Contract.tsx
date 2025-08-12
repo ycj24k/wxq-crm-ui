@@ -7,6 +7,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import { useRef, useState } from 'react';
 import ModelAdd from './ModelAdd';
 import ModelAdds from './ModelAdds';
+import ModelNewAdd from './ModelNewAdd'
 import { Button, Image, message, Popconfirm } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import ImgUrl from '@/services/util/ImgUrl';
@@ -227,8 +228,16 @@ export default (props: any) => {
           callbackRef={() => callbackRef()}
         />
       )}
-      {InfoVisibleFalgs && (
+      {/* {InfoVisibleFalgs && (
         <ModelAdds
+          setModalVisible={() => setInfoVisibles(false)}
+          modalVisible={InfoVisibleFalgs}
+          renderData={renderData}
+          callbackRef={() => callbackRef()}
+        />
+      )} */}
+      {InfoVisibleFalgs && (
+        <ModelNewAdd
           setModalVisible={() => setInfoVisibles(false)}
           modalVisible={InfoVisibleFalgs}
           renderData={renderData}

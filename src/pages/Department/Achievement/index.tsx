@@ -51,6 +51,8 @@ export default () => {
         //console.log(initialState.currentUser.departmentId,'initialState-----')
         userList([Dictionaries.getDepartmentList(initialState?.currentUser?.userid)])
 
+        console.log([Dictionaries.getDepartmentList(initialState?.currentUser?.userid)],'qnmd')
+
     }, [time, timeLength])
     useEffect(() => {
         if (tableType != 'yeji') {
@@ -225,7 +227,7 @@ export default () => {
         const userListDi = async (listChildren: { userId: any; name: any; children: any; }[]) => {
 
             listChildren.forEach((item: any) => {
-                if (item.userId && item.enable) {
+                if (item.userId) { // && item.enable
                     userIds.push(item.userId)
                     users.push({
                         name: item.name,
