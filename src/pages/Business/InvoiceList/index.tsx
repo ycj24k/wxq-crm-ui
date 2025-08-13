@@ -87,11 +87,19 @@ export default () => {
         console.log(newArr)
         setInvoicelist(newArr)
     }
+    const getInvoiceMsg = async (ids:any) => {
+        const res = await request.get(`/sms/business/bizInvoice/getInvoiceTempByChargeId?idList=${ids}`)
+        console.log(res)
+    }
     useEffect(() => {
+        // http://localhost:8000/#/business/invoicelist?idList=5,6,7
         if (ChargeList.length > 0) {
             setFromValue({ chargeAccount: ChargeList[0].method + '' })
             getInvoiceInfo(ChargeList[0].studentUserId)
             handleChargeList(ChargeList);
+            const ids = ChargeList.map((item: any) => item.id).join(',')
+            getInvoiceMsg(ids)
+            console.log(ids,'ChargeList--------------------->')
         }
     }, [ChargeList])
     const getInvoiceInfo = async (userId: string) => {
@@ -310,7 +318,6 @@ export default () => {
                                                         price: selectedItem.price,
                                                         quantity: selectedItem.quantity,
                                                         taxCode: selectedItem.taxCode,
-                                                        amount: selectedItem.amount,
                                                         email: selectedItem.email,
                                                         remark: selectedItem.remark,
                                                         cautions: selectedItem.cautions,

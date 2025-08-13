@@ -12,7 +12,7 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
 import { Button, message, Modal, Radio, RadioChangeEvent, } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -20,7 +20,9 @@ import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import OrderClassType from './orderClassType'
 import OrderPayWay from './orderPayWay'
 import MenuManageCard from './MenuTree'
+import SignUp from './SignUp'
 import { useModel } from 'umi';
+
 
 export default () => {
     const formRef = useRef<ProFormInstance>();
@@ -28,12 +30,18 @@ export default () => {
     const [findStudent, setFindStudent] = useState<boolean>(false)
     const [modalStudentInfo, setModalStudentInfo] = useState<boolean>(false)
     const [modalOrderVisible, setModalOrderVisible] = useState<boolean>(false)
+    const [awaylsUseProject, setAwaylsUseProject] = useState<any>()
+    const [projectslist, setProjectslist] = useState<any>()
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
     //const [studentInfo, setStudentInfo] = useState<any>({});
     const [MenuVisible, setMenuVisible] = useState<boolean>(false);
+    const [Registration, setRegistration] = useState<boolean>(false);
+
     const [renderData, setRenderData] = useState<any>({});
     const [type, setType] = useState<string>('0')
+    const [ID, setID] = useState<any>()
+    const [studentID, setStudentId] = useState<any>();
     const [steps, setSteps] = useState<any>(1)
-    const [backProject, setBackProject] = useState<any>([])
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -50,15 +58,57 @@ export default () => {
         removePayWayItem?: (index: number) => void;
         resetPayWay: () => void;
     }>(null);
+    useEffect(() => {
+        handleEnable()
+    }, [])
     const setRadio = (e: RadioChangeEvent) => {
         setSteps(e.target.value)
     }
+    //获取当前用户是否开启常用下单项目
+    const handleEnable = async () => {
+        const res = await request.get('/sms/commonProjects/enable')
+        if (res.status == 'success') {
+            getProject()
+        }
+    }
+
+    const convertToTreeData = (data: any[]): any[] => {
+        if (!data || !Array.isArray(data)) return [];
+
+        return data.map((item) => ({
+            key: item.id,
+            value: item.value,
+            label: item.name,
+            children: item.children ? convertToTreeData(item.children) : [],
+        }));
+    };
+
     const getProject = async () => {
         const res = await request.get('/sms/commonProjects')
-        setBackProject(res.data)
+        console.log(res, 'this.res')
+        const dictionariesList = localStorage.getItem('dictionariesList');
+        if (dictionariesList) {
+            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const result = Dictionaries.findDataByValues(res.data, dictionariesArray);
+            if (result) {
+                const newResult = [result]
+                const formattedData = convertToTreeData(newResult)
+                setProjectslist(formattedData)
+                console.log(formattedData, '新数组')
+            } else {
+                console.error('空数组');
+            }
+
+
+            // setProjectslist(result)
+            // console.log(result, 'result-------->')
+            // console.log(Dictionaries.getCascader('dict_reg_job'), 'dicc-cccc')
+        }
+        setAwaylsUseProject(res.data)
     }
     const handleOrder = (record: any) => {
         console.log(record, 'record')
+        setStudentId(record)
         setModalStudentInfo(true)
         setTimeout(() => {
             formRef?.current?.setFieldsValue({
@@ -109,8 +159,27 @@ export default () => {
     }
     //设置常用报考项目
     const handleSetProject = () => {
-        getProject()
+        // getProject()
         setMenuVisible(true)
+    }
+    const handleOpenRegistration = () => {
+        request
+            .get('/sms/business/bizField/orderField', {
+                orderId: ID,
+                valueType: 0,
+                _isGetAll: true,
+                _orderBy: 'fieldStandardId',
+                _direction: 'asc',
+            })
+            .then((res) => {
+                const resData = res.data.content;
+                if (resData.length <= 0) {
+                    message.error('学员报考项目尚未配置报名资料，请联系管理员添加。', 5);
+                    return;
+                }
+                setRenderData({ signup: resData, valueType: 0 });
+                setModalVisible(true);
+            });
     }
     let params: any = {
         isPay: true,
@@ -494,6 +563,17 @@ export default () => {
                 <p>学员资料不存在，请完善资料后再下单</p>
             </Modal>
 
+            <Modal
+                title="资料提交"
+                onCancel={() => {
+                    setRegistration(false)
+                }}
+                onOk={() => handleOpenRegistration()}
+                open={Registration}
+            >
+                <p>是否进行报考资料提交</p>
+            </Modal>
+
             <ModalForm
                 visible={modalStudentInfo}
                 title="学员信息"
@@ -590,7 +670,7 @@ export default () => {
                         label="报考岗位"
                         rules={[{ required: true, message: '请选择报考岗位' }]}
                         fieldProps={{
-                            options: Dictionaries.getCascader('dict_reg_job'),
+                            options: projectslist,
                             //showSearch: { filter },
                             onChange: (e: any) => { }
                             // onSearch: (value) => console.log(value)
@@ -767,6 +847,9 @@ export default () => {
                         .then((res: any) => {
                             if (res.status == 'success') {
                                 message.success('操作成功');
+                                console.log(res.data[0])
+                                setID(res.data[0])
+                                setRegistration(true)
                                 // 重置所有表单数据
                                 // 1. 重置学生表单
                                 formRef.current?.resetFields();
@@ -814,11 +897,23 @@ export default () => {
                 <OrderPayWay ref={payWayRef} />
             </ModalForm>
 
+
+
             {MenuVisible && (
                 <MenuManageCard
+                    awaylsUseProject={awaylsUseProject}
                     MenuVisible={MenuVisible}
-                    backProject={backProject}
+                    // backProject={backProject}
                     setMenuVisible={() => setMenuVisible(false)}
+                />
+            )}
+            {modalVisible && (
+                <SignUp
+                    setModalVisible={() => setModalVisible(false)}
+                    modalVisible={modalVisible}
+                    renderData={renderData}
+                    studentid={studentID}
+                // callbackRef={() => callbackRef()}
                 />
             )}
         </PageContainer>

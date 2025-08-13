@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import type { CheckInfo } from 'antd/es/tree';
 const { Search } = Input;
 import request from '@/services/ant-design-pro/apiRequest';
+import Dictionaries from '@/services/util/dictionaries';
 
 export default (props: any) => {
-  const { MenuVisible, setMenuVisible, MenuContent, callbackRef, menuRenderData,backProject } = props;
+  const { MenuVisible, setMenuVisible, MenuContent, callbackRef, menuRenderData, backProject, awaylsUseProject } = props;
 
   console.log(backProject, 'this.MenuContent')
 
@@ -15,17 +16,6 @@ export default (props: any) => {
   const [checkedKeys, setCheckedKeys] = useState<React.Key[]>([]);
   const [selectedIds, setSelectedIds] = useState<React.Key[]>([]);
   const [searchValue, setSearchValue] = useState<string>('');
-
-  useEffect(() => {
-    const dictionariesList = localStorage.getItem('dictionariesList');
-    if (dictionariesList) {
-      let dictionariesArray = JSON.parse(dictionariesList)[1].children
-      const formattedData = convertToTreeData(dictionariesArray)
-      setTreeData(formattedData);
-      setFilteredTreeData(formattedData);
-    }
-  }, [])
-
   // 将岗位转换为Tree组件可用的格式
   const convertToTreeData = (data: any[]): any[] => {
     if (!data || !Array.isArray(data)) return [];
@@ -36,6 +26,62 @@ export default (props: any) => {
       children: item.children ? convertToTreeData(item.children) : [],
     }));
   };
+
+  useEffect(() => {
+    getProjectTree()
+    // const dictionariesList = localStorage.getItem('dictionariesList');
+    // if (dictionariesList) {
+    //   let dictionariesArray = JSON.parse(dictionariesList)[1].children
+    //   const result = Dictionaries.findDataByValues(awaylsUseProject, dictionariesArray);
+    //   if (result) {
+    //     const newResult = [result]
+    //     const formattedData = convertToTreeData(newResult)
+    //     setTreeData(formattedData);
+    //     setFilteredTreeData(formattedData);
+    //     //console.log(formattedData, '------------------->')
+    //   } else {
+    //     console.error('空数组');
+    //   }
+    // }
+  }, [])
+
+  // useEffect(() => {
+  //   const dictionariesList = localStorage.getItem('dictionariesList');
+  //   if (dictionariesList) {
+  //     let dictionariesArray = JSON.parse(dictionariesList)[1].children
+  //     const formattedData = convertToTreeData(dictionariesArray)
+  //     setTreeData(formattedData);
+  //     setFilteredTreeData(formattedData);
+  //   }
+  // }, [])
+
+  const getProjectTree = () => {
+    if (awaylsUseProject) {
+      const dictionariesList = localStorage.getItem('dictionariesList');
+      if (dictionariesList) {
+        let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        const result = Dictionaries.findDataByValues(awaylsUseProject, dictionariesArray);
+        if (result) {
+          const newResult = [result]
+          const formattedData = convertToTreeData(newResult)
+          setTreeData(formattedData);
+          setFilteredTreeData(formattedData);
+          //console.log(formattedData, '------------------->')
+        } else {
+          console.error('空数组');
+        }
+      }
+    } else {
+      const dictionariesList = localStorage.getItem('dictionariesList');
+      if (dictionariesList) {
+        let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        const formattedData = convertToTreeData(dictionariesArray)
+        setTreeData(formattedData);
+        setFilteredTreeData(formattedData);
+      }
+    }
+  }
+
 
   // 过滤树节点的函数
   const filterTreeNode = (nodes: any[], keyword: string): any[] => {

@@ -76,7 +76,7 @@ class dictionaries {
       function getParent(list: any[], id: number): any[] {
         const res: any[] = [];
         const e = list.find(x => x.id == id);
-        
+
         if (!e) {
           return res; // 如果找不到对应的部门，返回空数组
         }
@@ -870,7 +870,7 @@ class dictionaries {
     }
     return [];
   }
-  filterByValue(data: any,description:string) {
+  filterByValue(data: any, description: string) {
     return data.users.map((user: any) => {
       // 解析 JobClassExam JSON
       const jobClassData = user.JobClassExam
@@ -895,7 +895,7 @@ class dictionaries {
 
 
       return {
-        description:description,
+        description: description,
         classType: jobClassData.classType || 0,
         classYear: jobClassData.classYear || 0,
         examType: jobClassData.examType || 0,
@@ -916,7 +916,7 @@ class dictionaries {
       const userIdValue = user.userId && typeof user.provider === 'object' ? this.getUserId(user.userId.label) : user.userId;
 
       return {
-        userId:userIdValue
+        userId: userIdValue
       };
     });
   }
@@ -1011,6 +1011,41 @@ class dictionaries {
     }
     return null;
   };
+
+
+  findDataByValues(values: any, treeData: any) {
+    // 创建一个Set用于快速查找value
+    const valueSet = new Set(values);
+
+    // 递归查找函数
+    function findNode(nodes: any) {
+      for (const node of nodes) {
+        // 检查当前节点的value是否在目标values中
+        if (valueSet.has(node.value)) {
+          // 如果是父节点，需要包含其所有子节点
+          if (node.children && node.children.length > 0) {
+            // 创建新节点，过滤子节点
+            const newNode = {
+              ...node,
+              children: node.children.filter((child: any) => valueSet.has(child.value))
+            };
+            return newNode;
+          }
+          return node;
+        }
+
+        // 如果当前节点不匹配，递归检查子节点
+        if (node.children && node.children.length > 0) {
+          const found: any = findNode(node.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    // 从根节点开始查找
+    return findNode(treeData);
+  }
 
 
 }

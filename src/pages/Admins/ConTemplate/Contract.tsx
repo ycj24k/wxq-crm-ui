@@ -228,22 +228,22 @@ export default (props: any) => {
           callbackRef={() => callbackRef()}
         />
       )}
-      {/* {InfoVisibleFalgs && (
+      {InfoVisibleFalgs && (
         <ModelAdds
           setModalVisible={() => setInfoVisibles(false)}
           modalVisible={InfoVisibleFalgs}
           renderData={renderData}
           callbackRef={() => callbackRef()}
         />
-      )} */}
-      {InfoVisibleFalgs && (
+      )}
+      {/* {InfoVisibleFalgs && (
         <ModelNewAdd
           setModalVisible={() => setInfoVisibles(false)}
           modalVisible={InfoVisibleFalgs}
           renderData={renderData}
           callbackRef={() => callbackRef()}
         />
-      )}
+      )} */}
       <ChargeIframe
         previewVisible={isModalVisibles}
         setPreviewVisible={() => setisModalVisibles(false)}

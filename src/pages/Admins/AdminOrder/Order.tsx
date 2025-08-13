@@ -29,6 +29,7 @@ import StudentInfo from '../StudentManage/studentInfo';
 import Modals from './Modals';
 import ChargeOrder from '../AdminCharge/ChargeOrder';
 import ChargeNew from '../AdminCharge/ChargeNew';
+import ChargeNewCopy from '../AdminCharge/ChargeNewCopy';
 import ChargeInfo from '../AdminCharge/ChargeInfo';
 import { history } from 'umi';
 import ChargeIframe from '../AdminCharge/ChargeIframe';
@@ -111,6 +112,7 @@ export default (props: any) => {
   const CompanyOrders = forwardRef(CompanyOrder);
   const ChargeOrders = forwardRef(ChargeOrder);
   const ChargeNews = forwardRef(ChargeNew);
+  const ChargeNewsCopy = forwardRef(ChargeNewCopy)
   const childRef = useRef();
   const orderRef = useRef();
   const actionRef = useRef<ActionType>();
@@ -1151,6 +1153,13 @@ export default (props: any) => {
             renderData={renderData}
             callbackRef={() => callbackRef()}
           />
+
+          {/* <ChargeNewsCopy
+            setModalVisible={() => setChargeNewsVisibleFalg(false)}
+            modalVisible={ChargeNewsVisibleFalg}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+          /> */}
         </Drawer>
 
         {ChargeInfoVisibleFalg && (
