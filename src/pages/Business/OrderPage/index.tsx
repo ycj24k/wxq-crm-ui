@@ -30,13 +30,12 @@ export default () => {
     const [findStudent, setFindStudent] = useState<boolean>(false)
     const [modalStudentInfo, setModalStudentInfo] = useState<boolean>(false)
     const [modalOrderVisible, setModalOrderVisible] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
     const [awaylsUseProject, setAwaylsUseProject] = useState<any>()
     const [projectslist, setProjectslist] = useState<any>()
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    //const [studentInfo, setStudentInfo] = useState<any>({});
     const [MenuVisible, setMenuVisible] = useState<boolean>(false);
     const [Registration, setRegistration] = useState<boolean>(false);
-
     const [renderData, setRenderData] = useState<any>({});
     const [type, setType] = useState<string>('0')
     const [ID, setID] = useState<any>()
@@ -71,7 +70,7 @@ export default () => {
             getProject()
         }
     }
-
+    //格式化数据
     const convertToTreeData = (data: any[]): any[] => {
         if (!data || !Array.isArray(data)) return [];
 
@@ -85,7 +84,6 @@ export default () => {
 
     const getProject = async () => {
         const res = await request.get('/sms/commonProjects')
-        console.log(res, 'this.res')
         const dictionariesList = localStorage.getItem('dictionariesList');
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
@@ -94,20 +92,13 @@ export default () => {
                 const newResult = [result]
                 const formattedData = convertToTreeData(newResult)
                 setProjectslist(formattedData)
-                console.log(formattedData, '新数组')
             } else {
                 console.error('空数组');
             }
-
-
-            // setProjectslist(result)
-            // console.log(result, 'result-------->')
-            // console.log(Dictionaries.getCascader('dict_reg_job'), 'dicc-cccc')
         }
         setAwaylsUseProject(res.data)
     }
     const handleOrder = (record: any) => {
-        console.log(record, 'record')
         setStudentId(record)
         setModalStudentInfo(true)
         setTimeout(() => {
@@ -159,7 +150,6 @@ export default () => {
     }
     //设置常用报考项目
     const handleSetProject = () => {
-        // getProject()
         setMenuVisible(true)
     }
     const handleOpenRegistration = () => {
@@ -548,7 +538,7 @@ export default () => {
 
                 </ProForm> */}
             </ProCard>
-
+            {/* 查询结果 */}
             <Modal
                 title="查询结果"
                 onCancel={() => {
@@ -562,7 +552,7 @@ export default () => {
             >
                 <p>学员资料不存在，请完善资料后再下单</p>
             </Modal>
-
+            {/* 资料提交 */}
             <Modal
                 title="资料提交"
                 onCancel={() => {
@@ -573,7 +563,7 @@ export default () => {
             >
                 <p>是否进行报考资料提交</p>
             </Modal>
-
+            {/* 学员信息 */}
             <ModalForm
                 visible={modalStudentInfo}
                 title="学员信息"
@@ -783,9 +773,14 @@ export default () => {
 
 
             </ModalForm>
-
+            {/* 下单 */}
             <ModalForm
                 title="下单"
+                submitter={{
+                    submitButtonProps: {
+                        loading,
+                    },
+                }}
                 width={1200}
                 visible={modalOrderVisible}
                 autoFocusFirstInput
@@ -797,12 +792,13 @@ export default () => {
                     maskClosable: false,
                 }}
                 onFinish={async (values) => {
-                    console.log(renderData, 'values')
+                    setLoading(true);
                     let classListValues;
                     try {
                         classListValues = await classListRef.current?.getFormValues();
                         if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
                             message.error('请至少添加一个班级信息');
+                            setLoading(false);
                             return;
                         }
                         // 验证每个班级信息是否完整
@@ -810,14 +806,17 @@ export default () => {
                             const user = classListValues.users[i];
                             if (!user.project || user.project.length === 0) {
                                 message.error(`第${i + 1}个班级的报考岗位不能为空`);
+                                setLoading(false);
                                 return;
                             }
                             if (!user.JobClassExam) {
                                 message.error(`第${i + 1}个班级的班型选择不能为空`);
+                                setLoading(false);
                                 return;
                             }
                             if (!user.source) {
                                 message.error(`第${i + 1}个班级的订单来源不能为空`);
+                                setLoading(false);
                                 return;
                             }
                         }
@@ -833,15 +832,11 @@ export default () => {
                         return;
                     }
 
-                    console.log(processedUsers)
-                    console.log(payWayValues)
-
                     let auditsParam: any = processedUsers.map((order: any, index: number) => ({
                         "student": renderData,
                         "order": order,
                         "charge": payWayValues[index]
                     }));
-                    console.log(auditsParam, 'auditsParam')
                     request
                         .postAll('/sms/business/bizOrder/intelligence', auditsParam)
                         .then((res: any) => {

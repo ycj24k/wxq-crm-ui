@@ -61,7 +61,6 @@ export default () => {
         const price = formRefInvoiceelse.current?.getFieldValue('price') || 0
         const quantity = formRefInvoiceelse.current?.getFieldValue('quantity') || 0
         formRefInvoiceelse?.current?.setFieldValue('amount', price * quantity)
-        console.log(price, quantity);
     }
 
     const setFromValue = (value: any) => {
@@ -75,8 +74,7 @@ export default () => {
     }, [])
 
     const getTitleName = async () => {
-        const res = await request.get('/sms/business/bizInvoice', { enable: true, _orderBy:'createTime' })
-        console.log(res.data.content)
+        const res = await request.get('/sms/business/bizInvoice', { enable: true, _orderBy: 'createTime' })
         let newArr = res.data.content.map((item: any) => {
             return {
                 ...item,
@@ -87,19 +85,17 @@ export default () => {
         console.log(newArr)
         setInvoicelist(newArr)
     }
-    const getInvoiceMsg = async (ids:any) => {
+    const getInvoiceMsg = async (ids: any) => {
         const res = await request.get(`/sms/business/bizInvoice/getInvoiceTempByChargeId?idList=${ids}`)
-        console.log(res)
+        setInvoicelist(res.data)
     }
     useEffect(() => {
-        // http://localhost:8000/#/business/invoicelist?idList=5,6,7
         if (ChargeList.length > 0) {
             setFromValue({ chargeAccount: ChargeList[0].method + '' })
             getInvoiceInfo(ChargeList[0].studentUserId)
             handleChargeList(ChargeList);
             const ids = ChargeList.map((item: any) => item.id).join(',')
             getInvoiceMsg(ids)
-            console.log(ids,'ChargeList--------------------->')
         }
     }, [ChargeList])
     const getInvoiceInfo = async (userId: string) => {
@@ -113,6 +109,16 @@ export default () => {
             })
             //setFromValue(dataInfo)
         }
+    }
+    const handleGetCompany = async (title: string) => {
+        const res = await request.get(`/sms/business/bizInvoice/searchTemplate?word=${title}`);
+        return res.data.content.map((item: any) => {
+            return {
+                ...item,
+                label: item.title,
+                value: item.id
+            }
+        });
     }
     const submitInvoice = async () => {
         try {
@@ -150,19 +156,18 @@ export default () => {
                 combinedValues.chargeList = []
             }
             let newType = 0
-            if(combinedValues.type == '普票'){
+            if (combinedValues.type == '普票') {
                 newType = 0
             }
-            if(combinedValues.type == '专票'){
+            if (combinedValues.type == '专票') {
                 newType = 1
             }
             let newCombinedValues = {
                 ...combinedValues,
-                type:newType,
+                type: newType,
                 chargeAccount: Dictionaries.getValue('dict_stu_refund_type', combinedValues.chargeAccount),
                 productType: Dictionaries.getValue('invoiceProductType', combinedValues.productType),
             }
-            console.log(newCombinedValues)
             let url = '/sms/business/bizInvoice'
             return new Promise(async (resolve) => {
                 request
@@ -180,7 +185,6 @@ export default () => {
             // 在这里添加提交逻辑（如API调用）
 
         } catch (error) {
-            console.error('表单验证失败:', error);
             Modal.error({
                 title: '表单验证失败',
                 content: '请检查表单填写是否完整且符合要求。',
@@ -288,23 +292,25 @@ export default () => {
                                 submitter={false}
                             >
                                 <ProForm.Group>
-                                    {/* <ProFormText name="title" label="发票抬头" width="lg" rules={[{ required: true }]} /> */}
                                     <ProFormSelect
-                                        label="发票抬头"
-                                        showSearch
+                                        placeholder={'请输入发票抬头搜索'}
+                                        width='md'
                                         name="title"
-                                        width="md"
-                                        options={invoicelist}
-                                        rules={[{ required: true }]}
+                                        label={'发票抬头'}
+                                        key="title"
+                                        showSearch
+                                        debounceTime={500}   //防止抖动
                                         fieldProps={{
+                                            //使用onChange
                                             onChange: (value) => {
-                                                const selectedItem = invoicelist.find((item: any) => item.value === value);
-                                                console.log(selectedItem, '选中项的完整值');
+                                                return value    //必须要return一个值出去 表单项才会展示值在输入框上
+                                            },
+                                            onSelect: (value,option) => {
                                                 let invoiceType = ''
-                                                if(selectedItem.type == '0'){
+                                                if(option.type == '0'){
                                                     invoiceType = '普票'
                                                 }
-                                                if(selectedItem.type == '1'){
+                                                if(option.type == '1'){
                                                     invoiceType = '专票'
                                                     setChecked(true)
                                                     setinvoiceFalg(false);
@@ -312,23 +318,46 @@ export default () => {
                                                 }
                                                 setTimeout(() => {
                                                     formRefInvoiceelse?.current?.setFieldsValue({
-                                                        title: selectedItem.label,
-                                                        productType: Dictionaries.getName('invoiceProductType', selectedItem.productType),
-                                                        chargeAccount: Dictionaries.getName('dict_stu_refund_type', selectedItem.chargeMethod),
-                                                        price: selectedItem.price,
-                                                        quantity: selectedItem.quantity,
-                                                        taxCode: selectedItem.taxCode,
-                                                        email: selectedItem.email,
-                                                        remark: selectedItem.remark,
-                                                        cautions: selectedItem.cautions,
+                                                        title: option.label,
+                                                        productType: Dictionaries.getName('invoiceProductType', option.productType),
+                                                        chargeAccount: option.chargeAccount === null || option.chargeAccount === 0 
+                                                            ? undefined 
+                                                            : Dictionaries.getName('dict_stu_refund_type', option.chargeAccount),
+                                                        price: option.price,
+                                                        quantity: option.quantity,
+                                                        taxCode: option.taxCode,
+                                                        email: option.email,
+                                                        remark: option.remark,
+                                                        cautions: option.cautions,
                                                         type: invoiceType,
-                                                        bank: selectedItem.bank,
-                                                        account: selectedItem.account,
-                                                        mobile: selectedItem.mobile,
-                                                        address: selectedItem.address
+                                                        bank: option.bank,
+                                                        account: option.account,
+                                                        mobile: option.mobile,
+                                                        address: option.address
                                                     });
                                                 }, 100)
                                             }
+                                        }}
+                                        request={(e: any) => {
+                                            // 初始化为空的Promise，稍后resolve填充的数据
+                                            return new Promise((resolve, reject) => {
+                                                if (e.keyWords) {
+                                                    request.get(`/sms/business/bizInvoice/searchTemplate?word=${e.keyWords}`).then((response: any) => {
+                                                        if (response.data && response.data.length > 0) {
+                                                            const no_options = response.data.map((key: any) => ({
+                                                                ...key,
+                                                                label: key.title,
+                                                                value: key.id,
+                                                            }));
+                                                            resolve(no_options);
+                                                        } else {
+                                                            resolve([]);
+                                                        }
+                                                    }).catch(reject);
+                                                } else {
+                                                    resolve([]);
+                                                }
+                                            });
                                         }}
                                     />
                                     <ProFormSelect
@@ -337,6 +366,16 @@ export default () => {
                                         width="md"
                                         initialValue="0"
                                         rules={[{ required: true }]}
+                                        fieldProps={{
+                                            onChange: async (e: any) => {
+                                                setTimeout(() => {
+                                                    formRefInvoiceelse?.current?.setFieldsValue({
+                                                        productType: Dictionaries.getName('invoiceProductType', e),
+                                                    })
+                                                },100)
+                                                
+                                            }
+                                        }}
                                         request={async () =>
                                             Dictionaries.getList('invoiceProductType') as any
                                         }
@@ -347,9 +386,19 @@ export default () => {
 
                                     <ProFormSelect
                                         label="付款方式"
+                                        placeholder={'请选择收款方式'}
                                         name="chargeAccount"
-                                        rules={[{ required: true }]}
+                                        rules={[{ required: true, message:'请选择付款方式' }]}
                                         width="md"
+                                        fieldProps={{
+                                            onChange: (e:any) => {
+                                                setTimeout(() => {
+                                                    formRefInvoiceelse?.current?.setFieldsValue({
+                                                        chargeAccount: Dictionaries.getName('dict_stu_refund_type', e),
+                                                    })
+                                                },100)
+                                            }
+                                        }}
                                         request={async () => Dictionaries.getList('dict_stu_refund_type') as any}
                                     />
                                     <ProFormDigit name='price' label='单价' rules={[{ required: true }]} fieldProps={{
@@ -405,7 +454,6 @@ export default () => {
                                         rules={[{ required: true }]}
                                         fieldProps={{
                                             onChange: (e) => {
-                                                console.log(e)
                                                 if (e == 0) {
                                                     setinvoiceFalg(true);
                                                     setHasAccount(false)

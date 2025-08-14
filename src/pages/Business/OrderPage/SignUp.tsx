@@ -78,6 +78,7 @@ export default (props: any) => {
     let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
     let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
     const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + studentid.studentId + '&' + tokenName + '=' + tokenValue;
+    setQrcodeVisible(true)
     setQrcodeSrc(src)
   }
   const submitData = (id: any) => {
