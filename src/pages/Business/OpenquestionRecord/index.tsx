@@ -120,8 +120,8 @@ export default (props: any) => {
           key: 'type',
           valueType: 'select',
           valueEnum: {
-            '01': '题库',
-            '02': '课程',
+            '02': '题库',
+            '03': '课程',
           },
           fieldProps: {
             onChange: (value: string) => {

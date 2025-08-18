@@ -88,8 +88,44 @@
     path: '/business/question',
     component: './Business/Question',
   },
+  // {
+  //   name: '线索列表',
+  //   path: '/business/cluelist',
+  //   component: './Business/ClueList',
+  // },
   {
-    name:'下单专页',
+    name: '个人视图',
+    path: '/business/cluelist/personview',
+    component: './Business/ClueList/PersonView'
+  },
+  {
+    name: '管理视图',
+    path: '/business/cluelist/managerview',
+    component: './Business/ClueList/ManagerView'
+  },
+
+  {
+    name: '个人视图',
+    path: '/business/salelead/salepersonlead',
+    component: './Business/SaleLead/SaleGroupLead'
+  },
+  {
+    name: '管理视图',
+    path: '/business/salelead/salegrouplead',
+    component: './Business/SaleLead/SalePersonLead'
+  },
+  {
+    name: '规则配置中心',
+    path: '/business/rulemangercenter',
+    component: './Business/RuleMangerCenter',
+  },
+  {
+    name: '线索小组管理',
+    path: '/business/cluemanagement',
+    component: './Business/Cluemanagement'
+  },
+  {
+    name: '下单专页',
     path: '/business/orderpage',
     component: './Business/OrderPage',
   },
@@ -170,7 +206,7 @@
     component: './Business/Invoice',
   },
   {
-    name:'开具发票',
+    name: '开具发票',
     path: '/business/invoicelist',
     component: './Business/InvoiceList',
   },
@@ -563,9 +599,9 @@
     component: './Business/RefundReview',
   },
   {
-    name:'专属码未支付申请退款',
-    path:'/business/exclusiveqrcoderefund',
-    component:'./Business/ExclusiveQRCodeRefund',
+    name: '专属码未支付申请退款',
+    path: '/business/exclusiveqrcoderefund',
+    component: './Business/ExclusiveQRCodeRefund',
   },
   {
     name: '报考资料',

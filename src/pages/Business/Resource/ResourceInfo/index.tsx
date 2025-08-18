@@ -36,7 +36,9 @@ type GithubIssueItem = {
 };
 
 export default (props: any) => {
-  const { hidden } = props;
+  const { hidden, isPerson, isGroup, showMyself } = props;
+  console.log(isPerson, '===>')
+  console.log(showMyself, '===>')
   const { initialState } = useModel('@@initialState');
   const [renderData, setRenderData] = useState<any>(null);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
@@ -63,6 +65,22 @@ export default (props: any) => {
     }
   }, [TabListNuber])
   const columns: ProColumns<GithubIssueItem>[] = [
+    {
+      title: '出镜人',
+      dataIndex: 'name',
+      hideInTable: !isPerson && !isGroup,
+    },
+    {
+      width: 120,
+      title: '匹配线索分组',
+      dataIndex: 'groupName',
+      hideInTable: !isPerson && !isGroup,
+    },
+    {
+      title: '线索提供人',
+      dataIndex: 'provider',
+      hideInTable: !isGroup
+    },
     {
       title: '姓名',
       dataIndex: 'name',
@@ -126,7 +144,7 @@ export default (props: any) => {
       title: '学员类型',
       dataIndex: 'type',
       valueType: 'select',
-      width:130,
+      width: 130,
       sorter: true,
       order: 9,
       filters: true,
@@ -239,7 +257,7 @@ export default (props: any) => {
       dataIndex: 'studentStatus',
       valueType: 'select',
       filters: true,
-      width:120,
+      width: 120,
       valueEnum: Dictionaries.getSearch('visitStatus'),
       render: (text, record) => <span>{Dictionaries.getName('visitStatus', record.studentStatus)}</span>
     },
@@ -278,24 +296,46 @@ export default (props: any) => {
   let sortList: any = {
     ['receiveNum,circulationTime']: 'asc,desc',
   };
+  let tabs = [];
+  if (showMyself) {
+    tabs = [
+      {
+        key: 'nm',
+        label: (<span>新媒体线索</span>)
+      },
+      {
+        key: 'zong',
+        label: (<span>总公司资源库</span>)
+      },
+      {
+        key: 'all',
+        label: (<span>所有资源</span>)
+      },
+    ]
+
+  } else {
+    tabs = [
+      {
+        key: 'fen',
+        label: (<span>分公司资源库</span>)
+      },
+      {
+        key: 'zong',
+        label: (<span>总公司资源库</span>)
+      },
+      {
+        key: 'all',
+        label: (<span>所有资源</span>)
+      },
+    ]
+  }
+
   let toolbar = {
     menu: {
       type: 'tab',
-      items: [
-        {
-          key: 'fen',
-          label: (<span>分公司资源库</span>)
-        },
-        {
-          key: 'zong',
-          label: (<span>总公司资源库</span>)
-        },
-        {
-          key: 'all',
-          label: (<span>所有资源</span>)
-        },
-      ],
+      items: tabs,
       onChange: (key: string) => {
+        console.log(key,'key----------->')
         if (key == 'fen') {
           setParams({ departmentId: departmentId })
         } else if (key == 'zong') {

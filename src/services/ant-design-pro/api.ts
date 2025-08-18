@@ -2,6 +2,7 @@
 /* eslint-disable */
 import { request } from 'umi';
 import request1 from './apiRequest';
+import component from '@/locales/bn-BD/component';
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
@@ -550,6 +551,54 @@ export async function currentUser(options?: { [key: string]: any }) {
               },
             ],
           },
+          {
+            name:'线索管理',
+            icon:'ClusterOutlined',
+            routes:[
+              {
+                name:'线索小组管理',
+                path:'/business/cluemanagement',
+                component: './Business/Cluemanagement'
+              },
+              {
+                name: '规则配置中心',
+                path: '/business/rulemangercenter',
+                component: './Business/RuleMangerCenter',
+              },
+            ]
+          },
+          {
+            name:'线索列表',
+            icon: 'table',
+            routes: [
+              {
+                name:'个人视图',
+                path:'/business/cluelist/personview',
+                component:'./Business/Cluelist/PersonView'
+              },
+              {
+                name:'管理视图',
+                path: '/business/cluelist/managerview',
+                component: './Business/Cluelist/Managerview'
+              }
+            ]
+          },
+          {
+            name:'销售线索管理',
+            icon: 'table',
+            routes: [
+              {
+                name:'个人视图',
+                path:'/business/salelead/salepersonlead',
+                component:'./Business/SaleLead/SaleGroupLead'
+              },
+              {
+                name:'管理视图',
+                path: '/business/salelead/salegrouplead',
+                component: './Business/SaleLead/SalePersonLead'
+              }
+            ]
+          }
         ],
       },
       {

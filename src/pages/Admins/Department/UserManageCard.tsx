@@ -22,6 +22,8 @@ export default (props: any) => {
     getUserList,
     departNameList = false
   } = props;
+  console.log(parentIdTree,'parentIdTree======>')
+  console.log(departments,'departments======>')
 
   let obj: any;
   let obj2: any = [];
@@ -30,7 +32,7 @@ export default (props: any) => {
   const [expandedKeys, setexpandedKeys] = useState([]);
   const [searchValue, setsearchValue] = useState('');
   const [autoExpandParent, setautoExpandParent] = useState(true);
-  const [value, setValue] = useState(true);
+  const [value, setValue] = useState(false);
   const listFn = (data: any) => {
     let arr2: any = [];
     data.forEach((item: any, index: number) => {
@@ -90,6 +92,8 @@ export default (props: any) => {
     }
 
   })
+
+  console.log(listF, 'CardContent222222222222222222')
 
 
   if (CardContent) arr = listFn(listF);
@@ -243,6 +247,7 @@ export default (props: any) => {
             autoExpandParent={autoExpandParent}
             defaultCheckedKeys={CheckedKeys}
             onCheck={(checkedKeysValue, e) => {
+              console.log(e,'-------------------------->')
               const arr = e.checkedNodes
               let idsList: any = []
               arr.forEach((item: any) => {

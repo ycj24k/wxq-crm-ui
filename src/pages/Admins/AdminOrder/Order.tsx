@@ -83,7 +83,6 @@ export default (props: any) => {
     showStudentBtn,
     orderType
   } = props;
-  console.log(orderType, 'orderType')
   const [CommodalVisibleFalg, setComModalVisible] = useState<boolean>(false);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
@@ -1138,6 +1137,7 @@ export default (props: any) => {
             callbackRef={() => callbackRef()}
           />
         )}
+
         <Drawer
           title="缴费"
           width={1200}
@@ -1147,19 +1147,19 @@ export default (props: any) => {
           footer={null}
           destroyOnClose={true}
         >
-          <ChargeNews
-            setModalVisible={() => setChargeNewsVisibleFalg(false)}
-            modalVisible={ChargeNewsVisibleFalg}
-            renderData={renderData}
-            callbackRef={() => callbackRef()}
-          />
-
-          {/* <ChargeNewsCopy
+          {/* <ChargeNews
             setModalVisible={() => setChargeNewsVisibleFalg(false)}
             modalVisible={ChargeNewsVisibleFalg}
             renderData={renderData}
             callbackRef={() => callbackRef()}
           /> */}
+
+          <ChargeNewsCopy
+            setModalVisible={() => setChargeNewsVisibleFalg(false)}
+            modalVisible={ChargeNewsVisibleFalg}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+          />
         </Drawer>
 
         {ChargeInfoVisibleFalg && (
