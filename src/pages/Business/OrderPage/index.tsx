@@ -36,6 +36,7 @@ export default () => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [MenuVisible, setMenuVisible] = useState<boolean>(false);
     const [Registration, setRegistration] = useState<boolean>(false);
+    const [OptionEnable, setOptionEnable] = useState<boolean>(true);
     const [renderData, setRenderData] = useState<any>({});
     const [type, setType] = useState<string>('0')
     const [ID, setID] = useState<any>()
@@ -100,6 +101,7 @@ export default () => {
     }
     const handleOrder = (record: any) => {
         setStudentId(record)
+        setOptionEnable(false)
         setModalStudentInfo(true)
         setTimeout(() => {
             formRef?.current?.setFieldsValue({
@@ -660,7 +662,9 @@ export default () => {
                         label="报考岗位"
                         rules={[{ required: true, message: '请选择报考岗位' }]}
                         fieldProps={{
-                            options: projectslist,
+                            options: OptionEnable ? projectslist : Dictionaries.getCascader('dict_reg_job'),
+                            // options: projectslist,
+                            // options: Dictionaries.getCascader('dict_reg_job'),
                             //showSearch: { filter },
                             onChange: (e: any) => { }
                             // onSearch: (value) => console.log(value)
@@ -825,17 +829,35 @@ export default () => {
                     }
                     const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
 
+                    // 3. 验证支付方式表单
                     let payWayValues: any;
+                    //let payMsg = {}
+                    let newPay
                     try {
                         payWayValues = await payWayRef.current?.getFormValues();
+                        newPay = payWayValues.map((item: any) => {
+                            const userIdValue = item.userId && typeof item.userId === 'object' ? Dictionaries.getUserId(item.userId.label) : item.userId;
+                            const newfiles = item.files[0].response.data
+                            return {
+                                ...item,
+                                files: newfiles,
+                                userId: userIdValue[0]
+                            }
+                        })
                     } catch (error) {
                         return;
                     }
+                    // let payWayValues: any;
+                    // try {
+                    //     payWayValues = await payWayRef.current?.getFormValues();
+                    // } catch (error) {
+                    //     return;
+                    // }
 
                     let auditsParam: any = processedUsers.map((order: any, index: number) => ({
                         "student": renderData,
                         "order": order,
-                        "charge": payWayValues[index]
+                        "charge": newPay[index]
                     }));
                     request
                         .postAll('/sms/business/bizOrder/intelligence', auditsParam)
@@ -868,6 +890,14 @@ export default () => {
 
                 }}
             >
+                <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                    <div style={{ width: '30%', height: '40px', color: 'rgba(0, 0, 0, 0.85)', fontWeight: '500', fontSize: '16px' }}>
+                        学员姓名：{renderData.name}
+                    </div>
+                    <div style={{ width: '30%', height: '40px', color: 'rgba(0, 0, 0, 0.85)', fontWeight: '500', fontSize: '16px' }}>
+                        联系方式：{renderData.mobile}
+                    </div>
+                </div>
                 <OrderClassType
                     renderData={renderData}
                     ref={classListRef}
@@ -890,6 +920,11 @@ export default () => {
                         }
                     }} />
                 <OrderPayWay ref={payWayRef} />
+                {/* <ProFormTextArea
+                    width={1100}
+                    label='备注'
+                    name="description"
+                /> */}
             </ModalForm>
 
 

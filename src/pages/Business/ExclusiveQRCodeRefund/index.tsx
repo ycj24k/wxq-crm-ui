@@ -146,6 +146,7 @@ export default (props: any) => {
                     values.filess.forEach((item: any) => {
                         arr.push(item.response.data);
                     });
+                    console.log(arr,'arr')
                     delete values.filess;
                     values.files = arr.join(',');
                     let res = await request.post(`/sms/business/bizChargeLog/refund/${refundId}?file=${values.files}`)

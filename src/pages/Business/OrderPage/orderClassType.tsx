@@ -422,6 +422,8 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             title={'报考班型'}
                             extra={action}
                             style={{
+                                width:'1000px',
+                                margin: '0 auto',
                                 marginBlockEnd: 8,
                             }}
                         >
@@ -543,6 +545,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             label="订单来源"
                                             name="source"
                                             placeholder="请选择订单来源"
+                                            hidden={true}
                                             width="sm"
                                             rules={[{ required: true, message: '请选择订单来源' }]}
                                             request={async () => Dictionaries.getList('dict_source') as any}
@@ -594,6 +597,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             label={'信息提供人'}
                                             placeholder={'请输入信息提供人'}
                                             allowClear
+                                            hidden={true}
                                             width={'sm'}
                                             secondary
                                             request={() => {

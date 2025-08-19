@@ -3,7 +3,9 @@ import ProForm, {
     ProFormDateTimePicker,
     ProFormSelect,
     ProFormInstance,
-    ProFormDigit
+    ProFormDigit,
+    ProFormTextArea,
+    ProFormUploadDragger
 } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from '@ant-design/pro-card';
@@ -11,7 +13,7 @@ import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import moment from 'moment';
 import ChargeLog from '@/pages/Business/ChargeLog';
-import { Modal } from 'antd'
+import { message, Modal } from 'antd'
 
 interface PayWayMethods {
     getFormValues: () => Promise<any>;
@@ -128,11 +130,20 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
             }, 0);
         }
     }));
+
     const userRefs: any = useRef({});
     //显示收款记录
     const [userNameIds, setUserNameIds] = useState<{ [key: number]: any }>({});
     const [chargeType, setChargeType] = useState<string>('6');
-
+    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    let obj: { [key: string]: string } = {};
+    if (tokenValue !== null) {
+        obj[tokenName] = tokenValue;
+    } else {
+        // 处理 tokenValue 为 null 的情况，例如显示错误消息或设置默认值
+        console.error('Token value is null');
+    }
     useEffect(() => {
         if (chargeLog) {
             //console.log(chargeLog,'chargeLog--------->chargeLog')
@@ -394,6 +405,17 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 min: 0,
                                 formatter: (value) => value ? `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '',
                                 parser: (value) => value ? value.replace(/\¥\s?|(,*)/g, '') : '',
+                                onChange(e) {
+                                    const amount = Number(e) || 0;
+                                    const collectedAmount = Number(formRefs.current[index]?.getFieldValue('collectedAmount')) || 0;
+                                    const performance = amount - collectedAmount;
+                                    console.log('计算业绩金额:', { amount, collectedAmount, performance });
+                                    formRefs.current[index]?.setFieldsValue({
+                                        performanceAmount: performance,
+                                        commissionBase: performance // 如果需要同步更新提成基数
+                                    });
+                                }
+
                             }}
                             rules={[
                                 { required: true, message: '请输入收费金额' },
@@ -418,6 +440,16 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 min: 0,
                                 formatter: (value) => value ? `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '',
                                 parser: (value) => value ? value.replace(/\¥\s?|(,*)/g, '') : '',
+                                onChange(e) {
+                                    const collectedAmount = Number(e) || 0;
+                                    const amount = Number(formRefs.current[index]?.getFieldValue('amount')) || 0;
+                                    const performance = amount - collectedAmount;
+                                    console.log('代收款项变化重新计算:', { amount, collectedAmount, performance });
+                                    formRefs.current[index]?.setFieldsValue({
+                                        performanceAmount: performance,
+                                        commissionBase: performance
+                                    });
+                                }
                             }}
                             rules={[
                                 { required: true, message: '请输入代收款项金额' },
@@ -432,13 +464,64 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 }
                             ]}
                         />
+                        <ProFormDigit
+                            label={`业绩金额`}
+                            readonly={true}
+                            name="performanceAmount"
+                            width="sm"
+                        />
+                        <ProFormDigit
+                            label={`提成基数`}
+                            readonly={true}
+                            name="commissionBase"
+                            width="sm"
+                        />
+                        {/* <ProFormText label="本次收费后剩余尾款" name="surplus" readonly /> */}
                         {/* <ProFormTextArea
                             width={1100}
                             label={renderData.type != 'orders' ? '备注' : '退款原因'}
                             name="description"
                             rules={[{ required: true }]}
                         /> */}
+                        <ProFormTextArea
+                            width={1100}
+                            label='备注'
+                            name="description"
+                        />
+                        <ProFormUploadDragger
+                            width="xl"
+                            label="上传附件"
+                            name="files"
+                            action="/sms/business/bizNotice/upload"
+                            fieldProps={{
+                                multiple: true,
+                                headers: {
+                                    ...obj,
+                                },
+                                listType: 'picture',
+                                onRemove: (e: any) => { },
+                                beforeUpload: (file: any) => {
+                                    console.log('file', file);
+                                },
+                                onPreview: async (file: any) => {
+                                    console.log('file', file);
 
+                                    if (!file.url && !file.preview) {
+                                        console.log('1');
+                                    }
+                                },
+                                onChange: (info: any) => {
+                                    const { status } = info.file;
+                                    if (status !== 'uploading') {
+                                    }
+                                    if (status === 'done') {
+                                        message.success(`${info.file.name} 上传成功.`);
+                                    } else if (status === 'error') {
+                                        message.error(`${info.file.name} 上传失败.`);
+                                    }
+                                },
+                            }}
+                        />
                     </ProForm.Group>
 
                     <Modal

@@ -25,7 +25,6 @@ export default (props: any) => {
         children?: CustomDataNode[];
         // 其他可能需要的属性
     }
-    console.log(renderData.type, 'renderData');
     let obj: any;
     let obj2: any = [];
     let CheckedKeys: any = [];
@@ -35,6 +34,7 @@ export default (props: any) => {
     const [autoExpandParent, setautoExpandParent] = useState(true);
     const [checkedID, setCheckedID] = useState<any>();
     const [value, setValue] = useState(false);
+    const [prevCheckedKeys, setPrevCheckedKeys] = useState<React.Key[]>([]);
     const listFn = (data: any) => {
         let arr2: any = [];
         data.forEach((item: any, index: number) => {
@@ -258,7 +258,7 @@ export default (props: any) => {
                         CheckedKeys = [];
                         setUserChooseVisible(false);
                     }}
-                    onOk={() => { 
+                    onOk={() => {
                         setUserChooseVisible(false)
                         callbackRef();
                     }}
@@ -278,27 +278,60 @@ export default (props: any) => {
                             autoExpandParent={autoExpandParent}
                             defaultCheckedKeys={CheckedKeys}
                             onCheck={(checkedKeysValue, e) => {
+                                //console.log(checkedKeysValue, e)
                                 const node = e.node as CustomDataNode;
                                 let checkedNodesID = node.userId;
-                                if (renderData?.type == 'newMedia') {
-                                    console.log(renderData.record)
-                                    request.post('/sms/lead/ladUserGroupProvider', { userGroupId: renderData.record.id, provider: checkedNodesID }).then((res: any) => {
-                                        if (res.status == 'success') {
-                                            message.success('绑定成功！');
-                                        }
-                                    }).catch(() => {
-                                        message.error('操作失败！');
-                                    });
-                                } else {
-                                    request.post('/sms/lead/ladUserGroupUser', { userGroupId: renderData.id, userId: checkedNodesID }).then((res: any) => {
-                                        if (res.status == 'success') {
-                                            message.success('绑定成功！');
-                                        }
-                                    }).catch(() => {
-                                        message.error('操作失败！');
-                                    });
+                                if (renderData?.type == 'sale') {
+                                    let params = {
+                                        userGroupId: renderData.record.id,
+                                        userId: checkedNodesID
+                                    }
+                                    if (renderData?.type == 'sale' && e.checked == true) {
+                                        request.post('/sms/lead/ladUserGroupUser', params).then((res: any) => {
+                                            if (res.status == 'success') {
+                                                message.success('绑定成功！');
+                                            }
+                                        }).catch(() => {
+                                            message.error('操作失败！');
+                                        });
+                                    }
+                                    if (renderData?.type == 'sale' && e.checked == false) {
+                                        request.delete('/sms/lead/ladUserGroupUser/deleteByParam', params).then((res: any) => {
+                                            if (res.status == 'success') {
+                                                message.success('解除成功！');
+                                            }
+                                        }).catch(() => {
+                                            message.error('操作失败！');
+                                        });
+                                    }
                                 }
 
+
+
+                                if (renderData?.type == 'newMedia') {
+                                    let params = {
+                                        userGroupId: renderData.record.id,
+                                        provider: checkedNodesID
+                                    }
+                                    if (renderData?.type == 'newMedia' && e.checked == true) {
+                                        request.post('/sms/lead/ladUserGroupProvider', params).then((res: any) => {
+                                            if (res.status == 'success') {
+                                                message.success('绑定成功！');
+                                            }
+                                        }).catch(() => {
+                                            message.error('操作失败！');
+                                        });
+                                    }
+                                    if (renderData?.type == 'newMedia' && e.checked == false) {
+                                        request.delete('/sms/lead/ladUserGroupProvider/deleteByParam', params).then((res: any) => {
+                                            if (res.status == 'success') {
+                                                message.success('解除成功！');
+                                            }
+                                        }).catch(() => {
+                                            message.error('操作失败！');
+                                        });
+                                    }
+                                }
 
                                 obj2 = e.checkedNodes;
                             }}

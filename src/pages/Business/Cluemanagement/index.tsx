@@ -28,6 +28,16 @@ export default () => {
         sort: string;
         userList: any[];
     };
+    const transformProviderList = (providerList: string) => {
+        // 将字符串分割并转换为数字数组
+        const numbers = providerList.split(',').map(Number);
+        
+        // 转换为所需格式
+        return numbers.map(id => ({
+            id: id
+        }));
+    }
+    
     const columns: ProColumns<GithubIssueItem>[] = [
         {
             title: '小组名称',
@@ -70,11 +80,12 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        setDepartment(record.userList);
+                        let list = transformProviderList(record.userList)
+                        setDepartment(list);
                         setParentIdTree(record.id);
                         // setCardVisible(true);
                         setUserChooseVisible(true)
-                        setRenderData(record)
+                        setRenderData({ record, type: 'sale' })
                     }}
                 >
                     绑定
@@ -103,9 +114,9 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        setDepartment(record.userList);
+                        let list = transformProviderList(record.providerList)
+                        setDepartment(list);
                         setParentIdTree(record.id);
-                        // setCardVisible(true);
                         setUserChooseVisible(true)
                         setRenderData({ record, type: 'newMedia' })
                     }}
@@ -238,6 +249,7 @@ export default () => {
                     UserChooseVisible={UserChooseVisible}
                     CardContent={CardContent}
                     renderData={renderData}
+                    departments={department}
                     callbackRef={() => callbackRef()}
                     setUserChooseVisible={() => setUserChooseVisible(false)}
                 />
