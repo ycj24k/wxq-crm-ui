@@ -911,6 +911,48 @@ class dictionaries {
     });
   }
 
+
+  filterByValueNext(data: any) {
+    return data.users.map((user: any) => {
+      // 解析 JobClassExam JSON
+      const jobClassData = user.JobClassExam
+        ? JSON.parse(user.JobClassExam)
+        : { classType: 0, examType: 0, classYear: 0, project: '' };
+
+      // 处理 project 数组
+      const projectId = Array.isArray(user.project)
+        ? user.project[user.project.length - 1]
+        : user.project;
+
+      // 处理 provider 对象
+      const providerValue = user.provider && typeof user.provider === 'object'
+        ? user.provider.value
+        : user.provider;
+
+      // 处理来源
+      const newScour = this.getValue('dict_source', user.source)
+      // 处理信息提供人provider
+      //console.log(this.getUserId('王芳')[0])
+      //const newProvider = this.getUserId(user.provider)[0]
+
+
+      return {
+        // description: description,
+        classType: jobClassData.classType || 0,
+        classYear: jobClassData.classYear || 0,
+        examType: jobClassData.examType || 0,
+        project: projectId,
+        provider: providerValue,
+        quantity: user.quantity || 0,
+        receivable: user.receivable || 0,
+        source: newScour || '0',
+        discount: user.discount || 0,
+        discountRemark: user.discountRemark || '',
+        studentUserId: user.studentUserId || 0
+      };
+    });
+  }
+
   filterByValuePay(data: any) {
     return data.users.map((user: any) => {
       const userIdValue = user.userId && typeof user.provider === 'object' ? this.getUserId(user.userId.label) : user.userId;
@@ -1047,6 +1089,33 @@ class dictionaries {
     return findNode(treeData);
   }
 
+
+  extractMatchingItems(data: any[], values: string[]): any[] {
+    const result: any[] = [];
+
+    // 递归查找匹配项
+    function findMatches(items: any[]) {
+      for (const item of items) {
+        // 检查当前项是否匹配
+        if (values.includes(item.value)) {
+          // 创建当前项的副本
+          const itemCopy = { ...item };
+          // 如果有子节点，递归处理
+          if (item.children && item.children.length > 0) {
+            itemCopy.children = item.children.filter(child => values.includes(child.value));
+          }
+          result.push(itemCopy);
+        }
+        // 如果有子节点，继续递归查找
+        else if (item.children && item.children.length > 0) {
+          findMatches(item.children);
+        }
+      }
+    }
+
+    findMatches(data);
+    return result;
+  }
 
 }
 

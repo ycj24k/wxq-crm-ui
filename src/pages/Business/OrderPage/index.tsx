@@ -11,7 +11,7 @@ import ProForm, {
     ProFormTextArea
 } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal, Radio, RadioChangeEvent, } from 'antd';
+import { Button, message, Modal, Radio, RadioChangeEvent, Switch } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -36,12 +36,13 @@ export default () => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [MenuVisible, setMenuVisible] = useState<boolean>(false);
     const [Registration, setRegistration] = useState<boolean>(false);
-    const [OptionEnable, setOptionEnable] = useState<boolean>(true);
     const [renderData, setRenderData] = useState<any>({});
     const [type, setType] = useState<string>('0')
     const [ID, setID] = useState<any>()
     const [studentID, setStudentId] = useState<any>();
     const [steps, setSteps] = useState<any>(1)
+    const [defaultChecked, setDefaultChecked] = useState<boolean>(false)
+    const [backProject, setBackProject] = useState<any>()
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -58,19 +59,17 @@ export default () => {
         removePayWayItem?: (index: number) => void;
         resetPayWay: () => void;
     }>(null);
-    useEffect(() => {
-        handleEnable()
-    }, [])
+    // useEffect(() => {
+    //     handleEnable()
+    // }, [])
     const setRadio = (e: RadioChangeEvent) => {
         setSteps(e.target.value)
     }
-    //获取当前用户是否开启常用下单项目
-    const handleEnable = async () => {
-        const res = await request.get('/sms/commonProjects/enable')
-        if (res.status == 'success') {
-            getProject()
-        }
-    }
+    // const onChange = async (e: any) => {
+    //     setDefaultChecked(e)
+    //     const res = await request.post(`/sms/commonProjects/enable/${e}`)
+    //     console.log(res)
+    // }
     //格式化数据
     const convertToTreeData = (data: any[]): any[] => {
         if (!data || !Array.isArray(data)) return [];
@@ -85,13 +84,31 @@ export default () => {
 
     const getProject = async () => {
         const res = await request.get('/sms/commonProjects')
+        // setBackProject(res.data)
+        // const dictionariesList = localStorage.getItem('dictionariesList');
+        // if (dictionariesList) {
+        //     let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        //     console.log(dictionariesArray)
+        //     const result = Dictionaries.findDataByValues(res.data, dictionariesArray);
+        //     if (result) {
+        //         const newResult = [result]
+        //         const formattedData = convertToTreeData(newResult)
+        //         setProjectslist(formattedData)
+        //     } else {
+        //         console.error('空数组');
+        //     }
+        // }
+        // setAwaylsUseProject(res.data)
         const dictionariesList = localStorage.getItem('dictionariesList');
+        setBackProject(res.data)
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
-            const result = Dictionaries.findDataByValues(res.data, dictionariesArray);
+            const result = Dictionaries.extractMatchingItems(dictionariesArray,res.data);
             if (result) {
-                const newResult = [result]
-                const formattedData = convertToTreeData(newResult)
+                // const newResult = [result]
+                // console.log(newResult,'newResult==========>')
+                const formattedData = convertToTreeData(result)
+                console.log(formattedData,'formattedData=======>')
                 setProjectslist(formattedData)
             } else {
                 console.error('空数组');
@@ -99,10 +116,19 @@ export default () => {
         }
         setAwaylsUseProject(res.data)
     }
+
+
+
     const handleOrder = (record: any) => {
+        handleOpenProject()
         setStudentId(record)
-        setOptionEnable(false)
+        //setOptionEnable(false)
         setModalStudentInfo(true)
+        let farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
+        let son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
+        let text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
+        let text2 = Dictionaries.getCascaderName('dict_reg_job', son)
+        let commonText = `${text1}/${text2}`
         setTimeout(() => {
             formRef?.current?.setFieldsValue({
                 name: record.name,
@@ -111,9 +137,8 @@ export default () => {
                 mobile: record.mobile,
                 type: record.type.toString(),
                 source: record.studentSource.toString(),
-                project: Dictionaries.getCascaderValue('dict_reg_job', record.project),
+                project: commonText,
             })
-
             let data = {}
             let datas = {
                 id: record.userId,
@@ -172,6 +197,16 @@ export default () => {
                 setRenderData({ signup: resData, valueType: 0 });
                 setModalVisible(true);
             });
+    }
+    //查询用户是否开启了常用下单项目
+    const handleOpenProject = async () => {
+        const res = await request.get('/sms/commonProjects/enable')
+        if (res.status == 'success') {
+            setDefaultChecked(true)
+            getProject()
+        } else {
+            setDefaultChecked(false)
+        }
     }
     let params: any = {
         isPay: true,
@@ -507,7 +542,6 @@ export default () => {
                         filter,
                     ) => {
                         const res = await request.get(url, params);
-                        console.log(res.data.content)
                         if (res.data.content.length === 0) {
                             setFindStudent(true)
                         }
@@ -546,9 +580,10 @@ export default () => {
                 onCancel={() => {
                     setFindStudent(false)
                 }}
-                onOk={() => {
+                onOk={async () => {
                     setFindStudent(false)
                     setModalStudentInfo(true)
+                    handleOpenProject()
                 }}
                 open={findStudent}
             >
@@ -584,11 +619,8 @@ export default () => {
                 onFinish={async (values) => {
                     setType('0');
                     setModalOrderVisible(true)
-                    console.log('完整表单数据:', JSON.stringify(values, null, 2));
                     if (values?.labels) {
-                        console.log('共享分成数据:', values.labels);
                     } else {
-                        console.log('未提交共享分成数据或当前未启用共享功能');
                     }
                     if (values.project) values.project = values.project[values.project.length - 1];
                     if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
@@ -601,7 +633,13 @@ export default () => {
                     return true;
                 }}
             >
-                <Button type='primary' style={{ marginBottom: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>
+                <div style={{ marginBottom: '15px' }}>
+                    {/* 是否开起常用报考项目：<Switch checkedChildren="开启" unCheckedChildren="关闭" checked={defaultChecked} onChange={onChange} /> */}
+                    <Button type='primary' style={{ marginBottom: '15px', marginLeft: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>
+                    {/* {defaultChecked && <Button type='primary' style={{ marginBottom: '15px', marginLeft: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>} */}
+                </div>
+
+
                 <ProForm.Group>
                     <ProFormSelect
                         label="学员类型"
@@ -662,12 +700,8 @@ export default () => {
                         label="报考岗位"
                         rules={[{ required: true, message: '请选择报考岗位' }]}
                         fieldProps={{
-                            options: OptionEnable ? projectslist : Dictionaries.getCascader('dict_reg_job'),
-                            // options: projectslist,
-                            // options: Dictionaries.getCascader('dict_reg_job'),
-                            //showSearch: { filter },
-                            onChange: (e: any) => { }
-                            // onSearch: (value) => console.log(value)
+                            options: projectslist
+                            //options: OptionEnable ? projectslist : Dictionaries.getCascader('dict_reg_job'),
                         }}
                     />
 
@@ -827,8 +861,8 @@ export default () => {
                     } catch (error) {
                         return;
                     }
-                    const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
-
+                    //const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
+                    const processedUsers = Dictionaries.filterByValueNext(classListValues)
                     // 3. 验证支付方式表单
                     let payWayValues: any;
                     //let payMsg = {}
@@ -837,7 +871,7 @@ export default () => {
                         payWayValues = await payWayRef.current?.getFormValues();
                         newPay = payWayValues.map((item: any) => {
                             const userIdValue = item.userId && typeof item.userId === 'object' ? Dictionaries.getUserId(item.userId.label) : item.userId;
-                            const newfiles = item.files[0].response.data
+                            const newfiles = item.files ? item.files[0].response.data : null
                             return {
                                 ...item,
                                 files: newfiles,
@@ -864,7 +898,6 @@ export default () => {
                         .then((res: any) => {
                             if (res.status == 'success') {
                                 message.success('操作成功');
-                                console.log(res.data[0])
                                 setID(res.data[0])
                                 setRegistration(true)
                                 // 重置所有表单数据
@@ -884,9 +917,12 @@ export default () => {
                                     payWayRef.current.resetPayWay();
                                 }
                             } else {
+                                setLoading(false);
                                 message.error(res.msg)
                             }
-                        }).catch((err) => { })
+                        }).catch((err) => {
+                            setLoading(false);
+                        })
 
                 }}
             >
@@ -933,7 +969,8 @@ export default () => {
                 <MenuManageCard
                     awaylsUseProject={awaylsUseProject}
                     MenuVisible={MenuVisible}
-                    // backProject={backProject}
+                    getProject={getProject}
+                    backProject={backProject}
                     setMenuVisible={() => setMenuVisible(false)}
                 />
             )}

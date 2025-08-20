@@ -288,7 +288,7 @@ export default (props: any, orderRef: any) => {
           // console.log(333, bank.method)
           // })
         }
-        console.log('renderData.list[0]', renderData.list[0]);
+        console.log('renderData.list[0]', renderData.list[0].num);
         console.log('res', res);
         console.log('fiedsValue', fiedsValue);
         // if (renderData.types == 'eidt') {
@@ -707,6 +707,7 @@ export default (props: any, orderRef: any) => {
     >
       <Spin spinning={spinning}>
         <div className="scolle" style={{ overflowX: 'auto', paddingBottom: '100px' }}>
+          <div style={{ marginBottom: '15px'}}>订单编号：{renderData.list[0].num}</div>
           <ProForm.Group>
             {renderData.type == 'orders' ? <ProFormSelect
               label="缴费类型"

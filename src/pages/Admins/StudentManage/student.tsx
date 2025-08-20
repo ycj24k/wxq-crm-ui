@@ -692,7 +692,7 @@ export default (props: any) => {
                     下单
                   </a>
 
-                  {/* <a
+                  <a
                     type="primary"
                     hidden={isFormal}
                     onClick={() => {
@@ -701,7 +701,7 @@ export default (props: any) => {
                     }}
                   >
                     跟进记录
-                  </a> */}
+                  </a>
                 </Space>
               </div>
               <Space>
@@ -1070,71 +1070,7 @@ export default (props: any) => {
           >
             新建推荐学员
           </Button>,
-          <Button
-            key="buttons"
-            icon={<FormOutlined />}
-            type="primary"
-            hidden={!isFormal}
-            onClick={async () => {
-              const status = (await request.get('/sms/share/isVerify')).data;
-              const autoSign = (await request.get('/sms/share/isVerifyAutoSign')).data;
-              if (status && autoSign) {
-                if (initialState?.currentUser?.idCard) {
-                  if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-                    message.error('请选择一位学员签署合同!');
-                    return;
-                  }
-                  setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
-                  if (!selectedRowsList[0]?.idCard) {
-                    message.error('请先补充学员/负责人的身份证信息！');
-                    // setRenderData({ ...record, typee: 'eidt' });
-                    setModalVisible(true);
-                    return;
-                  }
-
-                  if (
-                    selectedRowsList[0].type == 1 &&
-                    !selectedRowsList[0].codeFile
-                    // !selectedRowsList[0].powerAttorneyFile
-                  ) {
-                    Modal.info({
-                      title: '尚未上传企业授权信息!',
-                      content: <p>请先补充信息在签署合同</p>,
-                      okText: '补充',
-                      onOk: () => {
-                        setCompanyContractVisible(true);
-                      },
-                    });
-                    return;
-                  }
-
-                  setContractSVisible(true);
-                } else {
-                  message.error('请先完善您的身份证信息后再签署合同！');
-                }
-              } else {
-                setRenderData([status, autoSign]);
-                setIsVerifyModelVisible(true);
-                // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
-                // const urls = (await request.post('/sms/share/verify')).data;
-                // setpreviewImage(urls);
-                // setPreviewVisible(true);
-              }
-            }}
-          >
-            合同签署
-          </Button>,
-          //更新后的合同签署
           // <Button
-          //   // key="buttons"
-          //   // icon={<FormOutlined />}
-          //   // type="primary"
-          //   // hidden={!isFormal}
-          //   // onClick={async () => {
-          //   //   setContract(true);
-          //   // }}
-
-
           //   key="buttons"
           //   icon={<FormOutlined />}
           //   type="primary"
@@ -1188,6 +1124,70 @@ export default (props: any) => {
           // >
           //   合同签署
           // </Button>,
+          //更新后的合同签署
+          <Button
+            // key="buttons"
+            // icon={<FormOutlined />}
+            // type="primary"
+            // hidden={!isFormal}
+            // onClick={async () => {
+            //   setContract(true);
+            // }}
+
+
+            key="buttons"
+            icon={<FormOutlined />}
+            type="primary"
+            hidden={!isFormal}
+            onClick={async () => {
+              const status = (await request.get('/sms/share/isVerify')).data;
+              const autoSign = (await request.get('/sms/share/isVerifyAutoSign')).data;
+              if (status && autoSign) {
+                if (initialState?.currentUser?.idCard) {
+                  if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
+                    message.error('请选择一位学员签署合同!');
+                    return;
+                  }
+                  setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
+                  if (!selectedRowsList[0]?.idCard) {
+                    message.error('请先补充学员/负责人的身份证信息！');
+                    // setRenderData({ ...record, typee: 'eidt' });
+                    setModalVisible(true);
+                    return;
+                  }
+
+                  if (
+                    selectedRowsList[0].type == 1 &&
+                    !selectedRowsList[0].codeFile
+                    // !selectedRowsList[0].powerAttorneyFile
+                  ) {
+                    Modal.info({
+                      title: '尚未上传企业授权信息!',
+                      content: <p>请先补充信息在签署合同</p>,
+                      okText: '补充',
+                      onOk: () => {
+                        setCompanyContractVisible(true);
+                      },
+                    });
+                    return;
+                  }
+
+                  setContractSVisible(true);
+                } else {
+                  message.error('请先完善您的身份证信息后再签署合同！');
+                }
+              } else {
+                setRenderData([status, autoSign]);
+                setIsVerifyModelVisible(true);
+                // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
+                // const urls = (await request.post('/sms/share/verify')).data;
+                // setpreviewImage(urls);
+                // setPreviewVisible(true);
+              }
+            }}
+          >
+            合同签署
+          </Button>,
           <Button
             key="butto"
             hidden={order == 'order' || isFormal || recommend}

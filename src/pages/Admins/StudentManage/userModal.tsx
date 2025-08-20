@@ -101,7 +101,8 @@ export default (props: any) => {
           education: renderData.education?.toString(),
           QQ: renderData?.qq,
         });
-
+        console.log(renderData.project, 'renderData.project')
+        console.log(Dictionaries.getCascaderName('dict_reg_job', renderData.project))
         let data = {}
         let datas = {
           id: renderData.userId,

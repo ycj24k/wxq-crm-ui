@@ -187,15 +187,15 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'MessageOutlined',
             routes: [
               {
+                name:'下单专页',
+                path: '/business/orderpage',
+                component: './Business/OrderPage',
+              },
+              {
                 name: '潜在所属学员',
                 icon: 'SolutionOutlined',
                 path: '/business/studentmanages',
                 component: './Business/StudentManages',
-              },
-              {
-                name:'开具发票',
-                path: '/business/invoicelist',
-                component: './Business/InvoiceList',
               },
               {
                 name: '潜在学员',
@@ -248,11 +248,7 @@ export async function currentUser(options?: { [key: string]: any }) {
               //   path: '/business/provide/resource',
               //   component: './Business/ProvideUser/Resource',
               // },
-              {
-                name:'下单专页',
-                path: '/business/orderpage',
-                component: './Business/OrderPage',
-              },
+              
               {
                 name: '小程序二维码下载',
                 path: '/business/qrcode',
@@ -345,6 +341,16 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'AccountBookOutlined',
             routes: [
               {
+                name: '退款',
+                path: '/business/refund',
+                component: './Business/Refund'
+              },
+              {
+                name: '补缴下单',
+                path: '/business/supplementaryorder',
+                component: './Business/SuppleMentaryOrder'
+              },
+              {
                 name: '订单列表',
                 icon: 'table',
                 path: '/business/businessorder',
@@ -365,6 +371,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 name: '缴费列表',
                 path: '/business/businesscharge/list',
                 component: './Business/BusinessCharge/List',
+              },
+              {
+                name:'开具发票',
+                path: '/business/invoicelist',
+                component: './Business/InvoiceList',
               },
               {
                 name: '发票信息',

@@ -7,7 +7,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 
 export default (props: any) => {
-  const { MenuVisible, setMenuVisible, MenuContent, callbackRef, menuRenderData, backProject, awaylsUseProject } = props;
+  const { MenuVisible, setMenuVisible, MenuContent, callbackRef, menuRenderData, backProject, awaylsUseProject, getProject } = props;
 
   console.log(backProject, 'this.MenuContent')
 
@@ -28,7 +28,10 @@ export default (props: any) => {
   };
 
   useEffect(() => {
-    getProjectTree()
+    // getProjectTree()
+
+
+
     // const dictionariesList = localStorage.getItem('dictionariesList');
     // if (dictionariesList) {
     //   let dictionariesArray = JSON.parse(dictionariesList)[1].children
@@ -45,15 +48,16 @@ export default (props: any) => {
     // }
   }, [])
 
-  // useEffect(() => {
-  //   const dictionariesList = localStorage.getItem('dictionariesList');
-  //   if (dictionariesList) {
-  //     let dictionariesArray = JSON.parse(dictionariesList)[1].children
-  //     const formattedData = convertToTreeData(dictionariesArray)
-  //     setTreeData(formattedData);
-  //     setFilteredTreeData(formattedData);
-  //   }
-  // }, [])
+  useEffect(() => {
+    const dictionariesList = localStorage.getItem('dictionariesList');
+    if (dictionariesList) {
+      let dictionariesArray = JSON.parse(dictionariesList)[1].children
+      const formattedData = convertToTreeData(dictionariesArray)
+      console.log(formattedData,'handleOpenProject()')
+      setTreeData(formattedData);
+      setFilteredTreeData(formattedData);
+    }
+  }, [])
 
   const getProjectTree = () => {
     if (awaylsUseProject) {
@@ -193,39 +197,19 @@ export default (props: any) => {
   };
 
   const handleSure = () => {
-    console.log(selectedIds, 'selectedIds')
     request.postAll('/sms/commonProjects', selectedIds).then((res: any) => {
       if (res.status == 'success') {
         message.success('操作成功');
+        setMenuVisible(false)
+        getProject
       }
     });
-    // request
-    //   .post2(
-    //     '/sms/system/sysRoleMenu/updateFromTree',
-    //     {
-    //       id: menuRenderData.id,
-    //     },
-    //     {
-    //       array: selectedIds,
-    //     },
-    //   )
-    //   .then((res: any) => {
-    //     if (res.status == 'success') {
-    //       message.success('授权成功');
-    //       setSelectedIds([]);
-    //       callbackRef();
-    //       setTimeout(() => {
-    //         setMenuVisible(false);
-    //         setTreeData([])
-    //       }, 500);
-    //     }
-    //   });
   }
 
   return (
     <>
       <Modal
-        title="菜单授权"
+        title="设置常用项目"
         open={MenuVisible}
         onCancel={() => {
           setMenuVisible(false)

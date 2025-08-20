@@ -73,6 +73,8 @@ export default (props: any) => {
   const {
     admins,
     admin,
+    refund,
+    suppOrder,
     studentUserId = '',
     type = 0,
     orderId = '',
@@ -91,6 +93,7 @@ export default (props: any) => {
   const [SpingFalg, SetSpingFalg] = useState<boolean>(false);
   const [ChargeOrderVisibleFalg, setChargeOrderVisible] = useState<boolean>(false);
   const [ChargeNewsVisibleFalg, setChargeNewsVisibleFalg] = useState<boolean>(false);
+  const [suppVisibleFalg, setSuppVisible] = useState<boolean>(false);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
   const [ChargeInfoVisibleFalg, setChargeInfoVisible] = useState<boolean>(false);
   //学员下单
@@ -508,12 +511,13 @@ export default (props: any) => {
           <Tooltip placement="topLeft" title={'订单缴费'}>
             <Button
               key="jiaofei"
-              hidden={record.parentId != '-1' || orderType != 'sp'}
               size="small"
               type="primary"
+              hidden={!suppOrder}
               icon={<AccountBookOutlined />}
               className="tablebut"
               onClick={async () => {
+                console.log(record,'record------>')
                 const list = await getChargeList(record.id, true);
                 if (list.length > 0 && list.every((item: any) => item.confirm !== true)) {
                   showConfirm(
@@ -522,14 +526,14 @@ export default (props: any) => {
                       let orders: any = record;
                       orders.orderId = record.id;
                       setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
-                      setChargeNewsVisibleFalg(true);
+                      setSuppVisible(true);
                     },
                   );
                 } else {
                   let orders: any = record;
                   orders.orderId = record.id;
                   setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
-                  setChargeNewsVisibleFalg(true);
+                  setSuppVisible(true);
                 }
               }}
             >
@@ -541,7 +545,7 @@ export default (props: any) => {
           <Tooltip placement="topLeft" title={'订单缴费'}>
             <Button
               key="jiaofei"
-              hidden={record.parentId != '-1' || orderType == 'sp'}
+              hidden={record.parentId != '-1' || orderType == 'sp' || refund || suppOrder}
               size="small"
               type="primary"
               icon={<AccountBookOutlined />}
@@ -574,7 +578,7 @@ export default (props: any) => {
               key="editable"
               type="primary"
               size="small"
-              hidden={showType == 'refund' || orderType == 'sp'}
+              hidden={showType == 'refund' || orderType == 'sp' || refund || suppOrder}
               icon={<EditOutlined />}
               className="tablebut"
               onClick={async () => {
@@ -602,7 +606,7 @@ export default (props: any) => {
               setRenderData({ ...record, type: 'orders', orderNumber: 0 });
               setChargeOrderVisible(true);
             }}
-            hidden={record.parentId != '-1' || orderType == 'sp'}
+            hidden={record.parentId != '-1' || orderType == 'sp' || suppOrder}
             icon={<AccountBookOutlined />}
             className="tablebut"
             danger
@@ -629,7 +633,7 @@ export default (props: any) => {
             cancelText="取消"
           >
             <Button
-              hidden={record.parentId != '-1' || showType == 'refund' || orderType == 'sp'}
+              hidden={record.parentId != '-1' || showType == 'refund' || orderType == 'sp' || refund || suppOrder}
               key="delete"
               size="small"
               type="primary"
@@ -645,7 +649,7 @@ export default (props: any) => {
               size="small"
               type="primary"
               className="tablebut"
-              hidden={showType == 'refund'}
+              hidden={showType == 'refund' || refund}
               icon={<ProfileOutlined />}
               onClick={async () => {
                 SetSpingFalg(true);
@@ -1139,6 +1143,26 @@ export default (props: any) => {
         )}
 
         <Drawer
+          title="补缴下单"
+          width={1200}
+          
+
+          visible={suppVisibleFalg}
+          onClose={() => setSuppVisible(false)}
+          maskClosable={false}
+          footer={null}
+          destroyOnClose={true}
+        >
+          <ChargeNews
+            setModalVisible={() => setSuppVisible(false)}
+            modalVisible={suppVisibleFalg}
+            renderData={renderData}
+            supple={true}
+            callbackRef={() => callbackRef()}
+          />
+        </Drawer>
+
+        <Drawer
           title="缴费"
           width={1200}
           visible={ChargeNewsVisibleFalg}
@@ -1147,19 +1171,19 @@ export default (props: any) => {
           footer={null}
           destroyOnClose={true}
         >
-          {/* <ChargeNews
-            setModalVisible={() => setChargeNewsVisibleFalg(false)}
-            modalVisible={ChargeNewsVisibleFalg}
-            renderData={renderData}
-            callbackRef={() => callbackRef()}
-          /> */}
-
-          <ChargeNewsCopy
+          <ChargeNews
             setModalVisible={() => setChargeNewsVisibleFalg(false)}
             modalVisible={ChargeNewsVisibleFalg}
             renderData={renderData}
             callbackRef={() => callbackRef()}
           />
+
+          {/* <ChargeNewsCopy
+            setModalVisible={() => setChargeNewsVisibleFalg(false)}
+            modalVisible={ChargeNewsVisibleFalg}
+            renderData={renderData}
+            callbackRef={() => callbackRef()}
+          /> */}
         </Drawer>
 
         {ChargeInfoVisibleFalg && (

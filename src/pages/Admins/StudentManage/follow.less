@@ -32,6 +32,7 @@
     padding: 0 20px;
     height: 40px;
 }
+
 .header_bottom {
     width: 100%;
     margin-top: 20px;
@@ -75,36 +76,51 @@
         }
 
         .header_content {
-            width: 100%;
-            height: 120px;
-
+            width: 90%;
+            
+            margin: 0 auto;
+            border: 1px solid #f0f0f0;
             .content_top {
                 width: 100%;
                 height: 30px;
                 line-height: 30px;
                 box-sizing: border-box;
-                padding: 0px 20px 0px 20px;
+                padding: 0px 20px 20px 20px;
                 display: flex;
                 justify-content: space-between;
+                .projectName{
+                    width: 100%;
+                    height: 40px;
+                    display: flex;
+                    justify-content: space-between;
+                    .left{
+                        font-size: 20px;
+                        font-weight: bold;
+                    }
+                }
             }
-            .content_middle{
+
+            .content_middle {
                 width: 100%;
                 box-sizing: border-box;
-                padding: 0px 20px 0px 20px;
+                padding: 0px 20px 20px 20px;
             }
         }
 
     }
 }
-.header_search{
+
+.header_search {
     width: 100%;
     display: flex;
 }
-.search_left{
+
+.search_left {
     display: flex;
     align-items: center;
     flex: 0.5;
 }
+
 .search_right {
     display: flex;
     align-items: center;

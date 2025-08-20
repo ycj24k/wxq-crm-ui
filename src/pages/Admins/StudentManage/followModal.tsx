@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import Tables from "@/components/Tables"
 import { useModel } from 'umi';
 import ProForm, {
     ModalForm,
@@ -12,22 +11,19 @@ import ProForm, {
     ProFormText
 } from '@ant-design/pro-form';
 
-import { ProColumns } from "@ant-design/pro-table"
 import './follow.less'
 import { Button, message, Modal, Input, Space } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
-import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import request from '@/services/ant-design-pro/apiRequest';
 const { Search } = Input;
 
 
 export default (props: any) => {
     const { modalVisible, setModalVisible, renderData, url } = props;
-    console.log(url, 'renderData')
-    console.log(renderData, 'renderData')
     const { initialState } = useModel('@@initialState');
     const [followModal, setFollowModal] = useState<boolean>(false);
-    //const [userNameIds, setUserNameIds] = useState<number>(0);
+    const [ImgUrl, setImageUrl] = useState<any>();
+    const [followImage, setFollowImage] = useState<any>()
     const [followList, setFollowList] = useState<any>([])
     const [expandedItems, setExpandedItems] = useState<number[]>([]);
     //编辑时的id
@@ -83,7 +79,13 @@ export default (props: any) => {
 
 
 
-
+    const handleWatch = async (id: any, file: any) => {
+        let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+        let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+        const src = '/sms/business/bizReturnVisit/download?id=' + id + '&fileName=' + file + '&' + tokenName + '=' + tokenValue;
+        setImageUrl(src)
+        setFollowImage(true)
+    }
 
     const handleAddfollow = () => {
         console.log(editId)
@@ -207,12 +209,24 @@ export default (props: any) => {
                                     {expandedItems.includes(item.id) && (
                                         <div className='header_content'>
                                             <div className='content_top'>
-                                                <div>沟通项目：{Dictionaries.getCascaderName('dict_reg_job', item.project)}</div>
+                                                <div className='projectName'>
+                                                    <div className='left'>{Dictionaries.getCascaderName('dict_reg_job', item.project)} </div>
+                                                    <div>跟进人：{item.userName}</div>
+                                                </div>
+                                                {/* <div>
+                                                    <Button onClick={() => handleWatch(item.id, item.file)} type='primary'>查看</Button>
+                                                </div>
                                                 <div>跟进人：{item.userName}</div>
-                                                <div>下次跟进时间：{item.nextVisitDate}</div>
-                                                <div>沟通类型：{Dictionaries.getName('dict_c_type', item.type)}</div>
+                                               
+                                                <div>沟通类型：{Dictionaries.getName('dict_c_type', item.type)}</div> */}
                                             </div>
-                                            <div className='content_middle'>沟通内容：{item.content}</div>
+                                            
+                                            <div className='content_middle' style={{ marginTop:'20px' }}>沟通内容：{item.content}</div>
+                                            <div className='content_middle'>下次跟进时间：{item.nextVisitDate}</div>
+                                            <div className='content_middle'>
+                                                <Button onClick={() => handleWatch(item.id, item.file)} type='primary' size="small">查看图片</Button>
+                                            </div>
+                                            
                                         </div>
                                     )}
                                 </div>
@@ -271,9 +285,9 @@ export default (props: any) => {
                     setEditId('')
                     if (editId) {
                         values.id = editId;
-                        values.type = Dictionaries.getValue('dict_c_type',values.type)
-                        values.intention = Dictionaries.getValue('dict_intention_level',values.intention)
-                    } 
+                        values.type = Dictionaries.getValue('dict_c_type', values.type)
+                        values.intention = Dictionaries.getValue('dict_intention_level', values.intention)
+                    }
                     request
                         .post(url, values)
                         .then((res: any) => {
@@ -359,7 +373,7 @@ export default (props: any) => {
                         width="xl"
                         label="上传附件"
                         name="filess"
-                        action="/sms/business/bizNotice/upload"
+                        action="/sms/business/bizReturnVisit/upload"
                         fieldProps={{
                             multiple: true,
                             headers: {
@@ -392,6 +406,20 @@ export default (props: any) => {
                     <ProFormTextArea width={800} label="跟进内容" name="content" rules={[{ required: true }]} />
                 </ProForm.Group>
             </ModalForm>
+
+            <Modal
+                title="跟进记录图"
+                width={400}
+                open={followImage}
+                onOk={() => {
+                    setFollowImage(false);
+                }}
+                onCancel={() => {
+                    setFollowImage(false);
+                }}
+            >
+                <img style={{ width: '100%' }} src={ImgUrl}></img>
+            </Modal>
         </>
     );
 };

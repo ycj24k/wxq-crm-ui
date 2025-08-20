@@ -631,11 +631,11 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             >
 
             </ProFormList>
-            <ProFormTextArea
+            {/* <ProFormTextArea
                 width={1100}
                 label={'备注'}
                 name="description"
-            />
+            /> */}
         </ProForm>
     );
 })

@@ -33,7 +33,7 @@ export default () => {
         },
       ]}
     >
-      <Order admin={true} type={TabListNuber} />
+      <Order admin={true} type={TabListNuber} suppOrder={false}/>
     </PageContainer>
   );
 };
