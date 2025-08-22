@@ -30,8 +30,8 @@ import PayWay from "./payWay"
 
 export default (props: any) => {
     const { initialState } = useModel('@@initialState');
-    const { reBuild, select, getAll = false, type = 0 , showBtn, num} = props
-    console.log(num,'num======>')
+    const { reBuild, select, getAll = false, type = 0, showBtn, num, Orderpage } = props
+    console.log(num, 'num======>')
     const [exportLoading, setExportLoading] = useState<boolean>();
     const [selectData, setSelectData] = useState<Array<any>>();
     const [studentlistmessage, setStudentlistmessage] = useState<any>();
@@ -91,11 +91,14 @@ export default (props: any) => {
     //confirm: true, isRefund:true
     //const param = getAll ? {} : { isUseUp: false }
     let param = null
-    if(num == 'isTrue'){
-        param = { isRefund:false, isUseup:false, enable:true }
+    if (num == 'isTrue') {
+        param = { isRefund: false, isUseup: false, enable: true }
     }
-    if(!num){
-        param = getAll ? {} : { isUseUp: false }
+    if (!num) {
+        param = getAll ? {} : { isUseUp: false, isRefund: true }
+    }
+    if(Orderpage){
+        param = getAll ? {} : { isUseUp: false, isRefund: false }
     }
     // if(getAll){
     //     param = {}
@@ -366,7 +369,7 @@ export default (props: any) => {
         let classListValues;
         try {
             classListValues = await classListRef.current?.getFormValues();
-            console.log(classListValues.description,'classListValues')
+            console.log(classListValues.description, 'classListValues')
             if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
                 message.error('请至少添加一个班级信息');
                 setConfirmLoading(false)
@@ -399,7 +402,7 @@ export default (props: any) => {
             return;
         }
 
-        const processedUsers = Dictionaries.filterByValue(classListValues,classListValues.description)
+        const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
         console.log(processedUsers, 'processedUsers')
         //const payWayValues = await payWayRef.current?.getFormValues();
         let payWayValues: any;
@@ -418,7 +421,7 @@ export default (props: any) => {
             "order": order,
             "charge": payWayValues[index]
         }));
-        console.log(auditsParam,'auditsParam')
+        console.log(auditsParam, 'auditsParam')
         request
             .postAll('/sms/business/bizOrder/intelligence', auditsParam)
             .then((res: any) => {
@@ -722,7 +725,7 @@ export default (props: any) => {
                     });
                     delete values.filess;
                     values.files = arr.join(',');
-                    console.log(values,'values-----ModalForm,')
+                    console.log(values, 'values-----ModalForm,')
                 }
             }}
             modalProps={{
@@ -733,10 +736,10 @@ export default (props: any) => {
             }}
         >
             <a
-              download="汇德退费申请书模板（两个--企业和个人）"
-              href="./template/汇德退费申请书模板（两个--企业和个人）.doc"
+                download="汇德退费申请书模板（两个--企业和个人）"
+                href="./template/汇德退费申请书模板（两个--企业和个人）.doc"
             >
-              下载退费申请书模板(两个--企业和个人)
+                下载退费申请书模板(两个--企业和个人)
             </a>,
             <ProFormUploadDragger
                 width="xl"
@@ -749,8 +752,8 @@ export default (props: any) => {
                         ...obj,
                     },
                     listType: 'picture',
-                    onRemove: (e:any) => { },
-                    beforeUpload: (file:any) => {
+                    onRemove: (e: any) => { },
+                    beforeUpload: (file: any) => {
                         console.log('file', file);
                     },
                     onPreview: async (file: any) => {
@@ -764,7 +767,7 @@ export default (props: any) => {
                         // setPreviewImage(file.url || file.preview);
                         // setPreviewVisible(true);
                     },
-                    onChange: (info:any) => {
+                    onChange: (info: any) => {
                         const { status } = info.file;
                         if (status !== 'uploading') {
                         }

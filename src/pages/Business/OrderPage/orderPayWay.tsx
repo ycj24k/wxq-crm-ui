@@ -531,7 +531,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         onCancel={() => setChargeLogVisible(false)}
                         footer={null}
                     >
-                        <ChargeLog select={setChargeLog} type={1} />
+                        <ChargeLog select={setChargeLog} type={1} Orderpage={true}/>
                     </Modal>
 
                 </ProForm>

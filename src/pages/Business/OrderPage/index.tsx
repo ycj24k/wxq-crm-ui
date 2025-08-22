@@ -41,8 +41,10 @@ export default () => {
     const [ID, setID] = useState<any>()
     const [studentID, setStudentId] = useState<any>();
     const [steps, setSteps] = useState<any>(1)
-    const [defaultChecked, setDefaultChecked] = useState<boolean>(false)
+    // const [defaultChecked, setDefaultChecked] = useState<boolean>(false)
     const [backProject, setBackProject] = useState<any>()
+    const [MobileNumber, setMobileNumber] = useState<any>()
+    const [WeChatNumber, setWeChatNumber] = useState<any>()
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -50,7 +52,11 @@ export default () => {
     const [userNameId, setUserNameId] = useState<any>();
     const [userNameIds, setUserNameIds] = useState<any>();
     const [userNameId2, setUserNameId2] = useState<any>();
-
+    const callbackRef = (value: any = true) => {
+        // @ts-ignore
+        actionRef.current.reloadAndRest();
+        getProject()
+    };
     const actionRef = useRef<ActionType>();
     const classListRef = useRef<{ handleChangeData: (data: any) => any[] }>(null);
     const payWayRef = useRef<{
@@ -62,6 +68,15 @@ export default () => {
     // useEffect(() => {
     //     handleEnable()
     // }, [])
+
+    useEffect(() => {
+        setTimeout(() => {
+            formRef?.current?.setFieldsValue({
+                mobile: MobileNumber,
+            })
+        }, 100)
+    }, [MobileNumber])
+
     const setRadio = (e: RadioChangeEvent) => {
         setSteps(e.target.value)
     }
@@ -103,12 +118,12 @@ export default () => {
         setBackProject(res.data)
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
-            const result = Dictionaries.extractMatchingItems(dictionariesArray,res.data);
+            const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
                 // const newResult = [result]
                 // console.log(newResult,'newResult==========>')
                 const formattedData = convertToTreeData(result)
-                console.log(formattedData,'formattedData=======>')
+                console.log(formattedData, 'formattedData=======>')
                 setProjectslist(formattedData)
             } else {
                 console.error('空数组');
@@ -117,13 +132,29 @@ export default () => {
         setAwaylsUseProject(res.data)
     }
 
+    const handleWatch = () => {
+        setFindStudent(false)
+        setModalStudentInfo(true)
+        // 合并表单设置
+        const formValues: Record<string, string> = {};
+        if (MobileNumber) formValues.mobile = MobileNumber;
+        if (WeChatNumber) formValues.weChat = WeChatNumber;
 
+        if (Object.keys(formValues).length > 0) {
+            setTimeout(() => {
+                formRef?.current?.setFieldsValue(formValues);
+            }, 100);
+        }
+        handleOpenProject()
+    }
 
     const handleOrder = (record: any) => {
         handleOpenProject()
         setStudentId(record)
         //setOptionEnable(false)
-        setModalStudentInfo(true)
+        setRenderData(record)
+        //setModalStudentInfo(true)
+        setModalOrderVisible(true)
         let farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
         let son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
         let text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
@@ -202,10 +233,10 @@ export default () => {
     const handleOpenProject = async () => {
         const res = await request.get('/sms/commonProjects/enable')
         if (res.status == 'success') {
-            setDefaultChecked(true)
+            // setDefaultChecked(true)
             getProject()
         } else {
-            setDefaultChecked(false)
+            // setDefaultChecked(false)
         }
     }
     let params: any = {
@@ -264,6 +295,12 @@ export default () => {
             title: '手机号',
             dataIndex: 'mobile',
             key: 'mobile',
+            width: 130,
+        },
+        {
+            title: '微信',
+            dataIndex: 'weChat',
+            key: 'weChat',
             width: 130,
         },
         {
@@ -535,6 +572,8 @@ export default () => {
                             current?: any;
                             page?: number;
                             pageSize?: number;
+                            mobile?: string;
+                            weChat?: string;
                         } = {
 
                             },
@@ -542,6 +581,9 @@ export default () => {
                         filter,
                     ) => {
                         const res = await request.get(url, params);
+                        console.log(params.mobile, 'params')
+                        setMobileNumber(params.mobile)
+                        setWeChatNumber(params.weChat)
                         if (res.data.content.length === 0) {
                             setFindStudent(true)
                         }
@@ -580,11 +622,12 @@ export default () => {
                 onCancel={() => {
                     setFindStudent(false)
                 }}
-                onOk={async () => {
-                    setFindStudent(false)
-                    setModalStudentInfo(true)
-                    handleOpenProject()
-                }}
+                onOk={handleWatch}
+                // onOk={async () => {
+                //     setFindStudent(false)
+                //     setModalStudentInfo(true)
+                //     handleOpenProject()
+                // }}
                 open={findStudent}
             >
                 <p>学员资料不存在，请完善资料后再下单</p>
@@ -622,6 +665,7 @@ export default () => {
                     if (values?.labels) {
                     } else {
                     }
+                    if (values.type) values.type = '0'
                     if (values.project) values.project = values.project[values.project.length - 1];
                     if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
                     if (values.userId) values.userId = Dictionaries.getUserId(values.userId.label)[0]
@@ -638,7 +682,6 @@ export default () => {
                     <Button type='primary' style={{ marginBottom: '15px', marginLeft: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>
                     {/* {defaultChecked && <Button type='primary' style={{ marginBottom: '15px', marginLeft: '15px' }} onClick={handleSetProject}>设置常用报考项目</Button>} */}
                 </div>
-
 
                 <ProForm.Group>
                     <ProFormSelect
@@ -859,6 +902,7 @@ export default () => {
                             }
                         }
                     } catch (error) {
+                        setLoading(false);
                         return;
                     }
                     //const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
@@ -879,6 +923,7 @@ export default () => {
                             }
                         })
                     } catch (error) {
+                        setLoading(false);
                         return;
                     }
                     // let payWayValues: any;
@@ -969,7 +1014,7 @@ export default () => {
                 <MenuManageCard
                     awaylsUseProject={awaylsUseProject}
                     MenuVisible={MenuVisible}
-                    getProject={getProject}
+                    callbackRef={() => callbackRef()}
                     backProject={backProject}
                     setMenuVisible={() => setMenuVisible(false)}
                 />

@@ -138,6 +138,7 @@ export default (props: any) => {
                 <Button
                     style={{ marginLeft: 5 }}
                     type="primary"
+                    hidden={!record.refundReason}
                     size="small"
                     onClick={() => {
                         fetchDownload('/sms/business/bizChargeLog/download', record.id, { fileName: record.refundReason }, '.docx');
@@ -176,6 +177,8 @@ export default (props: any) => {
                             request.post(`/sms/business/bizAudit/audit/${12}?entityId=${record.id}&confirm=true`).then((res: any) => {
                                 if (res.status == 'success') {
                                     message.success('成功通过');
+                                    actionRef.current.reload();
+                                    BadgesNumbers()
                                 }
                             });
                         }}

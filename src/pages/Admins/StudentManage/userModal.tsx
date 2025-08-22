@@ -498,7 +498,6 @@ export default (props: any) => {
           request={async () => Dictionaries.getList('studentType') as any}
           fieldProps={{
             onChange: (e) => {
-              // onchange(e);
               if (e == '1') {
                 setCompany('企业名称');
               } else if (e == '2') {

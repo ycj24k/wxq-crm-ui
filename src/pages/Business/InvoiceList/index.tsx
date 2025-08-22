@@ -303,11 +303,16 @@ export default () => {
                                         fieldProps={{
                                             //使用onChange
                                             onChange: (value) => {
+                                               
                                                 return value    //必须要return一个值出去 表单项才会展示值在输入框上
                                             },
                                             onSelect: (value,option) => {
+                                                console.log(option)
                                                 let invoiceType = ''
                                                 if(option.type == '0'){
+                                                    invoiceType = '普票'
+                                                }
+                                                if(option.type == null) {
                                                     invoiceType = '普票'
                                                 }
                                                 if(option.type == '1'){
@@ -319,7 +324,11 @@ export default () => {
                                                 setTimeout(() => {
                                                     formRefInvoiceelse?.current?.setFieldsValue({
                                                         title: option.label,
-                                                        productType: Dictionaries.getName('invoiceProductType', option.productType),
+                                                        productType:  option.type === null || option.type === 0 
+                                                        ? undefined 
+                                                        : Dictionaries.getName('invoiceProductType', option.type), 
+                                                        
+                                                        //Dictionaries.getName('invoiceProductType', option.productType),
                                                         chargeAccount: option.chargeAccount === null || option.chargeAccount === 0 
                                                             ? undefined 
                                                             : Dictionaries.getName('dict_stu_refund_type', option.chargeAccount),
@@ -347,7 +356,7 @@ export default () => {
                                                             const no_options = response.data.map((key: any) => ({
                                                                 ...key,
                                                                 label: key.title,
-                                                                value: key.id,
+                                                                value: key.title,
                                                             }));
                                                             resolve(no_options);
                                                         } else {

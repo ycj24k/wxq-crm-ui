@@ -7,9 +7,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 
 export default (props: any) => {
-  const { MenuVisible, setMenuVisible, MenuContent, callbackRef, menuRenderData, backProject, awaylsUseProject, getProject } = props;
-
-  console.log(backProject, 'this.MenuContent')
+  const { MenuVisible, setMenuVisible, callbackRef, backProject, awaylsUseProject } = props;
 
   const [treeData, setTreeData] = useState<any[]>([]);
   const [filteredTreeData, setFilteredTreeData] = useState<any[]>([]);
@@ -201,7 +199,7 @@ export default (props: any) => {
       if (res.status == 'success') {
         message.success('操作成功');
         setMenuVisible(false)
-        getProject
+        callbackRef()
       }
     });
   }
@@ -234,7 +232,7 @@ export default (props: any) => {
               <Tree
                 showIcon
                 checkable
-                defaultExpandAll
+                defaultExpandAll={false}
                 treeData={filteredTreeData}
                 checkedKeys={checkedKeys}
                 onCheck={handleCheck}

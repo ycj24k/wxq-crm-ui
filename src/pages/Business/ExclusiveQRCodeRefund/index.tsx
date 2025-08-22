@@ -42,6 +42,7 @@ export default (props: any) => {
         setRefundReason(record.remark)
         setRefundId(record.id)
     }
+    const param = { isUseUp: false }
 
     const columns: ProColumns<any>[] = [
         {
@@ -93,13 +94,18 @@ export default (props: any) => {
             search: getAll,
             sorter: true,//confirm //isRefund
             render: (text, record) => <>
-                <Tag
+                {/* <Tag
                     color={
                         record.confirm === true ? '#87d068' : record.confirm === false ? '#FF0000' : '#f50'
                     }
                 >
-                    {record.confirm === true ? '审核通过' : record.confirm === false ? '未通过' : '未审核'}{record.confirm === false && record.isRefund && ',已重新提交'}
-                </Tag><br />
+                    {record.confirm === true && record.isRefund === true ? '审核通过' : record.confirm === false ? '未通过' : '未审核'}{record.confirm === false && record.isRefund && ',已重新提交'}
+                </Tag><br /> */}
+                {record.confirm === true && record.isRefund === true && <Tag color="#87d068">审核通过</Tag>}
+                {record.confirm === false && record.isRefund === false && <Tag color="#f50">审核未通过</Tag>}
+                {record.confirm === false && record.isRefund === true && <Tag color="red">审核不通过,已重新提交</Tag>}
+                {record.confirm === null && record.isRefund === false && <Tag color="volcano">未提交退费</Tag>}
+                {record.confirm === null && record.isRefund === true && <Tag color="green">已提交,待审核</Tag>}
             </>
         },
         {
@@ -118,7 +124,7 @@ export default (props: any) => {
                     <Button
                         type="primary"
                         danger
-                        disabled={record.confirm}
+                        disabled={record.confirm || record.confirm === null && record.isRefund === true}
                         onClick={() => handleRefound(record)}>申请退款</Button>
                 </>
 
@@ -130,7 +136,7 @@ export default (props: any) => {
         <Tables
             columns={columns}
             request={{ url: '/sms/business/bizChargeLog' }}
-            //params={param}
+            params={param}
             actionRef={actionRef}
         />
 
@@ -146,7 +152,6 @@ export default (props: any) => {
                     values.filess.forEach((item: any) => {
                         arr.push(item.response.data);
                     });
-                    console.log(arr,'arr')
                     delete values.filess;
                     values.files = arr.join(',');
                     let res = await request.post(`/sms/business/bizChargeLog/refund/${refundId}?file=${values.files}`)
@@ -174,7 +179,7 @@ export default (props: any) => {
                 width="xl"
                 label="上传附件"
                 name="filess"
-                action="/sms/business/bizNotice/upload"
+                action="/sms/business/bizChargeLog/upload"
                 fieldProps={{
                     multiple: true,
                     headers: {
@@ -204,7 +209,7 @@ export default (props: any) => {
                     },
                 }}
             />
-            <span>退费原因：{refundReason}</span>
+            <span>不通过原因：{refundReason}</span>
         </ModalForm>
 
 

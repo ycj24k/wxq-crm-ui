@@ -6,13 +6,41 @@ import {
     ProFormList,
     ProFormText,
 } from '@ant-design/pro-components';
+import './index.less'
+import { Button } from "antd";
+import { PlusOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { useState } from "react";
 
 
 export default () => {
+    const [rulelist, setRuleList] = useState<any>([
+        {
+            id: 1,
+            name: '规则1'
+        },
+        {
+            id: 2,
+            name: '规则2'
+        },
+        {
+            id: 3,
+            name: '规则3'
+        }
+    ])
+    const [hoverStates, setHoverStates] = useState<any>({})
+    const handleMouseEnter = (id: any) => {
+        setHoverStates((prev: any) => ({ ...prev, [id]: true }))
+    }
+    const handleMouseLeave = (id: any) => {
+        setHoverStates((prev: any) => ({ ...prev, [id]: false }))
+    }
+    const handleDelete = (id: any) => {
+        setRuleList((prev: any) => prev.filter((item: any) => item.id !== id))
+    }
     return <>
         <PageContainer>
             <ProCard>
-                <ProForm onFinish={async (e) => console.log(e)}>
+                {/* <ProForm onFinish={async (e) => console.log(e)}>
                     <ProFormList
                         name="users"
                         label="规则配置"
@@ -45,6 +73,7 @@ export default () => {
                                 {
                                     value: '333',
                                     label: '333',
+                                    label1: '666'
                                 },
                             ]}
                             creatorButtonProps={{
@@ -60,11 +89,42 @@ export default () => {
                             <ProFormGroup key="group">
                                 <ProFormText name="value" label="值" />
                                 <ProFormText name="label" label="显示名称" />
-                                <ProFormText name="label" label="显示名称" />
+                                <ProFormText name="label1" label="显示名称" />
                             </ProFormGroup>
                         </ProFormList>
                     </ProFormList>
-                </ProForm>
+                </ProForm> */}
+                <div className="top_container">
+                    <Button type="primary" icon={<PlusOutlined />}>添加规则设置</Button>
+                </div>
+                <div className="rule_list">
+                    {rulelist.map((item: any) => {
+                        return <>
+                            <div
+                                onMouseEnter={() => handleMouseEnter(item.id)}
+                                onMouseLeave={() => handleMouseLeave(item.id)}
+                                key={item.id}
+                                className="rule_item"
+                            >
+                                {hoverStates[item.id] && (
+                                    <CloseCircleOutlined
+                                        onClick={() => { handleDelete(item.id) }}
+                                        style={{
+                                            color: '#d81e06',
+                                            position: 'absolute',
+                                            right: '0px',
+                                            top: '0px',
+                                            fontSize: '16px',
+                                            zIndex:99
+                                        }}
+                                        className="close_icon"
+                                    />
+                                )}
+                                {item.name}
+                            </div>
+                        </>
+                    })}
+                </div>
             </ProCard>
         </PageContainer>
     </>

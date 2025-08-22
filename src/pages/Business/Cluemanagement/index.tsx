@@ -4,6 +4,7 @@ import { ActionType, ProColumns } from "@ant-design/pro-table"
 import { Button, message, Popconfirm, Space } from "antd"
 import { useEffect, useRef, useState } from "react"
 import Modal from "./edit"
+import ExpandModal from './expandModal'
 import { PageContainer } from "@ant-design/pro-layout"
 import dictionaries from "@/services/util/dictionaries"
 import ProTable from '@ant-design/pro-table';
@@ -13,6 +14,7 @@ export default () => {
     const actionRef = useRef<ActionType>();
     const callbackRef = () => actionRef.current?.reload()
     const [modalVisible, setModalVisible] = useState<boolean>(false)
+    const [ExpandModalVisible, setExpandModalVisible] = useState<boolean>(false)
     const [renderData, setRenderData] = useState<any>({});
     const [CardContent, setCardContent] = useState<any>();
     const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
@@ -229,6 +231,17 @@ export default () => {
                         type="primary"
                         onClick={() => {
                             setRenderData({ type: 'add' })
+                            setExpandModalVisible(true)
+                        }}
+                    >
+                        添加拓展信息
+                    </Button>,
+                    <Button
+                        key="button"
+                        icon={<PlusOutlined />}
+                        type="primary"
+                        onClick={() => {
+                            setRenderData({ type: 'add' })
                             setModalVisible(true)
                         }}
                     >
@@ -241,6 +254,11 @@ export default () => {
                 renderData={renderData}
                 visible={modalVisible}
                 setVisible={setModalVisible}
+                callbackRef={callbackRef}
+            />
+            <ExpandModal 
+                visible={ExpandModalVisible}
+                setVisible={setExpandModalVisible}
                 callbackRef={callbackRef}
             />
 
