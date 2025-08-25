@@ -41,10 +41,12 @@ export default () => {
     const [ID, setID] = useState<any>()
     const [studentID, setStudentId] = useState<any>();
     const [steps, setSteps] = useState<any>(1)
+    const [editID, setEditID] = useState<any>()
     // const [defaultChecked, setDefaultChecked] = useState<boolean>(false)
     const [backProject, setBackProject] = useState<any>()
     const [MobileNumber, setMobileNumber] = useState<any>()
     const [WeChatNumber, setWeChatNumber] = useState<any>()
+    const [totalReceivable, setTotalReceivable] = useState<number>(0);
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -116,20 +118,20 @@ export default () => {
         // setAwaylsUseProject(res.data)
         const dictionariesList = localStorage.getItem('dictionariesList');
         setBackProject(res.data)
+        let data;
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
-                // const newResult = [result]
-                // console.log(newResult,'newResult==========>')
                 const formattedData = convertToTreeData(result)
-                console.log(formattedData, 'formattedData=======>')
+                data = formattedData
                 setProjectslist(formattedData)
             } else {
                 console.error('空数组');
             }
         }
         setAwaylsUseProject(res.data)
+        return data
     }
 
     const handleWatch = () => {
@@ -169,6 +171,145 @@ export default () => {
                 type: record.type.toString(),
                 source: record.studentSource.toString(),
                 project: commonText,
+            })
+            let data = {}
+            let datas = {
+                id: record.userId,
+                name: record.userName
+            }
+            let data2 = {}
+            if (record.provider) {
+                data = {
+                    id: record.provider,
+                    name: record.providerName
+                }
+            } else {
+                data = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            if (record.owner) {
+                data2 = {
+                    id: record.owner,
+                    name: record.ownerName ? record.ownerName : '无'
+                }
+            } else {
+                data2 = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+            }
+            userRef?.current?.setDepartment(datas);
+            userRefs?.current?.setDepartment(data);
+            userRef2?.current?.setDepartment(data2);
+            setUserNameId(datas)
+            setUserNameIds(data)
+            setUserNameId2(data2)
+        }, 100)
+    }
+    function findObjectAndRelated(treeData: any[], targetValue: string) {
+        // 用于存储找到的目标对象
+        let targetObject: any = null;
+        // 用于存储目标对象的上级对象
+        let parentObject: any = null;
+        // 用于存储与目标对象同级的所有对象
+        let siblingObjects: any[] = [];
+
+        // 递归查找函数
+        function findRecursive(nodes: any[], parent: any = null): boolean {
+            for (const node of nodes) {
+                // 检查当前节点是否是目标节点
+                if (node.value === targetValue) {
+                    targetObject = node;
+                    parentObject = parent;
+
+                    // 如果找到了父节点，获取所有同级节点
+                    if (parent) {
+                        // 在原始数据中查找父节点，以获取其所有子节点
+                        function findParentInTree(nodes: any[]): boolean {
+                            for (const n of nodes) {
+                                if (n.id === parent.id) {
+                                    siblingObjects = n.children || [];
+                                    return true;
+                                }
+                                if (n.children && findParentInTree(n.children)) {
+                                    return true;
+                                }
+                            }
+                            return false;
+                        }
+
+                        findParentInTree(treeData);
+                    }
+
+                    return true; // 找到目标，停止递归
+                }
+
+                // 如果当前节点有子节点，继续递归查找
+                if (node.children && findRecursive(node.children, node)) {
+                    return true;
+                }
+            }
+            return false; // 未找到目标
+        }
+
+        // 开始递归查找
+        findRecursive(treeData);
+
+        return {
+            target: targetObject,
+            parent: parentObject,
+            siblings: siblingObjects
+        };
+    }
+    //编辑
+    const handleEdit = async (record: any) => {
+        setModalStudentInfo(true);
+        // let newData;
+        // try {
+        //     let data = await getProject()
+        //     console.log(data,'data=====>')
+        //     newData = data
+        //     return data
+        // } catch (error) {
+            
+        // }
+        setEditID(record.studentId)
+
+        console.log(record.project, 'record=======>')
+        const dictionariesList = localStorage.getItem('dictionariesList');
+        if (dictionariesList) {
+            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const result = findObjectAndRelated(dictionariesArray, record.project)
+            console.log(result.parent,'123123123123')
+            if (result) {
+                const formattedData = convertToTreeData([result.parent])
+                console.log(formattedData, 'formattedData=======>formattedData123')
+                // setProjectslist([projectslist, formattedData])
+                //console.log(newData,'projectslist')
+                //setProjectslist(formattedData)
+            } else {
+                console.error('空数组');
+            }
+            // const result = Dictionaries.extractMatchingItems(dictionariesArray, record.project);
+            // console.log(result, 'result=======>result')
+        }
+
+        let farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
+        let son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
+        let text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
+        let text2 = Dictionaries.getCascaderName('dict_reg_job', son)
+        let commonText = `${text1}/${text2}`
+        setTimeout(() => {
+            formRef?.current?.setFieldsValue({
+                name: record.name,
+                idCard: record.idCard,
+                weChat: record.weChat,
+                mobile: record.mobile,
+                type: record.type.toString(),
+                source: record.studentSource.toString(),
+                project: commonText
             })
             let data = {}
             let datas = {
@@ -551,7 +692,8 @@ export default () => {
             render: (text, record, _, action) => (
                 //order为选择学员时所用，parentId为企业添加学员时所用
                 <>
-                    <Button type='primary' onClick={() => handleOrder(record)}>下单</Button>
+                    <Button type='primary' size='small' onClick={() => handleOrder(record)}>下单</Button>,
+                    <Button type='primary' size='small' onClick={() => handleEdit(record)}>编辑</Button>,
                 </>
             ),
         },
@@ -666,14 +808,21 @@ export default () => {
                     } else {
                     }
                     if (values.type) values.type = '0'
-                    if (values.project) values.project = values.project[values.project.length - 1];
+                    //if (values.project) values.project = values.project[values.project.length - 1];
                     if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
                     if (values.userId) values.userId = Dictionaries.getUserId(values.userId.label)[0]
                     if (values.provider) values.provider = Dictionaries.getUserId(values.provider.label)[0]
                     if (userNameId) values.userId = userNameId.id
                     if (userNameIds) values.provider = userNameIds.id
                     if (userNameId2) values.owner = userNameId2.id
+                    console.log(values.project, 'valuses------>')
+                    console.log(values.project[values.project.length - 1], 'vas')
                     setRenderData(values)
+                    if (editID) {
+                        // request.post('/sms/business/bizStudent', { id: editID, ...values }).then(res => {
+                        //     console.log(res)
+                        // })
+                    }
                     return true;
                 }}
             >
@@ -702,7 +851,13 @@ export default () => {
                         name="name"
                         label={type === '0' ? '学员姓名' : type === '1' ? '企业名称' : '代理名称'}
                         placeholder="请输入学员名称"
-                        rules={[{ required: true, message: '请输入学员名称' }]}
+                        rules={[
+                            {
+                                required: true,
+                                pattern: new RegExp(/^[\u4e00-\u9fa5]{2,5}$/),
+                                message: '不能包含空格,不能为英文,长度不能超过5个字',
+                            },
+                        ]}
                     />
                 </ProForm.Group>
                 <ProForm.Group>
@@ -711,6 +866,13 @@ export default () => {
                         name="mobile"
                         label={'手机号码'}
                         placeholder="请输入手机号码"
+                        rules={[
+                            {
+                                required: true,
+                                pattern: new RegExp(Dictionaries.getRegex('mobile')),
+                                message: '请输入正确的手机号',
+                            },
+                        ]}
                     />
                     <ProFormText
                         width="md"
@@ -725,7 +887,13 @@ export default () => {
                         name="idCard"
                         label="身份证号"
                         placeholder="请输入身份证号"
-                        rules={[{ required: true, message: '请输入身份证号' }]}
+                        rules={[
+                            {
+                                required: true,
+                                pattern: new RegExp(Dictionaries.getRegex('idCard')),
+                                message: '请输入正确的身份证号',
+                            },
+                        ]}
                     />
                     <ProFormSelect
                         label="客户来源"
@@ -868,6 +1036,7 @@ export default () => {
                 modalProps={{
                     destroyOnClose: true,
                     onCancel: () => {
+                        actionRef.current.reset();
                         setModalOrderVisible(false);
                     },
                     maskClosable: false,
@@ -945,6 +1114,7 @@ export default () => {
                                 message.success('操作成功');
                                 setID(res.data[0])
                                 setRegistration(true)
+                                actionRef.current.reset();
                                 // 重置所有表单数据
                                 // 1. 重置学生表单
                                 formRef.current?.resetFields();
@@ -978,10 +1148,19 @@ export default () => {
                     <div style={{ width: '30%', height: '40px', color: 'rgba(0, 0, 0, 0.85)', fontWeight: '500', fontSize: '16px' }}>
                         联系方式：{renderData.mobile}
                     </div>
+                    <div style={{ width: '30%', height: '40px', color: 'rgba(0, 0, 0, 0.85)', fontWeight: '500', fontSize: '16px' }}>
+                        当前订单应收总额：{totalReceivable}
+                    </div>
                 </div>
                 <OrderClassType
                     renderData={renderData}
                     ref={classListRef}
+                    onTotalPriceChange={(price: number) => {
+                        setTotalReceivable(price);
+                        formRef.current?.setFieldsValue({
+                            totalReceivable: price
+                        });
+                    }}
                     onTotalQuantityChange={(quantity: number) => {
                         formRef.current?.setFieldsValue({
                             quantity: quantity

@@ -15,7 +15,6 @@ import {
 export default (props: any) => {
     const { getAll = false, type = 0 } = props
 
-
     //存储退款原因
     const [refundID, setRefundID] = useState<any>();
     //存储id
@@ -24,7 +23,7 @@ export default (props: any) => {
     const [badges, setBadges] = useState<any>([])
     //展示
     const [showBtn, setShowBtn] = useState<string>('inReview');
-    
+
     // const [listContent, setlistContent] = useState<any>([
     //     {
     //         name:'张三'
@@ -38,7 +37,7 @@ export default (props: any) => {
     const actionRef = useRef<any>();
 
     //const param = getAll ? {} : { isUseUp: false }
-    let param: any = {isRefund: true, 'auditNum-isNull': true};
+    let param: any = { isRefund: true, 'auditNum-isNull': true };
     const [Params, setParams] = useState<any>(param);
     useEffect(() => {
         BadgesNumbers()
@@ -63,7 +62,7 @@ export default (props: any) => {
             .get('/sms/business/bizChargeLog/statistics', {
                 array: JSON.stringify([
                     {
-                        isRefund: true, 
+                        isRefund: true,
                         'auditNum-isNull': true,
                         enable: true
                     },
@@ -78,14 +77,15 @@ export default (props: any) => {
                         enable: true
                     },
                     {
-                        enable: true
+                        enable: true,
+                        isUseUp: false,
                     },
                     {
                         enable: false
                     },
                     {
-                        isRefund: false, 
-                        isUseUp: false, 
+                        isRefund: false,
+                        isUseUp: false,
                         enable: true
                     }
                 ]),
@@ -149,6 +149,20 @@ export default (props: any) => {
             </>
         },
         {
+            title: '退款状态',
+            dataIndex: 'isUseUp',
+            valueType: 'switch',
+            search: getAll,
+            sorter: true,//confirm //isRefund
+            render: (text, record) => <>
+                {record.confirm === true && record.isRefund === true && <Tag color="#87d068">审核通过</Tag>}
+                {record.confirm === false && record.isRefund === false && <Tag color="#f50">审核未通过</Tag>}
+                {record.confirm === false && record.isRefund === true && <Tag color="red">审核不通过,已重新提交</Tag>}
+                {record.confirm === null && record.isRefund === false && <Tag color="volcano">未提交退费</Tag>}
+                {record.confirm === null && record.isRefund === true && <Tag color="green">已提交,待审核</Tag>}
+            </>
+        },
+        {
             title: '是否已全部下单',
             dataIndex: 'isUseUp',
             valueType: 'switch',
@@ -188,8 +202,8 @@ export default (props: any) => {
                         <Button
                             type="primary"
                             size="small"
-                            
-                        hidden={showBtn !== 'inReview'}
+
+                            hidden={showBtn !== 'inReview'}
                         >
                             通过
                         </Button>
@@ -217,11 +231,11 @@ export default (props: any) => {
             <Badge
                 count={count}
                 style={{
-                    height:15,
-                    lineHeight:'15px',
+                    height: 15,
+                    lineHeight: '15px',
                     marginInlineStart: 4,
-                    color:'#fff',
-                    backgroundColor:'#ff4d4f',
+                    color: '#fff',
+                    backgroundColor: '#ff4d4f',
                 }}
             />
         );
@@ -258,7 +272,7 @@ export default (props: any) => {
             ],
             onChange: (key: any) => {
                 if (key == 'all') {
-                    setParams({ enable: true })
+                    setParams({ enable: true, isUseUp: false })
                     setShowBtn('all')
                     actionRef.current.reload();
                 }
@@ -314,6 +328,7 @@ export default (props: any) => {
                 if (res.status == 'success') {
                     message.success('成功');
                     actionRef.current.reload();
+                    BadgesNumbers()
                     setReply(false)
                 }
             }}

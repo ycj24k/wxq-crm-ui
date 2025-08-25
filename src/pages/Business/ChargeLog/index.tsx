@@ -27,11 +27,12 @@ import ProForm, {
 } from '@ant-design/pro-form';
 import ClassList from "./classList"
 import PayWay from "./payWay"
+import type { ActionType } from '@ant-design/pro-table';
 
 export default (props: any) => {
     const { initialState } = useModel('@@initialState');
+    const actionRef = useRef<ActionType>();
     const { reBuild, select, getAll = false, type = 0, showBtn, num, Orderpage } = props
-    console.log(num, 'num======>')
     const [exportLoading, setExportLoading] = useState<boolean>();
     const [selectData, setSelectData] = useState<Array<any>>();
     const [studentlistmessage, setStudentlistmessage] = useState<any>();
@@ -95,7 +96,7 @@ export default (props: any) => {
         param = { isRefund: false, isUseup: false, enable: true }
     }
     if (!num) {
-        param = getAll ? {} : { isUseUp: false, isRefund: true }
+        param = getAll ? {} : { isUseUp: false, isRefund: false  }
     }
     if(Orderpage){
         param = getAll ? {} : { isUseUp: false, isRefund: false }
@@ -296,6 +297,7 @@ export default (props: any) => {
                             request.post(`/sms/business/bizChargeLog/disable/${record.id}`).then((res: any) => {
                                 if (res.status == 'success') {
                                     message.success('废除成功');
+                                    actionRef?.current?.reload();
                                 }
                             });
                         }}
@@ -307,8 +309,9 @@ export default (props: any) => {
                             size="small"
                             danger
                             hidden={showBtn}
+                            disabled={record.enable == false}
                         >
-                            废除
+                            { record.enable == false ? '已废除' : '废除'}
                         </Button>
 
                     </Popconfirm>
@@ -469,6 +472,7 @@ export default (props: any) => {
     return <>
         <Tables
             columns={columns}
+            actionRef={actionRef}
             request={{ url: '/sms/business/bizChargeLog' }}
             params={param}
             rowSelection={type !== 0 && {

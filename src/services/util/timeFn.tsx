@@ -72,6 +72,28 @@ const DownTable = (
     post: (data: any) => {
       return Dictionaries.getName('Recruitment_Positions', data.post);
     },
+    chargeType: (data: any) => {
+      console.log(data.chargeType, 'data')
+      let str = ''
+      const chargeTypes = typeof data.chargeType === 'string' ? data.chargeType.split(',') : [];
+      const result = localStorage.getItem('dictionariesList')
+      let newCharge = []
+      if (result) {
+        let newResult = JSON.parse(result)[13].children
+        let chargeTypeNames = newResult.map((item: any) => {
+          return {
+            value: item.value,
+            name: item.name
+          }
+        })
+        newCharge = chargeTypeNames
+      }
+      const names = chargeTypes?.map((type: any) => {
+        const matched = newCharge.find((item: any) => item.value === type);
+        return matched ? matched.name : type;
+      });
+      return str = names?.join(', ')
+    },
     invoiceType: (data: any) => {
       let str = '';
       if (!data.invoiceType) {
@@ -100,7 +122,7 @@ const DownTable = (
           str = (data.percent * 100) + '%'
         }
       }
-      if(type == 'refund'  && data.ownerName != null && data.percent != null){
+      if (type == 'refund' && data.ownerName != null && data.percent != null) {
         if (data.percent != null) {
           str = (data.percent * 100) + '%'
         }
@@ -114,9 +136,9 @@ const DownTable = (
           str = data.percent * data.amount
         }
       }
-      if(type == 'refund'  && data.ownerName != null && data.percent != null){
+      if (type == 'refund' && data.ownerName != null && data.percent != null) {
         if (data.percent != null) {
-          str = data.percent * data.amount 
+          str = data.percent * data.amount
         }
       }
       return str;
@@ -227,7 +249,7 @@ const DownTable = (
     },
     auditTimeNext: (data: any) => {
       let str = ''
-      if(type == 'refund') str = moment(data.auditTime).format('YYYY-MM-DD');
+      if (type == 'refund') str = moment(data.auditTime).format('YYYY-MM-DD');
       return str
     },
     chargeTime: (data: any) => {

@@ -127,6 +127,31 @@ export default (props: any) => {
         },
         {
             width: 100,
+            title:'缴费类型',
+            dataIndex: 'chargeType',
+            render: (text, record) => {
+                const chargeTypes = typeof text === 'string' ? text.split(',') : [];
+                const result = localStorage.getItem('dictionariesList')
+                let newCharge = []
+                if(result){
+                    let newResult = JSON.parse(result)[13].children
+                    let chargeTypeNames = newResult.map((item:any)=>{
+                        return {
+                            value: item.value,
+                            name: item.name
+                        }
+                    })
+                    newCharge = chargeTypeNames
+                }
+                const names = chargeTypes?.map(type => {
+                    const matched = newCharge.find((item: any) => item.value === type);
+                    return matched ? matched.name : type;
+                });
+                return <span>{names?.join(', ')}</span>;
+            }
+        },
+        {
+            width: 100,
             title: '发票抬头',
             dataIndex: 'title',
             sorter: true

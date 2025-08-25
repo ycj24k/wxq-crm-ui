@@ -64,6 +64,7 @@ export default {
         发票申请人: 'userName',
         学员姓名: 'studentName',
         缴费编号: 'chargeNum',
+        缴费类型: 'chargeType',
         收费人: 'chargeUser',
         收费方式: 'chargeMethod',
         收费金额: 'chargeAmount',

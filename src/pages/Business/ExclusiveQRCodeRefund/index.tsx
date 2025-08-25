@@ -94,13 +94,6 @@ export default (props: any) => {
             search: getAll,
             sorter: true,//confirm //isRefund
             render: (text, record) => <>
-                {/* <Tag
-                    color={
-                        record.confirm === true ? '#87d068' : record.confirm === false ? '#FF0000' : '#f50'
-                    }
-                >
-                    {record.confirm === true && record.isRefund === true ? '审核通过' : record.confirm === false ? '未通过' : '未审核'}{record.confirm === false && record.isRefund && ',已重新提交'}
-                </Tag><br /> */}
                 {record.confirm === true && record.isRefund === true && <Tag color="#87d068">审核通过</Tag>}
                 {record.confirm === false && record.isRefund === false && <Tag color="#f50">审核未通过</Tag>}
                 {record.confirm === false && record.isRefund === true && <Tag color="red">审核不通过,已重新提交</Tag>}
@@ -124,7 +117,7 @@ export default (props: any) => {
                     <Button
                         type="primary"
                         danger
-                        disabled={record.confirm || record.confirm === null && record.isRefund === true}
+                        disabled={record.confirm || record.confirm === null && record.isRefund === true || record.confirm === false && record.isRefund === true}
                         onClick={() => handleRefound(record)}>申请退款</Button>
                 </>
 
