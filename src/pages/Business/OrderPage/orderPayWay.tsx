@@ -14,7 +14,8 @@ import { useRef, useState, forwardRef, useImperativeHandle, useEffect } from "re
 import moment from 'moment';
 import ChargeLog from '@/pages/Business/ChargeLog';
 import { message, Modal } from 'antd'
-
+import { ExclamationCircleFilled } from '@ant-design/icons';
+import { useModel } from 'umi';
 interface PayWayMethods {
     getFormValues: () => Promise<any>;
     addPayWayItem: () => void;
@@ -29,7 +30,10 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
 
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
     const [chargeLog, setChargeLog] = useState<Array<any> | null>();
-
+    
+    const { initialState } = useModel('@@initialState');
+    console.log(initialState?.currentUser?.id,'initialState=======>')
+    console.log(initialState?.currentUser?.name,'initialState=======>')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -213,6 +217,22 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         initialValues.departmentId = renderData.departmentId;
                     }
 
+                    // console.log(initialState?.currentUser?.id,'initialState=======>')
+                    // console.log(initialState?.currentUser?.name,'initialState=======>')
+
+
+                    userRefs.current[index].setDepartment({
+                        id: initialState?.currentUser?.id,
+                        name: initialState?.currentUser?.name
+                    });
+                    setUserNameIds(prev => ({
+                        ...prev,
+                        [index]: {
+                            id: initialState?.currentUser?.id,
+                            name: initialState?.currentUser?.name
+                        }
+                    }));
+
                     // 如果是第一个表单且有 payMessage，设置额外的初始值
                     if (index === payWayList[index] && payMessage) {
                         Object.assign(initialValues, {
@@ -339,6 +359,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                     userRefs.current[index] = ref;
                                 }
                             }}
+                            disabled={true}
                             width={300}
                             userLabel={'收费人'}
                             userNames="userId"
@@ -445,11 +466,26 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                     const amount = Number(formRefs.current[index]?.getFieldValue('amount')) || 0;
                                     const performance = amount - collectedAmount;
                                     console.log('代收款项变化重新计算:', { amount, collectedAmount, performance });
+                                    if(collectedAmount > amount) {
+                                        Modal.info({
+                                            title: '注意！当前代收款项金额大于收费金额！',
+                                            icon: <ExclamationCircleFilled />,
+                                            onOk() {
+                                                formRefs.current[index]?.setFieldsValue({
+                                                    performanceAmount: 0,
+                                                    commissionBase: 0,
+                                                    collectedAmount: ''
+                                                });
+
+                                            }
+                                        });
+                                        
+                                    }
                                     formRefs.current[index]?.setFieldsValue({
                                         performanceAmount: performance,
                                         commissionBase: performance
                                     });
-                                }
+                                },
                             }}
                             rules={[
                                 { required: true, message: '请输入代收款项金额' },

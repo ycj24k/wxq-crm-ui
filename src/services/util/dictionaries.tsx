@@ -1117,6 +1117,62 @@ class dictionaries {
     return result;
   }
 
+findObjectAndRelated(treeData: any[], targetValue: string) {
+  // 用于存储找到的目标对象
+  let targetObject: any = null;
+  // 用于存储目标对象的上级对象
+  let parentObject: any = null;
+  // 用于存储与目标对象同级的所有对象
+  let siblingObjects: any[] = [];
+
+  // 递归查找函数
+  function findRecursive(nodes: any[], parent: any = null): boolean {
+    for (const node of nodes) {
+      // 检查当前节点是否是目标节点
+      if (node.value === targetValue) {
+        targetObject = node;
+        parentObject = parent;
+
+        // 如果找到了父节点，获取所有同级节点
+        if (parent) {
+          // 在原始数据中查找父节点，以获取其所有子节点
+          function findParentInTree(nodes: any[]): boolean {
+            for (const n of nodes) {
+              if (n.id === parent.id) {
+                siblingObjects = n.children || [];
+                return true;
+              }
+              if (n.children && findParentInTree(n.children)) {
+                return true;
+              }
+            }
+            return false;
+          }
+
+          findParentInTree(treeData);
+        }
+
+        return true; // 找到目标，停止递归
+      }
+
+      // 如果当前节点有子节点，继续递归查找
+      if (node.children && findRecursive(node.children, node)) {
+        return true;
+      }
+    }
+    return false; // 未找到目标
+  }
+
+  // 开始递归查找
+  findRecursive(treeData);
+
+  return {
+    target: targetObject,
+    parent: parentObject,
+    siblings: siblingObjects
+  };
+}
+
 }
 
 export default new dictionaries();

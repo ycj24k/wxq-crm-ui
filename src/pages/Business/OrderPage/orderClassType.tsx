@@ -7,8 +7,7 @@ import {
     ProFormDigit,
     ProFormText,
     ProFormInstance,
-    ProFormTreeSelect,
-    ProFormTextArea
+    ProFormTreeSelect
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
 import Dictionaries from '@/services/util/dictionaries';
@@ -37,14 +36,13 @@ interface ClassListProps {
 
 const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType } = props;
-    console.log(renderData, 'renderData======>')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
                 // 执行表单验证
                 const values = await formRef.current?.validateFields();
                 return values;
-            } catch (error) {
+            } catch (error:any) {
                 // 显示验证错误信息
                 if (error && error.errorFields) {
                     // 获取第一个错误信息并显示
@@ -62,6 +60,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             formRef.current?.resetFields();
             // 重置状态
             setTotalPrice(0);
+            setDiscountPrice(0);
             setTotalQuantity(0);
             // 重置班型数据
             setJobClassExam([]);
@@ -83,6 +82,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const [orderList, setOrderList] = useState<any>([]);
     const [JobClassExam, setJobClassExam] = useState<any>([]);
     const [totalPrice, setTotalPrice] = useState<number>(0);
+    const [discountPrice, setDiscountPrice] = useState<number>(0);
     const [totalQuantity, setTotalQuantity] = useState<number>(0);
     const formRef = useRef<ProFormInstance>(null);
     const userRef = useRef<any>(null);
@@ -348,9 +348,9 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             );
 
                             // 调用父组件传入的回调函数，通知需要添加支付方式
-                            if (onAddClassType) {
-                                onAddClassType();
-                            }
+                            // if (onAddClassType) {
+                            //     onAddClassType();
+                            // }
                         } catch (error) {
                             console.error('添加行时处理项目失败:', error);
                         }
@@ -364,6 +364,10 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                 const quantitySum = users.reduce((total: number, user: any) => {
                                     return total + (Number(user.quantity) || 0);
                                 }, 0);
+                                const discountSum = users.reduce((total: number, user: any) => {
+                                    return total + (Number(user.discount) || 0);
+                                }, 0)
+                                setDiscountPrice(discountSum);
                                 setTotalPrice(receivableSum);
                                 setTotalQuantity(quantitySum);
                                 onTotalPriceChange?.(receivableSum);
@@ -385,9 +389,9 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             }
 
                             // 先通知父组件删除对应的支付方式
-                            if (props.onRemoveClassType) {
-                                props.onRemoveClassType(index);
-                            }
+                            // if (props.onRemoveClassType) {
+                            //     props.onRemoveClassType(index);
+                            // }
 
                             // 删除行后，重新计算总receivable
                             const users = formRef?.current?.getFieldValue('users') || [];
@@ -400,8 +404,12 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             const quantitySum = newUsers.reduce((total: number, user: any) => {
                                 return total + (Number(user.quantity) || 0);
                             }, 0);
+                            const discountSum = newUsers.reduce((total: number, user: any) => {
+                                return total + (Number(user.discount) || 0);
+                            }, 0)
                             setTotalPrice(receivableSum);
                             setTotalQuantity(quantitySum);
+                            setDiscountPrice(discountSum)
                             onTotalPriceChange?.(receivableSum);
                             onTotalQuantityChange?.(quantitySum);
 
@@ -422,7 +430,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             title={'报考班型'}
                             extra={action}
                             style={{
-                                width:'1000px',
+                                width: '1000px',
                                 margin: '0 auto',
                                 marginBlockEnd: 8,
                             }}
@@ -482,8 +490,12 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                         const quantitySum = newUsers.reduce((total, user) => {
                                                             return total + (Number(user.quantity) || 0);
                                                         }, 0);
-
+                                                        const discountSum = newUsers.reduce((total, user) => {
+                                                            return total + (Number(user.quantity) || 0);
+                                                        }, 0);
+                                                        console.log(discountSum,'discountSum----->')
                                                         // 更新状态和回调
+                                                        setDiscountPrice(discountSum);
                                                         setTotalPrice(receivableSum);
                                                         setTotalQuantity(quantitySum);
                                                         onTotalPriceChange?.(receivableSum);
@@ -558,7 +570,8 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                         <ProFormDigit
                                             name="discount"
                                             label="订单优惠金额"
-                                            min={-999999}
+                                            min={-99}
+                                            max={99999999}
                                             width={280}
                                             rules={[
                                                 {
@@ -568,6 +581,12 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             fieldProps={{
                                                 precision: 2,
                                                 onChange: (e) => {
+                                                    const users = formRef?.current?.getFieldValue('users') || [];
+                                                    const discountSum = users.reduce((total: number, user: any) => {
+                                                        return total + (Number(user.discount) || 0);
+                                                    }, 0);
+                                                    setDiscountPrice(discountSum);
+                                                    onTotalPriceChange?.(totalPrice - discountSum);
                                                 },
                                             }}
                                         />

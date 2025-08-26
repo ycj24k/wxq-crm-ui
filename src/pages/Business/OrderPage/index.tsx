@@ -208,99 +208,22 @@ export default () => {
             setUserNameId2(data2)
         }, 100)
     }
-    function findObjectAndRelated(treeData: any[], targetValue: string) {
-        // 用于存储找到的目标对象
-        let targetObject: any = null;
-        // 用于存储目标对象的上级对象
-        let parentObject: any = null;
-        // 用于存储与目标对象同级的所有对象
-        let siblingObjects: any[] = [];
-
-        // 递归查找函数
-        function findRecursive(nodes: any[], parent: any = null): boolean {
-            for (const node of nodes) {
-                // 检查当前节点是否是目标节点
-                if (node.value === targetValue) {
-                    targetObject = node;
-                    parentObject = parent;
-
-                    // 如果找到了父节点，获取所有同级节点
-                    if (parent) {
-                        // 在原始数据中查找父节点，以获取其所有子节点
-                        function findParentInTree(nodes: any[]): boolean {
-                            for (const n of nodes) {
-                                if (n.id === parent.id) {
-                                    siblingObjects = n.children || [];
-                                    return true;
-                                }
-                                if (n.children && findParentInTree(n.children)) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
-
-                        findParentInTree(treeData);
-                    }
-
-                    return true; // 找到目标，停止递归
-                }
-
-                // 如果当前节点有子节点，继续递归查找
-                if (node.children && findRecursive(node.children, node)) {
-                    return true;
-                }
-            }
-            return false; // 未找到目标
-        }
-
-        // 开始递归查找
-        findRecursive(treeData);
-
-        return {
-            target: targetObject,
-            parent: parentObject,
-            siblings: siblingObjects
-        };
-    }
     //编辑
     const handleEdit = async (record: any) => {
-        setModalStudentInfo(true);
-        // let newData;
-        // try {
-        //     let data = await getProject()
-        //     console.log(data,'data=====>')
-        //     newData = data
-        //     return data
-        // } catch (error) {
-            
-        // }
-        setEditID(record.studentId)
-
-        console.log(record.project, 'record=======>')
+        const res = await request.get('/sms/commonProjects')
         const dictionariesList = localStorage.getItem('dictionariesList');
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
-            const result = findObjectAndRelated(dictionariesArray, record.project)
-            console.log(result.parent,'123123123123')
+            const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
-                const formattedData = convertToTreeData([result.parent])
-                console.log(formattedData, 'formattedData=======>formattedData123')
-                // setProjectslist([projectslist, formattedData])
-                //console.log(newData,'projectslist')
-                //setProjectslist(formattedData)
-            } else {
-                console.error('空数组');
+                const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
+                let newData = [result[0],[formattedData1.parent][0]]
+                let nextData = convertToTreeData(newData)
+                setProjectslist(nextData)
             }
-            // const result = Dictionaries.extractMatchingItems(dictionariesArray, record.project);
-            // console.log(result, 'result=======>result')
         }
-
-        let farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
-        let son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
-        let text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
-        let text2 = Dictionaries.getCascaderName('dict_reg_job', son)
-        let commonText = `${text1}/${text2}`
+        setModalStudentInfo(true);
+        setEditID(record.studentId)
         setTimeout(() => {
             formRef?.current?.setFieldsValue({
                 name: record.name,
@@ -309,7 +232,7 @@ export default () => {
                 mobile: record.mobile,
                 type: record.type.toString(),
                 source: record.studentSource.toString(),
-                project: commonText
+                project: Dictionaries.getCascaderValue('dict_reg_job', record.project),
             })
             let data = {}
             let datas = {
@@ -692,8 +615,8 @@ export default () => {
             render: (text, record, _, action) => (
                 //order为选择学员时所用，parentId为企业添加学员时所用
                 <>
-                    <Button type='primary' size='small' onClick={() => handleOrder(record)}>下单</Button>,
-                    <Button type='primary' size='small' onClick={() => handleEdit(record)}>编辑</Button>,
+                    <Button type='primary' size='small' onClick={() => handleOrder(record)}>下单</Button>
+                    <Button style={{ marginLeft: '10px' }} type='primary' size='small' onClick={() => handleEdit(record)}>编辑</Button>
                 </>
             ),
         },
@@ -723,7 +646,6 @@ export default () => {
                         filter,
                     ) => {
                         const res = await request.get(url, params);
-                        console.log(params.mobile, 'params')
                         setMobileNumber(params.mobile)
                         setWeChatNumber(params.weChat)
                         if (res.data.content.length === 0) {
@@ -803,25 +725,35 @@ export default () => {
                 }}
                 onFinish={async (values) => {
                     setType('0');
-                    setModalOrderVisible(true)
                     if (values?.labels) {
                     } else {
                     }
                     if (values.type) values.type = '0'
-                    //if (values.project) values.project = values.project[values.project.length - 1];
+                    if (values.project) values.project = values.project[values.project.length - 1];
                     if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
                     if (values.userId) values.userId = Dictionaries.getUserId(values.userId.label)[0]
                     if (values.provider) values.provider = Dictionaries.getUserId(values.provider.label)[0]
                     if (userNameId) values.userId = userNameId.id
                     if (userNameIds) values.provider = userNameIds.id
                     if (userNameId2) values.owner = userNameId2.id
-                    console.log(values.project, 'valuses------>')
-                    console.log(values.project[values.project.length - 1], 'vas')
+                    if(!userNameId){
+                        Modal.error({ title: '请选择招生老师' })
+                        return;
+                    }
+                    if(!userNameIds){
+                        Modal.error({ title: '请选择信息提供人' })
+                        return;
+                    }
+                    if(!userNameId2){
+                        Modal.error({ title: '请选择出镜人' })
+                        return;
+                    }
+                    setModalOrderVisible(true)
                     setRenderData(values)
                     if (editID) {
-                        // request.post('/sms/business/bizStudent', { id: editID, ...values }).then(res => {
-                        //     console.log(res)
-                        // })
+                        request.post('/sms/business/bizStudent', { id: editID, ...values }).then(res => {
+                            console.log(res)
+                        })
                     }
                     return true;
                 }}
@@ -1136,6 +1068,7 @@ export default () => {
                                 message.error(res.msg)
                             }
                         }).catch((err) => {
+                            console.log(err,'err')
                             setLoading(false);
                         })
 

@@ -93,12 +93,15 @@ export default (props: any) => {
     //const param = getAll ? {} : { isUseUp: false }
     let param = null
     if (num == 'isTrue') {
+        console.log('123')
         param = { isRefund: false, isUseup: false, enable: true }
     }
     if (!num) {
-        param = getAll ? {} : { isUseUp: false, isRefund: false  }
+        console.log('456')
+        param = getAll ? {} : { isUseUp: false, isRefund: false, enable: false }
     }
     if(Orderpage){
+        console.log('789')
         param = getAll ? {} : { isUseUp: false, isRefund: false }
     }
     // if(getAll){
@@ -309,7 +312,7 @@ export default (props: any) => {
                             size="small"
                             danger
                             hidden={showBtn}
-                            disabled={record.enable == false}
+                            disabled={record.enable == false || record.confirm === null && record.isRefund === true}
                         >
                             { record.enable == false ? '已废除' : '废除'}
                         </Button>
