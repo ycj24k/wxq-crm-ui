@@ -22,6 +22,7 @@ import OrderPayWay from './orderPayWay'
 import MenuManageCard from './MenuTree'
 import SignUp from './SignUp'
 import { useModel } from 'umi';
+import student from '@/pages/Admins/StudentManage/student';
 
 
 export default () => {
@@ -47,6 +48,8 @@ export default () => {
     const [MobileNumber, setMobileNumber] = useState<any>()
     const [WeChatNumber, setWeChatNumber] = useState<any>()
     const [totalReceivable, setTotalReceivable] = useState<number>(0);
+    const [isAdd, setIsAdd] = useState<boolean>(false)
+    const [OrderPay, setOrderPay] = useState<boolean>(false)
 
     const userRef: any = useRef(null);
     const userRefs: any = useRef(null);
@@ -136,6 +139,7 @@ export default () => {
 
     const handleWatch = () => {
         setFindStudent(false)
+        setIsAdd(false)
         setModalStudentInfo(true)
         // 合并表单设置
         const formValues: Record<string, string> = {};
@@ -145,12 +149,20 @@ export default () => {
         if (Object.keys(formValues).length > 0) {
             setTimeout(() => {
                 formRef?.current?.setFieldsValue(formValues);
+                let data = {}
+                data = {
+                    name: initialState?.currentUser?.name,
+                    id: initialState?.currentUser?.userid,
+                }
+                userRef?.current?.setDepartment(data);
+                setUserNameId(data)
             }, 100);
         }
         handleOpenProject()
     }
 
     const handleOrder = (record: any) => {
+        setOrderPay(true)
         handleOpenProject()
         setStudentId(record)
         //setOptionEnable(false)
@@ -217,11 +229,12 @@ export default () => {
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
                 const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
-                let newData = [result[0],[formattedData1.parent][0]]
+                let newData = [result[0], [formattedData1.parent][0]]
                 let nextData = convertToTreeData(newData)
                 setProjectslist(nextData)
             }
         }
+        setIsAdd(true)
         setModalStudentInfo(true);
         setEditID(record.studentId)
         setTimeout(() => {
@@ -650,6 +663,7 @@ export default () => {
                         setWeChatNumber(params.weChat)
                         if (res.data.content.length === 0) {
                             setFindStudent(true)
+
                         }
                         return {
                             data: res.data.content,
@@ -736,24 +750,32 @@ export default () => {
                     if (userNameId) values.userId = userNameId.id
                     if (userNameIds) values.provider = userNameIds.id
                     if (userNameId2) values.owner = userNameId2.id
-                    if(!userNameId){
+                    if (!userNameId) {
                         Modal.error({ title: '请选择招生老师' })
                         return;
                     }
-                    if(!userNameIds){
+                    if (!userNameIds) {
                         Modal.error({ title: '请选择信息提供人' })
                         return;
                     }
-                    if(!userNameId2){
+                    if (!userNameId2) {
                         Modal.error({ title: '请选择出镜人' })
                         return;
                     }
-                    setModalOrderVisible(true)
+                    setOrderPay(false)
                     setRenderData(values)
-                    if (editID) {
+                    if (isAdd) {
+                        setModalOrderVisible(false)
                         request.post('/sms/business/bizStudent', { id: editID, ...values }).then(res => {
-                            console.log(res)
+                            if (res.status == 'success') {
+                                message.success('修改成功')
+                                callbackRef()
+                                setModalStudentInfo(false);
+                            }
                         })
+                    }
+                    if (!isAdd) {
+                        setModalOrderVisible(true)
                     }
                     return true;
                 }}
@@ -849,6 +871,8 @@ export default () => {
                     />
 
                     <UserTreeSelect
+                        disabled={false}
+                        newMedia={true}
                         ref={userRef}
                         userLabel={'招生老师'}
                         userNames="userId"
@@ -968,7 +992,7 @@ export default () => {
                 modalProps={{
                     destroyOnClose: true,
                     onCancel: () => {
-                        actionRef.current.reset();
+                        callbackRef()
                         setModalOrderVisible(false);
                     },
                     maskClosable: false,
@@ -1039,38 +1063,125 @@ export default () => {
                         "order": order,
                         "charge": newPay[index]
                     }));
-                    request
-                        .postAll('/sms/business/bizOrder/intelligence', auditsParam)
-                        .then((res: any) => {
-                            if (res.status == 'success') {
-                                message.success('操作成功');
-                                setID(res.data[0])
-                                setRegistration(true)
-                                actionRef.current.reset();
-                                // 重置所有表单数据
-                                // 1. 重置学生表单
-                                formRef.current?.resetFields();
-                                userRef?.current?.setDepartment({});
-                                userRefs?.current?.setDepartment({});
-                                userRef2?.current?.setDepartment({});
-                                setModalOrderVisible(false)
-                                // 2. 重置班级列表表单
-                                if (classListRef.current) {
-                                    classListRef.current.resetForm();
-                                }
-
-                                // 3. 重置支付方式组件
-                                if (payWayRef.current) {
-                                    payWayRef.current.resetPayWay();
-                                }
-                            } else {
-                                setLoading(false);
-                                message.error(res.msg)
+                    if (OrderPay) {
+                        console.log('456456456')
+                        console.log(auditsParam, 'auditsParam')
+                        const newAuditsParam = auditsParam.map((item: any) => ({
+                            ...item,
+                            student: {
+                                idCard: item.student.idCard,
+                                mobile: item.student.mobile,
+                                name: item.student.name,
+                                owner: item.student.owner,
+                                project: item.order.project,
+                                provider: item.student.provider,
+                                source: item.order.source,
+                                type: item.student.type,
+                                userId: item.student.userId,
+                                id: item.student.studentId,
                             }
-                        }).catch((err) => {
-                            console.log(err,'err')
-                            setLoading(false);
-                        })
+                        }))
+                        request
+                            .postAll('/sms/business/bizOrder/intelligence', newAuditsParam)
+                            .then((res: any) => {
+                                if (res.status == 'success') {
+                                    message.success('操作成功');
+                                    setID(res.data[0])
+                                    setRegistration(true)
+                                    callbackRef()
+                                    // 重置所有表单数据
+                                    // 1. 重置学生表单
+                                    formRef.current?.resetFields();
+                                    userRef?.current?.setDepartment({});
+                                    userRefs?.current?.setDepartment({});
+                                    userRef2?.current?.setDepartment({});
+                                    setModalOrderVisible(false)
+                                    // 2. 重置班级列表表单
+                                    if (classListRef.current) {
+                                        classListRef.current.resetForm();
+                                    }
+
+                                    // 3. 重置支付方式组件
+                                    if (payWayRef.current) {
+                                        payWayRef.current.resetPayWay();
+                                    }
+                                } else {
+                                    setLoading(false);
+                                    message.error(res.msg)
+                                }
+                            }).catch((err) => {
+                                console.log(err, 'err')
+                                setLoading(false);
+                            })
+                    }
+                    if (!OrderPay) {
+                        console.log(auditsParam, 'auditsParam')
+                        request
+                            .postAll('/sms/business/bizOrder/intelligence', auditsParam)
+                            .then((res: any) => {
+                                if (res.status == 'success') {
+                                    message.success('操作成功');
+                                    setID(res.data[0])
+                                    setRegistration(true)
+                                    callbackRef()
+                                    // 重置所有表单数据
+                                    // 1. 重置学生表单
+                                    formRef.current?.resetFields();
+                                    userRef?.current?.setDepartment({});
+                                    userRefs?.current?.setDepartment({});
+                                    userRef2?.current?.setDepartment({});
+                                    setModalOrderVisible(false)
+                                    // 2. 重置班级列表表单
+                                    if (classListRef.current) {
+                                        classListRef.current.resetForm();
+                                    }
+
+                                    // 3. 重置支付方式组件
+                                    if (payWayRef.current) {
+                                        payWayRef.current.resetPayWay();
+                                    }
+                                } else {
+                                    setLoading(false);
+                                    message.error(res.msg)
+                                }
+                            }).catch((err) => {
+                                console.log(err, 'err')
+                                setLoading(false);
+                            })
+                    }
+
+                    // request
+                    //     .postAll('/sms/business/bizOrder/intelligence', auditsParam)
+                    //     .then((res: any) => {
+                    //         if (res.status == 'success') {
+                    //             message.success('操作成功');
+                    //             setID(res.data[0])
+                    //             setRegistration(true)
+                    //             callbackRef()
+                    //             // 重置所有表单数据
+                    //             // 1. 重置学生表单
+                    //             formRef.current?.resetFields();
+                    //             userRef?.current?.setDepartment({});
+                    //             userRefs?.current?.setDepartment({});
+                    //             userRef2?.current?.setDepartment({});
+                    //             setModalOrderVisible(false)
+                    //             // 2. 重置班级列表表单
+                    //             if (classListRef.current) {
+                    //                 classListRef.current.resetForm();
+                    //             }
+
+                    //             // 3. 重置支付方式组件
+                    //             if (payWayRef.current) {
+                    //                 payWayRef.current.resetPayWay();
+                    //             }
+                    //         } else {
+                    //             setLoading(false);
+                    //             message.error(res.msg)
+                    //         }
+                    //     }).catch((err) => {
+                    //         console.log(err, 'err')
+                    //         setLoading(false);
+                    //     })
 
                 }}
             >
@@ -1112,7 +1223,7 @@ export default () => {
                             }
                         }
                     }} />
-                <OrderPayWay ref={payWayRef} />
+                <OrderPayWay ref={payWayRef} totalReceivable={totalReceivable} />
                 {/* <ProFormTextArea
                     width={1100}
                     label='备注'

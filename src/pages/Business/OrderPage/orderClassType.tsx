@@ -42,7 +42,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 // 执行表单验证
                 const values = await formRef.current?.validateFields();
                 return values;
-            } catch (error:any) {
+            } catch (error: any) {
                 // 显示验证错误信息
                 if (error && error.errorFields) {
                     // 获取第一个错误信息并显示
@@ -84,6 +84,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [discountPrice, setDiscountPrice] = useState<number>(0);
     const [totalQuantity, setTotalQuantity] = useState<number>(0);
+    const [discountRemake, setDiscountRemake] = useState<boolean>(false)
     const formRef = useRef<ProFormInstance>(null);
     const userRef = useRef<any>(null);
 
@@ -304,7 +305,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             <ProFormList
                 name="users"
                 creatorButtonProps={{
-                    creatorButtonText: '新增一条班型信息',
+                    creatorButtonText: '新增一条班型信息'
                 }}
                 creatorRecord={() => {
                     // 创建一个新记录时的默认值
@@ -493,7 +494,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                         const discountSum = newUsers.reduce((total, user) => {
                                                             return total + (Number(user.quantity) || 0);
                                                         }, 0);
-                                                        console.log(discountSum,'discountSum----->')
+                                                        console.log(discountSum, 'discountSum----->')
                                                         // 更新状态和回调
                                                         setDiscountPrice(discountSum);
                                                         setTotalPrice(receivableSum);
@@ -581,12 +582,16 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                             fieldProps={{
                                                 precision: 2,
                                                 onChange: (e) => {
+                                                    console.log(typeof e, 'e')
                                                     const users = formRef?.current?.getFieldValue('users') || [];
                                                     const discountSum = users.reduce((total: number, user: any) => {
                                                         return total + (Number(user.discount) || 0);
                                                     }, 0);
                                                     setDiscountPrice(discountSum);
                                                     onTotalPriceChange?.(totalPrice - discountSum);
+                                                    // 动态设置 discountRemark 的 rules
+                                                    const isDiscount = Number(e) !== 0;
+                                                    setDiscountRemake(isDiscount)
                                                 },
                                             }}
                                         />
@@ -598,6 +603,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                 autoComplete: 'no',
                                             }}
                                             rules={[
+                                                { required: discountRemake, message: '请填写本次折扣原因' },
                                             ]}
                                         />
                                         <ProFormText

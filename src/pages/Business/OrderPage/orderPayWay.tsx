@@ -24,16 +24,15 @@ interface PayWayMethods {
 }
 
 const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
-    const { renderData, payMessage } = props;
+    const { renderData, payMessage, totalReceivable } = props;
+    console.log(totalReceivable, 'totalReceivable')
     const [payWayList, setPayWayList] = useState<number[]>([0]); // 用于管理多个支付方式表单
     const formRefs = useRef<{ [key: number]: ProFormInstance }>({});
 
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
     const [chargeLog, setChargeLog] = useState<Array<any> | null>();
-    
+
     const { initialState } = useModel('@@initialState');
-    console.log(initialState?.currentUser?.id,'initialState=======>')
-    console.log(initialState?.currentUser?.name,'initialState=======>')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -217,9 +216,6 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         initialValues.departmentId = renderData.departmentId;
                     }
 
-                    // console.log(initialState?.currentUser?.id,'initialState=======>')
-                    // console.log(initialState?.currentUser?.name,'initialState=======>')
-
 
                     userRefs.current[index].setDepartment({
                         id: initialState?.currentUser?.id,
@@ -270,7 +266,9 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
             <ProCard bordered
                 title={'支付方式'}
                 style={{
+                    width: '1000px',
                     marginBlockEnd: 8,
+                    margin: '0 auto',
                     position: 'relative', marginBottom: index !== payWayList[payWayList.length - 1] ? 16 : 0
                 }} key={index} >
                 {/* {payWayList.length > 1 && (
@@ -295,7 +293,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         <ProFormSelect
                             label="缴费类型"
                             name="type"
-                            width="md"
+                            width="sm"
                             initialValue={chargeType}
                             request={async () =>
                                 Dictionaries.getList('chargeType')?.filter(x => ['0', '4', '5', '6'].indexOf(x.value) != -1) as any
@@ -310,7 +308,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         <ProFormText
                             label="chargeLogIds"
                             name="chargeLogIds"
-                            width="md"
+                            width="sm"
                             hidden={true}
                         />
                         {chargeType === '6' ? (
@@ -318,7 +316,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 <ProFormText
                                     label="收款记录"
                                     name="chargeLogName"
-                                    width="md"
+                                    width="sm"
                                     rules={[
                                         {
                                             required: true,
@@ -338,7 +336,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         <ProFormSelect
                             label="付款方式"
                             name="method"
-                            width="md"
+                            width="sm"
                             request={async () => Dictionaries.getList('dict_stu_refund_type') as any}
                             rules={[
                                 {
@@ -350,7 +348,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         <ProFormSelect
                             label="付款方式"
                             name="departmentId"
-                            width="md"
+                            width="sm"
                             hidden={true}
                         />
                         <UserTreeSelect
@@ -360,7 +358,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 }
                             }}
                             disabled={true}
-                            width={300}
+                            width={200}
                             userLabel={'收费人'}
                             userNames="userId"
                             userPlaceholder="请选择收费人"
@@ -374,7 +372,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         />
                         <ProFormDateTimePicker
                             name="chargeTime"
-                            width="md"
+                            width="sm"
                             label="收费日期"
                             fieldProps={{
                                 value: moment(),
@@ -398,13 +396,13 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                     }
                                 },
                             }}
-                            width="md"
+                            width="sm"
                             disabled={chargeType == '4' || chargeType == '6'}
                             rules={[{ required: ['4', '6'].indexOf(chargeType) == -1, message: '请填写缴费日期' }]}
                         />
                         <ProFormDateTimePicker
                             name="nextPaymentTime"
-                            width="md"
+                            width="sm"
                             label="下次缴费时间"
                             fieldProps={{
                                 showTime: { format: 'HH:mm' },
@@ -430,9 +428,10 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                     const amount = Number(e) || 0;
                                     const collectedAmount = Number(formRefs.current[index]?.getFieldValue('collectedAmount')) || 0;
                                     const performance = amount - collectedAmount;
-                                    console.log('计算业绩金额:', { amount, collectedAmount, performance });
+                                    const surplus = totalReceivable - amount
                                     formRefs.current[index]?.setFieldsValue({
                                         performanceAmount: performance,
+                                        surplus:surplus,
                                         commissionBase: performance // 如果需要同步更新提成基数
                                     });
                                 }
@@ -465,8 +464,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                     const collectedAmount = Number(e) || 0;
                                     const amount = Number(formRefs.current[index]?.getFieldValue('amount')) || 0;
                                     const performance = amount - collectedAmount;
-                                    console.log('代收款项变化重新计算:', { amount, collectedAmount, performance });
-                                    if(collectedAmount > amount) {
+                                    if (collectedAmount > amount) {
                                         Modal.info({
                                             title: '注意！当前代收款项金额大于收费金额！',
                                             icon: <ExclamationCircleFilled />,
@@ -479,7 +477,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
 
                                             }
                                         });
-                                        
+
                                     }
                                     formRefs.current[index]?.setFieldsValue({
                                         performanceAmount: performance,
@@ -512,7 +510,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                             name="commissionBase"
                             width="sm"
                         />
-                        {/* <ProFormText label="本次收费后剩余尾款" name="surplus" readonly /> */}
+                        <ProFormText label="本次收费后剩余尾款" name="surplus" readonly />
                         {/* <ProFormTextArea
                             width={1100}
                             label={renderData.type != 'orders' ? '备注' : '退款原因'}
@@ -525,7 +523,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                             name="description"
                         />
                         <ProFormUploadDragger
-                            width="xl"
+                            width={1000}
                             label="上传附件"
                             name="files"
                             action="/sms/business/bizNotice/upload"
@@ -567,7 +565,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                         onCancel={() => setChargeLogVisible(false)}
                         footer={null}
                     >
-                        <ChargeLog select={setChargeLog} type={1} Orderpage={true}/>
+                        <ChargeLog select={setChargeLog} type={1} Orderpage={true} />
                     </Modal>
 
                 </ProForm>
