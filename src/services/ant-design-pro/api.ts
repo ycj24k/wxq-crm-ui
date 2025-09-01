@@ -578,38 +578,38 @@ export async function currentUser(options?: { [key: string]: any }) {
               },
             ]
           },
-          {
-            name:'线索列表',
-            icon: 'table',
-            routes: [
-              {
-                name:'个人视图',
-                path:'/business/cluelist/personview',
-                component:'./Business/Cluelist/PersonView'
-              },
-              {
-                name:'管理视图',
-                path: '/business/cluelist/managerview',
-                component: './Business/Cluelist/Managerview'
-              }
-            ]
-          },
-          {
-            name:'销售线索管理',
-            icon: 'table',
-            routes: [
-              {
-                name:'个人视图',
-                path:'/business/salelead/salepersonlead',
-                component:'./Business/SaleLead/SaleGroupLead'
-              },
-              {
-                name:'管理视图',
-                path: '/business/salelead/salegrouplead',
-                component: './Business/SaleLead/SalePersonLead'
-              }
-            ]
-          }
+          // {
+          //   name:'线索列表',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name:'个人视图',
+          //       path:'/business/cluelist/personview',
+          //       component:'./Business/Cluelist/PersonView'
+          //     },
+          //     {
+          //       name:'管理视图',
+          //       path: '/business/cluelist/managerview',
+          //       component: './Business/Cluelist/Managerview'
+          //     }
+          //   ]
+          // },
+          // {
+          //   name:'销售线索管理',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name:'个人视图',
+          //       path:'/business/salelead/salepersonlead',
+          //       component:'./Business/SaleLead/SaleGroupLead'
+          //     },
+          //     {
+          //       name:'管理视图',
+          //       path: '/business/salelead/salegrouplead',
+          //       component: './Business/SaleLead/SalePersonLead'
+          //     }
+          //   ]
+          // }
         ],
       },
       {
@@ -713,12 +713,12 @@ export async function currentUser(options?: { [key: string]: any }) {
             path: '/admins/department',
             component: './Admins/Department',
           },
-          {
-            name: '菜单管理',
-            icon: 'ClusterOutlined',
-            path: '/admins/menusmanger',
-            component: './Admins/MenusManger',
-          },
+          // {
+          //   name: '菜单管理',
+          //   icon: 'ClusterOutlined',
+          //   path: '/admins/menusmanger',
+          //   component: './Admins/MenusManger',
+          // },
           {
             name: '角色管理',
             icon: 'TeamOutlined',

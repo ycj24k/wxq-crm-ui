@@ -27,6 +27,7 @@ import student from '@/pages/Admins/StudentManage/student';
 
 export default () => {
     const formRef = useRef<ProFormInstance>();
+    const formRefStudentInfo = useRef<ProFormInstance>();
     const { initialState } = useModel('@@initialState');
     const [findStudent, setFindStudent] = useState<boolean>(false)
     const [modalStudentInfo, setModalStudentInfo] = useState<boolean>(false)
@@ -148,7 +149,7 @@ export default () => {
 
         if (Object.keys(formValues).length > 0) {
             setTimeout(() => {
-                formRef?.current?.setFieldsValue(formValues);
+                formRefStudentInfo?.current?.setFieldsValue(formValues);
                 let data = {}
                 data = {
                     name: initialState?.currentUser?.name,
@@ -161,7 +162,7 @@ export default () => {
         handleOpenProject()
     }
 
-    const handleOrder = (record: any) => {
+    const handleOrder = async (record: any) => {
         setOrderPay(true)
         handleOpenProject()
         setStudentId(record)
@@ -223,13 +224,20 @@ export default () => {
     //编辑
     const handleEdit = async (record: any) => {
         const res = await request.get('/sms/commonProjects')
+        setBackProject(res.data)
         const dictionariesList = localStorage.getItem('dictionariesList');
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
                 const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
-                let newData = [result[0], [formattedData1.parent][0]]
+                let newData;
+                if (formattedData1.parent == null) {
+                    newData = [result[0]]
+                } else {
+                    newData = [result[0], [formattedData1.parent][0]]
+                }
+
                 let nextData = convertToTreeData(newData)
                 setProjectslist(nextData)
             }
@@ -238,7 +246,7 @@ export default () => {
         setModalStudentInfo(true);
         setEditID(record.studentId)
         setTimeout(() => {
-            formRef?.current?.setFieldsValue({
+            formRefStudentInfo?.current?.setFieldsValue({
                 name: record.name,
                 idCard: record.idCard,
                 weChat: record.weChat,
@@ -285,7 +293,10 @@ export default () => {
     }
     //设置常用报考项目
     const handleSetProject = () => {
-        setMenuVisible(true)
+        setMenuVisible(true);
+        formRefStudentInfo.current?.setFieldsValue({
+            project: null
+        })
     }
     const handleOpenRegistration = () => {
         request
@@ -727,7 +738,7 @@ export default () => {
                 title="学员信息"
                 width={1000}
                 layout='horizontal'
-                formRef={formRef}
+                formRef={formRefStudentInfo}
                 autoFocusFirstInput
                 modalProps={{
                     destroyOnClose: true,
@@ -993,64 +1004,143 @@ export default () => {
                     destroyOnClose: true,
                     onCancel: () => {
                         callbackRef()
+                        setTotalReceivable(0)
                         setModalOrderVisible(false);
                     },
                     maskClosable: false,
                 }}
                 onFinish={async (values) => {
-                    setLoading(true);
+                    // setLoading(true);
                     let classListValues;
-                    try {
-                        classListValues = await classListRef.current?.getFormValues();
-                        if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
-                            message.error('请至少添加一个班级信息');
+                    classListValues = await classListRef.current?.getFormValues();
+                    let newSubmitValue = classListValues.users.map((item: any) => {
+                        return {
+                            charge: {
+                                amount: item.amount,
+                                chargeLogIds: item.chargeLogIds,
+                                chargeLogName: item.chargeLogName,
+                                chargeTime: item.chargeTime,
+                                collectedAmount: item.collectedAmount,
+                                departmentId: renderData.departmentId,
+                                method: item.method,
+                                description: item.description,
+                                files: item.files ? item.files[0].response.data : null,
+                                paymentTime: item.paymentTime,
+                                type: item.type,
+                                userId: renderData.userId,
+                            },
+                            order: {
+                                classType: JSON.parse(item.JobClassExam).classType,
+                                examType: JSON.parse(item.JobClassExam).classType,
+                                classYear: JSON.parse(item.JobClassExam).classYear,
+                                receivable: JSON.parse(item.JobClassExam).receivable,
+                                project: JSON.parse(item.JobClassExam).project,
+                                discount: item.discount,
+                                source: renderData.source,
+                                discountRemark: item.discountRemark,
+                                provider: renderData.provider,
+                                quantity: item.quantity,
+                                studenUserId: renderData.studentId
+                            },
+                            student: {
+                                idCard: renderData.idCard,
+                                mobile: renderData.mobile,
+                                name: renderData.name,
+                                owner: renderData.owner,
+                                project: renderData.project,
+                                provider: renderData.provider,
+                                source: renderData.source,
+                                type: renderData.type,
+                                userId: renderData.userId,
+                                totalReceivable: totalReceivable
+                            }
+                        }
+                    })
+                    request
+                        .postAll('/sms/business/bizOrder/intelligence', newSubmitValue)
+                        .then((res: any) => {
+                            if (res.status == 'success') {
+                                message.success('操作成功');
+                                setID(res.data[0])
+                                setRegistration(true)
+                                setTotalReceivable(0)
+                                callbackRef()
+                                // 重置所有表单数据
+                                // 1. 重置学生表单
+                                formRef.current?.resetFields();
+                                userRef?.current?.setDepartment({});
+                                userRefs?.current?.setDepartment({});
+                                userRef2?.current?.setDepartment({});
+                                setModalOrderVisible(false)
+                                // 2. 重置班级列表表单
+                                if (classListRef.current) {
+                                    classListRef.current.resetForm();
+                                }
+
+                                // 3. 重置支付方式组件
+                                if (payWayRef.current) {
+                                    payWayRef.current.resetPayWay();
+                                }
+                            } else {
+                                setLoading(false);
+                                message.error(res.msg)
+                            }
+                        }).catch((err) => {
+                            console.log(err, 'err')
                             setLoading(false);
-                            return;
-                        }
-                        // 验证每个班级信息是否完整
-                        for (let i = 0; i < classListValues.users.length; i++) {
-                            const user = classListValues.users[i];
-                            if (!user.project || user.project.length === 0) {
-                                message.error(`第${i + 1}个班级的报考岗位不能为空`);
-                                setLoading(false);
-                                return;
-                            }
-                            if (!user.JobClassExam) {
-                                message.error(`第${i + 1}个班级的班型选择不能为空`);
-                                setLoading(false);
-                                return;
-                            }
-                            if (!user.source) {
-                                message.error(`第${i + 1}个班级的订单来源不能为空`);
-                                setLoading(false);
-                                return;
-                            }
-                        }
-                    } catch (error) {
-                        setLoading(false);
-                        return;
-                    }
-                    //const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
-                    const processedUsers = Dictionaries.filterByValueNext(classListValues)
-                    // 3. 验证支付方式表单
-                    let payWayValues: any;
-                    //let payMsg = {}
-                    let newPay
-                    try {
-                        payWayValues = await payWayRef.current?.getFormValues();
-                        newPay = payWayValues.map((item: any) => {
-                            const userIdValue = item.userId && typeof item.userId === 'object' ? Dictionaries.getUserId(item.userId.label) : item.userId;
-                            const newfiles = item.files ? item.files[0].response.data : null
-                            return {
-                                ...item,
-                                files: newfiles,
-                                userId: userIdValue[0]
-                            }
                         })
-                    } catch (error) {
-                        setLoading(false);
-                        return;
-                    }
+                    console.log(newSubmitValue, 'newSubmitValue------>')
+                    // try {
+                    //     classListValues = await classListRef.current?.getFormValues();
+                    //     if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
+                    //         message.error('请至少添加一个班级信息');
+                    //         setLoading(false);
+                    //         return;
+                    //     }
+                    //     // 验证每个班级信息是否完整
+                    //     for (let i = 0; i < classListValues.users.length; i++) {
+                    //         const user = classListValues.users[i];
+                    //         if (!user.project || user.project.length === 0) {
+                    //             message.error(`第${i + 1}个班级的报考岗位不能为空`);
+                    //             setLoading(false);
+                    //             return;
+                    //         }
+                    //         if (!user.JobClassExam) {
+                    //             message.error(`第${i + 1}个班级的班型选择不能为空`);
+                    //             setLoading(false);
+                    //             return;
+                    //         }
+                    //         if (!user.source) {
+                    //             message.error(`第${i + 1}个班级的订单来源不能为空`);
+                    //             setLoading(false);
+                    //             return;
+                    //         }
+                    //     }
+                    // } catch (error) {
+                    //     setLoading(false);
+                    //     return;
+                    // }
+                    // //const processedUsers = Dictionaries.filterByValue(classListValues, classListValues.description)
+                    // const processedUsers = Dictionaries.filterByValueNext(classListValues)
+                    // // 3. 验证支付方式表单
+                    // let payWayValues: any;
+                    // //let payMsg = {}
+                    // let newPay
+                    // try {
+                    //     payWayValues = await payWayRef.current?.getFormValues();
+                    //     newPay = payWayValues.map((item: any) => {
+                    //         const userIdValue = item.userId && typeof item.userId === 'object' ? Dictionaries.getUserId(item.userId.label) : item.userId;
+                    //         const newfiles = item.files ? item.files[0].response.data : null
+                    //         return {
+                    //             ...item,
+                    //             files: newfiles,
+                    //             userId: userIdValue[0]
+                    //         }
+                    //     })
+                    // } catch (error) {
+                    //     setLoading(false);
+                    //     return;
+                    // }
                     // let payWayValues: any;
                     // try {
                     //     payWayValues = await payWayRef.current?.getFormValues();
@@ -1058,97 +1148,98 @@ export default () => {
                     //     return;
                     // }
 
-                    let auditsParam: any = processedUsers.map((order: any, index: number) => ({
-                        "student": renderData,
-                        "order": order,
-                        "charge": newPay[index]
-                    }));
-                    if (OrderPay) {
-                        console.log('456456456')
-                        console.log(auditsParam, 'auditsParam')
-                        const newAuditsParam = auditsParam.map((item: any) => ({
-                            ...item,
-                            student: {
-                                idCard: item.student.idCard,
-                                mobile: item.student.mobile,
-                                name: item.student.name,
-                                owner: item.student.owner,
-                                project: item.order.project,
-                                provider: item.student.provider,
-                                source: item.order.source,
-                                type: item.student.type,
-                                userId: item.student.userId,
-                                id: item.student.studentId,
-                            }
-                        }))
-                        request
-                            .postAll('/sms/business/bizOrder/intelligence', newAuditsParam)
-                            .then((res: any) => {
-                                if (res.status == 'success') {
-                                    message.success('操作成功');
-                                    setID(res.data[0])
-                                    setRegistration(true)
-                                    callbackRef()
-                                    // 重置所有表单数据
-                                    // 1. 重置学生表单
-                                    formRef.current?.resetFields();
-                                    userRef?.current?.setDepartment({});
-                                    userRefs?.current?.setDepartment({});
-                                    userRef2?.current?.setDepartment({});
-                                    setModalOrderVisible(false)
-                                    // 2. 重置班级列表表单
-                                    if (classListRef.current) {
-                                        classListRef.current.resetForm();
-                                    }
+                    // let auditsParam: any = processedUsers.map((order: any, index: number) => ({
+                    //     "student": renderData,
+                    //     "order": order,
+                    //     "charge": newPay[index]
+                    // }));
 
-                                    // 3. 重置支付方式组件
-                                    if (payWayRef.current) {
-                                        payWayRef.current.resetPayWay();
-                                    }
-                                } else {
-                                    setLoading(false);
-                                    message.error(res.msg)
-                                }
-                            }).catch((err) => {
-                                console.log(err, 'err')
-                                setLoading(false);
-                            })
-                    }
-                    if (!OrderPay) {
-                        console.log(auditsParam, 'auditsParam')
-                        request
-                            .postAll('/sms/business/bizOrder/intelligence', auditsParam)
-                            .then((res: any) => {
-                                if (res.status == 'success') {
-                                    message.success('操作成功');
-                                    setID(res.data[0])
-                                    setRegistration(true)
-                                    callbackRef()
-                                    // 重置所有表单数据
-                                    // 1. 重置学生表单
-                                    formRef.current?.resetFields();
-                                    userRef?.current?.setDepartment({});
-                                    userRefs?.current?.setDepartment({});
-                                    userRef2?.current?.setDepartment({});
-                                    setModalOrderVisible(false)
-                                    // 2. 重置班级列表表单
-                                    if (classListRef.current) {
-                                        classListRef.current.resetForm();
-                                    }
+                    // if (OrderPay) {
+                    //     const newAuditsParam = auditsParam.map((item: any) => ({
+                    //         ...item,
+                    //         student: {
+                    //             idCard: item.student.idCard,
+                    //             mobile: item.student.mobile,
+                    //             name: item.student.name,
+                    //             owner: item.student.owner,
+                    //             project: item.order.project,
+                    //             provider: item.student.provider,
+                    //             source: item.order.source,
+                    //             type: item.student.type,
+                    //             userId: item.student.userId,
+                    //             id: item.student.studentId,
+                    //         }
+                    //     }))
+                    //     request
+                    //         .postAll('/sms/business/bizOrder/intelligence', newAuditsParam)
+                    //         .then((res: any) => {
+                    //             if (res.status == 'success') {
+                    //                 message.success('操作成功');
+                    //                 setID(res.data[0])
+                    //                 setRegistration(true)
+                    //                 setTotalReceivable(0)
+                    //                 callbackRef()
+                    //                 // 重置所有表单数据
+                    //                 // 1. 重置学生表单
+                    //                 formRef.current?.resetFields();
+                    //                 userRef?.current?.setDepartment({});
+                    //                 userRefs?.current?.setDepartment({});
+                    //                 userRef2?.current?.setDepartment({});
+                    //                 setModalOrderVisible(false)
+                    //                 // 2. 重置班级列表表单
+                    //                 if (classListRef.current) {
+                    //                     classListRef.current.resetForm();
+                    //                 }
 
-                                    // 3. 重置支付方式组件
-                                    if (payWayRef.current) {
-                                        payWayRef.current.resetPayWay();
-                                    }
-                                } else {
-                                    setLoading(false);
-                                    message.error(res.msg)
-                                }
-                            }).catch((err) => {
-                                console.log(err, 'err')
-                                setLoading(false);
-                            })
-                    }
+                    //                 // 3. 重置支付方式组件
+                    //                 if (payWayRef.current) {
+                    //                     payWayRef.current.resetPayWay();
+                    //                 }
+                    //             } else {
+                    //                 setLoading(false);
+                    //                 message.error(res.msg)
+                    //             }
+                    //         }).catch((err) => {
+                    //             console.log(err, 'err')
+                    //             setLoading(false);
+                    //         })
+                    // }
+                    // if (!OrderPay) {
+                    //     request
+                    //         .postAll('/sms/business/bizOrder/intelligence', auditsParam)
+                    //         .then((res: any) => {
+                    //             if (res.status == 'success') {
+                    //                 message.success('操作成功');
+                    //                 setID(res.data[0])
+                    //                 setRegistration(true)
+                    //                 setTotalReceivable(0)
+                    //                 callbackRef()
+                    //                 // 重置所有表单数据
+                    //                 // 1. 重置学生表单
+                    //                 formRef.current?.resetFields();
+                    //                 userRef?.current?.setDepartment({});
+                    //                 userRefs?.current?.setDepartment({});
+                    //                 userRef2?.current?.setDepartment({});
+                    //                 setModalOrderVisible(false)
+                    //                 setTotalReceivable(0)
+                    //                 // 2. 重置班级列表表单
+                    //                 if (classListRef.current) {
+                    //                     classListRef.current.resetForm();
+                    //                 }
+
+                    //                 // 3. 重置支付方式组件
+                    //                 if (payWayRef.current) {
+                    //                     payWayRef.current.resetPayWay();
+                    //                 }
+                    //             } else {
+                    //                 setLoading(false);
+                    //                 message.error(res.msg)
+                    //             }
+                    //         }).catch((err) => {
+                    //             console.log(err, 'err')
+                    //             setLoading(false);
+                    //         })
+                    // }
 
                     // request
                     //     .postAll('/sms/business/bizOrder/intelligence', auditsParam)
@@ -1198,6 +1289,7 @@ export default () => {
                 </div>
                 <OrderClassType
                     renderData={renderData}
+                    projectslist={projectslist}
                     ref={classListRef}
                     onTotalPriceChange={(price: number) => {
                         setTotalReceivable(price);
@@ -1223,7 +1315,7 @@ export default () => {
                             }
                         }
                     }} />
-                <OrderPayWay ref={payWayRef} totalReceivable={totalReceivable} />
+                {/* <OrderPayWay ref={payWayRef} totalReceivable={totalReceivable} /> */}
                 {/* <ProFormTextArea
                     width={1100}
                     label='备注'

@@ -98,32 +98,32 @@
     path: '/business/refund',
     component: './Business/Refund'
   },
+  {
+    name: '线索列表',
+    path: '/business/cluelist',
+    component: './Business/ClueList',
+  },
   // {
-  //   name: '线索列表',
-  //   path: '/business/cluelist',
-  //   component: './Business/ClueList',
+  //   name: '个人视图',
+  //   path: '/business/cluelist/personview',
+  //   component: './Business/ClueList/PersonView'
   // },
-  {
-    name: '个人视图',
-    path: '/business/cluelist/personview',
-    component: './Business/ClueList/PersonView'
-  },
-  {
-    name: '管理视图',
-    path: '/business/cluelist/managerview',
-    component: './Business/ClueList/ManagerView'
-  },
+  // {
+  //   name: '管理视图',
+  //   path: '/business/cluelist/managerview',
+  //   component: './Business/ClueList/ManagerView'
+  // },
 
-  {
-    name: '个人视图',
-    path: '/business/salelead/salepersonlead',
-    component: './Business/SaleLead/SaleGroupLead'
-  },
-  {
-    name: '管理视图',
-    path: '/business/salelead/salegrouplead',
-    component: './Business/SaleLead/SalePersonLead'
-  },
+  // {
+  //   name: '个人视图',
+  //   path: '/business/salelead/salepersonlead',
+  //   component: './Business/SaleLead/SaleGroupLead'
+  // },
+  // {
+  //   name: '管理视图',
+  //   path: '/business/salelead/salegrouplead',
+  //   component: './Business/SaleLead/SalePersonLead'
+  // },
   {
     name: '规则配置中心',
     path: '/business/rulemangercenter',
@@ -485,12 +485,12 @@
     path: '/admins/menusmanger',
     component: './Admins/MenusManger',
   },
-  {
-    name: '菜单管理',
-    icon: 'table',
-    path: '/admins/menusmanger',
-    component: './Admins/MenusManger',
-  },
+  // {
+  //   name: '菜单管理',
+  //   icon: 'table',
+  //   path: '/admins/menusmanger',
+  //   component: './Admins/MenusManger',
+  // },
   {
     name: '订单列表',
     icon: 'table',

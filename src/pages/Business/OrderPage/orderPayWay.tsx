@@ -5,6 +5,7 @@ import ProForm, {
     ProFormInstance,
     ProFormDigit,
     ProFormTextArea,
+    ProFormMoney,
     ProFormUploadDragger
 } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
@@ -415,24 +416,17 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 },
                             }}
                         />
-                        <ProFormDigit
+                        <ProFormMoney
                             label={`本次收费金额`}
                             name="amount"
                             width="sm"
+                             customSymbol="¥"
                             fieldProps={{
-                                precision: 2,
-                                min: 0,
-                                formatter: (value) => value ? `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '',
-                                parser: (value) => value ? value.replace(/\¥\s?|(,*)/g, '') : '',
                                 onChange(e) {
                                     const amount = Number(e) || 0;
-                                    const collectedAmount = Number(formRefs.current[index]?.getFieldValue('collectedAmount')) || 0;
-                                    const performance = amount - collectedAmount;
                                     const surplus = totalReceivable - amount
                                     formRefs.current[index]?.setFieldsValue({
-                                        performanceAmount: performance,
-                                        surplus:surplus,
-                                        commissionBase: performance // 如果需要同步更新提成基数
+                                        surplus: surplus
                                     });
                                 }
 
@@ -450,16 +444,14 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                                 }
                             ]}
                         />
-                        <ProFormDigit
+                        <ProFormMoney
                             tooltip="返代理费、快递费、税费，不包含在收费标准里的报名费等"
                             label={`代收款项`}
                             name="collectedAmount"
                             width="sm"
+                            customSymbol="¥"
+                            min={0}
                             fieldProps={{
-                                precision: 2,
-                                min: 0,
-                                formatter: (value) => value ? `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '',
-                                parser: (value) => value ? value.replace(/\¥\s?|(,*)/g, '') : '',
                                 onChange(e) {
                                     const collectedAmount = Number(e) || 0;
                                     const amount = Number(formRefs.current[index]?.getFieldValue('amount')) || 0;
@@ -499,13 +491,13 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                             ]}
                         />
                         <ProFormDigit
-                            label={`业绩金额`}
+                            label={`业绩金额（+）`}
                             readonly={true}
                             name="performanceAmount"
                             width="sm"
                         />
                         <ProFormDigit
-                            label={`提成基数`}
+                            label={`提成基数（+）`}
                             readonly={true}
                             name="commissionBase"
                             width="sm"

@@ -355,10 +355,10 @@ export default (props: any) => {
           callbackRef();
         }}
         tabList={[
-          {
-            tab: '新媒体资源库',
-            key: '0'
-          },
+          // {
+          //   tab: '新媒体资源库',
+          //   key: '0'
+          // },
           {
             tab: '流转资源库',
             key: '1',

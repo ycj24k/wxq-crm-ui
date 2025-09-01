@@ -396,7 +396,7 @@ export default (props: any) => {
           await submitok(values, 'edit');
         }}
       >
-        <Button type='primary' onClick={() => handleQrCode()}>收集资料二维码</Button>
+        {/* <Button type='primary' onClick={() => handleQrCode()}>收集资料二维码</Button> */}
         <ProForm.Group>{HtmlProForm}</ProForm.Group>
         <div style={{ display: 'none' }}>
           <Image

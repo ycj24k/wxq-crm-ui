@@ -109,6 +109,7 @@ export default forwardRef((props: any, ref) => {
     return lists.reverse();
   };
   const onSelectUser = (node: any) => {
+    console.log(node);
     if (!node.userId) {
       setTreeStatusU('error');
       setFalgUser(true);
@@ -177,7 +178,8 @@ export default forwardRef((props: any, ref) => {
             // tree-select args
             required
             fieldProps={{
-              disabled: disabled || newMedia,
+              disabled: false,
+              // disabled: disabled || newMedia,
               status: TreeStatusU,
               onSelect: (e: any, node: any) => {
                 onSelectUser(node);

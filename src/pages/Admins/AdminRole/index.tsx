@@ -137,43 +137,43 @@ export default () => {
       ),
     },
 
-    {
-      title: '授权菜单',
-      dataIndex: 'menu',
-      colSpan: 2,
-      search: false,
-      hideInTable: TabListNuber == '1' ? false : true,
-      ellipsis: true,
-      tip: '过长会自动收缩',
-    },
-    {
-      width: 120,
-      colSpan: 0,
-      hideInTable: TabListNuber == '1' ? false : true,
-      search: false,
-      render: (text, record, _, action) => (
-        <Button
-          size="small"
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={async () => {
-            if (!menuContentlist) {
-              menuContentlist = await request.get('/sms/system/sysMenu/tree');
-            }
-            const arr: any = [];
-            record.menuList.forEach((item: any) => {
-              arr.push(item.name);
-            });
-            //setDepartment(arr);
-            setMenuRenderData(record)
-            setMenuContent({ menuContentlist: menuContentlist.data });
-            setMenuVisible(true)
-          }}
-        >
-          授权菜单
-        </Button>
-      ),
-    },
+    // {
+    //   title: '授权菜单',
+    //   dataIndex: 'menu',
+    //   colSpan: 2,
+    //   search: false,
+    //   hideInTable: TabListNuber == '1' ? false : true,
+    //   ellipsis: true,
+    //   tip: '过长会自动收缩',
+    // },
+    // {
+    //   width: 120,
+    //   colSpan: 0,
+    //   hideInTable: TabListNuber == '1' ? false : true,
+    //   search: false,
+    //   render: (text, record, _, action) => (
+    //     <Button
+    //       size="small"
+    //       type="primary"
+    //       icon={<PlusOutlined />}
+    //       onClick={async () => {
+    //         if (!menuContentlist) {
+    //           menuContentlist = await request.get('/sms/system/sysMenu/tree');
+    //         }
+    //         const arr: any = [];
+    //         record.menuList.forEach((item: any) => {
+    //           arr.push(item.name);
+    //         });
+    //         //setDepartment(arr);
+    //         setMenuRenderData(record)
+    //         setMenuContent({ menuContentlist: menuContentlist.data });
+    //         setMenuVisible(true)
+    //       }}
+    //     >
+    //       授权菜单
+    //     </Button>
+    //   ),
+    // },
 
 
     {

@@ -220,13 +220,13 @@ export default (props: any) => {
                                                
                                                 <div>沟通类型：{Dictionaries.getName('dict_c_type', item.type)}</div> */}
                                             </div>
-                                            
-                                            <div className='content_middle' style={{ marginTop:'20px' }}>沟通内容：{item.content}</div>
+
+                                            <div className='content_middle' style={{ marginTop: '20px' }}>沟通内容：{item.content}</div>
                                             <div className='content_middle'>下次跟进时间：{item.nextVisitDate}</div>
                                             <div className='content_middle'>
                                                 <Button onClick={() => handleWatch(item.id, item.file)} type='primary' size="small">查看图片</Button>
                                             </div>
-                                            
+
                                         </div>
                                     )}
                                 </div>
@@ -371,7 +371,7 @@ export default (props: any) => {
                     /> */}
                     <ProFormUploadDragger
                         width="xl"
-                        label="上传附件"
+                        label="上传图片"
                         name="filess"
                         action="/sms/business/bizReturnVisit/upload"
                         fieldProps={{
@@ -379,10 +379,17 @@ export default (props: any) => {
                             headers: {
                                 ...obj,
                             },
+                            accept: "image/*",
                             listType: 'picture',
                             onRemove: (e: any) => { },
                             beforeUpload: (file: any) => {
                                 console.log('file', file);
+                                const isImage = file.type.startsWith('image/')
+                                if (!isImage) {
+                                    message.error('只能上传图片')
+                                    return false
+                                }
+                                return true
                             },
                             onPreview: async (file: any) => {
                                 console.log('file', file);

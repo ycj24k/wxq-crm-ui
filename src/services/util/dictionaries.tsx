@@ -1117,6 +1117,8 @@ class dictionaries {
     return result;
   }
 
+
+
 findObjectAndRelated(treeData: any[], targetValue: string) {
   // 用于存储找到的目标对象
   let targetObject: any = null;
@@ -1171,6 +1173,31 @@ findObjectAndRelated(treeData: any[], targetValue: string) {
     parent: parentObject,
     siblings: siblingObjects
   };
+}
+
+
+deepEqual(obj1: any, obj2: any): boolean {
+  // 比较基本类型和引用
+  if (obj1 === obj2) return true;
+  
+  // 如果其中一个是 null 或 undefined，而另一个不是
+  if (obj1 == null || obj2 == null) return false;
+  
+  // 比较类型
+  if (typeof obj1 !== 'object' || typeof obj2 !== 'object') return false;
+  
+  // 比较键的数量
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) return false;
+  
+  // 递归比较每个键值
+  for (const key of keys1) {
+    if (!keys2.includes(key)) return false;
+    if (!this.deepEqual(obj1[key], obj2[key])) return false;
+  }
+  
+  return true;
 }
 
 }

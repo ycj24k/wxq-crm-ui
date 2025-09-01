@@ -5,9 +5,10 @@ import {
     ProFormGroup,
     ProFormList,
     ProFormText,
+    ProFormSelect
 } from '@ant-design/pro-components';
 import './index.less'
-import { Button } from "antd";
+import { Button, Input, Select } from "antd";
 import { PlusOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useState } from "react";
 
@@ -16,15 +17,66 @@ export default () => {
     const [rulelist, setRuleList] = useState<any>([
         {
             id: 1,
-            name: '规则1'
+            name: '规则1',
+            children: [
+                {
+                    id: '1-1',
+                    text: '出镜人',
+                    isInclude: '0',
+                    name: '张三'
+                }
+            ],
+            childrenProject: [
+                {
+                    id: '1-1-1',
+                    andOr: 'and',
+                    text1: '项目',
+                    isInclude: '1',
+                    project: '高级职称'
+                }
+            ]
         },
         {
             id: 2,
-            name: '规则2'
+            name: '规则2',
+            children: [
+                {
+                    id: '1-1',
+                    text: '出镜人',
+                    isInclude: '0',
+                    name: '张三'
+                }
+            ],
+            childrenProject: [
+                {
+                    id: '1-1-1',
+                    andOr: 'and',
+                    text1: '项目',
+                    isInclude: '1',
+                    project: '高级职称'
+                }
+            ]
         },
         {
             id: 3,
-            name: '规则3'
+            name: '规则3',
+            children: [
+                {
+                    id: '1-1',
+                    text: '出镜人',
+                    isInclude: '0',
+                    name: '张三'
+                }
+            ],
+            childrenProject: [
+                {
+                    id: '1-1-1',
+                    andOr: 'and',
+                    text1: '项目',
+                    isInclude: '1',
+                    project: '高级职称'
+                }
+            ]
         }
     ])
     const [hoverStates, setHoverStates] = useState<any>({})
@@ -87,9 +139,25 @@ export default () => {
                             }}
                         >
                             <ProFormGroup key="group">
-                                <ProFormText name="value" label="值" />
-                                <ProFormText name="label" label="显示名称" />
-                                <ProFormText name="label1" label="显示名称" />
+                                <ProFormText name="value" />
+                                <ProFormSelect
+                                    name="type"
+                                    width="md"
+                                    options={[
+                                        { label: '包含', value: '0' },
+                                        { label: '不包含', value: '1' }
+                                    ]}
+                                    // fieldProps={{
+                                    //     onChange: setType
+                                    // }}
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请选择类型',
+                                        },
+                                    ]}
+                                />
+                                <ProFormText name="label1" />
                             </ProFormGroup>
                         </ProFormList>
                     </ProFormList>
@@ -115,12 +183,63 @@ export default () => {
                                             right: '0px',
                                             top: '0px',
                                             fontSize: '16px',
-                                            zIndex:99
+                                            zIndex: 99
                                         }}
                                         className="close_icon"
                                     />
                                 )}
                                 {item.name}
+                                <div style={{ display: 'flex', marginLeft: '100px' }}>
+                                    <Input
+                                        style={{ width: '200px', height: '32px' }}
+                                        size="small"
+                                        placeholder="Basic usage"
+                                        value={item.children?.[0]?.text || ''}
+                                    // onChange={(e) => {
+                                    //     setRuleList((prev: any) => prev.map((rule: any) => {
+                                    //         const currentChild = rule.children?.[0] || { text: '' };
+                                    //         return rule.id === item.id
+                                    //             ? {
+                                    //                 ...rule,
+                                    //                 children: [{ ...currentChild, text: e.target.value }]
+                                    //             }
+                                    //             : rule;
+                                    //     }));
+                                    // }}
+                                    />
+                                    <Select
+                                        defaultValue="lucy"
+                                        style={{ width: 100 }}
+                                        // onChange={handleChange}
+                                        options={[
+                                            { value: 'jack', label: '包含' },
+                                            { value: 'lucy', label: '不包含' }
+                                        ]}
+                                    />
+                                    
+                                    <Button style={{ marginLeft: '10px' }} type="primary">添加</Button>
+                                    <Button style={{ marginLeft: '5px' }} danger>删除</Button>
+                                </div>
+                                <div style={{ display: 'flex' }}>
+                                    <ProFormSelect
+                                        name="type"
+                                        width="md"
+                                        options={[
+                                            { label: '或', value: 'or' },
+                                            { label: '且', value: 'and' }
+                                        ]}
+                                    />
+                                    <ProFormText width={200} style={{ marginRight: '10px' }} name="name" />
+                                    <ProFormSelect
+                                        name="type"
+                                        width="md"
+                                        options={[
+                                            { label: '包含', value: '01' },
+                                            { label: '不包含', value: '02' }
+                                        ]}
+                                    />
+                                    <ProFormSelect></ProFormSelect>
+                                </div>
                             </div>
                         </>
                     })}

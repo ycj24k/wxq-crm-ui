@@ -125,7 +125,6 @@ export default (props: any) => {
   useEffect(() => {
     getdataSource()
     setparamsA({ ...history.location.query, ...searchParams });
-    console.log("searchParams", searchParams)
   }, []);
   const callbackRef = () => {
     // @ts-ignore
@@ -517,7 +516,7 @@ export default (props: any) => {
               icon={<AccountBookOutlined />}
               className="tablebut"
               onClick={async () => {
-                console.log(record,'record------>')
+                console.log(record, 'record------>')
                 const list = await getChargeList(record.id, true);
                 if (list.length > 0 && list.every((item: any) => item.confirm !== true)) {
                   showConfirm(
@@ -661,7 +660,7 @@ export default (props: any) => {
               缴费信息
             </Button>
           </Tooltip>
-          <div hidden={record.studentType == 0}>
+          <div hidden={record.studentType == 0 || showType == 'refund' || orderType == 'sp' || refund || suppOrder}>
             <Button
               key="banxin"
               size="small"
@@ -1145,7 +1144,7 @@ export default (props: any) => {
         <Drawer
           title="补缴下单"
           width={1200}
-          
+
 
           visible={suppVisibleFalg}
           onClose={() => setSuppVisible(false)}

@@ -98,7 +98,7 @@ export default (props: any) => {
     }
     if (!num) {
         console.log('456')
-        param = getAll ? {} : { isUseUp: false, isRefund: false, enable: false }
+        param = getAll ? {} : { isUseUp: false, isRefund: false, enable: true }
     }
     if(Orderpage){
         console.log('789')

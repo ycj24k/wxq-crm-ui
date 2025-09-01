@@ -6,7 +6,6 @@ import { Badge, Button, Dropdown, Menu, message, Popconfirm, Space, Tag, Table, 
 import { useEffect, useRef, useState } from "react"
 import ModalAdd from "./ModalAdd"
 import Dictionaries from '@/services/util/dictionaries';
-import moment from "moment"
 import request from '@/services/ant-design-pro/apiRequest';
 import UserModal from "@/pages/Admins/UserManage/userModal"
 import './index.less'

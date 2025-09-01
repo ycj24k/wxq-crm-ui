@@ -6,18 +6,27 @@ import {
     ProFormCascader,
     ProFormDigit,
     ProFormText,
+    ProFormMoney,
     ProFormInstance,
-    ProFormTreeSelect
+    ProFormDateTimePicker,
+    ProFormTreeSelect,
+    ProFormTextArea,
+    ProFormUploadDragger
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
 import Dictionaries from '@/services/util/dictionaries';
+import moment from 'moment';
+import { ExclamationCircleFilled } from '@ant-design/icons';
 import request from '@/services/ant-design-pro/apiRequest';
-import React, { forwardRef, useImperativeHandle, useEffect, useRef, useState } from 'react';
-import { Button, message } from 'antd';
+import { forwardRef, useImperativeHandle, useEffect, useRef, useState } from 'react';
+import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+import { Button, message, Modal } from 'antd';
+import ChargeLog from '@/pages/Business/ChargeLog';
 
 let JobClassExamA: any[] = [];
 let quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 let comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 
 
 interface ClassListMethods {
@@ -28,6 +37,7 @@ interface ClassListMethods {
 
 interface ClassListProps {
     renderData?: any;
+    projectslist?: any;
     onAddClassType?: () => void;
     onRemoveClassType?: (index: number) => void;
     onTotalPriceChange?: (price: number) => void;
@@ -35,7 +45,8 @@ interface ClassListProps {
 }
 
 const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
-    const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType } = props;
+    const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType, projectslist } = props;
+    //console.log(projectslist, 'projectslist')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -85,17 +96,72 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const [discountPrice, setDiscountPrice] = useState<number>(0);
     const [totalQuantity, setTotalQuantity] = useState<number>(0);
     const [discountRemake, setDiscountRemake] = useState<boolean>(false)
+    const [chargeType, setChargeType] = useState<string[]>([]);
+    const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
+    const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+    const [chargeLogIndex, setChargeLogIndex] = useState<any>()
+    const [newProjectslist, setProjectslist] = useState<any>();
+
+    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    let obj: { [key: string]: string } = {};
+    if (tokenValue !== null) {
+        obj[tokenName] = tokenValue;
+    } else {
+        // 处理 tokenValue 为 null 的情况，例如显示错误消息或设置默认值
+        console.error('Token value is null');
+    }
+
     const formRef = useRef<ProFormInstance>(null);
+    //const userRef = useRef<any[]>([]); // 初始化为空数组
     const userRef = useRef<any>(null);
+    // 将岗位转换为Tree组件可用的格式
+    const convertToTreeData = (data: any[]): any[] => {
+        if (!data || !Array.isArray(data)) return [];
+
+        return data.map((item) => ({
+            key: item.id,
+            value: item.value,
+            label: item.name,
+            children: item.children ? convertToTreeData(item.children) : [],
+        }));
+    };
+
+    const getProject = async () => {
+        const res = await request.get('/sms/commonProjects')
+        const dictionariesList = localStorage.getItem('dictionariesList');
+        if (dictionariesList) {
+            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
+            if (result) {
+                const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, renderData.project)
+                let newData = convertToTreeData([[formattedData1.parent][0]])
+
+                const foundObject = projectslist?.find((item: any) => JSON.stringify(item) === JSON.stringify(newData[0]))
+                if (foundObject) {
+                    setProjectslist(projectslist)
+                } else {
+                    let newProject = [...(projectslist || []), newData[0]];
+                    setProjectslist(newProject)
+                }
+            }
+        }
+    }
 
     useEffect(() => {
-        formRef?.current?.setFieldsValue({
-            provider: userNameId?.id,
-        });
-    }, [userNameId])
+        getProject()
+    }, [projectslist])
+
+
+    // useEffect(() => {
+    //     formRef?.current?.setFieldsValue({
+    //         provider: userNameId?.id,
+    //     });
+    // }, [userNameId])
 
 
     useEffect(() => {
+        console.log(renderData,)
         // 即使renderData不存在或不包含project字段，也继续初始化
         if (!renderData) {
             // 初始化一个空的用户列表，确保表单能够正常显示
@@ -135,7 +201,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 discount: item.discount || 0,
                 source: scoreName,
                 discountRemark: item.discountRemark || '',
-                provider: { "value": item.provider },
+                userId: { "value": item.userId },
                 // { "value": renderData.provider },
                 studentUserId: item.id || null
             });
@@ -151,6 +217,13 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 users: list,
                 provider: renderData.provider
             });
+
+            // const data = {
+            //     id: renderData.userId,
+            //     name: renderData.userName
+            // }
+            // userRef?.current?.setDepartment(data);
+            // setUserNameId(data)
 
             if (renderData.provider && renderData.providerName) {
                 const data = {
@@ -297,77 +370,107 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
         return lists.reverse();
     };
 
-    return (
-        <ProForm
-            formRef={formRef}
-            submitter={false}
-            onFinish={async (e: any) => console.log(e)}>
-            <ProFormList
-                name="users"
-                creatorButtonProps={{
-                    creatorButtonText: '新增一条班型信息'
-                }}
-                creatorRecord={() => {
-                    // 创建一个新记录时的默认值
-                    const defaultRecord = {
-                        project: renderData?.project ?
-                            Dictionaries.getCascaderValue('dict_reg_job', renderData.project) :
-                            [],
-                        quantity: 1,
-                        source: renderData && renderData.studentSource ? Dictionaries.getName('dict_source', renderData.studentSource) : undefined,
-                        provider: {
-                            value: renderData?.provider ?? null
-                        },
-                        receivable: 0,
-                        studentUserId: renderData?.id ?? null,
-                        discount: 0,
-                        discountRemark: '',
-                        JobClassExam: null // 确保班型选择字段存在但初始为null
+    useEffect(() => {
+        if (chargeLog) {
+            setChargeLogVisible(false);
+
+            // 获取当前 users 数据
+            const users = formRef?.current?.getFieldValue('users') || [];
+            const newUsers = [...users];
+
+            if (Array.isArray(chargeLog)) {
+                chargeLog.forEach((log) => {
+                    newUsers[chargeLogIndex] = {
+                        ...newUsers[chargeLogIndex],
+                        chargeLogIds: chargeLog[0].id,
+                        amount: chargeLog[0].amount,
+                        chargeLogName: chargeLog.map(x => x.name).join('、') + '的收款记录',
+                        paymentTime: chargeLog[0].paymentTime,
+                        //userId: chargeLog[0].userId + '',
+                        userId: { "value": chargeLog[0].userId },
+                        method: chargeLog[0].method + '',
+                        surplus: users[chargeLogIndex].receivable - chargeLog[0].amount,
                     };
+                });
+            }
 
-                    // 如果没有renderData，也要确保返回一个有效的记录
-                    if (!renderData) {
-                        return {
-                            ...defaultRecord,
-                            project: [], // 空数组作为初始值，确保下拉框可以显示
-                            source: '',
-                            provider: { value: null },
-                            studentUserId: null
+            // 更新表单数据
+            formRef?.current?.setFieldsValue({
+                users: newUsers
+            });
+        }
+    }, [chargeLog])
+
+    return (
+        <>
+            <ProForm
+                formRef={formRef}
+                submitter={false}
+                onFinish={async (e: any) => console.log(e)}>
+                <ProFormList
+                    name="users"
+                    creatorButtonProps={{
+                        creatorButtonText: '新增一条班型信息'
+                    }}
+                    creatorRecord={() => {
+                        // 创建一个新记录时的默认值
+                        const defaultRecord = {
+                            project: renderData?.project ?
+                                Dictionaries.getCascaderValue('dict_reg_job', renderData.project) :
+                                [],
+                            quantity: 1,
+                            //source: renderData && renderData.studentSource ? Dictionaries.getName('dict_source', renderData.studentSource) : undefined,
+                            provider: {
+                                value: renderData?.provider ?? null
+                            },
+                            userId: renderData?.userId ?? null,
+                            receivable: 0,
+                            studentUserId: renderData?.id ?? null,
+                            discount: 0,
+                            discountRemark: '',
+                            JobClassExam: null, // 确保班型选择字段存在但初始为null
                         };
-                    }
+                        console.log(renderData, 'defaultRecord----->')
 
-                    return defaultRecord;
-                }}
-                actionGuard={{
-                    beforeAddRow: async (defaultValue, insertIndex) => {
-                        try {
-                            // 安全处理project不存在的情况
-                            const projectValue = renderData?.project || [];
-                            await handleChangeProject(
-                                Array.isArray(projectValue) ? projectValue : [projectValue],
-                                insertIndex as number
-                            );
-
-                            // 调用父组件传入的回调函数，通知需要添加支付方式
-                            // if (onAddClassType) {
-                            //     onAddClassType();
-                            // }
-                        } catch (error) {
-                            console.error('添加行时处理项目失败:', error);
+                        // 如果没有renderData，也要确保返回一个有效的记录
+                        if (!renderData) {
+                            return {
+                                ...defaultRecord,
+                                project: [], // 空数组作为初始值，确保下拉框可以显示
+                                source: '',
+                                provider: { value: null },
+                                studentUserId: null
+                            };
                         }
-                        return new Promise((resolve) => {
-                            setTimeout(() => {
-                                // 添加行后，重新计算总receivable
+
+                        return defaultRecord;
+                    }}
+                    actionGuard={{
+                        beforeAddRow: async (defaultValue, insertIndex) => {
+                            // console.log(defaultValue, 'defaultValue----->')
+                            try {
+                                // 安全处理project不存在的情况
+                                const projectValue = renderData?.project || [];
+                                await handleChangeProject(
+                                    Array.isArray(projectValue) ? projectValue : [projectValue],
+                                    insertIndex as number
+                                );
+
+                                // 立即获取最新的 users 数据
                                 const users = formRef?.current?.getFieldValue('users') || [];
-                                const receivableSum = users.reduce((total: number, user: any) => {
-                                    return total + (Number(user.receivable) || 0);
+                                const discountSum = users.reduce((total: number, user: any) => {
+                                    return total + (Number(user.discount) || 0);
                                 }, 0);
+                                const receivableSum = users.reduce((total: number, user: any) => {
+                                    return total + (Number(user.receivable) || 0) - (Number(user.discount) || 0);
+                                }, 0) + defaultValue.receivable - defaultValue.discount;
+                                //- defaultValue.discount
+
                                 const quantitySum = users.reduce((total: number, user: any) => {
                                     return total + (Number(user.quantity) || 0);
                                 }, 0);
-                                const discountSum = users.reduce((total: number, user: any) => {
-                                    return total + (Number(user.discount) || 0);
-                                }, 0)
+
+                                // 更新状态和回调
                                 setDiscountPrice(discountSum);
                                 setTotalPrice(receivableSum);
                                 setTotalQuantity(quantitySum);
@@ -377,291 +480,656 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                     receivable: receivableSum,
                                     quantity: quantitySum
                                 });
-                                resolve(true);
-                            }, 1000);
-                        });
-                    },
-                    beforeRemoveRow: async (index) => {
-                        return new Promise((resolve) => {
-                            if (index === 0) {
-                                message.error('这行不能删');
-                                resolve(false);
-                                return;
+
+                                // 调用父组件传入的回调函数
+                                // if (onAddClassType) {
+                                //     onAddClassType();
+                                // }
+                                return true;
+                            } catch (error) {
+                                console.error('添加行时处理项目失败:', error);
+                                return false;
                             }
+                        },
+                        beforeRemoveRow: async (index) => {
+                            return new Promise((resolve) => {
+                                if (index === 0) {
+                                    message.error('这行不能删');
+                                    resolve(false);
+                                    return;
+                                }
 
-                            // 先通知父组件删除对应的支付方式
-                            // if (props.onRemoveClassType) {
-                            //     props.onRemoveClassType(index);
-                            // }
+                                // 先通知父组件删除对应的支付方式
+                                // if (props.onRemoveClassType) {
+                                //     props.onRemoveClassType(index);
+                                // }
 
-                            // 删除行后，重新计算总receivable
-                            const users = formRef?.current?.getFieldValue('users') || [];
-                            // 模拟删除该行后的数组
-                            const newUsers = [...users];
-                            newUsers.splice(index, 1);
-                            const receivableSum = newUsers.reduce((total: number, user: any) => {
-                                return total + (Number(user.receivable) || 0);
-                            }, 0);
-                            const quantitySum = newUsers.reduce((total: number, user: any) => {
-                                return total + (Number(user.quantity) || 0);
-                            }, 0);
-                            const discountSum = newUsers.reduce((total: number, user: any) => {
-                                return total + (Number(user.discount) || 0);
-                            }, 0)
-                            setTotalPrice(receivableSum);
-                            setTotalQuantity(quantitySum);
-                            setDiscountPrice(discountSum)
-                            onTotalPriceChange?.(receivableSum);
-                            onTotalQuantityChange?.(quantitySum);
+                                // 删除行后，重新计算总receivable
+                                const users = formRef?.current?.getFieldValue('users') || [];
+                                // 模拟删除该行后的数组
+                                const newUsers = [...users];
+                                newUsers.splice(index, 1);
+                                const receivableSum = newUsers.reduce((total: number, user: any) => {
+                                    return total + (Number(user.receivable) || 0);
+                                }, 0);
+                                const quantitySum = newUsers.reduce((total: number, user: any) => {
+                                    return total + (Number(user.quantity) || 0);
+                                }, 0);
+                                const discountSum = newUsers.reduce((total: number, user: any) => {
+                                    return total + (Number(user.discount) || 0);
+                                }, 0)
 
-                            setTimeout(() => {
-                                formRef?.current?.setFieldsValue({
-                                    receivable: receivableSum,
-                                    quantity: quantitySum
-                                });
-                                resolve(true);
-                            }, 100);
-                        });
-                    },
-                }}
-                itemRender={({ listDom, action }, { record, index }) => {
-                    return (
-                        <ProCard
-                            bordered
-                            title={'报考班型'}
-                            extra={action}
-                            style={{
-                                width: '1000px',
-                                margin: '0 auto',
-                                marginBlockEnd: 8,
-                            }}
-                        >
+                                const newTotalPrice = receivableSum - discountSum;
+                                onTotalPriceChange?.(newTotalPrice);
 
-                            <ProFormGroup key={index}>
-                                <ProForm.Group>
-                                    {/* 报考岗位下拉框，无条件渲染 */}
-                                    <ProFormCascader
-                                        width="sm"
-                                        name="project"
-                                        placeholder="咨询报考岗位"
-                                        label="报考岗位"
-                                        rules={[{ required: true, message: '请选择报考岗位' }]}
-                                        fieldProps={{
-                                            options: Dictionaries.getCascader('dict_reg_job'),
-                                            showSearch: { filter },
-                                            onChange: (e: any) => { handleChangeProject(e, index) }
-                                            // onSearch: (value) => console.log(value)
-                                        }}
-                                    />
 
-                                    {/* 班型选择，有条件渲染 */}
-                                    {JobClassExam[index] ? (<>
-                                        <ProFormSelect
-                                            label="班型选择"
-                                            name="JobClassExam"
-                                            fieldProps={{
-                                                options: JobClassExam[index],
-                                                showSearch: true,
-                                                onSelect: (e: string) => {
-                                                    try {
-                                                        const arr = JSON.parse(e);
-                                                        if (!arr || typeof arr !== 'object') {
-                                                            throw new Error('Invalid data format');
-                                                        }
+                                setTotalPrice(receivableSum);
+                                setTotalQuantity(quantitySum);
+                                setDiscountPrice(discountSum)
+                                //onTotalPriceChange?.(receivableSum);
+                                onTotalQuantityChange?.(quantitySum);
+
+                                setTimeout(() => {
+                                    formRef?.current?.setFieldsValue({
+                                        receivable: receivableSum,
+                                        quantity: quantitySum
+                                    });
+                                    resolve(true);
+                                }, 100);
+                            });
+                        },
+                    }}
+                    itemRender={({ listDom, action }, { record, index }) => {
+                        return (
+                            <>
+                                <ProCard
+                                    bordered
+                                    title={'报考班型'}
+                                    extra={action}
+                                    style={{
+                                        width: '1000px',
+                                        margin: '0 auto',
+                                        marginBlockEnd: 8,
+                                    }}
+                                >
+
+                                    <ProFormGroup key={index}>
+                                        <ProForm.Group>
+                                            {/* 报考岗位下拉框，无条件渲染 */}
+                                            <ProFormCascader
+                                                width="sm"
+                                                name="project"
+                                                placeholder="咨询报考岗位"
+                                                label="报考岗位"
+                                                rules={[{ required: true, message: '请选择报考岗位' }]}
+                                                fieldProps={{
+                                                    options: newProjectslist,
+                                                    showSearch: { filter },
+                                                    onChange: (e: any) => { handleChangeProject(e, index) }
+                                                }}
+                                            />
+
+                                            {/* 班型选择，有条件渲染 */}
+                                            {JobClassExam[index] ? (<>
+                                                <ProFormSelect
+                                                    label="班型选择"
+                                                    name="JobClassExam"
+                                                    fieldProps={{
+                                                        options: JobClassExam[index],
+                                                        showSearch: true,
+                                                        onSelect: (e: string) => {
+                                                            let newE = JSON.parse(e)
+                                                            console.log(newE.receivable, 'newE=====>')
+
+                                                            const users = formRef?.current?.getFieldValue('users') || [];
+                                                            const TotalSum = users.reduce((total: number, user: any) => {
+                                                                return total + (Number(user.receivable) || 0);
+                                                            }, 0) + newE.receivable;
+
+                                                            const TotalDiscount = users.reduce((total: number, user: any) => {
+                                                                return total + (Number(user.discount) || 0);
+                                                            }, 0)
+                                                            console.log(TotalSum - TotalDiscount)
+                                                            onTotalPriceChange?.(TotalSum - TotalDiscount);
+
+                                                            try {
+                                                                const arr = JSON.parse(e);
+                                                                if (!arr || typeof arr !== 'object') {
+                                                                    throw new Error('Invalid data format');
+                                                                }
+                                                                const users = formRef?.current?.getFieldValue('users') || [];
+                                                                if (!Array.isArray(users)) {
+                                                                    throw new Error('Users data is not an array');
+                                                                }
+                                                                // 创建新数组，确保React能检测到状态变化
+                                                                const newUsers = [...users];
+                                                                newUsers[index] = {
+                                                                    ...newUsers[index],
+                                                                    receivable: arr.receivable || 0
+                                                                };
+                                                                // 使用setFieldsValue更新表单状态
+                                                                formRef?.current?.setFieldsValue({
+                                                                    users: newUsers
+                                                                });
+
+                                                                // 计算所有receivable和quantity的总和
+                                                                // const receivableSum = newUsers.reduce((total, user) => {
+                                                                //     return total + (Number(user.receivable) || 0);
+                                                                // }, 0);
+                                                                const quantitySum = newUsers.reduce((total, user) => {
+                                                                    return total + (Number(user.quantity) || 0);
+                                                                }, 0);
+                                                                // const discountSum = newUsers.reduce((total, user) => {
+                                                                //     return total + (Number(user.quantity) || 0);
+                                                                // }, 0);
+
+
+                                                                const TotalSum = users.reduce((total: number, user: any) => {
+                                                                    return total + (Number(user.receivable) || 0);
+                                                                }, 0) + newE.receivable;
+    
+                                                                const TotalDiscount = users.reduce((total: number, user: any) => {
+                                                                    return total + (Number(user.discount) || 0);
+                                                                }, 0)
+
+                                                                // 更新状态和回调
+                                                                // setDiscountPrice(discountSum);
+                                                                // setTotalPrice(receivableSum);
+                                                                setTotalQuantity(quantitySum);
+                                                                //onTotalPriceChange?.(receivableSum);
+                                                                onTotalPriceChange?.(TotalSum - TotalDiscount);
+                                                                onTotalQuantityChange?.(quantitySum);
+
+                                                                // 更新表单字段
+                                                                formRef?.current?.setFieldsValue({
+                                                                    //receivable: receivableSum,
+                                                                    receivable:TotalSum,
+                                                                    quantity: quantitySum
+                                                                });
+                                                            } catch (error) {
+                                                                message.error('操作失败，请重试');
+                                                            }
+                                                        },
+                                                    }}
+                                                    width="sm"
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            message: '请选择班型选择',
+                                                        },
+                                                    ]}
+                                                />
+                                                <Button
+                                                    style={{ marginTop: '30px', marginLeft: '-30px' }}
+                                                    type="primary"
+                                                    onClick={async () => {
+                                                        const arr1 = JSON.parse(JSON.stringify(JobClassExam));
+                                                        arr1[index] = false;
+                                                        setJobClassExam(arr1);
+                                                    }}
+                                                >
+                                                    取消
+                                                </Button>
+
+                                                <ProFormDigit
+                                                    name="quantity"
+                                                    width="sm"
+                                                    label="报名人数"
+                                                    disabled={true}
+                                                    fieldProps={{
+                                                        onChange: (e: any) => { },
+                                                    }}
+                                                    rules={[{ required: true, message: '请填写报名人数' }]}
+                                                />
+
+                                                <ProFormDigit
+                                                    name="receivable"
+                                                    label="收费标准"
+                                                    width="sm"
+                                                    disabled={JobClassExam[index]}
+                                                    fieldProps={{
+                                                        onChange: (e: any) => { },
+                                                    }}
+                                                    rules={[{ required: true, message: '请输入金额' }]}
+                                                />
+
+                                                {/* <ProFormSelect
+                                                    label="订单来源"
+                                                    name="source"
+                                                    placeholder="请选择订单来源"
+                                                    //hidden={true}
+                                                    width="sm"
+                                                    rules={[{ required: true, message: '请选择订单来源' }]}
+                                                    request={async () => Dictionaries.getList('dict_source') as any}
+                                                    allowClear={true}
+                                                    fieldProps={{
+                                                        showSearch: true,
+                                                        placeholder: '请选择订单来源',
+                                                    }}
+                                                /> */}
+                                                <ProFormMoney
+                                                    name="discount"
+                                                    label="订单优惠金额"
+                                                    width="sm"
+                                                    customSymbol="¥"
+                                                    fieldProps={{
+                                                        onChange: (e) => {
+                                                            const users = formRef?.current?.getFieldValue('users') || [];
+                                                            const discountSum = users.reduce((total: number, user: any) => {
+                                                                return total + (Number(user.discount) || 0);
+                                                            }, 0);
+                                                            const moneySum = users.reduce((total: number, user: any) => {
+                                                                return total + (Number(user.receivable) || 0);
+                                                            }, 0);
+                                                            setDiscountPrice(discountSum);
+                                                            onTotalPriceChange?.(moneySum - discountSum);
+                                                            // 动态设置 discountRemark 的 rules
+                                                            const isDiscount = Number(e) !== 0;
+                                                            setDiscountRemake(isDiscount);
+                                                        },
+                                                    }}
+                                                    rules={[
+                                                        { required: true },
+                                                    ]}
+                                                />
+                                                <ProFormText
+                                                    name="discountRemark"
+                                                    label="订单优惠原因"
+                                                    width="sm"
+                                                    fieldProps={{
+                                                        autoComplete: 'no',
+                                                    }}
+                                                    rules={[
+                                                        { required: discountRemake, message: '请填写本次折扣原因' },
+                                                    ]}
+                                                />
+                                                <ProFormText
+                                                    name="studentUserId"
+                                                    hidden={true}
+                                                    label="订单优惠原因"
+                                                    width="sm"
+                                                    fieldProps={{
+                                                        autoComplete: 'no',
+                                                    }}
+                                                    rules={[
+                                                    ]}
+                                                />
+                                                <ProFormTreeSelect
+                                                    name={'provider'}
+                                                    label={'信息提供人'}
+                                                    placeholder={'请输入信息提供人'}
+                                                    allowClear
+                                                    hidden={true}
+                                                    width={'sm'}
+                                                    secondary
+                                                    request={() => {
+                                                        return getDepartment();
+                                                    }}
+                                                    required
+                                                    fieldProps={{
+                                                        treeDefaultExpandAll: true,
+                                                        filterTreeNode: true,
+                                                        showSearch: true,
+                                                        dropdownMatchSelectWidth: false,
+                                                        labelInValue: true,
+                                                        treeNodeFilterProp: 'title',
+                                                        fieldNames: {
+                                                            label: 'title',
+                                                        },
+
+                                                    }}
+                                                />
+                                            </>) : (
+                                                <span style={{ display: 'inline-block', marginTop: '32px' }}>
+                                                    该项目尚未设置收费标准,请联系管理员设置!
+                                                </span>
+                                            )}
+
+                                        </ProForm.Group>
+                                        <div style={{ fontSize: '16px', fontWeight: '500', color: 'rgba(0, 0, 0, 0.85)', marginBottom: '20px' }}>支付方式</div>
+                                        <ProForm.Group>
+                                            <ProFormSelect
+                                                label="缴费类型"
+                                                name="type"
+                                                width="sm"
+                                                request={async () =>
+                                                    Dictionaries.getList('chargeType')?.filter(x => ['0', '4', '5', '6'].indexOf(x.value) != -1) as any
+                                                }
+                                                fieldProps={{
+                                                    onChange(e, record) {
+                                                        const newChargeType = [...chargeType];
+                                                        newChargeType[index] = e;
+                                                        setChargeType(newChargeType);
+                                                    }
+                                                }}
+                                                required
+                                            />
+                                            <ProFormText
+                                                label="chargeLogIds"
+                                                name="chargeLogIds"
+                                                width="sm"
+                                                hidden={true}
+                                            />
+                                            {chargeType[index] === '6' ? (
+                                                <>
+                                                    <ProFormText
+                                                        label="收款记录"
+                                                        name="chargeLogName"
+                                                        width="sm"
+                                                        rules={[
+                                                            {
+                                                                required: true,
+                                                            },
+                                                        ]}
+                                                        fieldProps={{
+                                                            onClick: () => {
+                                                                setChargeLogIndex(index)
+                                                                setChargeLog(null);
+                                                                setChargeLogVisible(true);
+                                                                return false;
+                                                            }
+                                                        }}
+                                                    />
+                                                </>
+                                            ) : null}
+
+                                            <ProFormSelect
+                                                label="付款方式"
+                                                name="method"
+                                                width="sm"
+                                                request={async () => Dictionaries.getList('dict_stu_refund_type') as any}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message: '请选择付款方式',
+                                                    },
+                                                ]}
+                                            />
+                                            <ProFormSelect
+                                                label="付款方式"
+                                                name="departmentId"
+                                                width="sm"
+                                                hidden={true}
+                                            />
+                                            <ProFormTreeSelect
+                                                name={'userId'}
+                                                label={'收费人'}
+                                                placeholder={'请输入收费人'}
+                                                allowClear
+                                                width={'sm'}
+                                                secondary
+                                                request={() => {
+                                                    return getDepartment();
+                                                }}
+                                                required
+                                                fieldProps={{
+                                                    treeDefaultExpandAll: true,
+                                                    filterTreeNode: true,
+                                                    showSearch: true,
+                                                    dropdownMatchSelectWidth: false,
+                                                    labelInValue: true,
+                                                    treeNodeFilterProp: 'title',
+                                                    fieldNames: {
+                                                        label: 'title',
+                                                    },
+
+                                                }}
+                                            />
+                                            <ProFormDateTimePicker
+                                                name="chargeTime"
+                                                width="sm"
+                                                label="收费日期"
+                                                initialValue={moment().format('YYYY-MM-DD HH:mm:ss')}
+                                                fieldProps={{
+                                                    onChange(e) {
+                                                        //formRef.current[index]?.setFieldValue('paymentTime', undefined)
                                                         const users = formRef?.current?.getFieldValue('users') || [];
-                                                        if (!Array.isArray(users)) {
-                                                            throw new Error('Users data is not an array');
-                                                        }
-                                                        // 创建新数组，确保React能检测到状态变化
                                                         const newUsers = [...users];
                                                         newUsers[index] = {
                                                             ...newUsers[index],
-                                                            receivable: arr.receivable || 0
+                                                            chargeTime: moment(e).format('YYYY-MM-DD HH:mm:ss')
                                                         };
-
-                                                        // 使用setFieldsValue更新表单状态
                                                         formRef?.current?.setFieldsValue({
                                                             users: newUsers
                                                         });
-
-                                                        // 计算所有receivable和quantity的总和
-                                                        const receivableSum = newUsers.reduce((total, user) => {
-                                                            return total + (Number(user.receivable) || 0);
-                                                        }, 0);
-                                                        const quantitySum = newUsers.reduce((total, user) => {
-                                                            return total + (Number(user.quantity) || 0);
-                                                        }, 0);
-                                                        const discountSum = newUsers.reduce((total, user) => {
-                                                            return total + (Number(user.quantity) || 0);
-                                                        }, 0);
-                                                        console.log(discountSum, 'discountSum----->')
-                                                        // 更新状态和回调
-                                                        setDiscountPrice(discountSum);
-                                                        setTotalPrice(receivableSum);
-                                                        setTotalQuantity(quantitySum);
-                                                        onTotalPriceChange?.(receivableSum);
-                                                        onTotalQuantityChange?.(quantitySum);
-
-                                                        // 更新表单字段
-                                                        formRef?.current?.setFieldsValue({
-                                                            receivable: receivableSum,
-                                                            quantity: quantitySum
-                                                        });
-                                                    } catch (error) {
-                                                        message.error('操作失败，请重试');
+                                                    },
+                                                    format: 'YYYY-MM-DD HH:mm:ss',
+                                                }}
+                                                rules={[{ required: true, message: '请填写收费日期' }]}
+                                            />
+                                            <ProFormDateTimePicker
+                                                name="paymentTime"
+                                                label="实际到账日期"
+                                                fieldProps={{
+                                                    showTime: { format: 'HH:mm:ss' },
+                                                    format: 'YYYY-MM-DD HH:mm:ss',
+                                                    onChange(e) {
+                                                        // 使用用户选择的时间，而不是当前时间
+                                                        if (e) {
+                                                            //formRefs.current[index]?.setFieldValue('paymentTime', moment(e).format('YYYY-MM-DD HH:mm:ss'))
+                                                            const users = formRef?.current?.getFieldValue('users') || [];
+                                                            const newUsers = [...users];
+                                                            newUsers[index] = {
+                                                                ...newUsers[index],
+                                                                paymentTime: moment(e).format('YYYY-MM-DD HH:mm:ss')
+                                                            };
+                                                            formRef?.current?.setFieldsValue({
+                                                                users: newUsers
+                                                            });
+                                                        }
+                                                    },
+                                                }}
+                                                width="sm"
+                                                disabled={chargeType[index] == '4' || chargeType[index] == '6'}
+                                                rules={[{ required: ['4', '6'].indexOf(chargeType[index]) == -1, message: '请填写缴费日期' }]}
+                                            />
+                                            <ProFormDateTimePicker
+                                                name="nextPaymentTime"
+                                                width="sm"
+                                                label="下次缴费时间"
+                                                fieldProps={{
+                                                    showTime: { format: 'HH:mm' },
+                                                    format: 'YYYY-MM-DD HH:mm',
+                                                    onChange(e) {
+                                                        // 使用用户选择的时间，而不是当前时间
+                                                        if (e) {
+                                                            //formRefs.current[index]?.setFieldValue('nextPaymentTime', moment(e).format('YYYY-MM-DD HH:mm:ss'))
+                                                            const users = formRef?.current?.getFieldValue('users') || [];
+                                                            const newUsers = [...users];
+                                                            newUsers[index] = {
+                                                                ...newUsers[index],
+                                                                nextPaymentTime: moment(e).format('YYYY-MM-DD HH:mm:ss')
+                                                            };
+                                                            formRef?.current?.setFieldsValue({
+                                                                users: newUsers
+                                                            });
+                                                        }
+                                                    },
+                                                }}
+                                            />
+                                            <ProFormMoney
+                                                label={`本次收费金额`}
+                                                name="amount"
+                                                width="sm"
+                                                customSymbol="¥"
+                                                fieldProps={{
+                                                    onChange(e) {
+                                                        const users = formRef?.current?.getFieldValue('users') || [];
+                                                        const amount = Number(e) || 0;
+                                                        const totalReceivable = users[index].receivable || 0;
+                                                        const surplus = totalReceivable - amount;
+                                                        const performance = amount - users[index].collectedAmount;
+                                                        if (isNaN(performance)) {
+                                                            const newUsers = [...users];
+                                                            newUsers[index] = {
+                                                                ...newUsers[index],
+                                                                surplus: surplus,
+                                                                performanceAmount: 0,
+                                                                commissionBase: 0
+                                                            };
+                                                            formRef?.current?.setFieldsValue({
+                                                                users: newUsers,
+                                                            });
+                                                        } else {
+                                                            const newUsers = [...users];
+                                                            newUsers[index] = {
+                                                                ...newUsers[index],
+                                                                surplus: surplus,
+                                                                performanceAmount: performance,
+                                                                commissionBase: performance
+                                                            };
+                                                            formRef?.current?.setFieldsValue({
+                                                                users: newUsers,
+                                                            });
+                                                        }
                                                     }
-                                                },
-                                            }}
-                                            width="sm"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: '请选择班型选择',
-                                                },
-                                            ]}
-                                        />
-                                        <Button
-                                            style={{ marginTop: '30px', marginLeft: '-30px' }}
-                                            type="primary"
-                                            onClick={async () => {
-                                                const arr1 = JSON.parse(JSON.stringify(JobClassExam));
-                                                arr1[index] = false;
-                                                setJobClassExam(arr1);
-                                            }}
-                                        >
-                                            取消
-                                        </Button>
+                                                }}
+                                                rules={[
+                                                    { required: true, message: '请输入收费金额' },
+                                                    { type: 'number', min: 0, message: '金额必须大于等于0' },
+                                                    {
+                                                        validator: async (_, value) => {
+                                                            if (value && value > 999999999) {
+                                                                throw new Error('金额不能超过9位数');
+                                                            }
+                                                            return Promise.resolve();
+                                                        }
+                                                    }
+                                                ]}
+                                            />
+                                            <ProFormMoney
+                                                tooltip="返代理费、快递费、税费，不包含在收费标准里的报名费等"
+                                                label={`代收款项`}
+                                                name="collectedAmount"
+                                                width="sm"
+                                                customSymbol="¥"
+                                                min={0}
+                                                fieldProps={{
+                                                    onChange(e) {
+                                                        const users = formRef?.current?.getFieldValue('users') || [];
+                                                        const collectedAmount = Number(e) || 0;
+                                                        const amount = users[index].amount;
+                                                        const performance = amount - collectedAmount;
+                                                        if (collectedAmount > amount) {
+                                                            Modal.info({
+                                                                title: '注意！当前代收款项金额大于收费金额！',
+                                                                icon: <ExclamationCircleFilled />,
+                                                                onOk() {
+                                                                    const newUsers = [...users];
+                                                                    newUsers[index] = {
+                                                                        ...newUsers[index],
+                                                                        performanceAmount: 0,
+                                                                        commissionBase: 0,
+                                                                        collectedAmount: ''
+                                                                    };
+                                                                    formRef?.current?.setFieldsValue({
+                                                                        users: newUsers
+                                                                    });
+                                                                }
+                                                            });
+                                                        } else {
+                                                            const newUsers = [...users];
+                                                            newUsers[index] = {
+                                                                ...newUsers[index],
+                                                                performanceAmount: performance,
+                                                                commissionBase: performance
+                                                            };
+                                                            formRef?.current?.setFieldsValue({
+                                                                users: newUsers
+                                                            });
+                                                        }
+                                                    },
+                                                }}
+                                                rules={[
+                                                    { required: true, message: '请输入代收款项金额' },
+                                                    { type: 'number', min: 0, message: '金额必须大于等于0' },
+                                                    {
+                                                        validator: async (_, value) => {
+                                                            if (value && value > 999999999) {
+                                                                throw new Error('金额不能超过9位数');
+                                                            }
+                                                            return Promise.resolve();
+                                                        }
+                                                    }
+                                                ]}
+                                            />
+                                            <ProFormDigit
+                                                label={`业绩金额（+）`}
+                                                readonly={true}
+                                                name="performanceAmount"
+                                                width="sm"
+                                            />
+                                            <ProFormDigit
+                                                label={`提成基数（+）`}
+                                                readonly={true}
+                                                name="commissionBase"
+                                                width="sm"
+                                            />
+                                            <ProFormText label="本次收费后剩余尾款" name="surplus" readonly />
+                                        </ProForm.Group>
+                                    </ProFormGroup>
+                                    <ProFormTextArea
+                                        width={1100}
+                                        label='备注'
+                                        name="description"
+                                    />
+                                    <ProFormUploadDragger
+                                        width={950}
+                                        label="上传附件"
+                                        name="files"
+                                        action="/sms/business/bizNotice/upload"
+                                        fieldProps={{
+                                            multiple: true,
+                                            headers: {
+                                                ...obj,
+                                            },
+                                            listType: 'picture',
+                                            onRemove: (e: any) => { },
+                                            beforeUpload: (file: any) => {
+                                                console.log('file', file);
+                                            },
+                                            onPreview: async (file: any) => {
+                                                console.log('file', file);
 
-                                        <ProFormDigit
-                                            name="quantity"
-                                            width="sm"
-                                            label="报名人数"
-                                            disabled={true}
-                                            fieldProps={{
-                                                onChange: (e: any) => { },
-                                            }}
-                                            rules={[{ required: true, message: '请填写报名人数' }]}
-                                        />
+                                                if (!file.url && !file.preview) {
+                                                    console.log('1');
+                                                }
+                                            },
+                                            onChange: (info: any) => {
+                                                const { status } = info.file;
+                                                if (status !== 'uploading') {
+                                                }
+                                                if (status === 'done') {
+                                                    message.success(`${info.file.name} 上传成功.`);
+                                                } else if (status === 'error') {
+                                                    message.error(`${info.file.name} 上传失败.`);
+                                                }
+                                            },
+                                        }}
+                                    />
+                                </ProCard>
+                            </>
+                        );
+                    }}
+                >
 
-                                        <ProFormDigit
-                                            name="receivable"
-                                            label="收费标准"
-                                            width="sm"
-                                            disabled={JobClassExam[index]}
-                                            fieldProps={{
-                                                onChange: (e: any) => { },
-                                            }}
-                                            rules={[{ required: true, message: '请输入金额' }]}
-                                        />
-
-                                        <ProFormSelect
-                                            label="订单来源"
-                                            name="source"
-                                            placeholder="请选择订单来源"
-                                            hidden={true}
-                                            width="sm"
-                                            rules={[{ required: true, message: '请选择订单来源' }]}
-                                            request={async () => Dictionaries.getList('dict_source') as any}
-                                            allowClear={true}
-                                            fieldProps={{
-                                                showSearch: true,
-                                                placeholder: '请选择订单来源',
-                                            }}
-                                        />
-                                        <ProFormDigit
-                                            name="discount"
-                                            label="订单优惠金额"
-                                            min={-99}
-                                            max={99999999}
-                                            width={280}
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                },
-                                            ]}
-                                            fieldProps={{
-                                                precision: 2,
-                                                onChange: (e) => {
-                                                    console.log(typeof e, 'e')
-                                                    const users = formRef?.current?.getFieldValue('users') || [];
-                                                    const discountSum = users.reduce((total: number, user: any) => {
-                                                        return total + (Number(user.discount) || 0);
-                                                    }, 0);
-                                                    setDiscountPrice(discountSum);
-                                                    onTotalPriceChange?.(totalPrice - discountSum);
-                                                    // 动态设置 discountRemark 的 rules
-                                                    const isDiscount = Number(e) !== 0;
-                                                    setDiscountRemake(isDiscount)
-                                                },
-                                            }}
-                                        />
-                                        <ProFormText
-                                            name="discountRemark"
-                                            label="订单优惠原因"
-                                            width="sm"
-                                            fieldProps={{
-                                                autoComplete: 'no',
-                                            }}
-                                            rules={[
-                                                { required: discountRemake, message: '请填写本次折扣原因' },
-                                            ]}
-                                        />
-                                        <ProFormText
-                                            name="studentUserId"
-                                            hidden={true}
-                                            label="订单优惠原因"
-                                            width="sm"
-                                            fieldProps={{
-                                                autoComplete: 'no',
-                                            }}
-                                            rules={[
-                                            ]}
-                                        />
-                                        <ProFormTreeSelect
-                                            name={'provider'}
-                                            label={'信息提供人'}
-                                            placeholder={'请输入信息提供人'}
-                                            allowClear
-                                            hidden={true}
-                                            width={'sm'}
-                                            secondary
-                                            request={() => {
-                                                return getDepartment();
-                                            }}
-                                            required
-                                            fieldProps={{
-                                                treeDefaultExpandAll: true,
-                                                filterTreeNode: true,
-                                                showSearch: true,
-                                                dropdownMatchSelectWidth: false,
-                                                labelInValue: true,
-                                                treeNodeFilterProp: 'title',
-                                                fieldNames: {
-                                                    label: 'title',
-                                                },
-
-                                            }}
-                                        />
-                                    </>) : (
-                                        <span style={{ display: 'inline-block', marginTop: '32px' }}>
-                                            该项目尚未设置收费标准,请联系管理员设置!
-                                        </span>
-                                    )}
-
-                                </ProForm.Group>
-                            </ProFormGroup>
-                        </ProCard>
-                    );
-                }}
-            >
-
-            </ProFormList>
-            {/* <ProFormTextArea
+                </ProFormList>
+                {/* <ProFormTextArea
                 width={1100}
                 label={'备注'}
                 name="description"
             /> */}
-        </ProForm>
+            </ProForm>
+            <Modal
+                title="选择收款记录"
+                width={1200}
+                open={chargeLogVisible}
+                onCancel={() => setChargeLogVisible(false)}
+                footer={null}
+            >
+                <ChargeLog select={setChargeLog} type={1} Orderpage={true} />
+            </Modal>
+        </>
     );
 })
 

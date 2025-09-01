@@ -51,7 +51,7 @@ export default (props: any) => {
     if (dictionariesList) {
       let dictionariesArray = JSON.parse(dictionariesList)[1].children
       const formattedData = convertToTreeData(dictionariesArray)
-      console.log(formattedData,'handleOpenProject()')
+      console.log(formattedData, 'handleOpenProject()')
       setTreeData(formattedData);
       setFilteredTreeData(formattedData);
     }
@@ -216,10 +216,40 @@ export default (props: any) => {
         onOk={() => {
           handleSure()
         }}
-        width={400}
+        width={500}
         destroyOnClose={true}
       >
-        <div className="menu-tree-container">
+        <div style={{ width: '100%', height: '400px', overflowY: 'auto' }}>
+          <div style={{ width: '100%', overflowY: 'auto' }}>
+            <div className="menu-tree-container">
+              <Search
+                placeholder="搜索菜单"
+                allowClear
+                onChange={(e) => setSearchValue(e.target.value)}
+                style={{ marginBottom: 8 }}
+              />
+
+              {treeData.length > 0 ? (
+                filteredTreeData.length > 0 ? (
+                  <Tree
+                    showIcon
+                    checkable
+                    defaultExpandAll={false}
+                    treeData={filteredTreeData}
+                    checkedKeys={checkedKeys}
+                    onCheck={handleCheck}
+                    checkStrictly={true}
+                  />
+                ) : (
+                  <div>没有匹配的菜单项</div>
+                )
+              ) : (
+                <div>暂无菜单数据</div>
+              )}
+            </div>
+          </div>
+        </div>
+        {/* <div className="menu-tree-container">
           <Search
             placeholder="搜索菜单"
             allowClear
@@ -244,7 +274,7 @@ export default (props: any) => {
           ) : (
             <div>暂无菜单数据</div>
           )}
-        </div>
+        </div> */}
       </Modal>
     </>
   );
