@@ -103,27 +103,31 @@
     path: '/business/cluelist',
     component: './Business/ClueList',
   },
-  // {
-  //   name: '个人视图',
-  //   path: '/business/cluelist/personview',
-  //   component: './Business/ClueList/PersonView'
-  // },
-  // {
-  //   name: '管理视图',
-  //   path: '/business/cluelist/managerview',
-  //   component: './Business/ClueList/ManagerView'
-  // },
-
-  // {
-  //   name: '个人视图',
-  //   path: '/business/salelead/salepersonlead',
-  //   component: './Business/SaleLead/SaleGroupLead'
-  // },
-  // {
-  //   name: '管理视图',
-  //   path: '/business/salelead/salegrouplead',
-  //   component: './Business/SaleLead/SalePersonLead'
-  // },
+  {
+    name: '新媒体线索视图',
+    path: '/business/cluelist/personview',
+    component: './Business/ClueList/PersonView'
+  },
+  {
+    name: '线索池',
+    path: '/business/cluelist/managerview',
+    component: './Business/ClueList/ManagerView'
+  },
+  {
+    name: '销售线索视图',
+    path: '/business/saleslead',
+    component: './Business/SalesLead',
+  },
+  {
+    name: '个人视图',
+    path: '/business/salelead/salepersonlead',
+    component: './Business/SaleLead/SaleGroupLead'
+  },
+  {
+    name: '管理视图',
+    path: '/business/salelead/salegrouplead',
+    component: './Business/SaleLead/SalePersonLead'
+  },
   {
     name: '规则配置中心',
     path: '/business/rulemangercenter',
@@ -395,6 +399,16 @@
     name: '个人中心',
     path: '/users',
     redirect: '/users/usercenter',
+  },
+  {
+    name: '代办计划',
+    path: '/users/todolist',
+    component: './TodoList',
+  },
+  {
+    name: '代办计划',
+    path: '/users',
+    redirect: '/users/todolist',
   },
   {
     name: '部门看板',

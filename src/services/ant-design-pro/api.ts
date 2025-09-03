@@ -20,7 +20,7 @@ export async function currentUser(options?: { [key: string]: any }) {
   //       exact: true, // 精确匹配路由
   //       activeMenu: item.code, // 添加activeMenu属性，用于控制菜单选中状态
   //     };
-      
+
   //     // 确保每个菜单项有唯一的key
   //     if (item.children && item.children.length > 0) {
   //       route.routes = convertToRoutes(item.children, level + 1);
@@ -29,13 +29,13 @@ export async function currentUser(options?: { [key: string]: any }) {
   //         hideChildren: false, // 不隐藏子菜单
   //         defaultOpen: true, // 默认展开子菜单
   //       };
-        
+
   //       // 为父级菜单添加选中状态控制
   //       if (level === 1) {
   //         route.activeMenuParent = true; // 标记为父级菜单，当子菜单被选中时也高亮显示
   //       }
   //     }
-      
+
   //     return route;
   //   });
   // }
@@ -44,7 +44,7 @@ export async function currentUser(options?: { [key: string]: any }) {
   // const loginRouter = await request1.get('/sms/user/getMenus');
   // // 添加对loginRouter.data为null的检查
   // let newRouter = loginRouter.data ? convertToRoutes(loginRouter.data) : [];
-  
+
 
 
   // const user: any = await request1.get('/sms/user');
@@ -187,7 +187,7 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'MessageOutlined',
             routes: [
               {
-                name:'下单专页',
+                name: '下单专页',
                 path: '/business/orderpage',
                 component: './Business/OrderPage',
               },
@@ -248,7 +248,7 @@ export async function currentUser(options?: { [key: string]: any }) {
               //   path: '/business/provide/resource',
               //   component: './Business/ProvideUser/Resource',
               // },
-              
+
               {
                 name: '小程序二维码下载',
                 path: '/business/qrcode',
@@ -260,9 +260,9 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/ExclusiveQRCode',
               },
               {
-                name:'专属码未支付申请退款',
-                path:'/business/exclusiveqrcoderefund',
-                component:'./Business/ExclusiveQRCodeRefund',
+                name: '专属码未支付申请退款',
+                path: '/business/exclusiveqrcoderefund',
+                component: './Business/ExclusiveQRCodeRefund',
               }
             ],
           },
@@ -341,16 +341,6 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'AccountBookOutlined',
             routes: [
               {
-                name: '退款',
-                path: '/business/refund',
-                component: './Business/Refund'
-              },
-              {
-                name: '补缴下单',
-                path: '/business/supplementaryorder',
-                component: './Business/SuppleMentaryOrder'
-              },
-              {
                 name: '订单列表',
                 icon: 'table',
                 path: '/business/businessorder',
@@ -373,7 +363,17 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/BusinessCharge/List',
               },
               {
-                name:'开具发票',
+                name: '退款',
+                path: '/business/refund',
+                component: './Business/Refund'
+              },
+              {
+                name: '补缴下单',
+                path: '/business/supplementaryorder',
+                component: './Business/SuppleMentaryOrder'
+              },
+              {
+                name: '开具发票',
                 path: '/business/invoicelist',
                 component: './Business/InvoiceList',
               },
@@ -563,12 +563,12 @@ export async function currentUser(options?: { [key: string]: any }) {
             ],
           },
           {
-            name:'线索管理',
-            icon:'ClusterOutlined',
-            routes:[
+            name: '线索管理',
+            icon: 'ClusterOutlined',
+            routes: [
               {
-                name:'线索小组管理',
-                path:'/business/cluemanagement',
+                name: '线索小组管理',
+                path: '/business/cluemanagement',
                 component: './Business/Cluemanagement'
               },
               {
@@ -578,22 +578,28 @@ export async function currentUser(options?: { [key: string]: any }) {
               },
             ]
           },
-          // {
-          //   name:'线索列表',
-          //   icon: 'table',
-          //   routes: [
-          //     {
-          //       name:'个人视图',
-          //       path:'/business/cluelist/personview',
-          //       component:'./Business/Cluelist/PersonView'
-          //     },
-          //     {
-          //       name:'管理视图',
-          //       path: '/business/cluelist/managerview',
-          //       component: './Business/Cluelist/Managerview'
-          //     }
-          //   ]
-          // },
+          {
+            name: '线索列表',
+            icon: 'table',
+            routes: [
+              {
+                name: '新媒体线索视图',
+                path: '/business/cluelist/personview',
+                component: './Business/Cluelist/PersonView'
+              },
+              {
+                name: '线索池',
+                path: '/business/cluelist/managerview',
+                component: './Business/Cluelist/Managerview'
+              }
+            ]
+          },
+          {
+            name: '销售线索视图',
+            icon: 'ClusterOutlined',
+            path: '/business/saleslead',
+            component: './Business/SalesLead',
+          },
           // {
           //   name:'销售线索管理',
           //   icon: 'table',
@@ -648,6 +654,12 @@ export async function currentUser(options?: { [key: string]: any }) {
             path: '/users/usercenter',
             component: './UserCenter',
           },
+          {
+            name: '代办计划',
+            icon: 'ReadOutlined',
+            path: '/users/todolist',
+            component: './UserCenter/TodoList'
+          }
         ],
       },
       {

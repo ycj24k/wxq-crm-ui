@@ -13,8 +13,9 @@ import ImgUrl from '@/services/util/ImgUrl';
 import SubmitData from './submitData';
 import { values } from 'lodash';
 export default (props: any) => {
-  const { modalVisible, setModalVisible, callbackRef, renderData, url, studentid } = props;
+  const { modalVisible, setModalVisible, callbackRef, renderData, callbackData, url, studentid, setID } = props;
   console.log(studentid, 'studentid')
+  console.log(setID, 'setID')
   const [HtmlProForm, setHtmlProForm] = useState<any>(false);
   const [isModalVisibles, setisModalVisibles] = useState<boolean>(false);
   const [submitDataModal, setsubmitDataModal] = useState<boolean>(false);
@@ -77,7 +78,7 @@ export default (props: any) => {
   const handleQrCode = async () => {
     let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
     let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + studentid.studentId + '&' + tokenName + '=' + tokenValue;
+    const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + setID + '&' + tokenName + '=' + tokenValue;
     setQrcodeVisible(true)
     setQrcodeSrc(src)
   }
@@ -301,14 +302,16 @@ export default (props: any) => {
             array.push({
               fieldId: key,
               value: values[key][0].response.data,
-              orderId: renderData.id,
+              //orderId: renderData.id,
+              orderId: setID,
               type: renderData.valueType,
             });
           } else {
             array.push({
               fieldId: key,
               value: values[key],
-              orderId: renderData.id,
+              orderId: setID,
+              //orderId: renderData.id,
               type: renderData.valueType,
             });
           }
@@ -322,24 +325,28 @@ export default (props: any) => {
 
     request.postAll('/sms/business/bizOrderField/saveArray', { array: array }).then((res) => {
       if (res.status == 'success') {
-        if (type == 'audit') {
-          request
-            .post('/sms/business/bizOrder', { id: renderData.id, isComplete: true })
-            .then((ress) => {
-              if (ress.status == 'success') {
-                message.success('操作成功');
-                setModalVisible();
-                callbackRef();
-              }
-            });
-        } else {
-          message.success('操作成功');
-          setModalVisible();
-          callbackRef();
-        }
-
-        // resolve(true);
+        message.success('操作成功');
+        setModalVisible();
+        callbackData();
       }
+      // if (res.status == 'success') {
+      //   if (type == 'audit') {
+      //     request
+      //       .post('/sms/business/bizOrder', { id: renderData.id, isComplete: true })
+      //       .then((ress) => {
+      //         if (ress.status == 'success') {
+      //           message.success('操作成功');
+      //           setModalVisible();
+      //           callbackRef();
+      //         }
+      //       });
+      //   } else {
+      //     message.success('操作成功');
+      //     setModalVisible();
+      //     callbackRef();
+      //   }
+      //   // resolve(true);
+      // }
     });
   };
   return (
@@ -352,7 +359,6 @@ export default (props: any) => {
         footer={null}
         destroyOnClose
       >
-
         <img style={{ width: '400px', height: '400px' }} src={qrcodeSrc} />
       </Modal>
       <ModalForm<{
@@ -366,37 +372,37 @@ export default (props: any) => {
         autoFocusFirstInput
         modalProps={{
           onCancel: () => setModalVisible(),
-          destroyOnClose: true,
-          maskClosable: false,
-          okText: '暂存',
+          // destroyOnClose: true,
+          // maskClosable: false,
+          // okText: '暂存',
         }}
-        submitter={{
-          render: (props, doms) => {
-            return [
-              ...doms,
-              <Button
-                htmlType="button"
-                type="primary"
-                hidden={renderData.type == 1}
-                onClick={async () => {
-                  formRef.current?.validateFieldsReturnFormatValue?.().then(async (values) => {
-                    console.log('校验表单并返回格式化后的所有数据：', values);
-                    await submitok(values, 'audit');
-                  });
-                }}
-                key="edit"
-              >
-                提交审核
-              </Button>,
-            ];
-          },
-        }}
+        // submitter={{
+        //   render: (props, doms) => {
+        //     return [
+        //       ...doms,
+        //       <Button
+        //         htmlType="button"
+        //         type="primary"
+        //         hidden={renderData.type == 1}
+        //         onClick={async () => {
+        //           formRef.current?.validateFieldsReturnFormatValue?.().then(async (values) => {
+        //             console.log('校验表单并返回格式化后的所有数据：', values);
+        //             await submitok(values, 'audit');
+        //           });
+        //         }}
+        //         key="edit"
+        //       >
+        //         提交
+        //       </Button>,
+        //     ];
+        //   },
+        // }}
         onFinish={async (values: any) => {
           // if (renderData.types == 'edit') values.id = renderData.id;
           await submitok(values, 'edit');
         }}
       >
-        {/* <Button type='primary' onClick={() => handleQrCode()}>收集资料二维码</Button> */}
+        <Button type='primary' onClick={() => handleQrCode()}>收集资料二维码</Button>
         <ProForm.Group>{HtmlProForm}</ProForm.Group>
         <div style={{ display: 'none' }}>
           <Image

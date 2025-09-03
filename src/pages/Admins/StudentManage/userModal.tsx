@@ -6,6 +6,7 @@ import {
   ProFormDatePicker,
   ProFormInstance,
   ProFormUploadDragger,
+  ProFormRadio,
 } from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
@@ -31,8 +32,8 @@ export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [company, setCompany] = useState('学员姓名');
   const { modalVisible, setModalVisible, callbackRef, url, type, sourceType, isShowMedium } = props;
-  console.log(isShowMedium, 'isShowMedium')
   let { renderData } = props;
+  console.log(renderData.from, 'isShowMedium')
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [Student, setStudentId] = useState<any>(null);
   const [isModalVisibles, setisModalVisibles] = useState<boolean>(false);
@@ -43,6 +44,7 @@ export default (props: any) => {
   const [ModbileListVisible, setModbileListVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
   let [department, setDepartment] = useState<any>({});
+  const [intention, setIntention] = useState<'normal' | 'hight' | ''>('');
 
   const userRef: any = useRef(null);
   const userRefs: any = useRef(null);
@@ -329,12 +331,12 @@ export default (props: any) => {
       if (phoneRegex.test(acc.联系方式)) {
         formRef.current?.setFieldsValue({
           mobile: acc.联系方式,
-          weChat:''
+          weChat: ''
         })
       } else if (wechatRegex.test(acc.联系方式)) {
         formRef.current?.setFieldsValue({
           weChat: acc.联系方式,
-          mobile:''
+          mobile: ''
         })
       }
       formRef.current?.setFieldsValue({
@@ -345,14 +347,14 @@ export default (props: any) => {
         owner: acc.出镜人,
       })
       const dataProvider = Dictionaries.getUserId(acc.出镜人)
-      if(acc.出镜人 === '无'){
+      if (acc.出镜人 === '无') {
         const newProvider = {
           id: '-1',
           name: acc.出镜人
         }
         setUserNameId2(newProvider)
         userRef2?.current?.setDepartment(newProvider);
-      }else {
+      } else {
         const newProvider = {
           id: dataProvider?.[0],
           name: acc.出镜人
@@ -360,8 +362,8 @@ export default (props: any) => {
         setUserNameId2(newProvider)
         userRef2?.current?.setDepartment(newProvider);
       }
-      
-    
+
+
       return acc;
     }, {});
 
@@ -527,7 +529,7 @@ export default (props: any) => {
         <Button
           style={{ marginTop: '30px', marginLeft: '-30px' }}
           type="primary"
-          hidden={renderData.parentId == undefined || renderData.parentId == -1}
+          hidden={renderData.parentId == undefined || renderData.parentId == -1 || renderData.from == 'newmide'}
           disabled={renderData.types}
           onClick={async () => {
             //   setCardContent({ content: content.data, type: 'order' });
@@ -664,6 +666,31 @@ export default (props: any) => {
         />
         {company === '企业名称' ? <ProFormCheckbox name="isPeer" label="是否同行" /> : ''}
         <ProFormCheckbox name="isLive" label="是否为出镜人专属资源" />
+
+        {sourceType == 2 ? (
+          <div>
+            <ProFormText readonly>意向等级</ProFormText>
+            <ProFormRadio.Group
+              fieldProps={{
+                value: intention,
+                onChange: (e) => setIntention(e.target.value),
+              }}
+              options={[
+                {
+                  label: '普通',
+                  value: 'normal',
+                },
+                {
+                  label: '高意向',
+                  value: 'high',
+                },
+              ]}
+            />
+          </div>
+        ) : null}
+
+
+
       </ProForm.Group>
       {company === '企业名称' ? (
         <ProFormText
@@ -682,17 +709,20 @@ export default (props: any) => {
       )}
 
 
-      <UserTreeSelect
-        ref={userRef}
-        userLabel={'招生老师'}
-        userNames="userId"
-        newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
-        userPlaceholder="请输入招生老师"
-        setUserNameId={(e: any) => setUserNameId(e)}
-        // setDepartId={(e: any) => setDepartId(e)}
-        flag={true}
-      // setFalgUser={(e: any) => setFalgUser(e)}
-      />
+      {sourceType != 2 ? (
+        <UserTreeSelect
+          ref={userRef}
+          userLabel={'招生老师'}
+          userNames="userId"
+          newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+          userPlaceholder="请输入招生老师"
+          setUserNameId={(e: any) => setUserNameId(e)}
+          // setDepartId={(e: any) => setDepartId(e)}
+          flag={true}
+          // setFalgUser={(e: any) => setFalgUser(e)}
+        />
+      ) : null}
+
 
       <UserTreeSelect
         ref={userRefs}

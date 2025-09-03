@@ -63,6 +63,10 @@ export default () => {
         actionRef.current.reloadAndRest();
         getProject()
     };
+
+    const callbackData = () => {
+        setRegistration(false)
+    }
     const actionRef = useRef<ActionType>();
     const classListRef = useRef<{ handleChangeData: (data: any) => any[] }>(null);
     const payWayRef = useRef<{
@@ -229,19 +233,62 @@ export default () => {
         if (dictionariesList) {
             let dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
-            if (result) {
-                const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
-                let newData;
-                if (formattedData1.parent == null) {
-                    newData = [result[0]]
-                } else {
-                    newData = [result[0], [formattedData1.parent][0]]
-                }
 
-                let nextData = convertToTreeData(newData)
-                setProjectslist(nextData)
+            const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
+            const foundObject = result?.find((item: any) => JSON.stringify(item) === JSON.stringify([formattedData1.parent][0]))
+
+            // console.log([formattedData1.parent][0],'formattedData1')
+            // console.log(foundObject,'foundObject')
+            // console.log(result,'result')
+
+
+            let newData;
+            if (foundObject) {
+                newData = result
+            } else {
+                newData = [...(result || []), [formattedData1.parent][0]];
+                // setProjectslist(newProject)
             }
+            let nextData = convertToTreeData(newData)
+            console.log(nextData,'newData')
+            setProjectslist(nextData)
+
+
+
+            // if (result) {
+            //     const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
+            //     let newData;
+            //     if (formattedData1.parent == null) {
+            //         newData = [result[0]]
+            //     } else {
+            //         newData = [result[0], [formattedData1.parent][0]]
+            //     }
+
+            //     let nextData = convertToTreeData(newData)
+            //     setProjectslist(nextData)
+            // }
         }
+
+
+        // const res = await request.get('/sms/commonProjects')
+        // setBackProject(res.data)
+        // const dictionariesList = localStorage.getItem('dictionariesList');
+        // if (dictionariesList) {
+        //     let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        //     const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
+        //     if (result) {
+        //         const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
+        //         let newData;
+        //         if (formattedData1.parent == null) {
+        //             newData = [result[0]]
+        //         } else {
+        //             newData = [result[0], [formattedData1.parent][0]]
+        //         }
+
+        //         let nextData = convertToTreeData(newData)
+        //         setProjectslist(nextData)
+        //     }
+        // }
         setIsAdd(true)
         setModalStudentInfo(true);
         setEditID(record.studentId)
@@ -749,11 +796,14 @@ export default () => {
                     maskClosable: false,
                 }}
                 onFinish={async (values) => {
-                    setType('0');
-                    if (values?.labels) {
-                    } else {
-                    }
-                    if (values.type) values.type = '0'
+                    console.log(values, 'values------>')
+                    // setType('0');
+                    // if (values?.labels) {
+                    // } else {
+                    // }
+                    // if (values.type) values.type = '0'
+                    if (values.type) values.type = type
+                    if (values.isPeer) values.isPeer = values.isPeer
                     if (values.project) values.project = values.project[values.project.length - 1];
                     if (values.owner) values.owner = Dictionaries.getUserId(values.owner.label)[0]
                     if (values.userId) values.userId = Dictionaries.getUserId(values.userId.label)[0]
@@ -773,6 +823,7 @@ export default () => {
                         Modal.error({ title: '请选择出镜人' })
                         return;
                     }
+                    console.log(values, 'values------>')
                     setOrderPay(false)
                     setRenderData(values)
                     if (isAdd) {
@@ -805,6 +856,7 @@ export default () => {
                         request={async () => Dictionaries.getList('studentType') as any}
                         fieldProps={{
                             onChange: (e) => {
+                                console.log(e, 'e---->')
                                 setType(e)
                             },
                         }}
@@ -936,7 +988,7 @@ export default () => {
                         <ProForm.Group>
                             <ProFormText
                                 width="md"
-                                name="companyPeople"
+                                name="chargePersonName"
                                 label="企业联系人"
                                 placeholder="请输入企业联系人"
                                 rules={[{ required: true, message: '请输入企业联系人' }]}
@@ -948,14 +1000,30 @@ export default () => {
                                 placeholder="请输入统一社会信用代码"
                                 rules={[{ required: true, message: '请输入统一社会信用代码' }]}
                             />
+                            <ProFormSelect
+                                label="是否是同行"
+                                name="isPeer"
+                                width="md"
+                                options={[
+                                    { label: '是', value: 'true' },
+                                    { label: '否', value: 'false' }
+                                ]}
+                                fieldProps={{
+                                    onChange: (e: any) => {
+                                        console.log(e)
+                                    }
+                                }}
+                                rules={[{ required: true, message: '请选择是否是同行' }]}
+                            // request={async () => Dictionaries.getList('dict_source') as any}
+                            />
                         </ProForm.Group>
-                        <div>
+                        {/* <div>
                             <ProForm.Group title="是否共享订单"></ProForm.Group>
                             <Radio.Group name="radiogroup" onChange={(e) => { setRadio(e) }}>
                                 <Radio value={1}>非共享</Radio>
                                 <Radio value={2}>共享下单</Radio>
                             </Radio.Group>
-                        </div>
+                        </div> */}
 
 
                         {steps == '2' ? (
@@ -1050,9 +1118,12 @@ export default () => {
                                 project: renderData.project,
                                 provider: renderData.provider,
                                 source: renderData.source,
+                                isPeer: renderData.isPeer ? renderData.isPeer : null,
                                 type: renderData.type,
                                 userId: renderData.userId,
-                                totalReceivable: totalReceivable
+                                totalReceivable: totalReceivable,
+                                chargePersonName: renderData.chargePersonName ? renderData.chargePersonName : null,
+                                code: renderData.code ? renderData.code : null,
                             }
                         }
                     })
@@ -1072,6 +1143,7 @@ export default () => {
                                 userRefs?.current?.setDepartment({});
                                 userRef2?.current?.setDepartment({});
                                 setModalOrderVisible(false)
+                                setModalStudentInfo(false)
                                 // 2. 重置班级列表表单
                                 if (classListRef.current) {
                                     classListRef.current.resetForm();
@@ -1339,8 +1411,10 @@ export default () => {
                     setModalVisible={() => setModalVisible(false)}
                     modalVisible={modalVisible}
                     renderData={renderData}
+                    setID={ID}
                     studentid={studentID}
-                // callbackRef={() => callbackRef()}
+                    callbackRef={() => callbackRef()}
+                    callbackData={() => callbackData()}
                 />
             )}
         </PageContainer>

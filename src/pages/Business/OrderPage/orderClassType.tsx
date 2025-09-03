@@ -46,7 +46,6 @@ interface ClassListProps {
 
 const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType, projectslist } = props;
-    //console.log(projectslist, 'projectslist')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -401,6 +400,18 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
         }
     }, [chargeLog])
 
+
+    const handlejisuan = () => {
+        const users = formRef?.current?.getFieldValue('users') || [];
+        let totalReceivable = 0;
+        users.forEach((item:any) => {
+            const jobClassExam = JSON.parse(item.JobClassExam);
+            totalReceivable += jobClassExam.receivable * item.quantity - item.discount;
+        })
+        onTotalPriceChange?.(totalReceivable)
+        console.log(totalReceivable,'totalReceivable------totalReceivable')
+    }
+
     return (
         <>
             <ProForm
@@ -430,7 +441,6 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             discountRemark: '',
                             JobClassExam: null, // 确保班型选择字段存在但初始为null
                         };
-                        console.log(renderData, 'defaultRecord----->')
 
                         // 如果没有renderData，也要确保返回一个有效的记录
                         if (!renderData) {
@@ -458,23 +468,30 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
 
                                 // 立即获取最新的 users 数据
                                 const users = formRef?.current?.getFieldValue('users') || [];
+                                // 优惠的金额
                                 const discountSum = users.reduce((total: number, user: any) => {
                                     return total + (Number(user.discount) || 0);
                                 }, 0);
-                                const receivableSum = users.reduce((total: number, user: any) => {
-                                    return total + (Number(user.receivable) || 0) - (Number(user.discount) || 0);
-                                }, 0) + defaultValue.receivable - defaultValue.discount;
-                                //- defaultValue.discount
-
+                                // 报名人数
                                 const quantitySum = users.reduce((total: number, user: any) => {
                                     return total + (Number(user.quantity) || 0);
                                 }, 0);
 
+                                // 总金额
+                                const receivableSum = users.reduce((total: number, user: any) => {
+                                    return total + (Number(user.receivable) || 0) - (Number(user.discount) || 0);
+                                }, 0) + defaultValue.receivable - defaultValue.discount;
+
+                                const newTotalPrice = defaultValue.receivable * (quantitySum + defaultValue.quantity) - (discountSum + defaultValue.discount)
+                                //handlejisuan()
                                 // 更新状态和回调
                                 setDiscountPrice(discountSum);
                                 setTotalPrice(receivableSum);
                                 setTotalQuantity(quantitySum);
-                                onTotalPriceChange?.(receivableSum);
+                                //二次注释
+                                onTotalPriceChange?.(newTotalPrice);
+
+                                //onTotalPriceChange?.(receivableSum);
                                 onTotalQuantityChange?.(quantitySum);
                                 formRef?.current?.setFieldsValue({
                                     receivable: receivableSum,
@@ -519,7 +536,8 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                     return total + (Number(user.discount) || 0);
                                 }, 0)
 
-                                const newTotalPrice = receivableSum - discountSum;
+
+                                const newTotalPrice = (receivableSum - discountSum) * quantitySum;
                                 onTotalPriceChange?.(newTotalPrice);
 
 
@@ -578,19 +596,18 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                         options: JobClassExam[index],
                                                         showSearch: true,
                                                         onSelect: (e: string) => {
+                                                            handlejisuan()
                                                             let newE = JSON.parse(e)
-                                                            console.log(newE.receivable, 'newE=====>')
+                                                            
+                                                            // const users = formRef?.current?.getFieldValue('users') || [];
+                                                            // const TotalSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.receivable) || 0);
+                                                            // }, 0) + newE.receivable;
 
-                                                            const users = formRef?.current?.getFieldValue('users') || [];
-                                                            const TotalSum = users.reduce((total: number, user: any) => {
-                                                                return total + (Number(user.receivable) || 0);
-                                                            }, 0) + newE.receivable;
-
-                                                            const TotalDiscount = users.reduce((total: number, user: any) => {
-                                                                return total + (Number(user.discount) || 0);
-                                                            }, 0)
-                                                            console.log(TotalSum - TotalDiscount)
-                                                            onTotalPriceChange?.(TotalSum - TotalDiscount);
+                                                            // const TotalDiscount = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.discount) || 0);
+                                                            // }, 0)
+                                                            // onTotalPriceChange?.(TotalSum - TotalDiscount);
 
                                                             try {
                                                                 const arr = JSON.parse(e);
@@ -612,40 +629,33 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                                     users: newUsers
                                                                 });
 
-                                                                // 计算所有receivable和quantity的总和
-                                                                // const receivableSum = newUsers.reduce((total, user) => {
-                                                                //     return total + (Number(user.receivable) || 0);
-                                                                // }, 0);
-                                                                const quantitySum = newUsers.reduce((total, user) => {
-                                                                    return total + (Number(user.quantity) || 0);
-                                                                }, 0);
-                                                                // const discountSum = newUsers.reduce((total, user) => {
+                                                                console.log(newE.receivable, 'newE=====>')
+
+                                                                // const quantitySum = newUsers.reduce((total, user) => {
                                                                 //     return total + (Number(user.quantity) || 0);
                                                                 // }, 0);
 
+                                                                // const TotalSum = users.reduce((total: number, user: any) => {
+                                                                //     return total + (Number(user.receivable) || 0);
+                                                                // }, 0) + newE.receivable * users[index].quantity;
 
-                                                                const TotalSum = users.reduce((total: number, user: any) => {
-                                                                    return total + (Number(user.receivable) || 0);
-                                                                }, 0) + newE.receivable;
+
     
-                                                                const TotalDiscount = users.reduce((total: number, user: any) => {
-                                                                    return total + (Number(user.discount) || 0);
-                                                                }, 0)
+                                                                // const TotalDiscount = users.reduce((total: number, user: any) => {
+                                                                //     return total + (Number(user.discount) || 0);
+                                                                // }, 0)
 
                                                                 // 更新状态和回调
-                                                                // setDiscountPrice(discountSum);
-                                                                // setTotalPrice(receivableSum);
-                                                                setTotalQuantity(quantitySum);
-                                                                //onTotalPriceChange?.(receivableSum);
-                                                                onTotalPriceChange?.(TotalSum - TotalDiscount);
-                                                                onTotalQuantityChange?.(quantitySum);
+                                                                // setTotalQuantity(quantitySum);
+                                                                // onTotalPriceChange?.(TotalSum - TotalDiscount);
+                                                                // onTotalQuantityChange?.(quantitySum);
 
                                                                 // 更新表单字段
-                                                                formRef?.current?.setFieldsValue({
-                                                                    //receivable: receivableSum,
-                                                                    receivable:TotalSum,
-                                                                    quantity: quantitySum
-                                                                });
+                                                                // formRef?.current?.setFieldsValue({
+                                                                //     //receivable: receivableSum,
+                                                                //     receivable:TotalSum,
+                                                                //     quantity: quantitySum
+                                                                // });
                                                             } catch (error) {
                                                                 message.error('操作失败，请重试');
                                                             }
@@ -675,9 +685,41 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                     name="quantity"
                                                     width="sm"
                                                     label="报名人数"
-                                                    disabled={true}
+                                                    disabled={renderData.type != '1'}
                                                     fieldProps={{
-                                                        onChange: (e: any) => { },
+                                                        onChange: (e: any) => {
+                                                            handlejisuan()
+
+                                                            //二次注释
+                                                            //const users = formRef?.current?.getFieldValue('users') || [];
+
+                                                            // const TotalSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.receivable) || 0);
+                                                            // },0)
+                                                            
+                                                            //二次注释
+                                                            // const discountSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.discount) || 0);
+                                                            // }, 0);
+
+                                                            //二次注释
+                                                            // const quantitySum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.quantity) || 0);
+                                                            // }, 0);
+
+                                                            //二次注释
+                                                            //onTotalPriceChange?.((users[0].receivable) * quantitySum  - discountSum);
+
+
+                                                            // const users = formRef?.current?.getFieldValue('users') || [];
+                                                            // const TotalSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.receivable) || 0);
+                                                            // }, 0) * e
+                                                            // const TotalDiscount = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.discount) || 0);
+                                                            // }, 0)
+                                                            // onTotalPriceChange?.(TotalSum - TotalDiscount);
+                                                        },
                                                     }}
                                                     rules={[{ required: true, message: '请填写报名人数' }]}
                                                 />
@@ -714,15 +756,37 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                     customSymbol="¥"
                                                     fieldProps={{
                                                         onChange: (e) => {
-                                                            const users = formRef?.current?.getFieldValue('users') || [];
-                                                            const discountSum = users.reduce((total: number, user: any) => {
-                                                                return total + (Number(user.discount) || 0);
-                                                            }, 0);
-                                                            const moneySum = users.reduce((total: number, user: any) => {
-                                                                return total + (Number(user.receivable) || 0);
-                                                            }, 0);
-                                                            setDiscountPrice(discountSum);
-                                                            onTotalPriceChange?.(moneySum - discountSum);
+                                                            handlejisuan()
+
+                                                            //二次注释
+                                                            // const users = formRef?.current?.getFieldValue('users') || [];
+
+                                                            // const TotalSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.receivable) || 0);
+                                                            // },0)
+                                                            // const discountSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.discount) || 0);
+                                                            // }, 0);
+
+                                                            // const quantitySum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.quantity) || 0);
+                                                            // }, 0);
+
+                                                            
+                                                            //二次注释
+                                                            //onTotalPriceChange?.((users[0].receivable) * quantitySum  - discountSum);
+
+                                                            // const discountSum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.discount) || 0);
+                                                            // }, 0);
+                                                            // const quantitySum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.quantity) || 0);
+                                                            // }, 0);
+                                                            // const moneySum = users.reduce((total: number, user: any) => {
+                                                            //     return total + (Number(user.receivable) || 0);
+                                                            // }, 0) * quantitySum;
+                                                            // setDiscountPrice(discountSum);
+                                                            // onTotalPriceChange?.(moneySum - discountSum);
                                                             // 动态设置 discountRemark 的 rules
                                                             const isDiscount = Number(e) !== 0;
                                                             setDiscountRemake(isDiscount);

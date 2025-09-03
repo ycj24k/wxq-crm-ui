@@ -356,15 +356,15 @@ export default (props: any) => {
                 }}
                 tabList={[
                     {
-                        tab: '新媒体线索',
+                        tab: '个人',
                         key: '1',
                     },
                     {
-                        tab: '公海',
+                        tab: '企业',
                         key: '4',
                     },
                     {
-                        tab: '无效数据库',
+                        tab: '代理人',
                         key: '7',
                     },
                 ]}
