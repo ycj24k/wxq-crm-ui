@@ -19,7 +19,6 @@ import moment from 'moment';
 import { ExclamationCircleFilled } from '@ant-design/icons';
 import request from '@/services/ant-design-pro/apiRequest';
 import { forwardRef, useImperativeHandle, useEffect, useRef, useState } from 'react';
-import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import { Button, message, Modal } from 'antd';
 import ChargeLog from '@/pages/Business/ChargeLog';
 
@@ -45,7 +44,8 @@ interface ClassListProps {
 }
 
 const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
-    const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType, projectslist } = props;
+    const { renderData, onTotalPriceChange, onTotalQuantityChange, onAddClassType, onRemoveClassType, projectslist,typeStatus } = props;
+    console.log(typeStatus,'typeStatus')
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
             try {
@@ -685,7 +685,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                     name="quantity"
                                                     width="sm"
                                                     label="报名人数"
-                                                    disabled={renderData.type != '1'}
+                                                    disabled={typeStatus != '1'}
                                                     fieldProps={{
                                                         onChange: (e: any) => {
                                                             handlejisuan()
@@ -810,7 +810,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                 <ProFormText
                                                     name="studentUserId"
                                                     hidden={true}
-                                                    label="订单优惠原因"
+                                                    label="隐藏赋值"
                                                     width="sm"
                                                     fieldProps={{
                                                         autoComplete: 'no',

@@ -27,9 +27,6 @@ export default (props: any) => {
 
   useEffect(() => {
     // getProjectTree()
-
-
-
     // const dictionariesList = localStorage.getItem('dictionariesList');
     // if (dictionariesList) {
     //   let dictionariesArray = JSON.parse(dictionariesList)[1].children

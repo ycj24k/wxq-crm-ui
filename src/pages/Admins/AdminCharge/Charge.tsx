@@ -1091,7 +1091,7 @@ export default (props: any) => {
                 <Button loading={loading} type='primary' hidden={!!setModalsCharge}
                   onClick={() => {
                     // setcheckFalg(true);
-                    setLoading(true)
+                    // setLoading(true)
                     if (chargeType == 'refundList' || chargeType == 'refund') {
                       request
                         .get('/sms/business/bizCharge/getListOfFinance', {
@@ -1099,7 +1099,7 @@ export default (props: any) => {
                         })
                         .then((res) => {
                           if (res.status == 'success') {
-                            setLoading(false)
+                            //setLoading(false)
                             DownTable(res.data, DownHeader.RefundHeader, '退费信息', 'refund');
                           }
                         });
@@ -1215,7 +1215,7 @@ export default (props: any) => {
                 message.error('请选择条件!')
                 return
               } else {
-                setLoading(true)
+                //setLoading(true)
                 // const data = {
                 //   enable: true,
                 //   'type-in': '0,2',
@@ -1226,15 +1226,15 @@ export default (props: any) => {
                   .then((res) => {
                     if (res.status == 'success') {
                       if (chargeType == 'refundList' || chargeType == 'refund') {
-                        setLoading(false)
+                        //setLoading(false)
                         DownTable(res.data, DownHeader.PayHeader, '退费信息', 'refund');
                       } else {
-                        setLoading(false)
+                        //setLoading(false)
                         DownTable(res.data, DownHeader.jiaoPayHeader, '缴费', 'charge');
                       }
                     }
                   }).catch(err => {
-                    setLoading(false)
+                    //setLoading(false)
                   });
                 // const content = (await request.get('/sms/business/bizCharge/getListOfFinance2', fromDataList)).data
                 // DownTable(content, DownHeader.PayHeader, '缴费信息', 'charge');

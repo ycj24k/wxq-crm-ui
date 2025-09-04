@@ -17,12 +17,19 @@ import Dictionaries from '@/services/util/dictionaries';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
+
 import OrderClassType from './orderClassType'
 import OrderPayWay from './orderPayWay'
 import MenuManageCard from './MenuTree'
 import SignUp from './SignUp'
 import { useModel } from 'umi';
+import Upload from '@/services/util/upload';
+import {
+    PlusOutlined,
+    DownloadOutlined,
+} from '@ant-design/icons';
 import student from '@/pages/Admins/StudentManage/student';
+
 
 
 export default () => {
@@ -32,13 +39,20 @@ export default () => {
     const [findStudent, setFindStudent] = useState<boolean>(false)
     const [modalStudentInfo, setModalStudentInfo] = useState<boolean>(false)
     const [modalOrderVisible, setModalOrderVisible] = useState<boolean>(false)
+    const [addprojectstudent, setAddprojectstudent] = useState<boolean>(false)
+    const [typeStatus, setTypeStatus] = useState<any>(0)
     const [loading, setLoading] = useState<boolean>(false)
     const [awaylsUseProject, setAwaylsUseProject] = useState<any>()
     const [projectslist, setProjectslist] = useState<any>()
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [MenuVisible, setMenuVisible] = useState<boolean>(false);
     const [Registration, setRegistration] = useState<boolean>(false);
+    const [qrcodeVisible, setQrcodeVisible] = useState(false)
+    const [qrcodeSrc, setQrcodeSrc] = useState<any>()
+    const [teamStudents, setTeamStudents] = useState<boolean>(false);
     const [renderData, setRenderData] = useState<any>({});
+    const [UploadFalg, setUploadVisible] = useState<boolean>(false);
+    const [Uploadurl, setUrl] = useState<string>('');
     const [type, setType] = useState<string>('0')
     const [ID, setID] = useState<any>()
     const [studentID, setStudentId] = useState<any>();
@@ -61,6 +75,7 @@ export default () => {
     const callbackRef = (value: any = true) => {
         // @ts-ignore
         actionRef.current.reloadAndRest();
+        actionRefClass.current?.reloadAndRest?.();
         getProject()
     };
 
@@ -68,6 +83,7 @@ export default () => {
         setRegistration(false)
     }
     const actionRef = useRef<ActionType>();
+    const actionRefClass = useRef<ActionType>();
     const classListRef = useRef<{ handleChangeData: (data: any) => any[] }>(null);
     const payWayRef = useRef<{
         getFormValues: () => Promise<any>;
@@ -170,6 +186,8 @@ export default () => {
         setOrderPay(true)
         handleOpenProject()
         setStudentId(record)
+        console.log(record,'下单')
+        setTypeStatus(record.type)
         //setOptionEnable(false)
         setRenderData(record)
         //setModalStudentInfo(true)
@@ -250,7 +268,7 @@ export default () => {
                 // setProjectslist(newProject)
             }
             let nextData = convertToTreeData(newData)
-            console.log(nextData,'newData')
+            console.log(nextData, 'newData')
             setProjectslist(nextData)
 
 
@@ -292,6 +310,8 @@ export default () => {
         setIsAdd(true)
         setModalStudentInfo(true);
         setEditID(record.studentId)
+        setTypeStatus(record.type)
+        console.log(record,'record--------->')
         setTimeout(() => {
             formRefStudentInfo?.current?.setFieldsValue({
                 name: record.name,
@@ -363,6 +383,13 @@ export default () => {
                 setRenderData({ signup: resData, valueType: 0 });
                 setModalVisible(true);
             });
+    }
+    const handleQrCode = async () => {
+        let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+        let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+        const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + ID + '&' + tokenName + '=' + tokenValue;
+        setQrcodeVisible(true)
+        setQrcodeSrc(src)
     }
     //查询用户是否开启了常用下单项目
     const handleOpenProject = async () => {
@@ -858,6 +885,7 @@ export default () => {
                             onChange: (e) => {
                                 console.log(e, 'e---->')
                                 setType(e)
+                                setTypeStatus(e)
                             },
                         }}
                         rules={[{ required: true, message: '请选择学员类型' }]}
@@ -983,7 +1011,7 @@ export default () => {
                 />
 
 
-                {type == '1' ? (
+                {typeStatus == '1' ? (
                     <>
                         <ProForm.Group>
                             <ProFormText
@@ -1132,8 +1160,14 @@ export default () => {
                         .then((res: any) => {
                             if (res.status == 'success') {
                                 message.success('操作成功');
+                                if (renderData.type == '1') {
+                                    setTeamStudents(true)
+                                }
+                                if (renderData.type == '0' || renderData.type == '2') {
+                                    setRegistration(true)
+                                }
                                 setID(res.data[0])
-                                setRegistration(true)
+                                
                                 setTotalReceivable(0)
                                 callbackRef()
                                 // 重置所有表单数据
@@ -1361,6 +1395,7 @@ export default () => {
                 </div>
                 <OrderClassType
                     renderData={renderData}
+                    typeStatus={typeStatus}
                     projectslist={projectslist}
                     ref={classListRef}
                     onTotalPriceChange={(price: number) => {
@@ -1394,7 +1429,269 @@ export default () => {
                     name="description"
                 /> */}
             </ModalForm>
+            {/* 提交资料二维码 */}
+            <Modal
+                title="提交资料二维码"
+                open={qrcodeVisible}
+                width={500}
+                onCancel={() => setQrcodeVisible(false)}
+                footer={null}
+                destroyOnClose
+            >
+                <img style={{ width: '400px', height: '400px' }} src={qrcodeSrc} />
+            </Modal>
 
+            {/* 批量导入学员信息 */}
+            {UploadFalg && (
+                <Upload
+                    setModalVisible={() => setUploadVisible(false)}
+                    modalVisible={UploadFalg}
+                    url={Uploadurl}
+                    type="studentOrder"
+                    propsData={{ resourceType: 0, parentId: renderData.studentId }}
+                    callbackRef={() => callbackRef()}
+                    callbackFn={(e: any) => {
+                        actionRefClass.current?.reloadAndRest?.();
+                    }}
+                />
+            )}
+            {/* <Modal
+                width={500}
+                title="新增学员"
+                onCancel={() => { setAddprojectstudent(false) }}
+                open={addprojectstudent}
+            >
+
+            </Modal> */}
+            <Modal
+                width={1100}
+                title="团组学员信息"
+                onCancel={() => {
+                    setTeamStudents(false)
+                }}
+                onOk={handleWatch}
+                open={teamStudents}
+            >
+                <ProTable
+                    toolBarRender={() => [
+                        <Button
+                            key="buttons"
+                            icon={<DownloadOutlined />}
+                            type="primary"
+                            onClick={() => {
+                                let url = '/sms/business/bizOrder/saveStudentAndOrder';
+                                setUrl(url + '?id=' + ID);
+                                setUploadVisible(true);
+                            }}
+                        >
+                            批量导入学员
+                        </Button>,
+                        <Button
+                            key="buttons"
+                            type="primary"
+                            onClick={() => handleQrCode()}
+                        >
+                            收集资料二维码
+                        </Button>,
+                        // <Button
+                        //     key="buttons"
+                        //     icon={<PlusOutlined />}
+                        //     type="primary"
+                        //     onClick={() => {
+                        //         setUploadVisible(true);
+                        //     }}
+                        // >
+                        //     新增学员
+                        // </Button>
+                    ]}
+                    columns={[
+                        {
+                            title: '学员',
+                            dataIndex: 'studentName',
+                            readonly: true,
+                        },
+
+                        {
+                            title: '班型应收金额',
+                            dataIndex: 'receivable',
+                            readonly: true,
+                        },
+                        {
+                            title: '班型人数',
+                            dataIndex: 'quantity',
+                            readonly: true,
+                        },
+                        // {
+                        //   title: '平均实际应收',
+                        //   dataIndex: 'averageReceivable',
+                        //   readonly: true,
+                        // },
+                        // {
+                        //   title: '平均优惠金额',
+                        //   dataIndex: 'averageDiscount',
+                        //   readonly: true,
+                        // },
+                        // {
+                        //   title: '分配金额',
+                        //   dataIndex: 'amount',
+                        //   // readonly: true,
+                        // },
+                        {
+                            title: '报考岗位',
+                            // dataIndex: 'classType',
+                            search: false,
+                            readonly: true,
+                            render: (text, record) => (
+                                <span>
+                                    {record.project &&
+                                        [...new Set(record.project.split(','))].map((item: any, index: number) => {
+                                            return (
+                                                <span key={index}>
+                                                    {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
+                                                </span>
+                                            );
+                                        })}
+                                </span>
+                            ),
+                        },
+                        {
+                            title: '班级类型',
+                            dataIndex: 'classType',
+                            search: false,
+                            readonly: true,
+                            render: (text, record) => (
+                                <span>{Dictionaries.getName('dict_class_type', record.classType)}</span>
+                            ),
+                        },
+                        {
+                            title: '班型年限',
+                            dataIndex: 'classYear',
+                            search: false,
+                            readonly: true,
+                            render: (text, record) => (
+                                <span>{Dictionaries.getName('dict_class_year', record.classYear)}</span>
+                            ),
+                        },
+                        {
+                            title: '考试类型',
+                            dataIndex: 'examType',
+                            readonly: true,
+                            search: false,
+                            render: (text, record) => (
+                                <span>{Dictionaries.getName('dict_exam_type', record.examType)}</span>
+                            ),
+                        },
+                        {
+                            title: '创建时间',
+                            key: 'createTime',
+                            sorter: true,
+                            dataIndex: 'createTime',
+                            valueType: 'dateRange',
+                            render: (text, record) => (
+                                <span>{record.createTime}</span>
+                            ),
+                        },
+                        // {
+                        //   title: '操作',
+                        //   dataIndex: 'operation',
+                        //   key: 'operation',
+                        //   valueType: 'option',
+                        //   render: (text, record, _, action) => (
+                        //     <>
+                        //       <Tooltip placement="topLeft" title={'分配金额'}>
+                        //         <Button
+                        //           key="editable"
+                        //           type="primary"
+                        //           size="small"
+                        //           icon={<EditOutlined />}
+                        //           className="tablebut"
+                        //           onClick={() => {
+                        //             action?.startEditable?.(record.id);
+                        //             // setRenderData({ ...record, type: 'order', orderNumber: 0 });
+                        //             // if (record.studentType == 0) {
+                        //             //   setOrderVisible(true);
+                        //             // } else {
+                        //             //   setCOrderVisible(true);
+                        //             // }
+                        //           }}
+                        //         >
+                        //           {/* 编辑 */}
+                        //         </Button>
+                        //       </Tooltip>
+                        //       <Popconfirm
+                        //         key="delete"
+                        //         title="是否确定删除？"
+                        //         onConfirm={() => {
+                        //           request.delete('/sms/business/bizOrder', { id: record.id }).then((res: any) => {
+                        //             if (res.status == 'success') {
+                        //               message.success('删除成功');
+                        //               callbackRefs();
+                        //             }
+                        //           });
+                        //         }}
+                        //         okText="删除"
+                        //         cancelText="取消"
+                        //       >
+                        //         <Button key="delete" size="small" type="primary" danger icon={<DeleteOutlined />}>
+                        //           {/* 删除 */}
+                        //         </Button>
+                        //       </Popconfirm>
+                        //     </>
+                        //   ),
+                        // },
+                    ]}
+                    search={false}
+                    cardBordered
+                    rowKey="id"
+                    actionRef={actionRefClass}
+                    editable={{
+                        type: 'multiple',
+                        //editableKeys,
+                        onSave: async (rowKey, data, row) => {
+                            let array = [
+                                {
+                                    amount: data.amount,
+                                    id: data.id,
+                                },
+                            ];
+                            console.log(data);
+                            if (data.amount > data.averageReceivable) {
+                                // setEditableRowKeys(editableKeys);
+                                message.error('分配金额不得大于实际应收金额');
+                                //callbackRefs();
+                                return false;
+                            }
+                            request.postAll('/sms/business/bizOrder/saveArray', {
+                                array: array,
+                            });
+                            // await waitTime(2000);
+                            setTimeout(() => {
+                                //callbackRefs();
+                            }, 500);
+                        },
+                        //onChange: setEditableRowKeys,
+                    }}
+                    request={async (params: any = {}, sort, filter) => {
+                        params.parentId = ID; //ID
+                        // params.standardId = renderData.standardId;
+                        // params.classType = renderData.order.classType;
+                        // params.examType = renderData.order.examType;
+                        // params.classYear = renderData.order.classYear;
+                        // params.project = renderData.order.project;
+                        // params.receivable = renderData.order.receivable;
+                        ///sms/business/bizOrder
+                        const dataList: any = await request.get('/sms/business/bizOrder', {
+                            ...params,
+                        });
+                        console.log(dataList,'-======-')
+                        return {
+                            data: dataList.data.content,
+                            success: dataList.success,
+                            total: dataList.data.totalElements,
+                        };
+                    }}
+                ></ProTable>
+            </Modal>
 
 
             {MenuVisible && (
