@@ -567,7 +567,7 @@ export async function currentUser(options?: { [key: string]: any }) {
             icon: 'ClusterOutlined',
             routes: [
               {
-                name: '线索小组管理',
+                name: '资源小组',
                 path: '/business/cluemanagement',
                 component: './Business/Cluemanagement'
               },

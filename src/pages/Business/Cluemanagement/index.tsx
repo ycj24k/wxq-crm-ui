@@ -245,7 +245,7 @@ export default () => {
                             setModalVisible(true)
                         }}
                     >
-                        添加线索小组
+                        添加资源小组
                     </Button>
                 ]}
                 dateFormatter="string"

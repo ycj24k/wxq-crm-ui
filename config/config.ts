@@ -77,7 +77,8 @@ export default defineConfig({
   exportStatic: {},
   proxy: {
     '/sms': {
-      target: 'http://10.168.1.10:80',
+      // target: 'http://10.168.1.10:80',
+      target: 'https://50435n29m5.vicp.fun',
       // target: getInfo(),
       changeOrigin: true,
       // pathRewrite: { '^/sms': '' },
