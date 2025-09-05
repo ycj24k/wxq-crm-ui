@@ -9,6 +9,8 @@ import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import Dictionaries from './services/util/dictionaries';
 import Socket from '@/services/util/websocket';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import errorHandler from '@/utils/errorHandler';
 import {
   SmileOutlined,
   HeartOutlined,

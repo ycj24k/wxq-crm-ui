@@ -1,181 +1,3 @@
-// @import '~antd/es/style/variable.less';
-
-// html,
-// body,
-// #root {
-//   height: 100%;
-// }
-
-// .colorWeak {
-//   filter: invert(80%);
-// }
-
-// .ant-layout {
-//   min-height: 100vh;
-// }
-
-
-// .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
-//   left: unset;
-// }
-// .tablebut {
-//   margin-right: 10px;
-//   margin-bottom: 5px;
-// }
-// canvas {
-//   display: block;
-// }
-// .aaaa1 {
-//   .ant-modal-confirm-btns {
-//     display: none;
-//   }
-// }
-// .ant-table-footer {
-//   background-color: rgb(255, 242, 204);
-// }
-// .xibaoimg {
-//   display: inline-block;
-//   width: 32px;
-//   height: 32px;
-//   margin: 2px auto;
-//   background-image: url('../public/lihua.png');
-// }
-// .bianpao {
-//   display: inline-block;
-//   width: 64px;
-//   height: 64px;
-//   // margin: 2px auto;
-//   background-image: url('../public/bianpao.gif');
-//   background-repeat: no-repeat;
-//   background-size: 100%;
-// }
-// body {
-//   text-rendering: optimizeLegibility;
-//   -webkit-font-smoothing: antialiased;
-//   -moz-osx-font-smoothing: grayscale;
-// }
-// .ant-pro-grid-content.wide {
-//   max-width: 100%;
-// }
-// .ant-tabs-top > .ant-tabs-nav {
-//   margin-bottom: 0;
-// }
-// .newss {
-//   top: 52px !important;
-// }
-// ul,
-// ol {
-//   list-style: none;
-// }
-// .ant-modal-body {
-//   margin-left: 25px;
-// }
-// @media (max-width: @screen-xs) {
-//   .ant-table {
-//     width: 100%;
-//     overflow-x: auto;
-//     &-thead > tr,
-//     &-tbody > tr {
-//       > th,
-//       > td {
-//         white-space: pre;
-//         > span {
-//           display: block;
-//         }
-//       }
-//     }
-//   }
-// }
-
-// // Compatible with IE11
-// @media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
-//   body .ant-design-pro > .ant-layout {
-//     min-height: 100vh;
-//   }
-// }
-
-// // 顶部菜单选中项样式
-// .ant-pro-top-nav-header .ant-menu-item-selected,
-// .ant-pro-top-nav-header .ant-menu-item-selected .ant-pro-menu-item-link {
-//   background-color: rgb(24 144 255) !important;
-//   color: #fff !important;
-//   padding: 0 16px !important; /* 添加水平方向的内边距 */
-// }
-
-// // 顶部菜单项样式（非选中状态）
-// .ant-pro-top-nav-header .ant-menu-item {
-//   padding: 0 !important; /* 移除默认内边距 */
-// }
-
-// // 顶部菜单项链接样式（非选中状态）
-// .ant-pro-top-nav-header .ant-menu-item a,
-// .ant-pro-top-nav-header .ant-menu-item .ant-pro-menu-item-link {
-//   padding: 0 16px !important; /* 添加水平方向的内边距 */
-//   height: 100% !important; /* 确保高度为100% */
-//   display: flex !important; /* 使用flex布局 */
-//   align-items: center !important; /* 垂直居中 */
-// }
-
-// // 侧边栏菜单选中项样式
-// .ant-pro-sider .ant-menu-item-selected,
-// .ant-pro-sider .ant-menu-item-selected .ant-pro-menu-item-link,
-// .ant-pro-sider .ant-menu-item-selected a {
-//   background-color: rgb(230 247 255) !important;
-//   color: #1890ff !important;
-//   width: 100% !important; /* 确保宽度为100% */
-// }
-
-// // 直接针对自定义类名
-// .ant-pro-menu-item-link {
-//   &.selected-top-menu {
-//     background-color: rgb(24 144 255) !important;
-//     color: #fff !important;
-//     width: 100% !important; /* 确保宽度为100% */
-//     display: block !important; /* 确保元素为块级元素 */
-//     padding: 0 16px !important; /* 添加水平方向的内边距 */
-//   }
-  
-//   &.selected-side-menu {
-//     background-color: rgb(230 247 255) !important;
-//     color: #1890ff !important;
-//     width: 100% !important; /* 确保宽度为100% */
-//     display: block !important; /* 确保元素为块级元素 */
-//   }
-// }
-
-// /* 确保侧边栏菜单项的背景色充满整个宽度，同时保持文字位置不变 */
-// .ant-pro-sider .ant-menu-item {
-//   /* 保持原有样式 */
-//   position: relative; /* 添加相对定位，为绝对定位的背景提供参考 */
-// }
-
-// /* 为选中的菜单项添加伪元素，作为背景 */
-// .ant-pro-sider .ant-menu-item-selected::before,
-// .ant-pro-sider .ant-menu-item .selected-side-menu::before {
-//   content: '';
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   background-color: rgb(230 247 255) !important;
-//   z-index: -1; /* 确保背景在内容之下 */
-// }
-
-// /* 确保链接元素不会改变文字位置 */
-// .ant-pro-sider .ant-menu-item a,
-// .ant-pro-sider .ant-menu-item .ant-pro-menu-item-link {
-//   /* 保持原有样式 */
-//   background-color: transparent !important; /* 确保链接元素背景透明 */
-// }
-
-// /* 修复选中项文字颜色 */
-// .ant-pro-sider .ant-menu-item-selected a,
-// .ant-pro-sider .ant-menu-item-selected .ant-pro-menu-item-link,
-// .ant-pro-menu-item-link.selected-side-menu {
-//   color: #1890ff !important;
-// }
-
 @import '~antd/es/style/variable.less';
 
 html,
@@ -191,24 +13,30 @@ body,
 .ant-layout {
   min-height: 100vh;
 }
+
 .ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
   left: unset;
 }
+
 .tablebut {
   margin-right: 10px;
   margin-bottom: 5px;
 }
+
 canvas {
   display: block;
 }
+
 .aaaa1 {
   .ant-modal-confirm-btns {
     display: none;
   }
 }
+
 .ant-table-footer {
   background-color: rgb(255, 242, 204);
 }
+
 .xibaoimg {
   display: inline-block;
   width: 32px;
@@ -216,36 +44,43 @@ canvas {
   margin: 2px auto;
   background-image: url('../public/lihua.png');
 }
+
 .bianpao {
   display: inline-block;
   width: 64px;
   height: 64px;
-  // margin: 2px auto;
   background-image: url('../public/bianpao.gif');
   background-repeat: no-repeat;
   background-size: 100%;
 }
+
 body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 .ant-pro-grid-content.wide {
   max-width: 100%;
 }
+
 .ant-tabs-top > .ant-tabs-nav {
   margin-bottom: 0;
 }
+
 .newss {
   top: 52px !important;
 }
+
 ul,
 ol {
   list-style: none;
 }
+
 .ant-modal-body {
   margin-left: 25px;
 }
+
 @media (max-width: @screen-xs) {
   .ant-table {
     width: 100%;

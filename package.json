@@ -44,8 +44,11 @@
   },
   "lint-staged": {
     "**/*.less": "stylelint --syntax less",
-    "**/*.{js,jsx,ts,tsx}": "npm run lint-staged:js",
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+    "**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{less,md,json}": [
       "prettier --write"
     ]
   },
@@ -65,6 +68,7 @@
     "@ant-design/pro-table": "^2.69.0",
     "@dnd-kit/core": "^6.3.1",
     "@hello-pangea/dnd": "^18.0.1",
+    "@types/react-window": "^1.8.8",
     "@umijs/route-utils": "^2.0.0",
     "antd": "^4.24.16",
     "array-move": "^4.0.0",
@@ -86,9 +90,11 @@
     "react-dom": "^17.0.0",
     "react-helmet-async": "^1.2.0",
     "react-sortable-hoc": "^2.0.0",
+    "react-window": "^2.0.2",
     "umi": "^3.5.0",
     "xlsx": "^0.18.5",
-    "xlsx-populate": "^1.21.0"
+    "xlsx-populate": "^1.21.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@ant-design/pro-cli": "^2.1.0",

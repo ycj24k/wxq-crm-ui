@@ -1,8 +1,8 @@
-/lambda/
-/scripts
-/config
-.history
-public
-dist
+/dist
+/node_modules
+/public
 .umi
-mock
+.umi-production
+.umi-test
+*.d.ts
+/src/services/swagger/

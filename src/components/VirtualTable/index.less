@@ -1,0 +1,38 @@
+.virtual-table {
+  .ant-table-container {
+    .ant-table-header {
+      margin: 0;
+    }
+    
+    .ant-table-body {
+      .virtual-grid {
+        &::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.05);
+        }
+      }
+      
+      .virtual-table-cell {
+        box-sizing: border-box;
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        
+        &.virtual-table-cell-last {
+          border-right: none;
+        }
+      }
+    }
+  }
+}
