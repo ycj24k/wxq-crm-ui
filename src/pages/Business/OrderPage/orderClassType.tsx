@@ -685,7 +685,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                     name="quantity"
                                                     width="sm"
                                                     label="报名人数"
-                                                    disabled={typeStatus != '1'}
+                                                    //disabled={typeStatus != '1'}
                                                     fieldProps={{
                                                         onChange: (e: any) => {
                                                             handlejisuan()
@@ -1021,7 +1021,9 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                         const users = formRef?.current?.getFieldValue('users') || [];
                                                         const amount = Number(e) || 0;
                                                         const totalReceivable = users[index].receivable || 0;
-                                                        const surplus = totalReceivable - amount;
+                                                        const totalquantity = users[index].quantity || 0;
+                                                        const commonPrice = totalReceivable * totalquantity
+                                                        const surplus = commonPrice - amount;
                                                         const performance = amount - users[index].collectedAmount;
                                                         if (isNaN(performance)) {
                                                             const newUsers = [...users];
