@@ -563,18 +563,13 @@ export async function currentUser(options?: { [key: string]: any }) {
             ],
           },
           {
-            name: '线索管理',
+            name: '资源小组管理',
             icon: 'ClusterOutlined',
             routes: [
               {
                 name: '资源小组',
                 path: '/business/cluemanagement',
                 component: './Business/Cluemanagement'
-              },
-              {
-                name: '规则配置中心',
-                path: '/business/rulemangercenter',
-                component: './Business/RuleMangerCenter',
               },
             ]
           },

@@ -1,6 +1,6 @@
 import apiRequest from "@/services/ant-design-pro/apiRequest"
 import { PlusOutlined } from "@ant-design/icons"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { Button, message, Popconfirm, Space } from "antd"
 import { useEffect, useRef, useState } from "react"
 import Modal from "./edit"
@@ -9,6 +9,7 @@ import { PageContainer } from "@ant-design/pro-layout"
 import dictionaries from "@/services/util/dictionaries"
 import ProTable from '@ant-design/pro-table';
 import UserChoose from "./UserChoose"
+import RuleConfigDrawer from "./RuleConfigDrawer"
 
 export default () => {
     const actionRef = useRef<ActionType>();
@@ -17,9 +18,10 @@ export default () => {
     const [ExpandModalVisible, setExpandModalVisible] = useState<boolean>(false)
     const [renderData, setRenderData] = useState<any>({});
     const [CardContent, setCardContent] = useState<any>();
-    const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
-    let [department, setDepartment] = useState<any>();
+    const [_parentIdTree, setParentIdTree] = useState<string | number>('-1');
+    const [department, setDepartment] = useState<any>();
     const [UserChooseVisible, setUserChooseVisible] = useState<boolean>(false);
+    const [ruleDrawerVisible, setRuleDrawerVisible] = useState<boolean>(false);
     const url = '/sms/lead/ladUserGroup'
     let content: any = null;
     let roleContent: any = null;
@@ -72,7 +74,7 @@ export default () => {
             width: 80,
             search: false,
             colSpan: 0,
-            render: (text: any, record: any, _: any, action: any) => (
+            render: (text: any, record: any, _: any, _action: any) => (
                 <Button
                     size="small"
                     type="primary"
@@ -82,7 +84,7 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        let list = transformProviderList(record.userList)
+                        const list = transformProviderList(record.userList)
                         setDepartment(list);
                         setParentIdTree(record.id);
                         // setCardVisible(true);
@@ -106,7 +108,7 @@ export default () => {
             width: 80,
             search: false,
             colSpan: 0,
-            render: (text: any, record: any, _: any, action: any) => (
+            render: (text: any, record: any, _: any, _action: any) => (
                 <Button
                     size="small"
                     type="primary"
@@ -116,7 +118,7 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        let list = transformProviderList(record.providerList)
+                        const list = transformProviderList(record.providerList)
                         setDepartment(list);
                         setParentIdTree(record.id);
                         setUserChooseVisible(true)
@@ -144,7 +146,7 @@ export default () => {
             title: '操作',
             search: false,
             render: (text: any, record: any) => [
-                <Space>
+                <Space key={record.id}>
                     <a
                         onClick={() => {
                             setRenderData({ record, type: 'eidt' })
@@ -172,6 +174,15 @@ export default () => {
                             删除
                         </a>
                     </Popconfirm>
+
+                    <Button
+                        type="link"
+                        onClick={() => {
+                            setRuleDrawerVisible(true);
+                        }}
+                    >
+                        配置规则
+                    </Button>
                 </Space>
             ]
         }
@@ -197,8 +208,8 @@ export default () => {
                     } = {
 
                         },
-                    sort,
-                    filter,
+                    _sort,
+                    _filter,
                 ) => {
                     roleContent = await apiRequest.get(url, params);
                     return {
@@ -272,6 +283,12 @@ export default () => {
                     setUserChooseVisible={() => setUserChooseVisible(false)}
                 />
             )}
+
+            {/* 配置规则右侧弹窗 */}
+            <RuleConfigDrawer
+                visible={ruleDrawerVisible}
+                onClose={() => setRuleDrawerVisible(false)}
+            />
         </PageContainer>
     </>
 }

@@ -78,7 +78,8 @@ export default defineConfig({
   proxy: {
     '/sms': {
       // target: 'http://10.168.1.10:80',
-      target: 'https://50435n29m5.vicp.fun',
+      // target: 'http://50i435f295.qicp.vip',// 开发
+      target: 'http://test.wxq.cshuide.com',// 测试
       // target: getInfo(),
       changeOrigin: true,
       // pathRewrite: { '^/sms': '' },

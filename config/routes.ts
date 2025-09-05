@@ -129,11 +129,6 @@
     component: './Business/SaleLead/SalePersonLead'
   },
   {
-    name: '规则配置中心',
-    path: '/business/rulemangercenter',
-    component: './Business/RuleMangerCenter',
-  },
-  {
     name: '资源小组',
     path: '/business/cluemanagement',
     component: './Business/Cluemanagement'
