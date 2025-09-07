@@ -277,6 +277,11 @@ export async function currentUser(options?: { [key: string]: any }) {
                 component: './Business/StudentManageTrue',
               },
               {
+                name: '学员等级',
+                path: '/business/studentlevel',
+                component: './Business/StudentLevel',
+              },
+              {
                 name: '正式团组',
                 icon: 'TeamOutlined',
                 path: '/business/companymanagetrue',
@@ -574,6 +579,48 @@ export async function currentUser(options?: { [key: string]: any }) {
             ]
           },
           {
+            name: '新媒体资源',
+            icon: 'table',
+            routes: [
+              {
+                name: '新媒体资源视图',
+                path: '/business/newmedia/view',
+                component: './Business/NewMediaResource/View',
+              },
+              {
+                path: '/business/newmedia',
+                redirect: '/business/newmedia/view',
+              },
+            ]
+          },
+          {
+            name: '销售管理',
+            icon: 'table',
+            routes: [
+              {
+                name: '销售管理',
+                path: '/business/sales/manage',
+                component: './Business/Sales/Manage',
+              },
+              {
+                name: '销售等级',
+                path: '/business/sales/level',
+                component: './Business/Sales/Level',
+              },
+            ]
+          },
+          {
+            name: 'SOP模板管理',
+            icon: 'table',
+            routes: [
+              {
+                name: 'SOP模板管理',
+                path: '/business/sop/template',
+                component: './Business/SOP/Template',
+              },
+            ]
+          },
+          {
             name: '线索列表',
             icon: 'table',
             routes: [
@@ -650,7 +697,7 @@ export async function currentUser(options?: { [key: string]: any }) {
             component: './UserCenter',
           },
           {
-            name: '代办计划',
+            name: '待办计划',
             icon: 'ReadOutlined',
             path: '/users/todolist',
             component: './UserCenter/TodoList'
@@ -903,4 +950,22 @@ export async function removeRule(options?: { [key: string]: any }) {
     method: 'DELETE',
     ...(options || {}),
   });
+}
+
+/** ================= 学员等级 API ================= */
+/** 列表 GET /sms/student/level */
+export async function getStudentLevel(params?: any) {
+  return request1.get('/sms/student/level', params);
+}
+/** 新增 POST /sms/student/level */
+export async function createStudentLevel(data: any) {
+  return request1.post('/sms/student/level', data);
+}
+/** 更新 POST /sms/student/level/update */
+export async function updateStudentLevel(data: any) {
+  return request1.post('/sms/student/level/update', data);
+}
+/** 删除 DELETE /sms/student/level */
+export async function deleteStudentLevel(id: number | string) {
+  return request1.delete('/sms/student/level', { id });
 }

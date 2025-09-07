@@ -1,3 +1,6 @@
+.ant-picker-calendar-full .ant-picker-panel .ant-picker-body th {
+  padding-right: 20px !important; /* 去除表格单元默认内边距，避免误差 */
+}
 .notice {
   &-Title {
     margin-bottom: 10px;
@@ -39,4 +42,105 @@
       flex: 0.6;
     }
   }
+}
+
+.todo_right_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.date_title {
+  font-size: 16px;
+  color: #333333;
+}
+
+.weekday_text {
+  margin-left: 8px;
+  color: #666;
+}
+
+.todo_list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.todo_card {
+  .todo_title {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 6px;
+  }
+  .todo_meta {
+    color: #666;
+    margin-bottom: 4px;
+  }
+  .todo_time {
+    color: #999;
+  }
+}
+
+.todo_cell {
+  display: flex;
+  justify-content: flex-end; /* 统一靠右：提示点放在右侧 */
+  margin-top: 8px;
+  padding-right: 8px; /* 与日期/星期右侧内边距保持一致 */
+}
+
+.todo_dot {
+  width: 6px;
+  height: 6px;
+  background: #1890ff;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* 优化标准日历视觉 */
+.ant-picker-calendar-full .ant-picker-calendar-date {
+  border-top: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-right: 8px; /* 与星期标题保持同一右内边距 */
+  padding-left: 8px;
+}
+.ant-picker-calendar-full .ant-picker-calendar-date-value {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 26px;
+  width: 100%;
+  text-align: right; /* 日期数字统一靠右 */
+  padding-right: 8px; /* 与星期/提示点对齐 */
+}
+.ant-picker-calendar-full .ant-picker-calendar-today .ant-picker-calendar-date {
+  border-color: #1890ff;
+}
+.ant-picker-calendar-full .ant-picker-calendar-selected-day .ant-picker-calendar-date {
+  background: rgba(24, 144, 255, 0.12);
+}
+
+/* 日期单元内内容区域置中并加大默认高度，视觉更规整 */
+.ant-picker-calendar-full .ant-picker-calendar-date-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 26px;
+}
+
+/* 日历头部字号与权重增强 */
+.ant-picker-calendar .ant-picker-calendar-header .ant-picker-calendar-year-select,
+.ant-picker-calendar .ant-picker-calendar-header .ant-picker-calendar-month-select {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 星期栏置中与加粗 */
+.ant-picker-calendar .ant-picker-content th {
+  text-align: right; /* 星期标题统一靠右 */
+  font-weight: 600;
+  padding-right: 8px !important; /* 与日期/提示点对齐，强覆盖 */
+  padding-left: 0;
 }

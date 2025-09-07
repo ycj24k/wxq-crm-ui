@@ -134,6 +134,21 @@
     component: './Business/Cluemanagement'
   },
   {
+    name: '新媒体资源',
+    path: '/business/newmedia',
+    routes: [
+      {
+        name: '新媒体资源视图',
+        path: '/business/newmedia/view',
+        component: './Business/NewMediaResource/View',
+      },
+      {
+        path: '/business/newmedia',
+        redirect: '/business/newmedia/view',
+      },
+    ],
+  },
+  {
     name: '下单专页',
     path: '/business/orderpage',
     component: './Business/OrderPage',
@@ -168,6 +183,38 @@
     name: '潜在学员',
     path: '/business/studentmanage',
     component: './Business/StudentManage',
+  },
+  {
+    name: '学员等级',
+    path: '/business/studentlevel',
+    component: './Business/StudentLevel',
+  },
+  {
+    name: '销售管理',
+    path: '/business/sales',
+    routes: [
+      {
+        name: '销售管理',
+        path: '/business/sales/manage',
+        component: './Business/Sales/Manage',
+      },
+      {
+        name: '销售等级',
+        path: '/business/sales/level',
+        component: './Business/Sales/Level',
+      },
+    ],
+  },
+  {
+    name: 'SOP模板管理',
+    path: '/business/sop',
+    routes: [
+      {
+        name: 'SOP模板管理',
+        path: '/business/sop/template',
+        component: './Business/SOP/Template',
+      },
+    ],
   },
   {
     name: '待支付学员',
@@ -396,12 +443,12 @@
     redirect: '/users/usercenter',
   },
   {
-    name: '代办计划',
+    name: '待办计划',
     path: '/users/todolist',
     component: './TodoList',
   },
   {
-    name: '代办计划',
+    name: '待办计划',
     path: '/users',
     redirect: '/users/todolist',
   },
