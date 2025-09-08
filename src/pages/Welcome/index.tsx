@@ -424,7 +424,7 @@ const Welcome: React.FC = () => {
               <Avatar size={70} src={currentUser.avatar} alt="avatar" />
               <div className="leftBox-div">
                 <p className="leftBox-title">
-                  {times}好,{currentUser?.name}，祝你开心每一天！
+                  {times}好,{currentUser?.name}，祝你开心每一天！！
                 </p>
 
                 <p className="leftBox-wh">今天又是业绩满满的一天,加油、加油。加油！</p>
