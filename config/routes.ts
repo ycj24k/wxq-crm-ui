@@ -587,6 +587,12 @@
     component: './Admins/UserManage',
   },
   {
+    name: '销售等级',
+    icon: 'table',
+    path: '/admins/saleslevel',
+    component: './Admins/UserManage/LevelIndex',
+  },
+  {
     name: '合同管理',
     icon: 'table',
     path: '/admins/contract',

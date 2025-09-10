@@ -16,7 +16,7 @@ import GroupCard from './groupModal';
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
-import { getCompanyRequest } from '@/services/util/util';
+import { getCompanyRequest,getsysUserLevel} from '@/services/util/util';
 export default (props: any) => {
   const [CardVisible, setCardVisible] = useState<boolean>(false);
   const [groupVisible, setGroupisible] = useState<boolean>(false);
@@ -434,6 +434,18 @@ export default (props: any) => {
                   required: true,
                 },
               ]}
+            ></ProFormSelect>
+            <ProFormSelect
+              label="销售等级"
+              name="UserLevel"
+              width="xs"
+              initialValue={renderData.salesLevel}
+              request={getsysUserLevel}
+              // rules={[
+              //   {
+              //     required: true,
+              //   },
+              // ]}
             ></ProFormSelect>
             <ProFormText
               name="percent"

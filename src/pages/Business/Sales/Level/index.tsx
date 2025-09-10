@@ -41,7 +41,7 @@ export default () => {
         rowKey="id"
         columns={columns}
         actionRef={actionRef}
-        search={false}
+        search={{ labelWidth: 'auto' }}
         toolBarRender={() => [
           <Button type="primary" key="new" onClick={() => { setEditing(null); form.resetFields(); setVisible(true); }}>新增</Button>
         ]}
@@ -50,6 +50,7 @@ export default () => {
           return { data: res.data?.content || [], success: true, total: res.data?.totalElements || 0 };
         }}
       />
+
 
       <Modal
         title={editing ? '编辑销售等级' : '新增销售等级'}

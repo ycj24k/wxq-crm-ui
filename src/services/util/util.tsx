@@ -65,13 +65,22 @@ export function getSession() {
 
 export async function getCompanyRequest() {
   return (await apiRequest.get('/sms/share/getCompany')).data?.map((e: any) => {
+    console.log('getCompanyRequest',e)
     return {
       label: e.name,
       value: e.id + ''
     }
   })
 }
-
+export async function getsysUserLevel() {
+  return (await apiRequest.get('/sms/system/sysUserLevel')).data?.map((e: any) => {
+    console.log('getsysUserLevel',e)
+    return {
+      label: e.data.content.name,
+      value: e.data.content.id + ''
+    }
+  })
+}
 export function getInfo() {
   return {
     origin: 'http://10.168.1.10:80'

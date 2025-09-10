@@ -418,6 +418,30 @@ export default (props: any) => {
                 }
               });
             }
+            if (CardContent.type == 'sysuser') {
+              console.log(arrid,'arrid')
+              console.log(parentIdTree,'parentIdTree')
+              request
+                .post2(
+                  '/sms/system/sysUserLevel/correlationUser',
+                  {
+                    id: parentIdTree,
+                  },
+                  {
+                    integers: arrid,
+                  },
+                )
+                .then((res: any) => {
+                  if (res.status == 'success') {
+                    message.success('授权成功');
+                    CheckedKeys = [];
+                    callbackRef();
+                    setTimeout(() => {
+                      setCardVisible(false);
+                    }, 500);
+                  }
+                });
+            }
           }}
         >
           <>
@@ -437,7 +461,6 @@ export default (props: any) => {
               onCheck={(checkedKeysValue, e) => {
                 console.log('checkedKeysValue', checkedKeysValue);
                 console.log('e', e);
-
                 obj2 = e.checkedNodes;
               }}
               onSelect={(selectedKeys, e: any) => {
