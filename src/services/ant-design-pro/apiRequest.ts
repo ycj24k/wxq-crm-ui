@@ -234,6 +234,66 @@ class httpRequest {
     let option = { url };
     return this.baseOptions(option, 'DELETE');
   }
+
+  // 资源小组规则配置相关接口
+  /**
+   * 获取资源小组规则配置
+   * @param userGroupId 用户组ID
+   */
+  async getRuleConfig(userGroupId: number) {
+    return this.get(`/sms/lead/ladUserGroup/ruleConfig/${userGroupId}`);
+  }
+
+  /**
+   * 设置资源小组规则配置
+   * @param userGroupId 用户组ID
+   * @param ruleGroups 规则组数据
+   */
+  async setRuleConfig(userGroupId: number, ruleGroups: any[]) {
+    return this.postAll(`/sms/lead/ladUserGroup/ruleConfig/${userGroupId}`, { ladRuleGroups: ruleGroups });
+  }
+
+  /**
+   * 获取规则可选字段列表
+   */
+  async getRuleFields() {
+    return this.get('/sms/lead/ladRule/getRuleFields');
+  }
+
+  /**
+   * 获取新媒体资源学员列表
+   * @param params 查询参数
+   */
+  async getNewMediaStudents(params: any) {
+    return this.get('/sms/business/bizStudentUser/studentDeal', params);
+  }
+
+  /**
+   * 添加学员到销售小组
+   * @param students 学员数据数组
+   */
+  async addStudentsToGroup(students: any[]) {
+    return this.postAll('/sms/business/bizStudent/addUserGroup', students);
+  }
+
+  /**
+   * 获取 SOP 模板列表（分页）
+   * GET /sms/sop/sopEntity
+   * params: { name?, project?, description?, enable?, id?, isDel?, _page?, _size?, _orderBy?, _direction?, _isGetAll? }
+   */
+  async getSOPTemplates(params: any) {
+    return this.get('/sms/sop/sopEntity', params);
+  }
+
+  /** 获取 SOP 规则列表 */
+  async getSOPRules(sopId: number) {
+    return this.get(`/sms/sop/sopEntity/rule/${sopId}`);
+  }
+
+  /** 保存 SOP 规则列表 */
+  async saveSOPRules(sopId: number, sopRules: any[]) {
+    return this.postAll(`/sms/sop/sopEntity/rule/${sopId}`, sopRules);
+  }
 }
 
 export default new httpRequest();
