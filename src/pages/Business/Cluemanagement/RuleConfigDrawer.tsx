@@ -1,10 +1,11 @@
 /**
  * 配置规则右侧弹窗组件
  */
-import React, { useState } from 'react';
-import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber } from 'antd';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin } from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import moment from 'moment';
+import apiRequest from '@/services/ant-design-pro/apiRequest';
 
 const { Option } = Select;
 
@@ -24,43 +25,54 @@ interface OperatorConfig {
 
 // 规则行
 interface RuleLine {
-  id: string;
+  id: number;
   field: string;
   operator: number;
   value: string;
+  ruleGroupId?: number;
+  createBy?: number;
+  createTime?: string;
+  isDel?: number;
+  type?: number;
+  updateBy?: number;
+  updateTime?: string;
 }
 
 // 规则组
 interface RuleGroup {
-  id: string;
+  id: number;
   name: string;
   relation: 'and' | 'or';
   rules: RuleLine[];
+  userGroupId?: number;
+  isDel?: number;
+  operator?: number;
+}
+
+// API字段类型
+interface ApiFieldType {
+  field: string;
+  name: string;
+  type: string;
 }
 
 interface RuleConfigDrawerProps {
   visible: boolean;
   onClose: () => void;
   onConfirm?: (groups: RuleGroup[]) => void;
+  userGroupId?: number;
 }
 
 const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   visible,
   onClose,
   onConfirm,
+  userGroupId,
 }) => {
-  // 计算字段配置
-  const fieldTypes: FieldType[] = [
-    { key: 'owner', name: '信息所有人', type: 'string' },
-    { key: 'department', name: '部门', type: 'string' },
-    { key: 'position', name: '职位', type: 'string' },
-    { key: 'age', name: '年龄', type: 'number' },
-    { key: 'salary', name: '薪资', type: 'number' },
-    { key: 'createTime', name: '创建时间', type: 'datetime' },
-    { key: 'birthday', name: '生日', type: 'date' },
-    { key: 'workTime', name: '工作时间', type: 'time' },
-    { key: 'isActive', name: '是否激活', type: 'boolean' },
-  ];
+  // 状态管理
+  const [loading, setLoading] = useState(false);
+  const [fieldTypes, setFieldTypes] = useState<FieldType[]>([]);
+  const [_apiFields, setApiFields] = useState<ApiFieldType[]>([]);
 
   // 运算类型配置
   const operatorConfigs: OperatorConfig[] = [
@@ -82,40 +94,113 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 15, name: '否', valueType: 'boolean' },
   ];
 
-  const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([
-    {
-      id: '1',
-      name: '规则组1',
-      relation: 'and',
-      rules: [
-        {
-          id: '1-1',
-          field: 'owner',
-          operator: 2,
-          value: '张三'
-        },
-        {
-          id: '1-2',
-          field: 'department',
-          operator: 0,
-          value: '技术部'
-        }
-      ]
-    },
-    {
-      id: '2',
-      name: '规则组2',
-      relation: 'or',
-      rules: [
-        {
-          id: '2-1',
-          field: 'age',
-          operator: 6,
-          value: '25'
-        }
-      ]
+  const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
+
+  // 加载字段列表
+  const loadFieldTypes = async () => {
+    try {
+      const response = await apiRequest.getRuleFields();
+      if (response.status === 'success' && response.data) {
+        const data = Array.isArray(response.data) ? response.data : [response.data];
+        setApiFields(data);
+        // 转换API字段格式为组件需要的格式
+        const convertedFields: FieldType[] = data.map((field: ApiFieldType) => ({
+          key: field.field || '',
+          name: field.name || '',
+          type: (field.type as any) || 'string'
+        }));
+        setFieldTypes(convertedFields);
+      } else {
+        // 如果API失败，使用默认字段
+        const defaultFields: FieldType[] = [
+          { key: 'owner', name: '信息所有人', type: 'string' },
+          { key: 'department', name: '部门', type: 'string' },
+          { key: 'position', name: '职位', type: 'string' },
+          { key: 'age', name: '年龄', type: 'number' },
+          { key: 'salary', name: '薪资', type: 'number' },
+          { key: 'createTime', name: '创建时间', type: 'datetime' },
+          { key: 'birthday', name: '生日', type: 'date' },
+          { key: 'workTime', name: '工作时间', type: 'time' },
+          { key: 'isActive', name: '是否激活', type: 'boolean' },
+        ];
+        setFieldTypes(defaultFields);
+      }
+    } catch (error) {
+      console.error('加载字段列表失败:', error);
+      message.error('加载字段列表失败');
+      // 使用默认字段
+      const defaultFields: FieldType[] = [
+        { key: 'owner', name: '信息所有人', type: 'string' },
+        { key: 'department', name: '部门', type: 'string' },
+        { key: 'position', name: '职位', type: 'string' },
+        { key: 'age', name: '年龄', type: 'number' },
+        { key: 'salary', name: '薪资', type: 'number' },
+        { key: 'createTime', name: '创建时间', type: 'datetime' },
+        { key: 'birthday', name: '生日', type: 'date' },
+        { key: 'workTime', name: '工作时间', type: 'time' },
+        { key: 'isActive', name: '是否激活', type: 'boolean' },
+      ];
+      setFieldTypes(defaultFields);
     }
-  ]);
+  };
+
+  // 加载规则配置
+  const loadRuleConfig = useCallback(async () => {
+    if (!userGroupId) return;
+    
+    setLoading(true);
+    try {
+      const response = await apiRequest.getRuleConfig(userGroupId);
+      if (response.status === 'success' && response.data) {
+        // 转换API数据格式为组件需要的格式
+        const data = Array.isArray(response.data) ? response.data : [response.data];
+        const convertedGroups: RuleGroup[] = data.map((group: any) => ({
+          id: group.id || 0,
+          name: `规则组${group.id || 1}`,
+          relation: group.operator === 0 ? 'and' : 'or',
+          rules: group.ruleList || [],
+          userGroupId: group.userGroupId || userGroupId,
+          isDel: group.isDel || 0,
+          operator: group.operator || 0
+        }));
+        setRuleGroups(convertedGroups);
+      } else {
+        // 如果没有数据，初始化一个空的规则组
+        setRuleGroups([{
+          id: 0,
+          name: '规则组1',
+          relation: 'and',
+          rules: [],
+          userGroupId: userGroupId,
+          isDel: 0,
+          operator: 0
+        }]);
+      }
+    } catch (error) {
+      console.error('加载规则配置失败:', error);
+      message.error('加载规则配置失败');
+      // 初始化一个空的规则组
+      setRuleGroups([{
+        id: 0,
+        name: '规则组1',
+        relation: 'and',
+        rules: [],
+        userGroupId: userGroupId,
+        isDel: 0,
+        operator: 0
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  }, [userGroupId]);
+
+  // 组件挂载时加载数据
+  useEffect(() => {
+    if (visible) {
+      loadFieldTypes();
+      loadRuleConfig();
+    }
+  }, [visible, userGroupId, loadRuleConfig]);
 
   // 获取字段类型
   const getFieldType = (fieldKey: string): string => {
@@ -151,14 +236,16 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 添加规则行
-  const addRuleLine = (groupId: string) => {
+  const addRuleLine = (groupId: number) => {
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         const newRule: RuleLine = {
-          id: `${groupId}-${Date.now()}`,
-          field: 'owner',
+          id: 0,
+          field: fieldTypes.length > 0 ? fieldTypes[0].key : '',
           operator: 0,
-          value: ''
+          value: '',
+          ruleGroupId: groupId,
+          isDel: 0
         };
         return {
           ...group,
@@ -170,7 +257,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 删除规则行
-  const removeRuleLine = (groupId: string, ruleId: string) => {
+  const removeRuleLine = (groupId: number, ruleId: number) => {
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
@@ -185,28 +272,33 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   // 添加规则组
   const addRuleGroup = () => {
     const newGroup: RuleGroup = {
-      id: Date.now().toString(),
+      id: 0,
       name: `规则组${ruleGroups.length + 1}`,
       relation: 'and',
       rules: [
         {
-          id: `${Date.now()}-1`,
-          field: 'owner',
+          id: 0,
+          field: fieldTypes.length > 0 ? fieldTypes[0].key : '',
           operator: 0,
-          value: ''
+          value: '',
+          ruleGroupId: 0,
+          isDel: 0
         }
-      ]
+      ],
+      userGroupId: userGroupId,
+      isDel: 0,
+      operator: 0
     };
     setRuleGroups(prev => [...prev, newGroup]);
   };
 
   // 删除规则组
-  const removeRuleGroup = (groupId: string) => {
+  const removeRuleGroup = (groupId: number) => {
     setRuleGroups(prev => prev.filter(group => group.id !== groupId));
   };
 
   // 更新规则值
-  const updateRuleValue = (groupId: string, ruleId: string, field: string, value: any) => {
+  const updateRuleValue = (groupId: number, ruleId: number, field: string, value: any) => {
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
@@ -230,7 +322,50 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     }));
   };
 
-  // 组级关系已取消，改为规则行级别关系（relation 存在于每条规则上）
+  // 保存规则配置
+  const handleSave = async () => {
+    if (!userGroupId) {
+      message.error('用户组ID不能为空');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // 转换数据格式为API需要的格式
+      const apiData = ruleGroups.map(group => ({
+        id: group.id,
+        isDel: group.isDel || 0,
+        operator: group.relation === 'and' ? 0 : 1,
+        ruleList: group.rules.map(rule => ({
+          createBy: rule.createBy || 0,
+          createTime: rule.createTime || '',
+          field: rule.field,
+          id: rule.id,
+          isDel: rule.isDel || 0,
+          ruleGroupId: group.id,
+          type: rule.type || 0,
+          updateBy: rule.updateBy || 0,
+          updateTime: rule.updateTime || '',
+          value: rule.value
+        })),
+        userGroupId: userGroupId
+      }));
+
+      const response = await apiRequest.setRuleConfig(userGroupId, apiData);
+      if (response.status === 'success') {
+        message.success('规则配置保存成功');
+        onConfirm?.(ruleGroups);
+        onClose();
+      } else {
+        message.error(response.msg || '保存失败');
+      }
+    } catch (error) {
+      console.error('保存规则配置失败:', error);
+      message.error('保存规则配置失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 渲染计算值输入组件
   const renderValueInput = (rule: RuleLine) => {
@@ -243,7 +378,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <InputNumber
             value={rule.value ? Number(rule.value) : undefined}
-            onChange={(value) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', value?.toString() || '')}
+            onChange={(value) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', value?.toString() || '')}
             placeholder="请输入数字"
             style={{ width: '100%' }}
           />
@@ -252,7 +387,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <DatePicker
             value={rule.value ? moment(rule.value, 'YYYY-MM-DD') : null}
-            onChange={(date) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', date?.format('YYYY-MM-DD') || '')}
+            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', date?.format('YYYY-MM-DD') || '')}
             placeholder="请选择日期"
             style={{ width: '100%' }}
           />
@@ -262,7 +397,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           <DatePicker
             showTime
             value={rule.value ? moment(rule.value, 'YYYY-MM-DD HH:mm:ss') : null}
-            onChange={(date) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', date?.format('YYYY-MM-DD HH:mm:ss') || '')}
+            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', date?.format('YYYY-MM-DD HH:mm:ss') || '')}
             placeholder="请选择日期时间"
             style={{ width: '100%' }}
           />
@@ -272,7 +407,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           <DatePicker
             picker="time"
             value={rule.value ? moment(rule.value, 'HH:mm:ss') : null}
-            onChange={(date) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', date?.format('HH:mm:ss') || '')}
+            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', date?.format('HH:mm:ss') || '')}
             placeholder="请选择时间"
             style={{ width: '100%' }}
           />
@@ -281,7 +416,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Select
             value={rule.value}
-            onChange={(value) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', value)}
+            onChange={(value) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', value)}
             placeholder="请选择"
             style={{ width: '100%' }}
           >
@@ -293,7 +428,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Input
             value={rule.value}
-            onChange={(e) => updateRuleValue(rule.id.split('-')[0], rule.id, 'value', e.target.value)}
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
             placeholder="请输入值"
           />
         );
@@ -310,12 +445,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
       extra={
         <Space>
           <Button size="middle" onClick={onClose}>取消</Button>
-          <Button size="middle" type="primary" onClick={() => onConfirm?.(ruleGroups)}>确认</Button>
+          <Button size="middle" type="primary" loading={loading} onClick={handleSave}>确认</Button>
         </Space>
       }
     >
-      <div style={{ padding: '20px 0' }}>
-        {ruleGroups.map((group, _groupIndex) => (
+      <Spin spinning={loading}>
+        <div style={{ padding: '20px 0' }}>
+          {ruleGroups.map((group, _groupIndex) => (
           <Card
             key={group.id}
             title={
@@ -350,7 +486,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
               </Space>
             }
           >
-            {group.rules.map((rule, ruleIndex) => (
+            {group.rules.map((rule, _ruleIndex) => (
               <Row key={rule.id} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
                 <Col span={5}>
                   <Select
@@ -407,7 +543,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             添加规则组
           </Button>
         </div>
-      </div>
+        </div>
+      </Spin>
     </Drawer>
   );
 };

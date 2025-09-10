@@ -22,6 +22,7 @@ export default () => {
     const [department, setDepartment] = useState<any>();
     const [UserChooseVisible, setUserChooseVisible] = useState<boolean>(false);
     const [ruleDrawerVisible, setRuleDrawerVisible] = useState<boolean>(false);
+    const [currentUserGroupId, setCurrentUserGroupId] = useState<number | undefined>();
     const url = '/sms/lead/ladUserGroup'
     let content: any = null;
     let roleContent: any = null;
@@ -178,6 +179,7 @@ export default () => {
                     <Button
                         type="link"
                         onClick={() => {
+                            setCurrentUserGroupId(record.id);
                             setRuleDrawerVisible(true);
                         }}
                     >
@@ -287,7 +289,11 @@ export default () => {
             {/* 配置规则右侧弹窗 */}
             <RuleConfigDrawer
                 visible={ruleDrawerVisible}
-                onClose={() => setRuleDrawerVisible(false)}
+                onClose={() => {
+                    setRuleDrawerVisible(false);
+                    setCurrentUserGroupId(undefined);
+                }}
+                userGroupId={currentUserGroupId}
             />
         </PageContainer>
     </>
