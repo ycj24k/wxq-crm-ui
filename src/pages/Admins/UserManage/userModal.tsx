@@ -437,7 +437,7 @@ export default (props: any) => {
             ></ProFormSelect>
             <ProFormSelect
               label="销售等级"
-              name="UserLevel"
+              name="salesLevel"
               width="xs"
               initialValue={renderData.salesLevel}
               request={getsysUserLevel}

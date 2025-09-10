@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { EditOutlined, PlusOutlined, DeleteOutlined, RedoOutlined } from '@ant-design/icons';
 import { Button, Modal, Select, Form, Input, InputNumber, message, Popconfirm, Spin } from 'antd';
 import UserManageCard from '../Department/UserManageCard';
@@ -38,7 +39,7 @@ export default () => {
   const [departmentList, setDepartmentList] = useState<any>([]);
   const [CardVisible, setCardVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
-  let [department, setDepartment] = useState<any>();
+  const [department, setDepartment] = useState<any>();
   const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
   const [studentLevelOptions, setStudentLevelOptions] = useState<any[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<number[]>([]);
@@ -59,7 +60,7 @@ export default () => {
     const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
       _isGetAll: true,
     });
-    let targetID = contentList.data[0].id;
+    const targetID = contentList.data[0].id;
     const targetData = contentList.data.find((item: any) => item.parentId === targetID);
     const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID && item.parentId != -1) : [];
     const data = result.map((item: any) => {
@@ -78,7 +79,7 @@ export default () => {
       const options = await getsysUserLevel();
       setStudentLevelOptions(options);
     } catch (error) {
-      message.error('获取学生等级选项失败');
+      message.error('获取客戶等级选项失败');
     }
   };
   
@@ -88,9 +89,11 @@ export default () => {
     
     try {
       setLoading(true);
-      await apiRequest.post(`/sms/system/sysUserLevel/correlationStudentLevel/${renderData.id}`, {
-        integers: selectedLevels
-      });
+      await apiRequest.postAll(
+        `/sms/system/sysUserLevel/correlationStudentLevel/${renderData.id}`,
+         selectedLevels,
+        // selectedLevels  // 直接传递数组作为请求体
+      );
       message.success('关联成功');
       setUserVisible(false);
       setSelectedLevels([]);
@@ -170,7 +173,7 @@ export default () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={async () => {
-            let content = await apiRequest.get('/sms/share/getDepartmentAndUser');
+            const content = await apiRequest.get('/sms/share/getDepartmentAndUser');
             setCardContent({ content: content.data, type: 'sysuser' });
             setDepartment(record.userList);
             setParentIdTree(record.id);
