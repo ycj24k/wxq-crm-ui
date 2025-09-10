@@ -22,8 +22,8 @@ export default (props: any) => {
     getUserList,
     departNameList = false
   } = props;
-  console.log(parentIdTree,'parentIdTree======>')
-  console.log(departments,'departments======>')
+  console.log(parentIdTree, 'parentIdTree======>')
+  console.log(departments, 'departments======>')
 
   let obj: any;
   let obj2: any = [];
@@ -247,7 +247,7 @@ export default (props: any) => {
             autoExpandParent={autoExpandParent}
             defaultCheckedKeys={CheckedKeys}
             onCheck={(checkedKeysValue, e) => {
-              console.log(e,'-------------------------->')
+              console.log(e, '-------------------------->')
               const arr = e.checkedNodes
               let idsList: any = []
               arr.forEach((item: any) => {
@@ -418,6 +418,25 @@ export default (props: any) => {
                 }
               });
             }
+            if (CardContent.type == 'sysuser') {
+              console.log(arrid, 'arrid')
+              console.log(parentIdTree, 'parentIdTree')
+              request.postAll(
+                `/sms/system/sysUserLevel/correlationUser/${parentIdTree}`,
+                arrid,
+                // selectedLevels  // 直接传递数组作为请求体
+              )
+                .then((res: any) => {
+                  if (res.status == 'success') {
+                    message.success('授权成功');
+                    CheckedKeys = [];
+                    callbackRef();
+                    setTimeout(() => {
+                      setCardVisible(false);
+                    }, 500);
+                  }
+                });
+            }
           }}
         >
           <>
@@ -437,7 +456,6 @@ export default (props: any) => {
               onCheck={(checkedKeysValue, e) => {
                 console.log('checkedKeysValue', checkedKeysValue);
                 console.log('e', e);
-
                 obj2 = e.checkedNodes;
               }}
               onSelect={(selectedKeys, e: any) => {

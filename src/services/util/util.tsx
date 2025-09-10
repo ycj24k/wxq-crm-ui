@@ -3,11 +3,11 @@ import { history } from "umi";
 import apiRequest from "../ant-design-pro/apiRequest";
 
 export function judgeDivisor(m: any, n: any) {
-  var num = {};
-  var i = 0;
-  var x: any = parseInt(m / n);
+  const num = {};
+  let i = 0;
+  const x: any = parseInt(m / n);
   m = m % n;
-  var result = '';
+  let result = '';
   while (m != 0 && !(m in num)) {
     num[m] = i++;
     result += parseInt((m * 10) / n);
@@ -65,13 +65,22 @@ export function getSession() {
 
 export async function getCompanyRequest() {
   return (await apiRequest.get('/sms/share/getCompany')).data?.map((e: any) => {
+    console.log('getCompanyRequest',e)
     return {
       label: e.name,
       value: e.id + ''
     }
   })
 }
-
+export async function getsysUserLevel() {
+  return (await apiRequest.get('/sms/system/sysUserLevel')).data?.content?.map((e: any) => {
+    console.log('getsysUserLevel',e)
+    return {
+      label: e.name,
+      value: e.id + ''
+    }
+  })
+}
 export function getInfo() {
   return {
     origin: 'http://10.168.1.10:80'

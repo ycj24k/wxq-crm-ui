@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { DownloadOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Table, message, Tag, Popconfirm } from 'antd';
+import { DownloadOutlined, PlusOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Button, Table, message, Tag, Popconfirm ,Space } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
@@ -60,7 +60,7 @@ export default (props: any) => {
     actionRef.current.reload();
   };
   useEffect(() => {
-    if (TabListNuber == '7') {
+    if (TabListNuber == '7' || TabListNuber == '0') {
       setParams({})
     }
   }, [TabListNuber])
@@ -269,7 +269,54 @@ export default (props: any) => {
       fixed: 'right',
       render: (text, record, _, action) => (
         <>
-          <Popconfirm
+        <Space>
+        <a
+            key="edit"
+            // size="small"
+            type="primary"
+            // icon={<FormOutlined />}
+            onClick={() => {
+              request
+                .post('/sms/business/bizStudentUser/receive', {
+                  ids: record.id,
+                  ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
+                })
+                .then((res: any) => {
+                  if (res.status == 'success') {
+                    message.success('领取成功');
+                    callbackRef();
+                  }
+                });
+            }}
+          >
+            领取
+          </a>
+          <a
+            key="edit"
+            // size="small"
+            type="primary"
+            // icon={<FormOutlined />}
+           
+            onClick={() => {
+              // console.log(StudentIds);
+                // request
+                //   .post('/sms/business/bizStudentUser/receive', {
+                //     ids: record.id,
+                //     ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
+                //   })
+                //   .then((res: any) => {
+                //     if (res.status == 'success') {
+                //       message.success('分配成功');
+                //       callbackRef();
+                //     }
+                //   });
+                message.success('接口未开发，请联系后台');
+            }}
+            
+          >
+            分配
+          </a>
+           <Popconfirm
             key="deletePop"
             title="是否确定删除？"
             style={{ marginRight: '15px', marginBottom: '8px' }}
@@ -288,6 +335,9 @@ export default (props: any) => {
               删除
             </a>
           </Popconfirm>
+          
+        </Space>
+         
         </>
 
       )
@@ -335,11 +385,12 @@ export default (props: any) => {
       type: 'tab',
       items: tabs,
       onChange: (key: string) => {
-        console.log(key,'key----------->')
+        console.log(key, 'key----------->')
         if (key == 'fen') {
           setParams({ departmentId: departmentId })
         } else if (key == 'zong') {
-          setParams({ 'departmentId-in': '15,-1' })
+          // setParams({ 'departmentId-in': '15,-1' })
+          setParams({ departmentId: '15' })//新规则
         } else {
           setParams({})
         }
@@ -355,21 +406,26 @@ export default (props: any) => {
           callbackRef();
         }}
         tabList={[
+
           // {
-          //   tab: '新媒体资源库',
-          //   key: '0'
+          //   tab: '流转资源库',
+          //   key: '1',
           // },
-          {
-            tab: '流转资源库',
-            key: '1',
-          },
           // {
           //   tab: '系统资源库',
           //   key: '2',
           // },
           {
-            tab: '正式学员流转库',
+            tab: '潜在学员公海',
+            key: '99',
+          },
+          {
+            tab: '正式学员公海',
             key: '4',
+          },
+          {
+            tab: '新媒体资源',
+            key: '0'
           },
           {
             tab: '无效数据库',
@@ -380,10 +436,10 @@ export default (props: any) => {
         <Tables
           columns={columns}
           actionRef={actionRef}
-          toolbar={TabListNuber != '7' ? toolbar : undefined}
+          toolbar={TabListNuber == '7' || TabListNuber == '0' ? undefined : toolbar}
           request={{
-            url: '/sms/business/bizStudentUser/circulationStudent',
-            params: { source: TabListNuber, 'userId-isNull': true, ...params },
+            url: '/sms/business/bizStudentUser/circulationLibrary',
+            params: { ...(TabListNuber !== '99' && { source: TabListNuber }), 'userId-isNull': true, ...params },
             sortList: sortList,
           }}
           search={hidden ? false : { defaultCollapsed: true, defaultColsNumber: 10 }}
@@ -452,6 +508,32 @@ export default (props: any) => {
               type="primary"
               onClick={() => {
                 if (StudentIds.length == 0) {
+                  message.error('请选择需要分配的学员!');
+                  return;
+                }
+                // console.log(StudentIds);
+                // request
+                //   .post('/sms/business/bizStudentUser/receive', {
+                //     ids: StudentIds.join(','),
+                //     ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
+                //   })
+                //   .then((res: any) => {
+                //     if (res.status == 'success') {
+                //       message.success('操作成功');
+                //       callbackRef();
+                //     }
+                //   });
+                message.success('接口未开发，请联系后台');
+              }}
+            >
+              批量分配
+            </Button>,
+            <Button
+              key="button"
+              icon={<PlusOutlined />}
+              type="primary"
+              onClick={() => {
+                if (StudentIds.length == 0) {
                   message.error('请选择需要领取的学员!');
                   return;
                 }
@@ -459,7 +541,7 @@ export default (props: any) => {
                 request
                   .post('/sms/business/bizStudentUser/receive', {
                     ids: StudentIds.join(','),
-                    source: TabListNuber,
+                    ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
                   })
                   .then((res: any) => {
                     if (res.status == 'success') {
@@ -469,7 +551,32 @@ export default (props: any) => {
                   });
               }}
             >
-              领取
+              批量领取
+            </Button>,
+            <Button
+              key="button"
+              icon={<DeleteOutlined />}
+              type="primary"
+              danger
+              onClick={() => {
+                if (StudentIds.length == 0) {
+                  message.error('请选择需要删除的学员!');
+                  return;
+                }
+                console.log(StudentIds);
+                request
+                  .delete('/sms/business/bizStudentUser/deleteArray', {
+                    ids: StudentIds.join(','),
+                  })
+                  .then((res: any) => {
+                    if (res.status == 'success') {
+                      message.success('删除成功');
+                      callbackRef();
+                    }
+                  });
+              }}
+            >
+              批量删除
             </Button>,
           ]}
         />

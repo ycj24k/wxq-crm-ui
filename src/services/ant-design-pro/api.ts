@@ -593,22 +593,22 @@ export async function currentUser(options?: { [key: string]: any }) {
               },
             ]
           },
-          {
-            name: '销售管理',
-            icon: 'table',
-            routes: [
-              {
-                name: '销售管理',
-                path: '/business/sales/manage',
-                component: './Business/Sales/Manage',
-              },
-              {
-                name: '销售等级',
-                path: '/business/sales/level',
-                component: './Business/Sales/Level',
-              },
-            ]
-          },
+          // {
+          //   name: '销售管理',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name: '销售管理',
+          //       path: '/business/sales/manage',
+          //       component: './Business/Sales/Manage',
+          //     },
+          //     {
+          //       name: '销售等级',
+          //       path: '/business/sales/level',
+          //       component: './Business/Sales/Level',
+          //     },
+          //   ]
+          // },
           {
             name: 'SOP模板管理',
             icon: 'table',
@@ -756,11 +756,42 @@ export async function currentUser(options?: { [key: string]: any }) {
         // component: './Admins/AdminUser',
         routes: [
           {
-            name: '用户管理',
+            name: '用户相关',
             icon: 'TeamOutlined',
-            path: '/admins/usermanage',
-            component: './Admins/UserManage',
+            routes: [
+                  {
+                    name: '用户管理',
+                    path: '/admins/usermanage',
+                    component: './Admins/UserManage',
+                  },
+                  {
+                    name: '销售等级',
+                    path: '/admins/saleslevel',
+                    component: './Admins/SalesLevel',
+                  },
+                  // {
+                  //   name: '用户等级',
+                  //   path: '/business/sales/level',
+                  //   component: './Business/Sales/Level',
+                  // },
+                ]
           },
+          // {
+          //   name: '用户相关',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name: '用户管理',
+          //       path: '/business/sales/manage',
+          //       component: './Business/Sales/Manage',
+          //     },
+          //     {
+          //       name: '用户等级',
+          //       path: '/business/sales/level',
+          //       component: './Business/Sales/Level',
+          //     },
+          //   ]
+          // },
           {
             name: '部门管理',
             icon: 'ClusterOutlined',
