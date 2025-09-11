@@ -16,7 +16,9 @@ export default (props: any) => {
         checkable = false,
         setUserID,
         renderData,
-        departNameList = false
+        departNameList = false,
+        // 新增：仅选择模式，确认时把选择的用户ID回传给调用方，不触发接口
+        onConfirmSelected
     } = props;
     interface CustomDataNode {
         title: string;
@@ -35,6 +37,10 @@ export default (props: any) => {
     const [checkedID, setCheckedID] = useState<any>();
     const [value, setValue] = useState(false);
     const [prevCheckedKeys, setPrevCheckedKeys] = useState<React.Key[]>([]);
+    // 记录初始与当前选中的人员 userId 列表（仅限人员节点）
+    const [initialUserIds, setInitialUserIds] = useState<number[]>([]);
+    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const listFn = (data: any) => {
         let arr2: any = [];
         data.forEach((item: any, index: number) => {
@@ -143,6 +149,21 @@ export default (props: any) => {
                 departmentsKey(arr, item);
             });
     }
+
+    // 初始化初始与当前勾选的人员 userId 列表
+    useEffect(() => {
+        if (departments && Array.isArray(departments)) {
+            const initIds = departments
+                .map((d: any) => Number(d?.id))
+                .filter((n: number) => !Number.isNaN(n));
+            setInitialUserIds(initIds);
+            setSelectedUserIds(initIds);
+        } else {
+            setInitialUserIds([]);
+            setSelectedUserIds([]);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [UserChooseVisible]);
     const getParentKey = (title: any, tree: any[]): [] => {
         let parentKey = []
         for (let i = 0; i < tree.length; i++) {
@@ -258,9 +279,58 @@ export default (props: any) => {
                         CheckedKeys = [];
                         setUserChooseVisible(false);
                     }}
-                    onOk={() => {
-                        setUserChooseVisible(false)
-                        callbackRef();
+                    confirmLoading={confirmLoading}
+                    onOk={async () => {
+                        // 仅选择模式：直接把选中ID回传并关闭
+                        if (typeof onConfirmSelected === 'function') {
+                            onConfirmSelected(selectedUserIds);
+                            setUserChooseVisible(false);
+                            return;
+                        }
+                        // 计算差异：新增与移除
+                        const setInit = new Set(initialUserIds);
+                        const setCurr = new Set(selectedUserIds);
+                        const toAdd: number[] = [];
+                        const toRemove: number[] = [];
+                        selectedUserIds.forEach((id) => { if (!setInit.has(id)) toAdd.push(id); });
+                        initialUserIds.forEach((id) => { if (!setCurr.has(id)) toRemove.push(id); });
+
+                        if (toAdd.length === 0 && toRemove.length === 0) {
+                            setUserChooseVisible(false);
+                            return;
+                        }
+
+                        setConfirmLoading(true);
+                        try {
+                            const groupId = renderData?.record?.id;
+                            const addCalls = toAdd.map((id) => {
+                                if (renderData?.type === 'sale') {
+                                    return request.post('/sms/lead/ladUserGroupUser', { userGroupId: groupId, userId: id });
+                                }
+                                if (renderData?.type === 'newMedia') {
+                                    return request.post('/sms/lead/ladUserGroupProvider', { userGroupId: groupId, provider: id });
+                                }
+                                return Promise.resolve(null);
+                            });
+                            const removeCalls = toRemove.map((id) => {
+                                if (renderData?.type === 'sale') {
+                                    return request.delete('/sms/lead/ladUserGroupUser/deleteByParam', { userGroupId: groupId, userId: id });
+                                }
+                                if (renderData?.type === 'newMedia') {
+                                    return request.delete('/sms/lead/ladUserGroupProvider/deleteByParam', { userGroupId: groupId, provider: id });
+                                }
+                                return Promise.resolve(null);
+                            });
+
+                            await Promise.allSettled([...addCalls, ...removeCalls]);
+                            message.success('操作成功！');
+                            setUserChooseVisible(false);
+                            callbackRef();
+                        } catch (e) {
+                            message.error('操作失败！');
+                        } finally {
+                            setConfirmLoading(false);
+                        }
                     }}
                 >
                     <>
@@ -277,62 +347,13 @@ export default (props: any) => {
                             expandedKeys={expandedKeys}
                             autoExpandParent={autoExpandParent}
                             defaultCheckedKeys={CheckedKeys}
-                            onCheck={(checkedKeysValue, e) => {
-                                //console.log(checkedKeysValue, e)
-                                const node = e.node as CustomDataNode;
-                                let checkedNodesID = node.userId;
-                                if (renderData?.type == 'sale') {
-                                    let params = {
-                                        userGroupId: renderData.record.id,
-                                        userId: checkedNodesID
-                                    }
-                                    if (renderData?.type == 'sale' && e.checked == true) {
-                                        request.post('/sms/lead/ladUserGroupUser', params).then((res: any) => {
-                                            if (res.status == 'success') {
-                                                message.success('绑定成功！');
-                                            }
-                                        }).catch(() => {
-                                            message.error('操作失败！');
-                                        });
-                                    }
-                                    if (renderData?.type == 'sale' && e.checked == false) {
-                                        request.delete('/sms/lead/ladUserGroupUser/deleteByParam', params).then((res: any) => {
-                                            if (res.status == 'success') {
-                                                message.success('解除成功！');
-                                            }
-                                        }).catch(() => {
-                                            message.error('操作失败！');
-                                        });
-                                    }
-                                }
-
-
-
-                                if (renderData?.type == 'newMedia') {
-                                    let params = {
-                                        userGroupId: renderData.record.id,
-                                        provider: checkedNodesID
-                                    }
-                                    if (renderData?.type == 'newMedia' && e.checked == true) {
-                                        request.post('/sms/lead/ladUserGroupProvider', params).then((res: any) => {
-                                            if (res.status == 'success') {
-                                                message.success('绑定成功！');
-                                            }
-                                        }).catch(() => {
-                                            message.error('操作失败！');
-                                        });
-                                    }
-                                    if (renderData?.type == 'newMedia' && e.checked == false) {
-                                        request.delete('/sms/lead/ladUserGroupProvider/deleteByParam', params).then((res: any) => {
-                                            if (res.status == 'success') {
-                                                message.success('解除成功！');
-                                            }
-                                        }).catch(() => {
-                                            message.error('操作失败！');
-                                        });
-                                    }
-                                }
-
+                            onCheck={(checkedKeysValue, e: any) => {
+                                // 仅在本地收集选中的人员 userId 列表，等“确定”时再统一提交
+                                const nodes = e.checkedNodes || [];
+                                const ids: number[] = nodes
+                                    .map((n: any) => Number(n?.userId))
+                                    .filter((n: any) => !!n && !Number.isNaN(n));
+                                setSelectedUserIds(ids);
                                 obj2 = e.checkedNodes;
                             }}
                             treeData={loop(arr)}

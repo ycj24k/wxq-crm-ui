@@ -250,7 +250,8 @@ class httpRequest {
    * @param ruleGroups 规则组数据
    */
   async setRuleConfig(userGroupId: number, ruleGroups: any[]) {
-    return this.postAll(`/sms/lead/ladUserGroup/ruleConfig/${userGroupId}`, { ladRuleGroups: ruleGroups });
+    // 后端要求：请求体直接传数组，不再包 ladRuleGroups，也不需要附带 userGroupId
+    return this.postAll(`/sms/lead/ladUserGroup/ruleConfig/${userGroupId}`, ruleGroups);
   }
 
   /**
