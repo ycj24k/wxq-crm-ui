@@ -46,7 +46,6 @@ class httpRequest {
     return new Promise((resolve, reject) => {
       request(url, option)
         .then((res: any) => {
-          console.log(res);
           if (err) {
             if (res.status === 'success' || res.status === 'pleaseRefreshDict') {
               resolve(res);

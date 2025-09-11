@@ -22,9 +22,6 @@ export default (props: any) => {
     getUserList,
     departNameList = false
   } = props;
-  console.log(parentIdTree, 'parentIdTree======>')
-  console.log(departments, 'departments======>')
-
   let obj: any;
   let obj2: any = [];
   let CheckedKeys: any = [];
@@ -93,11 +90,7 @@ export default (props: any) => {
 
   })
 
-  console.log(listF, 'CardContent222222222222222222')
-
-
   if (CardContent) arr = listFn(listF);
-  console.log('arr', arr);
 
   //处理tree key值
   const arrKey = (data: any, index?: number) => {
@@ -173,7 +166,6 @@ export default (props: any) => {
 
   const onChangeRadio = (e: any) => {
     const { value } = e.target;
-    console.log('e', e);
     setValue(value)
 
   };
@@ -219,7 +211,6 @@ export default (props: any) => {
       function initExpandedKey(e: []) {
         e.forEach((i: any) => {
           if (i.children) {
-            console.log(i.key)
             expandedKeyArr.push(i.key)
             initExpandedKey(i.children)
           }
@@ -229,7 +220,6 @@ export default (props: any) => {
       setexpandedKeys(expandedKeyArr)
     }
   }, [searchValue])
-  console.log('expandedKeys', expandedKeys);
   return (
     <>
       <Radio.Group onChange={onChangeRadio} value={value} defaultValue={value}>
@@ -247,7 +237,6 @@ export default (props: any) => {
             autoExpandParent={autoExpandParent}
             defaultCheckedKeys={CheckedKeys}
             onCheck={(checkedKeysValue, e) => {
-              console.log(e, '-------------------------->')
               const arr = e.checkedNodes
               let idsList: any = []
               arr.forEach((item: any) => {
@@ -419,12 +408,9 @@ export default (props: any) => {
               });
             }
             if (CardContent.type == 'sysuser') {
-              console.log(arrid, 'arrid')
-              console.log(parentIdTree, 'parentIdTree')
               request.postAll(
                 `/sms/system/sysUserLevel/correlationUser/${parentIdTree}`,
                 arrid,
-                // selectedLevels  // 直接传递数组作为请求体
               )
                 .then((res: any) => {
                   if (res.status == 'success') {
@@ -454,14 +440,9 @@ export default (props: any) => {
               autoExpandParent={autoExpandParent}
               defaultCheckedKeys={CheckedKeys}
               onCheck={(checkedKeysValue, e) => {
-                console.log('checkedKeysValue', checkedKeysValue);
-                console.log('e', e);
                 obj2 = e.checkedNodes;
               }}
               onSelect={(selectedKeys, e: any) => {
-                console.log('selectedKeys', selectedKeys);
-                console.log('e', e);
-
                 obj = { name: e.node.title, id: e.node.userId };
                 if (CardContent.type == 'pay' && e.node.userId) {
                   setchargePerson({ name: e.node.titles, id: e.node.userId });

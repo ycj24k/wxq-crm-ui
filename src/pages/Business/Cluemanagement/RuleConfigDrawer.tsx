@@ -126,7 +126,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         setFieldTypes(defaultFields);
       }
     } catch (error) {
-      console.error('加载字段列表失败:', error);
+      // console suppressed
       message.error('加载字段列表失败');
       // 使用默认字段
       const defaultFields: FieldType[] = [
@@ -177,7 +177,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         }]);
       }
     } catch (error) {
-      console.error('加载规则配置失败:', error);
+      // console suppressed
       message.error('加载规则配置失败');
       // 初始化一个空的规则组
       setRuleGroups([{
@@ -370,7 +370,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         message.error(response.msg || '保存失败');
       }
     } catch (error) {
-      console.error('保存规则配置失败:', error);
+      // console suppressed
       message.error('保存规则配置失败');
     } finally {
       setLoading(false);

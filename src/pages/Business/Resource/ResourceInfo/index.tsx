@@ -37,8 +37,7 @@ type GithubIssueItem = {
 
 export default (props: any) => {
   const { hidden, isPerson, isGroup, showMyself } = props;
-  console.log(isPerson, '===>')
-  console.log(showMyself, '===>')
+  // 调试输出移除，避免影响性能
   const { initialState } = useModel('@@initialState');
   const [renderData, setRenderData] = useState<any>(null);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);

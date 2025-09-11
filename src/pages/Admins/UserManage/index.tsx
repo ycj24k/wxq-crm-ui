@@ -423,7 +423,7 @@ export default (props: any) => {
           编辑
         </Button>,
         <Popconfirm
-          key={record.id + 'deletem'}
+          key={`${record.id}-resetPwd`}
           title="是否重置密码？"
           onConfirm={() => {
             request
@@ -438,12 +438,12 @@ export default (props: any) => {
           okText="重置"
           cancelText="取消"
         >
-          <Button type="primary" key="deletem" size="small" danger>
+          <Button type="primary" key={`btn-resetPwd-${record.id}`} size="small" danger>
             重置密码
           </Button>
         </Popconfirm>,
         <Popconfirm
-          key={record.id + 'deletem'}
+          key={`${record.id}-ec`}
           title={record.ecId ? '是否删除EC账号？' : "是否创建EC账号？"}
           onConfirm={() => {
             if (record.ecId) {
@@ -468,12 +468,12 @@ export default (props: any) => {
           okText="确定"
           cancelText="取消"
         >
-          <Button type="primary" key="deletem" size="small" danger={record.ecId ? true : false} hidden={type == 1}>
+          <Button type="primary" key={`btn-ec-${record.id}`} size="small" danger={record.ecId ? true : false} hidden={type == 1}>
             {record.ecId ? '删除EC' : '创建EC'}
           </Button>
         </Popconfirm>,
         <Popconfirm
-          key={record.id + 'deletev'}
+          key={`${record.id}-rebuild`}
           title="是否重置密码？"
           onConfirm={() => {
             request.post('/sms/share/buildAccount').then((res: any) => {
@@ -486,12 +486,12 @@ export default (props: any) => {
           okText="重构"
           cancelText="取消"
         >
-          <Button type="primary" key="deletev" size="small" danger hidden={type == 1}>
+          <Button type="primary" key={`btn-rebuild-${record.id}`} size="small" danger hidden={type == 1}>
             重构法大大
           </Button>
         </Popconfirm>,
         <Popconfirm
-          key={record.id + 'deletea'}
+          key={`${record.id}-delete`}
           title="是否确定删除？"
           onConfirm={() => {
             request.delete('/sms/system/sysUser', { id: record.id }).then((res: any) => {
@@ -504,7 +504,7 @@ export default (props: any) => {
           okText="删除"
           cancelText="取消"
         >
-          <Button type="primary" key="deletea" size="small" danger hidden={type == 1}>
+          <Button type="primary" key={`btn-delete-${record.id}`} size="small" danger hidden={type == 1}>
             删除
           </Button>
         </Popconfirm>,
@@ -518,7 +518,7 @@ export default (props: any) => {
       hideInTable: !props?.params,
       render: (text, record, _, action) => [
         <Popconfirm
-          key={record.id + 'delete'}
+          key={`${record.id}-remove`}
           title="是否确定移除？"
           onConfirm={() => {
             request
@@ -533,7 +533,7 @@ export default (props: any) => {
           okText="移除"
           cancelText="取消"
         >
-          <Button type="primary" key="deletes" size="small" danger>
+          <Button type="primary" key={`btn-remove-${record.id}`} size="small" danger>
             移除小组
           </Button>
         </Popconfirm>,

@@ -46,7 +46,7 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
     if (!children) {
       return null;
     }
-    const panes: React.ReactNode[] = [];
+    const items: any[] = [];
     React.Children.forEach(children, (child: React.ReactElement<NoticeIconTabProps>): void => {
       if (!child) {
         return;
@@ -55,8 +55,10 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
       const len = list && list.length ? list.length : 0;
       const msgCount = count || count === 0 ? count : len;
       const tabTitle: string = msgCount > 0 ? `${title} (${msgCount})` : title;
-      panes.push(
-        <TabPane tab={tabTitle} key={tabKey}>
+      items.push({
+        key: tabKey,
+        label: tabTitle,
+        children: (
           <NoticeList
             clearText={clearText}
             viewMoreText={viewMoreText}
@@ -69,15 +71,13 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
             showViewMore={showViewMore}
             title={title}
           />
-        </TabPane>,
-      );
+        ),
+      });
     });
     return (
       <>
         <Spin spinning={loading} delay={300}>
-          <Tabs className={styles.tabs} onChange={onTabChange}>
-            {panes}
-          </Tabs>
+          <Tabs className={styles.tabs} onChange={onTabChange} items={items} />
         </Spin>
       </>
     );
@@ -108,7 +108,7 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
       placement="bottomRight"
       overlay={notificationBox}
       overlayClassName={styles.popover}
-      trigger={['click']}
+      trigger={["click"]}
       visible={visible}
       onVisibleChange={setVisible}
     >
