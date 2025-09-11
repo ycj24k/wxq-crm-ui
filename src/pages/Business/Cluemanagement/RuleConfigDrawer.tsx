@@ -3,9 +3,12 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin } from 'antd';
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import { PlusOutlined, PlusCircleOutlined, MinusCircleOutlined, UserAddOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
+import Dictionaries from '@/services/util/dictionaries';
+import './RuleConfigDrawer.less';
+import UserChoose from './UserChoose';
 
 const { Option } = Select;
 
@@ -27,15 +30,11 @@ interface OperatorConfig {
 interface RuleLine {
   id: number;
   field: string;
-  operator: number;
+  operator?: number;
   value: string;
   ruleGroupId?: number;
-  createBy?: number;
-  createTime?: string;
-  isDel?: number;
+  // 删除多余元信息字段
   type?: number;
-  updateBy?: number;
-  updateTime?: string;
 }
 
 // 规则组
@@ -45,7 +44,6 @@ interface RuleGroup {
   relation: 'and' | 'or';
   rules: RuleLine[];
   userGroupId?: number;
-  isDel?: number;
   operator?: number;
 }
 
@@ -95,6 +93,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   ];
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
+  const [userPickVisible, setUserPickVisible] = useState<boolean>(false);
+  const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleId: number; fieldKey: string } | null>(null);
 
   // 加载字段列表
   const loadFieldTypes = async () => {
@@ -118,7 +118,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           { key: 'position', name: '职位', type: 'string' },
           { key: 'age', name: '年龄', type: 'number' },
           { key: 'salary', name: '薪资', type: 'number' },
-          { key: 'createTime', name: '创建时间', type: 'datetime' },
+          // { key: 'createTime', name: '创建时间', type: 'datetime' },
           { key: 'birthday', name: '生日', type: 'date' },
           { key: 'workTime', name: '工作时间', type: 'time' },
           { key: 'isActive', name: '是否激活', type: 'boolean' },
@@ -135,7 +135,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         { key: 'position', name: '职位', type: 'string' },
         { key: 'age', name: '年龄', type: 'number' },
         { key: 'salary', name: '薪资', type: 'number' },
-        { key: 'createTime', name: '创建时间', type: 'datetime' },
+        // { key: 'createTime', name: '创建时间', type: 'datetime' },
         { key: 'birthday', name: '生日', type: 'date' },
         { key: 'workTime', name: '工作时间', type: 'time' },
         { key: 'isActive', name: '是否激活', type: 'boolean' },
@@ -160,7 +160,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           relation: group.operator === 0 ? 'and' : 'or',
           rules: group.ruleList || [],
           userGroupId: group.userGroupId || userGroupId,
-          isDel: group.isDel || 0,
+          // 移除 isDel
           operator: group.operator || 0
         }));
         setRuleGroups(convertedGroups);
@@ -172,7 +172,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           relation: 'and',
           rules: [],
           userGroupId: userGroupId,
-          isDel: 0,
+          // 移除 isDel
           operator: 0
         }]);
       }
@@ -186,7 +186,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         relation: 'and',
         rules: [],
         userGroupId: userGroupId,
-        isDel: 0,
+        // 移除 isDel
         operator: 0
       }]);
     } finally {
@@ -208,10 +208,23 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     return field?.type || 'string';
   };
 
-  // 获取可用的运算类型
+  // 获取可用的运算类型（优先使用后端约定/图片规则）
   const getAvailableOperators = (fieldKey: string): OperatorConfig[] => {
+    // 已知映射（严格按后端/图片提供）
+    const strictMap: Record<string, number[]> = {
+      consultationTime: [4, 5, 9, 10, 11, 12],
+      project: [4, 5, 13],
+      studentSource: [4, 5, 13],
+      provider: [4, 5, 13],
+      isLive: [4, 5, 14, 15],
+      owner: [4, 5, 13],
+      intentionLevel: [4, 5, 13],
+    };
+    const matched = strictMap[fieldKey];
+    if (matched) return operatorConfigs.filter(op => matched.includes(op.value));
+
+    // 兜底：按字段类型
     const fieldType = getFieldType(fieldKey);
-    
     switch (fieldType) {
       case 'string':
         return operatorConfigs.filter(op => [0, 1, 2, 3, 4, 5, 8, 13].includes(op.value));
@@ -230,7 +243,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 获取运算类型的值类型
-  const getOperatorValueType = (operator: number): string => {
+  const getOperatorValueType = (operator?: number): string => {
+    if (operator == null) return 'empty';
     const config = operatorConfigs.find(op => op.value === operator);
     return config?.valueType || 'string';
   };
@@ -242,10 +256,10 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         const newRule: RuleLine = {
           id: 0,
           field: fieldTypes.length > 0 ? fieldTypes[0].key : '',
-          operator: 0,
+          type: undefined,
           value: '',
           ruleGroupId: groupId,
-          isDel: 0
+          // 移除 isDel
         };
         return {
           ...group,
@@ -279,14 +293,14 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         {
           id: 0,
           field: fieldTypes.length > 0 ? fieldTypes[0].key : '',
-          operator: 0,
+          type: undefined,
           value: '',
           ruleGroupId: 0,
-          isDel: 0
+          // 移除 isDel
         }
       ],
       userGroupId: userGroupId,
-      isDel: 0,
+      // 移除 isDel
       operator: 0
     };
     setRuleGroups(prev => [...prev, newGroup]);
@@ -306,9 +320,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           rules: group.rules.map(rule => {
             if (rule.id === ruleId) {
               const updatedRule = { ...rule, [field]: value };
-              
-              // 如果修改了字段或运算类型，重置值
-              if (field === 'field' || field === 'operator') {
+              // 如果修改了字段：置空运算类型与值
+              if (field === 'field') {
+                (updatedRule as any).type = undefined;
+                updatedRule.value = '';
+              }
+              // 如果修改了运算类型：置空值
+              if (field === 'type') {
                 updatedRule.value = '';
               }
               
@@ -331,24 +349,16 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
 
     setLoading(true);
     try {
-      // 转换数据格式为API需要的格式
-      const apiData = ruleGroups.map(group => ({
-        id: group.id,
-        isDel: group.isDel || 0,
+      // 转换为后端期望的数组：每个组需要有顺序 id(从1开始)、operator、ruleList
+      const apiData = ruleGroups.map((group) => ({
+        userGroupId: userGroupId,
         operator: group.relation === 'and' ? 0 : 1,
-        ruleList: group.rules.map(rule => ({
-          createBy: rule.createBy || 0,
-          createTime: rule.createTime || '',
+        ruleList: group.rules.map((rule) => ({
+          userGroupId: userGroupId,
           field: rule.field,
-          id: rule.id,
-          isDel: rule.isDel || 0,
-          ruleGroupId: group.id,
-          type: rule.type || 0,
-          updateBy: rule.updateBy || 0,
-          updateTime: rule.updateTime || '',
+          type: rule.type,
           value: rule.value
-        })),
-        userGroupId: userGroupId
+        }))
       }));
 
       const response = await apiRequest.setRuleConfig(userGroupId, apiData);
@@ -367,10 +377,51 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     }
   };
 
+  // 扁平化项目字典为叶子选项
+  const getProjectLeafOptions = (): { label: string; value: string }[] => {
+    const cascade = Dictionaries.getCascader('dict_reg_job') || [];
+    const res: { label: string; value: string }[] = [];
+    const walk = (nodes: any[]) => {
+      nodes.forEach((n) => {
+        if (n.children && n.children.length) {
+          walk(n.children);
+        } else {
+          res.push({ label: n.label, value: n.value });
+        }
+      });
+    };
+    walk(cascade);
+    return res;
+  };
+
+  // 扁平化人员为下拉选项
+  const getUserOptions = (): { label: string; value: string | number }[] => {
+    const dep = JSON.parse(localStorage.getItem('Department') as any) || [];
+    const out: any[] = [];
+    const walk = (nodes: any[]) => {
+      nodes.forEach((n) => {
+        if (n.userId && n.enable !== false) out.push({ label: n.name, value: n.userId });
+        if (n.children && n.children.length) walk(n.children);
+      });
+    };
+    walk(dep);
+    return out;
+  };
+
+  // 获取列表型选项（运算类型13用）
+  const getListOptionsByField = (fieldKey: string): { label: string; value: string | number }[] => {
+    if (fieldKey === 'project') return getProjectLeafOptions();
+    if (fieldKey === 'studentSource') return (Dictionaries.getList('dict_source') || []) as any;
+    if (fieldKey === 'intentionLevel') return (Dictionaries.getList('dict_intention_level') || []) as any;
+    if (fieldKey === 'provider' || fieldKey === 'owner') return getUserOptions();
+    return [];
+  };
+
   // 渲染计算值输入组件
   const renderValueInput = (rule: RuleLine) => {
-    const valueType = getOperatorValueType(rule.operator);
-    
+    const valueType = getOperatorValueType(rule.type);
+    const fieldKey = rule.field;
+
     switch (valueType) {
       case 'empty':
         return <Input disabled placeholder="无需输入值" />;
@@ -384,11 +435,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           />
         );
       case 'date':
+        // 规范：日期型统一使用 yyyy-MM-dd HH:mm:ss（按你要求，9/10 用日期时间，11/12 用时间）
         return (
           <DatePicker
-            value={rule.value ? moment(rule.value, 'YYYY-MM-DD') : null}
-            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', date?.format('YYYY-MM-DD') || '')}
-            placeholder="请选择日期"
+            showTime
+            value={rule.value ? moment(rule.value, 'YYYY-MM-DD HH:mm:ss') : null}
+            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', date?.format('YYYY-MM-DD HH:mm:ss') || '')}
+            placeholder="请选择日期时间"
             style={{ width: '100%' }}
           />
         );
@@ -420,9 +473,56 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             placeholder="请选择"
             style={{ width: '100%' }}
           >
-            <Option value="true">是</Option>
-            <Option value="false">否</Option>
+            <Option value="14">是</Option>
+            <Option value="15">否</Option>
           </Select>
+        );
+      // 列表选择（在列表 13）
+      case 'string':
+        if (rule.type === 13) {
+          const options = getListOptionsByField(fieldKey);
+          const valueArr = (rule.value ? String(rule.value).split(',') : []) as any[];
+          // 对人员字段采用弹窗选择（像绑定销售人员）
+          if (fieldKey === 'provider' || fieldKey === 'owner') {
+            const displayNames = valueArr
+              .map((id: any) => Dictionaries.getDepartmentUserName(Number(id)))
+              .filter(Boolean)
+              .join(', ');
+            return (
+              <div className="rule-user-picker">
+                <Input readOnly value={displayNames} placeholder="请选择人员" style={{ width: 220 }} />
+                <Button
+                  type="primary"
+                  size="small"
+                  shape="round"
+                  icon={<UserAddOutlined />}
+                  onClick={() => {
+                    setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleId: rule.id, fieldKey });
+                    setUserPickVisible(true);
+                  }}
+                >选择人员</Button>
+              </div>
+            );
+          }
+          return (
+            <Select
+              mode="multiple"
+              allowClear
+              value={valueArr}
+              onChange={(vals: any[]) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', vals.join(','))}
+              options={options}
+              placeholder="请选择"
+              style={{ width: '100%' }}
+            />
+          );
+        }
+        // 默认字符串输入
+        return (
+          <Input
+            value={rule.value}
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
+            placeholder="请输入值"
+          />
         );
       default:
         return (
@@ -456,7 +556,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             key={group.id}
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span>{group.name}</span>
+                <span>{`规则组${_groupIndex + 1}`}</span>
                 <Select
                   value={group.relation}
                   style={{ width: 80 }}
@@ -474,13 +574,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
               <Space>
                 <Button
                   type="text"
-                  icon={<PlusOutlined />}
+                  icon={<PlusCircleOutlined />}
                   onClick={() => addRuleLine(group.id)}
                 />
                 <Button
                   type="text"
                   danger
-                  icon={<MinusOutlined />}
+                  icon={<MinusCircleOutlined />}
                   onClick={() => removeRuleGroup(group.id)}
                 />
               </Space>
@@ -501,29 +601,30 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                 </Col>
                 <Col span={4}>
                   <Select
-                    value={rule.operator}
+                    value={rule.type}
                     style={{ width: '100%' }}
-                    onChange={(value) => updateRuleValue(group.id, rule.id, 'operator', value)}
+                    onChange={(value) => updateRuleValue(group.id, rule.id, 'type', value)}
+                    placeholder="请选择运算类型"
                   >
                     {getAvailableOperators(rule.field).map(op => (
                       <Option key={op.value} value={op.value}>{op.name}</Option>
                     ))}
                   </Select>
                 </Col>
-                <Col span={6}>
+                <Col span={8}>
                   {renderValueInput(rule)}
                 </Col>
-                <Col span={2}>
+                <Col span={3}>
                   <Space>
                     <Button
                       type="text"
-                      icon={<PlusOutlined />}
+                      icon={<PlusCircleOutlined />}
                       onClick={() => addRuleLine(group.id)}
                     />
                     <Button
                       type="text"
                       danger
-                      icon={<MinusOutlined />}
+                      icon={<MinusCircleOutlined />}
                       onClick={() => removeRuleLine(group.id, rule.id)}
                     />
                   </Space>
@@ -545,6 +646,19 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         </div>
         </div>
       </Spin>
+      {userPickVisible && (
+        <UserChoose
+          UserChooseVisible={userPickVisible}
+          setUserChooseVisible={setUserPickVisible}
+          CardContent={{ content: JSON.parse(localStorage.getItem('Department') as any) || [], type: 'role' }}
+          departments={[]}
+          renderData={{}}
+          onConfirmSelected={(ids: number[]) => {
+            if (!userPickRule) return;
+            updateRuleValue(userPickRule.groupId, userPickRule.ruleId, 'value', ids.join(','));
+          }}
+        />
+      )}
     </Drawer>
   );
 };

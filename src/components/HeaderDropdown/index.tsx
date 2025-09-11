@@ -8,10 +8,19 @@ export type HeaderDropdownProps = {
   overlayClassName?: string;
   overlay: React.ReactNode | (() => React.ReactNode) | any;
   placement?: 'bottomLeft' | 'bottomRight' | 'topLeft' | 'topCenter' | 'topRight' | 'bottomCenter';
-} & Omit<DropDownProps, 'overlay'>;
+} & Omit<DropDownProps, 'overlay' | 'dropdownRender' | 'onOpenChange' | 'open'> & {
+  onVisibleChange?: (open: boolean) => void;
+  visible?: boolean;
+};
 
-const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, ...restProps }) => (
-  <Dropdown overlayClassName={classNames(styles.container, cls)} {...restProps} />
+const HeaderDropdown: React.FC<HeaderDropdownProps> = ({ overlayClassName: cls, overlay, onVisibleChange, visible, ...restProps }) => (
+  <Dropdown
+    overlayClassName={classNames(styles.container, cls)}
+    dropdownRender={typeof overlay === 'function' ? (menu) => (overlay as any)(menu) : () => overlay}
+    onOpenChange={onVisibleChange}
+    open={visible}
+    {...restProps}
+  />
 );
 
 export default HeaderDropdown;

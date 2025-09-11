@@ -33,14 +33,28 @@ export default () => {
         sort: string;
         userList: any[];
     };
-    const transformProviderList = (providerList: string) => {
-        // 将字符串分割并转换为数字数组
-        const numbers = providerList.split(',').map(Number);
-        
-        // 转换为所需格式
-        return numbers.map(id => ({
-            id: id
-        }));
+    const transformProviderList = (providerList: any) => {
+        // 兼容 undefined、空字符串、数组、数字字符串
+        if (!providerList) return [];
+        if (Array.isArray(providerList)) {
+            return providerList
+                .map((v) => Number(v))
+                .filter((n) => !Number.isNaN(n))
+                .map((id) => ({ id }));
+        }
+        if (typeof providerList === 'string') {
+            const trimmed = providerList.trim();
+            if (!trimmed) return [];
+            return trimmed
+                .split(',')
+                .map((v) => Number(v))
+                .filter((n) => !Number.isNaN(n))
+                .map((id) => ({ id }));
+        }
+        if (typeof providerList === 'number') {
+            return Number.isNaN(providerList) ? [] : [{ id: providerList }];
+        }
+        return [];
     }
     
     const columns: ProColumns<GithubIssueItem>[] = [
@@ -85,7 +99,7 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        const list = transformProviderList(record.userList)
+                        const list = transformProviderList(record?.userList)
                         setDepartment(list);
                         setParentIdTree(record.id);
                         // setCardVisible(true);
@@ -119,7 +133,7 @@ export default () => {
                             content = await apiRequest.get('/sms/share/getDepartmentAndUser');
                         }
                         setCardContent({ content: content.data, type: 'role' });
-                        const list = transformProviderList(record.providerList)
+                        const list = transformProviderList(record?.providerList)
                         setDepartment(list);
                         setParentIdTree(record.id);
                         setUserChooseVisible(true)
