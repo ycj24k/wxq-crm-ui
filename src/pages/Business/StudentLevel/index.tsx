@@ -1,13 +1,15 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Modal, Form, Input, InputNumber, Space, message, Popconfirm, Tag } from 'antd';
+import { Button, Modal, Form, Select, Input, InputNumber, Space, message, Popconfirm, Tag } from 'antd';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
-
+import { getCompanyRequest } from '@/services/util/util';
+import Dictionaries from '@/services/util/dictionaries';
 type LevelItem = {
-  id: number;
-  name: string;       // 等级名称
-  code: string;       // 等级编码
+  id?: number;
+  departmentId?: number; // 所属公司
+  name?: string;       // 等级名称
+  code?: string;       // 等级编码
   priority: number;   // 优先级（数字越大越靠前）
   description?: string;
   enable?: boolean;
@@ -19,14 +21,53 @@ export default () => {
   const [visible, setVisible] = useState(false);
   const [editing, setEditing] = useState<LevelItem | null>(null);
   const [form] = Form.useForm<LevelItem>();
+  const [departmentList, setDepartmentList] = useState<any>([]);
+  // 获取分公司名称
+  useEffect(() => {
+    getCompanyName();
+    // getStudentLevelOptions();
+  }, []);
 
+  // 获取分公司名称
+  const getCompanyName = async () => {
+    const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
+      _isGetAll: true,
+    });
+    const targetID = contentList.data[0].id;
+    const targetData = contentList.data.find((item: any) => item.parentId === targetID);
+    const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID && item.parentId != -1) : [];
+    const data = result.map((item: any) => {
+      return {
+        ...item,
+        label: item.name,
+        value: item.id,
+      }
+    });
+    setDepartmentList(data);
+  }
   const columns: ProColumns<LevelItem>[] = [
     { title: '等级名称', dataIndex: 'name' },
-    { title: '等级编码', dataIndex: 'code' },
-    { title: '优先级', dataIndex: 'priority', sorter: true },
-    { title: '状态', dataIndex: 'enable', valueType: 'select', valueEnum: { true: { text: '启用', status: 'Success' }, false: { text: '停用', status: 'Default' } }, render: (_, r) => <Tag color={r.enable ? 'green' : 'default'}>{r.enable ? '启用' : '停用'}</Tag> },
+    // {
+    //      title: '所属公司',
+    //      dataIndex: 'companyId',
+    //      key: 'companyId',
+    //      valueType: 'select',
+    //      request: getCompanyRequest,
+    //    },
+     {
+          title: '部门',
+          dataIndex: 'departmentId',
+          search: false,
+          sorter: true,
+          render: (text, record) => (
+            <span>{Dictionaries.getDepartmentName(record.departmentId)[0]}</span>
+          ),
+        },
+    // { title: '等级编码', dataIndex: 'code' },
+    { title: '优先级', dataIndex: 'weight', sorter: true },
+    // { title: '状态', dataIndex: 'enable', valueType: 'select', valueEnum: { true: { text: '启用', status: 'Success' }, false: { text: '停用', status: 'Default' } }, render: (_, r) => <Tag color={r.enable ? 'green' : 'default'}>{r.enable ? '启用' : '停用'}</Tag> },
     { title: '描述', dataIndex: 'description', ellipsis: true },
-    { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
+    // { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
     {
       title: '操作',
       valueType: 'option',
@@ -34,7 +75,7 @@ export default () => {
         <a key="edit" onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
         <Popconfirm key="del" title="确定删除该等级？" onConfirm={async () => {
           // DELETE /sms/student/level
-          await apiRequest.delete('/sms/student/level', { id: record.id });
+          await apiRequest.delete('/sms/business/bizStudentLevel', { id: record.id });
           message.success('删除成功');
           actionRef.current?.reload();
         }}>
@@ -63,7 +104,7 @@ export default () => {
             query._orderBy = key;
             query._direction = sort[key]?.startsWith('desc') ? 'desc' : 'asc';
           }
-          const res = await apiRequest.get('/sms/student/level', query);
+          const res = await apiRequest.get('/sms/business/bizStudentLevel', query);
           return {
             data: res.data?.content || [],
             success: true,
@@ -81,11 +122,11 @@ export default () => {
           const values = await form.validateFields();
           if (editing) {
             // 更新：POST /sms/student/level/update
-            await apiRequest.post('/sms/student/level/update', { id: editing.id, ...values });
+            await apiRequest.post('/sms/business/bizStudentLevel', { id: editing.id, ...values });
             message.success('更新成功');
           } else {
             // 新增：POST /sms/student/level
-            await apiRequest.post('/sms/student/level', values);
+            await apiRequest.post('/sms/business/bizStudentLevel', values);
             message.success('新增成功');
           }
           setVisible(false);
@@ -96,10 +137,13 @@ export default () => {
           <Form.Item label="等级名称" name="name" rules={[{ required: true, message: '请输入等级名称' }]}>
             <Input placeholder="例如：VIP、普通、重点跟进" />
           </Form.Item>
-          <Form.Item label="等级编码" name="code" rules={[{ required: true, message: '请输入唯一编码' }]}>
-            <Input placeholder="例如：VIP、NORMAL、KEY" />
+          <Form.Item name='departmentId' label='所属公司' rules={[{ required: true, message: '请选择所属公司' }]}>
+            <Select style={{ width: '100%' }} options={departmentList} placeholder="公司" />
           </Form.Item>
-          <Form.Item label="优先级" name="priority" rules={[{ required: true, message: '请输入优先级' }]}>
+          {/* <Form.Item label="等级编码" name="code" rules={[{ required: true, message: '请输入唯一编码' }]}>
+            <Input placeholder="例如：VIP、NORMAL、KEY" />
+          </Form.Item> */}
+          <Form.Item label="优先级" name="weight" rules={[{ required: true, message: '请输入优先级' }]}>
             <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="数字越大优先级越高" />
           </Form.Item>
           <Form.Item label="描述" name="description">

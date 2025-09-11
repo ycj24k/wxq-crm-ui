@@ -328,6 +328,7 @@ export default (props: any) => {
                 }
               });
             }}
+
             okText="删除"
             cancelText="取消"
           >
@@ -406,15 +407,6 @@ export default (props: any) => {
           callbackRef();
         }}
         tabList={[
-
-          // {
-          //   tab: '流转资源库',
-          //   key: '1',
-          // },
-          // {
-          //   tab: '系统资源库',
-          //   key: '2',
-          // },
           {
             tab: '潜在学员公海',
             key: '99',
