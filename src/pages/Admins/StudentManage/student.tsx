@@ -21,6 +21,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 // import DownTable from '@/services/util/timeFn';
 import Dictionaries from '@/services/util/dictionaries';
+import { PageContainer } from '@ant-design/pro-layout';
 import Modals from './userModal';
 import FollowModal from './followModal';
 import StudentInfo from './studentInfo';
@@ -73,10 +74,12 @@ type GithubIssueItem = {
 };
 export default (props: any) => {
   const {
+    TabListNuber,
     order = '',
     admin,
     oncancel,
     type,
+    toolbar: propToolbar,
     setStudentId,
     setStudentVisible,
     isFormal = false,
@@ -98,12 +101,14 @@ export default (props: any) => {
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [previewImage, setpreviewImage] = useState<boolean>(false);
+  const [followStatus, setFollowStatus] = useState(undefined);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
   const [StudentOrderOpen, setStudentOrderOpen] = useState<boolean>(false);
   const [UploadFalgs, setUploadVisibles] = useState<boolean>(false);
   const [orderVisibleFalg, setOrderVisible] = useState<boolean>(false);
   const [orderVisibleFalg1, setOrderVisible1] = useState<boolean>(false);
   const [FromFalg, setFromFalg] = useState<boolean>(false);
+  const [userFromTeacher, setuserFromTeacher] = useState<boolean>(false);
   const [userFrom, setUserFrom] = useState<boolean>(false);
   const [AddModalsVisible, setAddModalsVisible] = useState<boolean>(false);
   const [renderData, setRenderData] = useState<any>(null);
@@ -115,13 +120,22 @@ export default (props: any) => {
   const [CardContent, setCardContent] = useState<any>();
   const { initialState } = useModel('@@initialState');
   const [userNameId, setUserNameId] = useState<any>();
+  const [userNameId1, setUserNameId1] = useState<any>();
   let [department, setDepartment] = useState<any>({});
-
+  const [isTabListNuber, setisTabListNuber] = useState<any>('0');
   const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
-  const url = isFormal ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
+  const url = isFormal ? '/sms/business/bizStudent' : '/sms/business/bizStudentUser/potentialStudent';
   const formRef = useRef<ProFormInstance>();
   const formRefs = useRef<ProFormInstance>();
+  useEffect(() => {
+    // 当 TabListNuber 变化时，重新加载表格数据
+    // setisTabListNuber(TabListNuber);
+    if (actionRef.current) {
+      actionRef.current.reload();
+    }
+  }, [TabListNuber]);
+
   // const url = '/sms/business/bizStudent';
   useEffect(() => {
     callbackRef();
@@ -153,6 +167,21 @@ export default (props: any) => {
         });
     }
   }, [department]);
+  const dynamicToolbar = propToolbar == '潜在学员' ? {
+    menu: {
+      type: 'tab',
+      items: [
+        { key: '0', label: <span>全部</span> },
+        { key: '1', label: <span>今日待跟进</span> },
+        { key: '2', label: <span>今日已联系</span> },
+        { key: '3', label: <span>从未跟进</span> },
+      ],
+      onChange: (key: any) => {
+        setFollowStatus(key);
+        callbackRef();
+      },
+    }
+  } : undefined;
   const downObj = {
     姓名: 'name',
     报考岗位: 'project',
@@ -174,6 +203,7 @@ export default (props: any) => {
     // @ts-ignore
     actionRef?.current?.clearSelected();
   };
+
   const highlightRow = (record: { provider: any; userId: any; }) => {
     // 判断是否为目标行，这里以 id 为 2 的行为例
     if (record.provider != record.userId) {
@@ -386,6 +416,7 @@ export default (props: any) => {
       dataIndex: 'qq',
       key: 'qq',
       hideInTable: isFormal,
+
       width: 100,
       render: (text, record) => <span style={{ userSelect: 'none' }}>{record.qq}</span>,
     },
@@ -745,6 +776,25 @@ export default (props: any) => {
                     删除
                   </a>
                 </Popconfirm>
+                <Popconfirm
+                  key="deletePop"
+                  title="是否确定锁定？"
+                  style={{ marginRight: '15px', marginBottom: '8px' }}
+                  onConfirm={() => {
+                    request.post(`/sms/business/bizStudent/lock/${record.id}`, ).then((res: any) => {
+                      if (res.status == 'success') {
+                        message.success('已锁定');
+                        callbackRef();
+                      }
+                    });
+                  }}
+                  okText="锁定"
+                  cancelText="取消"
+                >
+                  <a key="lock" style={{ color: 'brown' }}>
+                    锁定学员
+                  </a>
+                </Popconfirm>
               </Space>
             </>
           )}
@@ -795,7 +845,7 @@ export default (props: any) => {
       ['visitTime,circulationTime,createTime']: 'asc,desc,desc',
     };
   }
-  let toolbar = undefined;
+  // let toolbar = undefined;
   if (admin) {
   } else {
     if (type == '学员') {
@@ -835,6 +885,27 @@ export default (props: any) => {
   Object.assign(params, paramsA);
   return (
     <>
+      {/* <PageContainer
+        onTabChange={(e) => {
+          setTabListNuber(e);
+          callbackRef();
+        }}
+        tabList={[
+          {
+            tab: '个人',
+            key: '0',
+          },
+          {
+            tab: '企业',
+            key: '1',
+          },
+          {
+            tab: '代理人',
+            key: '2'
+          },
+
+        ]}
+      > */}
       <Tables
         columns={columns}
         className="student"
@@ -851,11 +922,16 @@ export default (props: any) => {
         onReset={() => {
           setparamsA({});
         }}
-        toolbar={toolbar}
+        toolbar={dynamicToolbar}
         request={
           order === 'BlacklistStudent'
             ? { url: url }
-            : { url: url, params: params, sortList: sortList }
+            : {
+              url: url, params: {
+                ...params,
+                ...(followStatus !== undefined && { followStatus })
+              }, sortList: sortList
+            }
         }
         rowSelection={{
           // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
@@ -967,52 +1043,6 @@ export default (props: any) => {
           //     批量导出
           //   </Button>
           // </Dropdown>,
-          <a
-            hidden={order == 'order' || isFormal || recommend}
-            download="新学员导入模板"
-            href="./template/新学员导入模板.xlsx"
-            key="ordera"
-          >
-            下载导入模板
-          </a>,
-          <Button
-            key="buttonq"
-            icon={<PlusOutlined />}
-            type="primary"
-            hidden={order == 'order' || isFormal || recommend}
-            onClick={() => {
-              if (parentId) {
-                setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
-              } else {
-                setRenderData({ typee: 'add', newMedia: false, teacher: true });
-              }
-
-              setModalVisible(true);
-              //新建或者新建新媒体学员导入的显示隐藏
-              setShowisShowMedium(false)
-            }}
-          >
-            新建
-          </Button>,
-          <Button
-            key="buttonq"
-            icon={<PlusOutlined />}
-            type="primary"
-            hidden={order == 'order' || isFormal || recommend}
-            onClick={() => {
-              if (parentId) {
-                setRenderData({ typee: 'add', parentId, newMedia: true, teacher: false });
-              } else {
-                setRenderData({ typee: 'add', newMedia: true, teacher: false });
-              }
-
-              setModalVisible(true);
-              //新建或者新建新媒体学员导入的显示隐藏
-              setShowisShowMedium(true)
-            }}
-          >
-            新建新媒体学员
-          </Button>,
           // <Button
           //   key="ordere"
           //   type="primary"
@@ -1038,38 +1068,6 @@ export default (props: any) => {
           // >
           //   推荐已有学员/企业给别人
           // </Button>,
-          <Button
-            key="ordere"
-            type="primary"
-            hidden={isFormal || recommend}
-            icon={<PlusOutlined />}
-            onClick={async () => {
-              if (selectedRowsList.length == 0) {
-                message.error('请先勾选至少一个学员在进行推荐!');
-                return;
-              }
-              setUserFrom(true);
-            }}
-          >
-            推荐已有学员给他人
-          </Button>,
-          <Button
-            key="buttonq"
-            icon={<PlusOutlined />}
-            type="primary"
-            hidden={order == 'order' || isFormal}
-            onClick={() => {
-              if (parentId) {
-                setRenderData({ typee: 'recommend', parentId });
-              } else {
-                setRenderData({ typee: 'recommend' });
-              }
-
-              setModalVisible(true);
-            }}
-          >
-            新建推荐学员
-          </Button>,
           // <Button
           //   key="buttons"
           //   icon={<FormOutlined />}
@@ -1124,108 +1122,210 @@ export default (props: any) => {
           // >
           //   合同签署
           // </Button>,
-          //更新后的合同签署
-          <Button
-            // key="buttons"
-            // icon={<FormOutlined />}
-            // type="primary"
-            // hidden={!isFormal}
-            // onClick={async () => {
-            //   setContract(true);
-            // }}
+          <div key="toolbar-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <Space style={{ marginLeft: 'auto' }}>
+              <a
+                hidden={order == 'order' || isFormal || recommend}
+                download="新学员导入模板"
+                href="./template/新学员导入模板.xlsx"
+                key="ordera"
+              >
+                下载导入模板
+              </a>
 
-
-            key="buttons"
-            icon={<FormOutlined />}
-            type="primary"
-            hidden={!isFormal}
-            onClick={async () => {
-              const status = (await request.get('/sms/share/isVerify')).data;
-              const autoSign = (await request.get('/sms/share/isVerifyAutoSign')).data;
-              if (status && autoSign) {
-                if (initialState?.currentUser?.idCard) {
-                  if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-                    message.error('请选择一位学员签署合同!');
-                    return;
-                  }
-                  setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
-                  if (!selectedRowsList[0]?.idCard) {
-                    message.error('请先补充学员/负责人的身份证信息！');
-                    // setRenderData({ ...record, typee: 'eidt' });
-                    setModalVisible(true);
-                    return;
+              <Button
+                key="buttonq"
+                icon={<PlusOutlined />}
+                type="primary"
+                hidden={order == 'order' || isFormal || recommend}
+                onClick={() => {
+                  if (parentId) {
+                    setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
+                  } else {
+                    setRenderData({ typee: 'add', newMedia: false, teacher: true });
                   }
 
-                  if (
-                    selectedRowsList[0].type == 1 &&
-                    !selectedRowsList[0].codeFile
-                    // !selectedRowsList[0].powerAttorneyFile
-                  ) {
-                    Modal.info({
-                      title: '尚未上传企业授权信息!',
-                      content: <p>请先补充信息在签署合同</p>,
-                      okText: '补充',
-                      onOk: () => {
-                        setCompanyContractVisible(true);
-                      },
-                    });
-                    return;
+                  setModalVisible(true);
+                  //新建或者新建新媒体学员导入的显示隐藏
+                  setShowisShowMedium(false)
+                }}
+              >
+                新建
+              </Button>
+              <Button
+                key="buttonq"
+                icon={<PlusOutlined />}
+                type="primary"
+                hidden={order == 'order' || isFormal || recommend}
+                onClick={() => {
+                  if (parentId) {
+                    setRenderData({ typee: 'add', parentId, newMedia: true, teacher: false });
+                  } else {
+                    setRenderData({ typee: 'add', newMedia: true, teacher: false });
                   }
 
-                  setContractSVisible(true);
-                } else {
-                  message.error('请先完善您的身份证信息后再签署合同！');
-                }
-              } else {
-                setRenderData([status, autoSign]);
-                setIsVerifyModelVisible(true);
-                // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
-                // const urls = (await request.post('/sms/share/verify')).data;
-                // setpreviewImage(urls);
-                // setPreviewVisible(true);
-              }
-            }}
-          >
-            合同签署
-          </Button>,
-          <Button
-            key="butto"
-            hidden={order == 'order' || isFormal || recommend}
-            icon={<DownloadOutlined />}
-            type="primary"
-            onClick={() => {
-              setUploadVisibles(true);
-              setUploadUrl('/sms/business/bizStudent/batch/importForOther');
-            }}
-          >
-            批量导入获客数据
-          </Button>,
-          <Button
-            key="butto"
-            hidden={order == 'order' || isFormal || recommend}
-            icon={<DownloadOutlined />}
-            type="primary"
-            onClick={() => {
-              setUploadVisible(true);
-              setUploadUrl('/sms/business/bizStudent/batch/import');
-            }}
-          >
-            批量导入学员和回访记录
-          </Button>,
-          <Button
-            key="buttona"
-            hidden={order == 'order' || isFormal || recommend}
-            icon={<DownloadOutlined />}
-            type="primary"
-            onClick={() => {
-              setUploadVisible(true);
-              setUploadUrl('/sms/business/bizStudent/saveArray');
-            }}
-          >
-            批量导入学员
-          </Button>,
+                  setModalVisible(true);
+                  //新建或者新建新媒体学员导入的显示隐藏
+                  setShowisShowMedium(true)
+                }}
+              >
+                新建新媒体学员
+              </Button>
+
+              <Button
+                key="ordere"
+                type="primary"
+                hidden={isFormal || recommend}
+                icon={<PlusOutlined />}
+                onClick={async () => {
+                  if (selectedRowsList.length == 0) {
+                    message.error('请先勾选至少一个学员在进行推荐!');
+                    return;
+                  }
+                  setUserFrom(true);
+                }}
+              >
+                推荐已有学员给他人
+              </Button>
+              <Button
+                key="ordere"
+                type="primary"
+                hidden={isFormal || recommend}
+                icon={<PlusOutlined />}
+                onClick={async () => {
+                  if (selectedRowsList.length == 0) {
+                    message.error('请先勾选至少一个学员在进行分配!');
+                    return;
+                  }
+                  setuserFromTeacher(true);
+                }}
+              >
+                重新分配老师
+              </Button>
+              <Button
+                key="buttonq"
+                icon={<PlusOutlined />}
+                type="primary"
+                hidden={order == 'order' || isFormal}
+                onClick={() => {
+                  if (parentId) {
+                    setRenderData({ typee: 'recommend', parentId });
+                  } else {
+                    setRenderData({ typee: 'recommend' });
+                  }
+
+                  setModalVisible(true);
+                }}
+              >
+                新建推荐学员
+              </Button>
+            </Space>
+
+            <Space style={{ marginLeft: 'auto' }}>
+              <Button
+                // key="buttons"
+                // icon={<FormOutlined />}
+                // type="primary"
+                // hidden={!isFormal}
+                // onClick={async () => {
+                //   setContract(true);
+                // }}
+
+
+                key="buttons"
+                icon={<FormOutlined />}
+                type="primary"
+                hidden={!isFormal}
+                onClick={async () => {
+                  const status = (await request.get('/sms/share/isVerify')).data;
+                  const autoSign = (await request.get('/sms/share/isVerifyAutoSign')).data;
+                  if (status && autoSign) {
+                    if (initialState?.currentUser?.idCard) {
+                      if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
+                        message.error('请选择一位学员签署合同!');
+                        return;
+                      }
+                      setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
+                      if (!selectedRowsList[0]?.idCard) {
+                        message.error('请先补充学员/负责人的身份证信息！');
+                        // setRenderData({ ...record, typee: 'eidt' });
+                        setModalVisible(true);
+                        return;
+                      }
+
+                      if (
+                        selectedRowsList[0].type == 1 &&
+                        !selectedRowsList[0].codeFile
+                        // !selectedRowsList[0].powerAttorneyFile
+                      ) {
+                        Modal.info({
+                          title: '尚未上传企业授权信息!',
+                          content: <p>请先补充信息在签署合同</p>,
+                          okText: '补充',
+                          onOk: () => {
+                            setCompanyContractVisible(true);
+                          },
+                        });
+                        return;
+                      }
+
+                      setContractSVisible(true);
+                    } else {
+                      message.error('请先完善您的身份证信息后再签署合同！');
+                    }
+                  } else {
+                    setRenderData([status, autoSign]);
+                    setIsVerifyModelVisible(true);
+                    // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
+                    // const urls = (await request.post('/sms/share/verify')).data;
+                    // setpreviewImage(urls);
+                    // setPreviewVisible(true);
+                  }
+                }}
+              >
+                合同签署
+              </Button>
+              <Button
+                key="butto"
+                hidden={order == 'order' || isFormal || recommend}
+                icon={<DownloadOutlined />}
+                type="primary"
+                onClick={() => {
+                  setUploadVisibles(true);
+                  setUploadUrl('/sms/business/bizStudent/batch/importForOther');
+                }}
+              >
+                批量导入获客数据
+              </Button>
+              <Button
+                key="butto"
+                hidden={order == 'order' || isFormal || recommend}
+                icon={<DownloadOutlined />}
+                type="primary"
+                onClick={() => {
+                  setUploadVisible(true);
+                  setUploadUrl('/sms/business/bizStudent/batch/import');
+                }}
+              >
+                批量导入学员和回访记录
+              </Button>
+              <Button
+                key="buttona"
+                hidden={order == 'order' || isFormal || recommend}
+                icon={<DownloadOutlined />}
+                type="primary"
+                onClick={() => {
+                  setUploadVisible(true);
+                  setUploadUrl('/sms/business/bizStudent/saveArray');
+                }}
+              >
+                批量导入学员
+              </Button>
+            </Space>
+          </div>
         ]}
       />
+
       {/* 回访记录 */}
       {followVisibleFalg && (
         <FollowModal
@@ -1417,6 +1517,54 @@ export default (props: any) => {
           />
         </ModalForm>
       )}
+      {userFromTeacher && (
+        <ModalForm
+          width={450}
+          visible={userFromTeacher}
+          modalProps={{
+            // destroyOnClose: true,
+            maskClosable: false,
+            onCancel: () => {
+              setuserFromTeacher(false);
+            },
+          }}
+          formRef={formRefs}
+          onFinish={async (value: any) => {
+            if (!userNameId1) {
+              message.error('请选择老师！')
+              return
+            }
+            console.log('selectedRowsId', selectedRowsId);
+            new Promise((resolve) => {
+              request
+                .postAll(`/sms/business/bizStudentUser/assign/${userNameId1.id}`, 
+                  selectedRowsId,
+                 )
+                .then((res) => {
+                  if (res.status == 'success') {
+                    message.success('分配成功!');
+                    setuserFromTeacher(false);
+                    callbackRef();
+                    // resolve(res);
+                  }
+                });
+            });
+          }}
+        >
+          <UserTreeSelect
+            ref={null}
+            userLabel={'推荐给'}
+            userNames="userId"
+            enable={true}
+            // newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+            userPlaceholder="请选择老师"
+            setUserNameId={(e: any) => setUserNameId1(e)}
+            // setDepartId={(e: any) => setDepartId(e)}
+            flag={true}
+          // setFalgUser={(e: any) => setFalgUser(e)}
+          />
+        </ModalForm>
+      )}
       {userFrom && (
         <ModalForm
           width={450}
@@ -1466,6 +1614,7 @@ export default (props: any) => {
           />
         </ModalForm>
       )}
+      {/* </PageContainer> */}
     </>
   );
 };

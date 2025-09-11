@@ -98,7 +98,7 @@ export default (props: any) => {
           ...renderData,
           sex: renderData?.sex === false ? 'false' : renderData?.sex === true ? 'true' : '',
           type: renderData.type.toString(),
-          source: renderData.studentSource.toString(),
+          source: renderData.studentSource?.toString(),
           project: Dictionaries.getCascaderValue('dict_reg_job', renderData.project),
           education: renderData.education?.toString(),
           QQ: renderData?.qq,

@@ -173,9 +173,12 @@ export default () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={async () => {
+            console.log(record);
             const content = await apiRequest.get('/sms/share/getDepartmentAndUser');
             setCardContent({ content: content.data, type: 'sysuser' });
-            setDepartment(record.userList);
+            
+            // 省略类型注解
+            setDepartment(record.userIdList.map((id: any) => ({ id })));
             setParentIdTree(record.id);
             setCardVisible(true);
           }}
@@ -277,10 +280,10 @@ export default () => {
           <Form.Item name='departmentId' label='所属公司' rules={[{ required: true, message: '请选择所属公司' }]}>
             <Select style={{ width: '100%' }} options={departmentList} placeholder="公司" />
           </Form.Item>
-          <Form.Item label="客户容量" name="customerCapacity">
+          <Form.Item label="客户容量" name="customerCapacity" rules={[{ required: true, message: '请输入客户容量' }]}>
             <InputNumber min={0} precision={0} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item label="锁定数量容量" name="lockedCustomerLimit">
+          <Form.Item label="锁定数量容量" name="lockedCustomerLimit"  rules={[{ required: true, message: '锁定数量容量' }]}>
             <InputNumber min={0} precision={0} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item label="描述" name="description">

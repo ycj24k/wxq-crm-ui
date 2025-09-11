@@ -114,7 +114,7 @@ export default (props: any) => {
 
   const departmentsKey = (data: any, id: any) => {
     data.forEach((items: any, indexs: number) => {
-      if (['role', 'user', 'achievement', 'Groups', 'projectDepartment'].includes(CardContent.type)) {
+      if (['role', 'user', 'achievement', 'Groups', 'projectDepartment','sysuser'].includes(CardContent.type)) {
         if (items.userId == id) {
           CheckedKeys.push(items.key);
           obj2.push(items)
