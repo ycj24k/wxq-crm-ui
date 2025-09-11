@@ -12,7 +12,7 @@ export type GlobalHeaderRightProps = {
   menu?: boolean;
 };
 import { history } from 'umi';
-const { TabPane } = Tabs;
+// Tabs.TabPane 废弃，使用 items
 
 const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
   // const { initialState, setInitialState } = useModel('@@initialState');
@@ -29,14 +29,15 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
   );
   const menuHeaderDropdown = (
     <div style={{ width: '300px', height: '366px', position: 'relative' }}>
-      <Tabs defaultActiveKey="1" centered style={{ marginBottom: '0px' }}>
-        <TabPane tab="通知" key="1">
-          {notice ? notice : <Empty style={{ marginTop: '45px' }} />}
-        </TabPane>
-        <TabPane tab="消息" key="2">
-          {menus ? menus : <Empty style={{ marginTop: '45px' }} />}
-        </TabPane>
-      </Tabs>
+      <Tabs
+        defaultActiveKey="1"
+        centered
+        style={{ marginBottom: '0px' }}
+        items={[
+          { key: '1', label: '通知', children: notice ? notice : <Empty style={{ marginTop: '45px' }} /> },
+          { key: '2', label: '消息', children: menus ? menus : <Empty style={{ marginTop: '45px' }} /> },
+        ]}
+      />
       <div className="menuBot">
         <div
           style={{ borderRight: '1px solid #eee', width: '50%', cursor: 'pointer' }}
