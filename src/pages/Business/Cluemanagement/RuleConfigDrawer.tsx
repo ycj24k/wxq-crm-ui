@@ -2,13 +2,12 @@
  * 配置规则右侧弹窗组件
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin } from 'antd';
-import { PlusOutlined, PlusCircleOutlined, MinusCircleOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin, TreeSelect } from 'antd';
+import { PlusOutlined, PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import './RuleConfigDrawer.less';
-import UserChoose from './UserChoose';
 
 const { Option } = Select;
 
@@ -94,8 +93,6 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   ];
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
-  const [userPickVisible, setUserPickVisible] = useState<boolean>(false);
-  const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleUid: string; fieldKey: string } | null>(null);
 
   // 加载字段列表
   const loadFieldTypes = async (isMounted: boolean = true) => {
@@ -441,6 +438,46 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     return out;
   };
 
+  // 获取人员树数据
+  const getUserTreeData = (): any[] => {
+    const dep = JSON.parse(localStorage.getItem('Department') as any) || [];
+    const convertToTreeData = (nodes: any[]): any[] => {
+      return nodes.map((node) => {
+        const treeNode: any = {
+          title: node.name,
+          value: `dept_${node.id}`, // 部门节点使用dept_前缀
+          key: `dept_${node.id}`,
+          children: [],
+        };
+        
+        // 如果有用户，添加用户节点
+        if (node.userId && node.enable !== false) {
+          treeNode.children.push({
+            title: node.name,
+            value: `user_${node.userId}`, // 用户节点使用user_前缀
+            key: `user_${node.userId}`,
+            isLeaf: true,
+          });
+        }
+        
+        // 如果有子部门，递归处理
+        if (node.children && node.children.length > 0) {
+          const childNodes = convertToTreeData(node.children);
+          treeNode.children.push(...childNodes);
+        }
+        
+        // 如果部门下没有用户和子部门，则不显示该部门
+        if (treeNode.children.length === 0) {
+          return null;
+        }
+        
+        return treeNode;
+      }).filter(Boolean); // 过滤掉null值
+    };
+    
+    return convertToTreeData(dep);
+  };
+
   // 获取列表型选项（运算类型13用）
   const getListOptionsByField = (fieldKey: string): { label: string; value: string | number }[] => {
     if (fieldKey === 'project') return getProjectLeafOptions();
@@ -515,26 +552,33 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         if (rule.type === 13) {
           const options = getListOptionsByField(fieldKey);
           const valueArr = (rule.value ? String(rule.value).split(',') : []) as any[];
-          // 对人员字段采用弹窗选择（像绑定销售人员）
+          // 对人员字段采用树形选择
           if (fieldKey === 'provider' || fieldKey === 'owner') {
-            const displayNames = valueArr
-              .map((id: any) => Dictionaries.getDepartmentUserName(Number(id)))
-              .filter(Boolean)
-              .join(', ');
+            // 将存储的用户ID转换为带前缀的格式用于显示
+            const displayValues = valueArr.map((id: any) => `user_${id}`);
+            
             return (
-              <div className="rule-user-picker">
-                <Input readOnly value={displayNames} placeholder="请选择人员" style={{ width: 220 }} />
-                <Button
-                  type="primary"
-                  size="small"
-                  shape="round"
-                  icon={<UserAddOutlined />}
-                  onClick={() => {
-                    setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleUid: rule.uid, fieldKey });
-                    setUserPickVisible(true);
-                  }}
-                >选择人员</Button>
-              </div>
+              <TreeSelect
+                multiple
+                allowClear
+                showSearch
+                treeCheckable
+                treeDefaultExpandAll
+                value={displayValues}
+                onChange={(values: any[]) => {
+                  // 只提取用户ID（过滤掉部门ID）
+                  const userIds = values
+                    .filter((val: string) => val.startsWith('user_'))
+                    .map((val: string) => val.replace('user_', ''));
+                  updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', userIds.join(','));
+                }}
+                treeData={getUserTreeData()}
+                placeholder="请选择人员"
+                style={{ width: '100%' }}
+                treeNodeFilterProp="title"
+                maxTagCount="responsive"
+                treeCheckStrictly={false}
+              />
             );
           }
           return (
@@ -589,7 +633,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             key={group.id}
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span>{`规则组${_groupIndex + 1}`}</span>
+                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>{`规则组${_groupIndex + 1}`}</span>
+                <span style={{ fontSize: '13px', color: '#333' }}>组内关系：</span>
                 <Select
                   value={group.relation}
                   style={{ width: 80 }}
@@ -683,19 +728,6 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         </div>
         </div>
       </Spin>
-      {userPickVisible && (
-        <UserChoose
-          UserChooseVisible={userPickVisible}
-          setUserChooseVisible={setUserPickVisible}
-          CardContent={{ content: JSON.parse(localStorage.getItem('Department') as any) || [], type: 'role' }}
-          departments={[]}
-          renderData={{}}
-          onConfirmSelected={(ids: number[]) => {
-            if (!userPickRule) return;
-            updateRuleValue(userPickRule.groupId, userPickRule.ruleUid, 'value', ids.join(','));
-          }}
-        />
-      )}
     </Drawer>
   );
 };
