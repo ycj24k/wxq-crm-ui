@@ -19,7 +19,7 @@ export default () => {
     >
       <Badge count={0}>
         {/* <div style={{ width: '200px', height: '500px', backgroundColor: 'white' }}></div> */}
-        <Dropdown overlay={menus} placement="topRight" trigger={['click']} visible={visible}>
+        <Dropdown menu={{ items: menus }} placement="topRight" trigger={['click']} open={visible}>
           <Button
             type="primary"
             icon={<CommentOutlined />}

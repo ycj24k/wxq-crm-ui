@@ -156,7 +156,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
       <HeaderDropdown
         overlayClassName="newss"
         trigger={['click']}
-        overlay={menuHeaderDropdown}
+        menu={{ items: menuHeaderDropdown }}
         // @ts-ignore
         placement="bottom"
         onVisibleChange={(e) => {

@@ -44,7 +44,33 @@ export default () => {
         })
     }
     useEffect(() => {
-        BadgesNumbers()
+        let isMounted = true;
+        
+        const loadBadges = async () => {
+            try {
+                const data = []
+                for (let i = 0; i <= 9; i++) {
+                    data.push({ status: i })
+                }
+                const res = await request.get('/sms/system/sysInterview/statistics', {
+                    array: JSON.stringify(data)
+                });
+                
+                if (isMounted) {
+                    setBadges(res.data);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.error('加载统计数据失败:', error);
+                }
+            }
+        };
+        
+        loadBadges();
+        
+        return () => {
+            isMounted = false;
+        };
     }, [])
     const setStatus = (key: number) => {
         request.post('/sms/system/sysInterview', { status: key, id: renderData.id }).then((res) => {
@@ -358,7 +384,7 @@ export default () => {
                     >
                         编辑
                     </a>
-                    <Dropdown overlay={menu} onOpenChange={(e) => {
+                    <Dropdown menu={{ items: menu }} onOpenChange={(e) => {
                         setRenderData(record)
                     }}>
                         <a onClick={e => {

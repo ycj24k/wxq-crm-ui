@@ -25,8 +25,40 @@ export default () => {
   const [departmentList, setDepartmentList] = useState<any>([]);
   // 获取分公司名称
   useEffect(() => {
-    getCompanyName();
+    let isMounted = true;
+    
+    const loadCompanyName = async () => {
+      try {
+        const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
+          _isGetAll: true,
+        });
+        
+        if (!isMounted) return; // 组件已卸载，不更新状态
+        
+        const targetID = contentList.data[0].id;
+        const targetData = contentList.data.find((item: any) => item.parentId === targetID);
+        const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID && item.parentId != -1) : [];
+        const data = result.map((item: any) => {
+          return {
+            ...item,
+            label: item.name,
+            value: item.id,
+          }
+        });
+        setDepartmentList(data);
+      } catch (error) {
+        if (isMounted) {
+          console.error('加载部门列表失败:', error);
+        }
+      }
+    };
+    
+    loadCompanyName();
     // getStudentLevelOptions();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // 获取分公司名称
