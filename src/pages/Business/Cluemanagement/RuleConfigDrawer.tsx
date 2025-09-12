@@ -29,7 +29,7 @@ interface OperatorConfig {
 interface RuleLine {
   id: number;
   field: string;
-  operator?: number;
+  operator?: number;               
   value: string;
   ruleGroupId?: number;
   uid: string; // 本地唯一键，避免同 id 规则联动
@@ -93,6 +93,22 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   ];
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
+  const [departmentData, setDepartmentData] = useState<any[]>([]);
+
+  // 加载部门数据（使用和绑定销售人员相同的接口）
+  const loadDepartmentData = async (isMounted: boolean = true) => {
+    try {
+      const response = await apiRequest.get('/sms/share/getDepartmentAndUser');
+      if (!isMounted) return;
+      
+      if (response.status === 'success' && response.data) {
+        setDepartmentData(response.data);
+      }
+    } catch (error) {
+      if (!isMounted) return;
+      console.error('加载部门数据失败:', error);
+    }
+  };
 
   // 加载字段列表
   const loadFieldTypes = async (isMounted: boolean = true) => {
@@ -214,6 +230,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         try {
           await loadFieldTypes(isMounted);
           if (isMounted) {
+            await loadDepartmentData(isMounted);
             await loadRuleConfig(isMounted);
           }
         } catch (error) {
@@ -438,41 +455,64 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     return out;
   };
 
-  // 获取人员树数据
+  // 获取人员树数据（使用和绑定销售人员相同的数据源）
   const getUserTreeData = (): any[] => {
-    const dep = JSON.parse(localStorage.getItem('Department') as any) || [];
+    // 使用动态加载的部门数据，如果没有则使用localStorage作为备用
+    const dep = departmentData.length > 0 ? departmentData : (JSON.parse(localStorage.getItem('Department') as any) || []);
+    
     const convertToTreeData = (nodes: any[]): any[] => {
-      return nodes.map((node) => {
-        const treeNode: any = {
-          title: node.name,
-          value: `dept_${node.id}`, // 部门节点使用dept_前缀
-          key: `dept_${node.id}`,
-          children: [],
-        };
-        
-        // 如果有用户，添加用户节点
-        if (node.userId && node.enable !== false) {
-          treeNode.children.push({
-            title: node.name,
-            value: `user_${node.userId}`, // 用户节点使用user_前缀
-            key: `user_${node.userId}`,
-            isLeaf: true,
-          });
+      const result: any[] = [];
+      
+      nodes.forEach((node, index) => {
+        // 如果是部门节点
+        if (node.departmentName) {
+          const deptNode: any = {
+            title: node.departmentName,
+            value: `dept_${node.id}`,
+            key: `dept_${node.id}`,
+            children: [],
+          };
+          
+          // 如果有用户，添加用户节点
+          if (node.userId && (node.enable !== false)) {
+            deptNode.children.push({
+              title: node.name,
+              value: `user_${node.userId}`,
+              key: `user_${node.userId}`,
+              isLeaf: true,
+            });
+          }
+          
+          // 如果有子部门，递归处理
+          if (node.children && node.children.length > 0) {
+            const childNodes = convertToTreeData(node.children);
+            deptNode.children.push(...childNodes);
+          }
+          
+          // 如果部门下没有用户和子部门，则不显示该部门
+          if (deptNode.children.length > 0) {
+            result.push(deptNode);
+          }
+        } else {
+          // 如果是人员节点，直接添加
+          if (node.userId && (node.enable !== false)) {
+            result.push({
+              title: node.name,
+              value: `user_${node.userId}`,
+              key: `user_${node.userId}`,
+              isLeaf: true,
+            });
+          }
+          
+          // 如果有子节点，递归处理
+          if (node.children && node.children.length > 0) {
+            const childNodes = convertToTreeData(node.children);
+            result.push(...childNodes);
+          }
         }
-        
-        // 如果有子部门，递归处理
-        if (node.children && node.children.length > 0) {
-          const childNodes = convertToTreeData(node.children);
-          treeNode.children.push(...childNodes);
-        }
-        
-        // 如果部门下没有用户和子部门，则不显示该部门
-        if (treeNode.children.length === 0) {
-          return null;
-        }
-        
-        return treeNode;
-      }).filter(Boolean); // 过滤掉null值
+      });
+      
+      return result;
     };
     
     return convertToTreeData(dep);
@@ -576,8 +616,44 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                 placeholder="请选择人员"
                 style={{ width: '100%' }}
                 treeNodeFilterProp="title"
-                maxTagCount="responsive"
+                maxTagCount={undefined} // 显示所有选中的标签
+                maxTagTextLength={undefined} // 不限制标签文本长度
                 treeCheckStrictly={false}
+                dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
+                tagRender={(props) => {
+                  const { label, closable, onClose } = props;
+                  return (
+                    <span style={{ 
+                      display: 'inline-block',
+                      margin: '2px 4px 2px 0',
+                      padding: '2px 8px',
+                      background: '#e6f7ff',
+                      border: '1px solid #91d5ff',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      color: '#1890ff',
+                      maxWidth: '150px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {label}
+                      {closable && (
+                        <span 
+                          onClick={onClose}
+                          style={{ 
+                            marginLeft: '4px', 
+                            cursor: 'pointer',
+                            color: '#1890ff',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          ×
+                        </span>
+                      )}
+                    </span>
+                  );
+                }}
               />
             );
           }
@@ -668,7 +744,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           >
             {group.rules.map((rule, _ruleIndex) => (
               <Row key={rule.uid} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
-                <Col span={5}>
+                <Col span={4}>
                   <Select
                     value={rule.field}
                     style={{ width: '100%' }}
@@ -691,10 +767,10 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                     ))}
                   </Select>
                 </Col>
-                <Col span={8}>
+                <Col span={12}>
                   {renderValueInput(rule)}
                 </Col>
-                <Col span={3}>
+                <Col span={4}>
                   <Space>
                     <Button
                       key={`add-rule-${group.id}-${rule.uid}`}
