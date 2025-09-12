@@ -95,7 +95,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
   const [userPickVisible, setUserPickVisible] = useState<boolean>(false);
+<<<<<<< HEAD
   const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleUid: string; fieldKey: string } | null>(null);
+=======
+  const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleId: number; fieldKey: string } | null>(null);
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
 
   // 加载字段列表
   const loadFieldTypes = async () => {
@@ -155,6 +159,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
       if (response.status === 'success' && response.data) {
         // 转换API数据格式为组件需要的格式
         const data = Array.isArray(response.data) ? response.data : [response.data];
+<<<<<<< HEAD
         const convertedGroups: RuleGroup[] = data.map((group: any, gi: number) => ({
           id: group.id || 0,
           name: `规则组${group.id || 1}`,
@@ -163,6 +168,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             ...r,
             uid: `${gi}-${ri}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
           })),
+=======
+        const convertedGroups: RuleGroup[] = data.map((group: any) => ({
+          id: group.id || 0,
+          name: `规则组${group.id || 1}`,
+          relation: group.operator === 0 ? 'and' : 'or',
+          rules: group.ruleList || [],
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
           userGroupId: group.userGroupId || userGroupId,
           // 移除 isDel
           operator: group.operator || 0
@@ -263,7 +275,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           type: undefined,
           value: '',
           ruleGroupId: groupId,
+<<<<<<< HEAD
           uid: `${groupId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+=======
+          // 移除 isDel
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
         };
         return {
           ...group,
@@ -275,12 +291,20 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 删除规则行
+<<<<<<< HEAD
   const removeRuleLine = (groupId: number, ruleUid: string) => {
+=======
+  const removeRuleLine = (groupId: number, ruleId: number) => {
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
           ...group,
+<<<<<<< HEAD
           rules: group.rules.filter(rule => rule.uid !== ruleUid)
+=======
+          rules: group.rules.filter(rule => rule.id !== ruleId)
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
         };
       }
       return group;
@@ -316,13 +340,21 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 更新规则值
+<<<<<<< HEAD
   const updateRuleValue = (groupId: number, ruleUid: string, field: string, value: any) => {
+=======
+  const updateRuleValue = (groupId: number, ruleId: number, field: string, value: any) => {
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
           ...group,
           rules: group.rules.map(rule => {
+<<<<<<< HEAD
             if (rule.uid === ruleUid) {
+=======
+            if (rule.id === ruleId) {
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
               const updatedRule = { ...rule, [field]: value };
               // 如果修改了字段：置空运算类型与值
               if (field === 'field') {
@@ -501,7 +533,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                   shape="round"
                   icon={<UserAddOutlined />}
                   onClick={() => {
+<<<<<<< HEAD
                     setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleUid: rule.uid, fieldKey });
+=======
+                    setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleId: rule.id, fieldKey });
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                     setUserPickVisible(true);
                   }}
                 >选择人员</Button>
@@ -524,7 +560,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Input
             value={rule.value}
+<<<<<<< HEAD
             onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', e.target.value)}
+=======
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
             placeholder="请输入值"
           />
         );
@@ -532,7 +572,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Input
             value={rule.value}
+<<<<<<< HEAD
             onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', e.target.value)}
+=======
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
             placeholder="请输入值"
           />
         );
@@ -591,12 +635,20 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             }
           >
             {group.rules.map((rule, _ruleIndex) => (
+<<<<<<< HEAD
               <Row key={rule.uid} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
+=======
+              <Row key={rule.id} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                 <Col span={5}>
                   <Select
                     value={rule.field}
                     style={{ width: '100%' }}
+<<<<<<< HEAD
                     onChange={(value) => updateRuleValue(group.id, rule.uid, 'field', value)}
+=======
+                    onChange={(value) => updateRuleValue(group.id, rule.id, 'field', value)}
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                   >
                     {fieldTypes.map(field => (
                       <Option key={field.key} value={field.key}>{field.name}</Option>
@@ -607,7 +659,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                   <Select
                     value={rule.type}
                     style={{ width: '100%' }}
+<<<<<<< HEAD
                     onChange={(value) => updateRuleValue(group.id, rule.uid, 'type', value)}
+=======
+                    onChange={(value) => updateRuleValue(group.id, rule.id, 'type', value)}
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                     placeholder="请选择运算类型"
                   >
                     {getAvailableOperators(rule.field).map(op => (
@@ -629,7 +685,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                       type="text"
                       danger
                       icon={<MinusCircleOutlined />}
+<<<<<<< HEAD
                       onClick={() => removeRuleLine(group.id, rule.uid)}
+=======
+                      onClick={() => removeRuleLine(group.id, rule.id)}
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                     />
                   </Space>
                 </Col>
@@ -659,7 +719,11 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           renderData={{}}
           onConfirmSelected={(ids: number[]) => {
             if (!userPickRule) return;
+<<<<<<< HEAD
             updateRuleValue(userPickRule.groupId, userPickRule.ruleUid, 'value', ids.join(','));
+=======
+            updateRuleValue(userPickRule.groupId, userPickRule.ruleId, 'value', ids.join(','));
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
           }}
         />
       )}

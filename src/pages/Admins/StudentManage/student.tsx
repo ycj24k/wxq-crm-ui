@@ -122,7 +122,11 @@ export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [userNameId, setUserNameId] = useState<any>();
   const [userNameId1, setUserNameId1] = useState<any>();
+<<<<<<< HEAD
   const [department, setDepartment] = useState<any>({});
+=======
+  let [department, setDepartment] = useState<any>({});
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
   const [isTabListNuber, setisTabListNuber] = useState<any>('0');
   const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
@@ -792,7 +796,11 @@ export default (props: any) => {
                   okText="锁定"
                   cancelText="取消"
                 >
+<<<<<<< HEAD
                   <a key="lock-student-manage" style={{ color: 'brown' }}>
+=======
+                  <a key="lock" style={{ color: 'brown' }}>
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                     锁定学员
                   </a>
                 </Popconfirm>
@@ -1135,7 +1143,11 @@ export default (props: any) => {
               </a>
 
               <Button
+<<<<<<< HEAD
                 key="add-student"
+=======
+                key="buttonq"
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1154,7 +1166,11 @@ export default (props: any) => {
                 新建
               </Button>
               <Button
+<<<<<<< HEAD
                 key="add-newmedia-student"
+=======
+                key="buttonq"
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1174,7 +1190,11 @@ export default (props: any) => {
               </Button>
 
               <Button
+<<<<<<< HEAD
                 key="recommend-student"
+=======
+                key="ordere"
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
@@ -1189,7 +1209,11 @@ export default (props: any) => {
                 推荐已有学员给他人
               </Button>
               <Button
+<<<<<<< HEAD
                 key="reassign-teacher"
+=======
+                key="ordere"
+>>>>>>> 1da3d8bffd4397a6c33310649a7ce92f8358eea1
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
