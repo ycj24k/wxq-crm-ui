@@ -4,6 +4,7 @@ import { Button, Table, message, Tag, Popconfirm ,Space } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
+import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
 import Upload from '@/services/util/upload';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -13,6 +14,7 @@ import filter from '@/services/util/filter';
 import { useModel } from 'umi';
 //添加用户
 import Modals from '@/pages/Admins/StudentManage/userModal'
+import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 // import Modals from './Modals';
 type GithubIssueItem = {
   name: string;
@@ -39,13 +41,17 @@ export default (props: any) => {
   const { hidden, isPerson, isGroup, showMyself } = props;
   console.log(isPerson, '===>')
   console.log(showMyself, '===>')
+  const formRefs = useRef<ProFormInstance>();
   const { initialState } = useModel('@@initialState');
+  const [userNameId1, setUserNameId1] = useState<any>();
   const [renderData, setRenderData] = useState<any>(null);
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
+  const [userFromTeacher, setuserFromTeacher] = useState<boolean>(false);
   const [UploadUrl, setUploadUrl] = useState<string>('/sms/business/bizStudent/addSystemRepository');
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [TabListNuber, setTabListNuber] = useState<any>('1');
   const [StudentIds, setStudentIds] = useState<any>([]);
+  const [selectedRowsId, setselectedRowsId] = useState<any>([]);
   const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid as number)?.id
   const [params, setParams] = useState<any>({ departmentId: departmentId })
   //代码迁移
@@ -279,7 +285,7 @@ export default (props: any) => {
               request
                 .post('/sms/business/bizStudentUser/receive', {
                   ids: record.id,
-                  ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
+                  ...({ source: TabListNuber }),//99为潜在学员，不传source
                 })
                 .then((res: any) => {
                   if (res.status == 'success') {
@@ -291,37 +297,37 @@ export default (props: any) => {
           >
             领取
           </a>
-          <a
+          {/* <a
             key="edit"
             // size="small"
             type="primary"
             // icon={<FormOutlined />}
            
             onClick={() => {
-              // console.log(StudentIds);
-                // request
-                //   .post('/sms/business/bizStudentUser/receive', {
-                //     ids: record.id,
-                //     ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
-                //   })
-                //   .then((res: any) => {
-                //     if (res.status == 'success') {
-                //       message.success('分配成功');
-                //       callbackRef();
-                //     }
-                //   });
-                message.success('接口未开发，请联系后台');
+              console.log(record);
+                request
+                  .postAll(`/sms/business/bizStudentUser/assign/${record.id}`, 
+                  
+                    record.id,//99为潜在学员，不传source
+                  )
+                  .then((res: any) => {
+                    if (res.status == 'success') {
+                      message.success('分配成功');
+                      callbackRef();
+                    }
+                  });
+                // message.success('接口未开发，请联系后台');
             }}
             
           >
             分配
-          </a>
-           <Popconfirm
+          </a> */}
+           {TabListNuber == '0' &&<Popconfirm
             key="deletePop"
             title="是否确定删除？"
             style={{ marginRight: '15px', marginBottom: '8px' }}
             onConfirm={() => {
-              request.delete('/sms/business/bizStudentUser', { id: record.id }).then((res: any) => {
+              request.delete('/sms/business/bizStudentUser/deleteArray', { ids: record.id }).then((res: any) => {
                 if (res.status == 'success') {
                   message.success('删除成功');
                   callbackRef();
@@ -335,7 +341,7 @@ export default (props: any) => {
             <a key="deletes" style={{ color: 'red' }}>
               删除
             </a>
-          </Popconfirm>
+          </Popconfirm>}
           
         </Space>
          
@@ -409,7 +415,7 @@ export default (props: any) => {
         tabList={[
           {
             tab: '潜在学员公海',
-            key: '99',
+            key: '1',
           },
           {
             tab: '正式学员公海',
@@ -430,9 +436,11 @@ export default (props: any) => {
           actionRef={actionRef}
           toolbar={TabListNuber == '7' || TabListNuber == '0' ? undefined : toolbar}
           request={{
-            url: '/sms/business/bizStudentUser/circulationLibrary',
-            params: { ...(TabListNuber !== '99' && { source: TabListNuber }), 'userId-isNull': true, ...params },
-            sortList: sortList,
+            url: TabListNuber == '0'?'/sms/business/bizStudentUser/leadStudent':'/sms/business/bizStudentUser/circulationLibrary',
+            params: { ...({ source: TabListNuber }), 'userId-isNull': true, ...params },
+            sortList:TabListNuber == '0'?{
+              ['circulationTime']: 'asc,desc',
+            }:sortList,
           }}
           search={hidden ? false : { defaultCollapsed: true, defaultColsNumber: 10 }}
           rowSelection={{
@@ -440,6 +448,7 @@ export default (props: any) => {
             // 注释该行则默认不显示下拉选项
             selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
             onChange: (e, selectedRows) => {
+              setselectedRowsId(e);
               setStudentIds(e);
             },
           }}
@@ -495,35 +504,51 @@ export default (props: any) => {
               批量导入
             </Button>,
             <Button
-              key="button"
-              icon={<PlusOutlined />}
-              type="primary"
-              onClick={() => {
-                if (StudentIds.length == 0) {
-                  message.error('请选择需要分配的学员!');
-                  return;
-                }
-                // console.log(StudentIds);
-                // request
-                //   .post('/sms/business/bizStudentUser/receive', {
-                //     ids: StudentIds.join(','),
-                //     ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
-                //   })
-                //   .then((res: any) => {
-                //     if (res.status == 'success') {
-                //       message.success('操作成功');
-                //       callbackRef();
-                //     }
-                //   });
-                message.success('接口未开发，请联系后台');
-              }}
-            >
-              批量分配
-            </Button>,
+            key="ordere"
+            type="primary"
+            hidden={TabListNuber != '1' && TabListNuber != '0'|| hidden}
+            icon={<PlusOutlined />}
+            onClick={async () => {
+              if (StudentIds.length == 0) {
+                message.error('请先勾选至少一个学员在进行分配!');
+                return;
+              }
+              setuserFromTeacher(true);
+            }}
+          >
+            批量分配
+          </Button>,
+            // <Button
+            //   key="button"
+            //   icon={<PlusOutlined />}
+            //   type="primary"
+            //   onClick={() => {
+            //     if (StudentIds.length == 0) {
+            //       message.error('请选择需要分配的学员!');
+            //       return;
+            //     }
+            //     // console.log(StudentIds);
+            //     // request
+            //     //   .post('/sms/business/bizStudentUser/receive', {
+            //     //     ids: StudentIds.join(','),
+            //     //     ...(TabListNuber !== '1' && { source: TabListNuber }),//99为潜在学员，不传source
+            //     //   })
+            //     //   .then((res: any) => {
+            //     //     if (res.status == 'success') {
+            //     //       message.success('操作成功');
+            //     //       callbackRef();
+            //     //     }
+            //     //   });
+            //     message.success('接口未开发，请联系后台');
+            //   }}
+            // >
+            //   批量分配
+            // </Button>,
             <Button
               key="button"
               icon={<PlusOutlined />}
               type="primary"
+              hidden={TabListNuber == '0' || hidden}
               onClick={() => {
                 if (StudentIds.length == 0) {
                   message.error('请选择需要领取的学员!');
@@ -533,7 +558,7 @@ export default (props: any) => {
                 request
                   .post('/sms/business/bizStudentUser/receive', {
                     ids: StudentIds.join(','),
-                    ...(TabListNuber !== '99' && { source: TabListNuber }),//99为潜在学员，不传source
+                    ...({ source: TabListNuber }),//99为潜在学员，不传source
                   })
                   .then((res: any) => {
                     if (res.status == 'success') {
@@ -545,11 +570,13 @@ export default (props: any) => {
             >
               批量领取
             </Button>,
+            
             <Button
               key="button"
               icon={<DeleteOutlined />}
               type="primary"
               danger
+              hidden={TabListNuber != '0' || hidden}
               onClick={() => {
                 if (StudentIds.length == 0) {
                   message.error('请选择需要删除的学员!');
@@ -596,6 +623,54 @@ export default (props: any) => {
             callbackRef={() => callbackRef()}
           />
         )}
+              {userFromTeacher && (
+        <ModalForm
+          width={450}
+          visible={userFromTeacher}
+          modalProps={{
+            // destroyOnClose: true,
+            maskClosable: false,
+            onCancel: () => {
+              setuserFromTeacher(false);
+            },
+          }}
+          formRef={formRefs}
+          onFinish={async (value: any) => {
+            if (!userNameId1) {
+              message.error('请选择老师！')
+              return
+            }
+            console.log('selectedRowsId', selectedRowsId);
+            new Promise((resolve) => {
+              request
+                .postAll(`/sms/business/bizStudentUser/assign/${userNameId1.id}`, 
+                  selectedRowsId,
+                 )
+                .then((res) => {
+                  if (res.status == 'success') {
+                    message.success('分配成功!');
+                    setuserFromTeacher(false);
+                    callbackRef();
+                    // resolve(res);
+                  }
+                });
+            });
+          }}
+        >
+          <UserTreeSelect
+            ref={null}
+            userLabel={'推荐给'}
+            userNames="userId"
+            enable={true}
+            // newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
+            userPlaceholder="请选择老师"
+            setUserNameId={(e: any) => setUserNameId1(e)}
+            // setDepartId={(e: any) => setDepartId(e)}
+            flag={true}
+          // setFalgUser={(e: any) => setFalgUser(e)}
+          />
+        </ModalForm>
+      )}
         {InfoVisibleFalg && (
           <StudentInfo
             setModalVisible={() => setInfoVisible(false)}

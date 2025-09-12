@@ -10,6 +10,7 @@ import apiRequest from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 
 type SalesLevel = {
+  studentLevelNameList: any;
   id?: number;
   name: string;      // 等级名称
   description: string;//描述
@@ -121,18 +122,32 @@ export default () => {
     { title: '客户容量', dataIndex: 'customerCapacity', sorter: true },
     { title: '锁定数量容量', dataIndex: 'lockedCustomerLimit', sorter: true },
     { title: '描述', dataIndex: 'description', sorter: true },
-    { 
-      title: '可见等级', 
-      colSpan: 2,
-      dataIndex: 'studentLevelList', 
-      sorter: true,
-      render: (_, record) => (
+    // { 
+    //   title: '可见等级', 
+    //   colSpan: 2,
+    //   dataIndex: 'studentLevelList', 
+    //   sorter: true,
+    //   render: (_, record) => (
+    //     <span>
+    //       {record.studentLevelNameList|| '无'}
+    //     </span>
+    //   )
+    // },
+    {
+         title: '可见等级',
+         search: false,
+         colSpan: 2,
+         dataIndex: 'studentLevelList',
+         key: 'studentLevelList',
+         valueType: 'select',
+         request: getsysUserLevel,
+            render: (_, record) => (
         <span>
-          {record.studentLevelList?.map((item: any) => item.name).join(', ') || '无'}
+          {record.studentLevelNameList|| '无'}
         </span>
       )
-    },
-    {
+       },
+    {                   
       search: false,
       colSpan: 0,
       render: (text, record: any, _, action) => (
@@ -144,8 +159,8 @@ export default () => {
             setRenderData(record);
             // 设置已选中的学生等级
             if (record.studentLevelList) {
-              console.log(record.studentLevelList);
-              setSelectedLevels(record.studentLevelList.map((item: any) => item.id));
+              // console.log(record.studentLevelList);
+              setSelectedLevels(record.studentLevelList.map((item: any) => item));
             } else {
               setSelectedLevels([]);
             }
@@ -178,7 +193,7 @@ export default () => {
             setCardContent({ content: content.data, type: 'sysuser' });
             
             // 省略类型注解
-            setDepartment(record.userIdList.map((id: any) => ({ id })));
+            setDepartment(record?.userIdList?.map((id: any) => ({ id })));
             setParentIdTree(record.id);
             setCardVisible(true);
           }}

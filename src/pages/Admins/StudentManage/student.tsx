@@ -177,6 +177,7 @@ export default (props: any) => {
         { key: '3', label: <span>从未跟进</span> },
       ],
       onChange: (key: any) => {
+        console.log(key, 'key');
         setFollowStatus(key);
         callbackRef();
       },
@@ -929,7 +930,7 @@ export default (props: any) => {
             : {
               url: url, params: {
                 ...params,
-                ...(followStatus !== undefined && { followStatus })
+                ...(followStatus !== undefined&&followStatus != '0' && { followStatus })
               }, sortList: sortList
             }
         }
