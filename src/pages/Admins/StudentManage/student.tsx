@@ -135,7 +135,20 @@ export default (props: any) => {
       actionRef.current.reload();
     }
   }, [TabListNuber]);
-
+  const tabs = [
+    {
+      key: 'fen',
+      label: (<span>分公司资源库</span>)
+    },
+    {
+      key: 'zong',
+      label: (<span>总公司资源库</span>)
+    },
+    {
+      key: 'all',
+      label: (<span>所有资源</span>)
+    },
+  ]
   // const url = '/sms/business/bizStudent';
   useEffect(() => {
     callbackRef();
@@ -167,22 +180,38 @@ export default (props: any) => {
         });
     }
   }, [department]);
-  const dynamicToolbar = propToolbar == '潜在学员' ? {
-    menu: {
-      type: 'tab',
-      items: [
-        { key: '0', label: <span>全部</span> },
-        { key: '1', label: <span>今日待跟进</span> },
-        { key: '2', label: <span>今日已联系</span> },
-        { key: '3', label: <span>从未跟进</span> },
-      ],
-      onChange: (key: any) => {
-        console.log(key, 'key');
-        setFollowStatus(key);
-        callbackRef();
-      },
-    }
-  } : undefined;
+  // console.log('propToolbar value:', propToolbar);
+  // console.log('isFormal value:', isFormal);
+  const dynamicToolbar =
+    propToolbar == '潜在学员' ? {
+      menu: {
+        type: 'tab',
+        items: [
+          { key: '0', label: <span>全部</span> },
+          { key: '1', label: <span>今日待跟进</span> },
+          { key: '2', label: <span>今日已联系</span> },
+          { key: '3', label: <span>从未跟进</span> },
+        ],
+        onChange: (key: any) => {
+          // console.log(key, 'key');
+          setFollowStatus(key);
+          callbackRef();
+        },
+      }
+    } : isFormal ? {
+      menu: {
+        type: 'tab',
+        items: [
+          { key: '00', label: <span>我的学员</span> },
+          { key: '11', label: <span>共享学员</span> },
+        ],
+        onChange: (key: any) => {
+          // console.log(key, 'key');
+          setFollowStatus(key);
+          callbackRef();
+        },
+      }
+    } : undefined;
   const downObj = {
     姓名: 'name',
     报考岗位: 'project',
@@ -782,7 +811,7 @@ export default (props: any) => {
                   title="是否确定锁定？"
                   style={{ marginRight: '15px', marginBottom: '8px' }}
                   onConfirm={() => {
-                    request.post(`/sms/business/bizStudent/lock/${record.id}`, ).then((res: any) => {
+                    request.post(`/sms/business/bizStudent/lock/${record.id}`,).then((res: any) => {
                       if (res.status == 'success') {
                         message.success('已锁定');
                         callbackRef();
@@ -928,10 +957,16 @@ export default (props: any) => {
           order === 'BlacklistStudent'
             ? { url: url }
             : {
-              url: url, params: {
+              url: followStatus == '11' 
+                ? '/sms/business/bizStudent/companyShare' 
+                : followStatus == '00' 
+                  ? '/sms/business/bizStudent' 
+                  : url,
+              params: {
                 ...params,
-                ...(followStatus !== undefined&&followStatus != '0' && { followStatus })
-              }, sortList: sortList
+                ...(followStatus !== undefined && followStatus != '0' && !isFormal && { followStatus })
+              }, 
+              sortList: sortList
             }
         }
         rowSelection={{
@@ -1538,9 +1573,9 @@ export default (props: any) => {
             console.log('selectedRowsId', selectedRowsId);
             new Promise((resolve) => {
               request
-                .postAll(`/sms/business/bizStudentUser/assign/${userNameId1.id}`, 
+                .postAll(`/sms/business/bizStudentUser/assign/${userNameId1.id}`,
                   selectedRowsId,
-                 )
+                )
                 .then((res) => {
                   if (res.status == 'success') {
                     message.success('分配成功!');

@@ -22,9 +22,9 @@ type SalesLevel = {
 
 // 获取学生等级选项
 async function getsysUserLevel() {
-  const res = await apiRequest.get('/sms/system/sysUserLevel');
+  const res = await apiRequest.get('/sms/business/bizStudentLevel/getAll');
   console.log('等级选项',res.data);
-  return res.data?.content?.map((e: any) => ({
+  return res.data?.map((e: any) => ({
     label: e.name,
     value: e.id
   })) || [];
