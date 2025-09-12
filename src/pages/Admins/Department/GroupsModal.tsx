@@ -23,7 +23,7 @@ interface valueType {
 export default (props: any) => {
   const formRef = useRef<ProFormInstance>();
   const [CardVisible, setCardVisible] = useState<boolean>(false);
-  let [department, setDepartment] = useState<any>({ name: '' });
+  const [department, setDepartment] = useState<any>({ name: '' });
   const { modalVisible, setModalVisible, callbackRef, renderData } = props;
   useEffect(() => {
     if (renderData.type == 'add') {

@@ -1,6 +1,7 @@
 import Tables from "@/components/Tables"
-import ProForm, { ProFormDatePicker, ProFormDigit, ProFormInstance, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ProFormDatePicker, ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { Button, Drawer, message, Modal, Popconfirm, Space } from "antd"
 import request from '@/services/ant-design-pro/apiRequest';
 import { useEffect, useRef, useState } from "react";

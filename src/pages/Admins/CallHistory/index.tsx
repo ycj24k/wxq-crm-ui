@@ -19,8 +19,8 @@ type GithubIssueItem = {
   isPass: boolean;
   file: string;
 };
-var audio: any
-var timeTimeOut: any
+let audio: any
+let timeTimeOut: any
 export default () => {
   const actionRef = useRef<ActionType>();
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
@@ -173,7 +173,7 @@ export default () => {
     </Button>,
     <audio id='audio' />
   ];
-  let sortList = {
+  const sortList = {
     ['startTime']: 'desc',
   };
   return (

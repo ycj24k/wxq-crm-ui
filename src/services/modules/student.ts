@@ -2,7 +2,7 @@
  * 学员管理相关API
  */
 import request from '@/services/ant-design-pro/apiRequest';
-import { Student, PageResponse, ApiResponse } from '@/types';
+import type { Student, PageResponse, ApiResponse } from '@/types';
 
 export const studentAPI = {
   /**

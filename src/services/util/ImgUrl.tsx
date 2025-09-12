@@ -1,12 +1,12 @@
-let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-let obj = {};
+const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+const obj = {};
 obj[tokenName] = tokenValue;
 
 const ImgUrl = async (url: string, id: number, str: string, upDownType: string = 'look') => {
-  let arr = str.split(',');
-  let arr1: any = [];
-  let Url: any = {
+  const arr = str.split(',');
+  const arr1: any = [];
+  const Url: any = {
     pdfUrl: [],
     imgUrl: [],
   };
@@ -25,16 +25,16 @@ const ImgUrl = async (url: string, id: number, str: string, upDownType: string =
               } else {
                 blob = new Blob([ress]);
               }
-              let reader = new FileReader();
+              const reader = new FileReader();
               reader.readAsDataURL(blob);
               reader.onload = (e) => {
                 resolve(reader.result);
               };
             } else {
-              let blobUrl = window.URL.createObjectURL(ress);
+              const blobUrl = window.URL.createObjectURL(ress);
               const a = document.createElement('a'); //获取a标签元素
               document.body.appendChild(a);
-              let filename = '附件'; //设置文件名称
+              const filename = '附件'; //设置文件名称
               a.href = blobUrl; //设置a标签路径
               a.download = filename;
               a.target = '_blank';

@@ -2,22 +2,22 @@
 
 
 const getFirstAndLastDayOfMonthDate = (months: any) => {
-    let today = new Date(months);
-    let year = today.getFullYear();
-    let month = today.getMonth();
+    const today = new Date(months);
+    const year = today.getFullYear();
+    const month = today.getMonth();
 
-    let firstDay = formatDate(new Date(year, month, 1)) + " " + "00:00:00";
-    let lastDay = formatDate(new Date(year, month + 1, 0)) + " " + "23:59:59";
+    const firstDay = formatDate(new Date(year, month, 1)) + " " + "00:00:00";
+    const lastDay = formatDate(new Date(year, month + 1, 0)) + " " + "23:59:59";
 
     return { firstDay, lastDay };
 }
 const getFirstAndLastDayOfMonth = (date: any = false) => {
-    let today = date ? new Date(date) : new Date();
-    let year = today.getFullYear();
-    let month = today.getMonth();
+    const today = date ? new Date(date) : new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
 
-    let firstDay = formatDate(new Date(year, month, 1)) + " " + "00:00:00";
-    let lastDay = formatDate(new Date(year, month + 1, 0)) + " " + "23:59:59";
+    const firstDay = formatDate(new Date(year, month, 1)) + " " + "00:00:00";
+    const lastDay = formatDate(new Date(year, month + 1, 0)) + " " + "23:59:59";
 
     return { firstDay, lastDay };
 }
@@ -46,23 +46,23 @@ const getTodayDate = (num: number = 0) => {
     return formattedDate;
 }
 const getTodayDates = (day: number = 1) => {
-    let today = new Date();
-    let year = today.getFullYear();
-    let month = String(today.getMonth() + 1).padStart(2, '0'); // Adding 1 because January is 0
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Adding 1 because January is 0
 
 
     return year + '-' + month + '-' + day;
 }
 const getAllTimesInPeriod = (startTime: any, endTime: any) => {
-    let times = [];
-    let currentTime = new Date(startTime);
-    let currentEndTime = new Date(endTime);
+    const times = [];
+    const currentTime = new Date(startTime);
+    const currentEndTime = new Date(endTime);
 
     while (currentTime <= currentEndTime) {
-        let year = currentTime.getFullYear();
-        let month = ('0' + (currentTime.getMonth() + 1)).slice(-2);
-        let day = ('0' + currentTime.getDate()).slice(-2);
-        let time = `${year}-${month}-${day}`;
+        const year = currentTime.getFullYear();
+        const month = ('0' + (currentTime.getMonth() + 1)).slice(-2);
+        const day = ('0' + currentTime.getDate()).slice(-2);
+        const time = `${year}-${month}-${day}`;
         times.push(time);
 
         currentTime.setDate(currentTime.getDate() + 1);
@@ -71,40 +71,40 @@ const getAllTimesInPeriod = (startTime: any, endTime: any) => {
     return times;
 }
 const getDaysInMonthBeforeToday = () => {
-    let today = new Date();
-    let year = today.getFullYear();
-    let month = String(today.getMonth() + 1).padStart(2, '0');
-    let days = [];
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const days = [];
     for (let day = 1; day <= today.getDate(); day++) {
-        let num = day < 10 ? '0' + day : day
-        let date = year + '-' + month + '-' + num
+        const num = day < 10 ? '0' + day : day
+        const date = year + '-' + month + '-' + num
         days.push(date);
     }
 
     return days;
 }
 const getDaysInMonths = (date: any = false) => {
-    let today = date ? new Date(date) : new Date();
-    let year = today.getFullYear();
-    let month = String(today.getMonth() + 1).padStart(2, '0');
-    let days = [];
-    let nums = new Date(year, month, 0).getDate()
+    const today = date ? new Date(date) : new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const days = [];
+    const nums = new Date(year, month, 0).getDate()
     for (let day = 1; day <= nums; day++) {
-        let num = day < 10 ? '0' + day : day
-        let date = year + '-' + month + '-' + num + ' ' + '00:00:00'
+        const num = day < 10 ? '0' + day : day
+        const date = year + '-' + month + '-' + num + ' ' + '00:00:00'
         days.push(date);
     }
 
     return days;
 }
 const getNextDay = () => {
-    let today = new Date();
-    let todayFormatted = today.toISOString().split('T')[0];
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
 
     // 获取明天的日期
-    let tomorrow = new Date();
+    const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    let tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+    const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
     return {
         todayFormatted, tomorrowFormatted
     }

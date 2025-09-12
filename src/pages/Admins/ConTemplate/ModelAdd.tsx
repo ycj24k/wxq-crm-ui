@@ -1,6 +1,7 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
-  ProFormInstance,
   ProFormText,
   ProFormTextArea,
   ProFormUploadDragger,
@@ -47,9 +48,9 @@ export default (props: any) => {
     }
   }, []);
 
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const submitok = (values: any) => {
     return new Promise((resolve) => {
@@ -105,9 +106,9 @@ export default (props: any) => {
             message: '请填写合同模板名称',
           },
         ]}
-      ></ProFormText>
+       />
       {/* <ProFormTextArea label="模板字段" name="parameter"></ProFormTextArea> */}
-      <ProFormTextArea label="注释" name="description"></ProFormTextArea>
+      <ProFormTextArea label="注释" name="description" />
       <ProForm.Group>
         <ProFormUploadDragger
           width={630}

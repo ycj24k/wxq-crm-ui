@@ -2,7 +2,8 @@
  * 优化的表格组件 - 包含虚拟滚动、缓存等优化
  */
 import React, { useMemo, useCallback, memo } from 'react';
-import ProTable, { ProTableProps } from '@ant-design/pro-table';
+import type { ProTableProps } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { useRequest } from '@/hooks';
 import VirtualTable from '../VirtualTable';
 

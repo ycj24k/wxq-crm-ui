@@ -112,7 +112,7 @@ if (history.location.pathname !== loginPath && !history.location.pathname.starts
 
 const jurisdiction = (url: string, userUrl: [] = []) => {
   if (url == loginPath || url.startsWith('/public')) return;
-  let arr: any[] = [];
+  const arr: any[] = [];
 
   const treeList = (arrList: []) => {
     if (!arrList) history.push(loginPath);

@@ -434,23 +434,18 @@
   },
   {
     name: '个人中心',
-    path: '/users/usercenter',
-    component: './UserCenter',
+    path: '/users',
+    redirect: '/users/usercenter',
   },
   {
     name: '个人中心',
-    path: '/users',
-    redirect: '/users/usercenter',
+    path: '/users/usercenter',
+    component: './UserCenter',
   },
   {
     name: '待办计划',
     path: '/users/todolist',
     component: './TodoList',
-  },
-  {
-    name: '待办计划',
-    path: '/users',
-    redirect: '/users/todolist',
   },
   {
     name: '部门看板',

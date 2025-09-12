@@ -4,7 +4,7 @@ import Contract from '@/pages/Admins/Contract/Contract';
 export default () => {
   return (
     <PageContainer>
-      <Contract admin={false}></Contract>
+      <Contract admin={false} />
     </PageContainer>
   );
 };

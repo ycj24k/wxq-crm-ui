@@ -1,6 +1,7 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
-  ProFormInstance,
   ProFormList,
   ProFormSelect,
   ProFormText,
@@ -142,7 +143,7 @@ export default (props: any) => {
           beforeRemoveRow: async (params_0: number | number[], params_1: number) => {
             return new Promise((resolve) => {
               if (renderData.parameter.length >= params_0 && renderData.parameter != false) {
-                let a = renderData.parameter.splice(params_0, 1);
+                const a = renderData.parameter.splice(params_0, 1);
                 request.delete('/sms/contract/conParameter', { id: a[0].id }).then((res: any) => {
                   if (res.status == 'success') {
                     message.success('删除成功');

@@ -1,7 +1,8 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useModel } from 'umi';
 import { Button, Col, Form, Input, message, Row, Space, Spin } from 'antd';
-import { ProFormGroup, ProFormInstance, ProFormList, ProFormTreeSelect } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ProFormGroup, ProFormList, ProFormTreeSelect } from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormText,
@@ -21,10 +22,10 @@ import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import Modal from 'antd/lib/modal/Modal';
 import ClassList from '@/pages/Business/ClassList';
 
-let content: any = null;
+const content: any = null;
 let quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 let comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-let JobClassExamA: any[] = [];
+const JobClassExamA: any[] = [];
 export default (props: any, childRef: any) => {
   const {
     modalVisible,
@@ -61,7 +62,7 @@ export default (props: any, childRef: any) => {
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [companyStudent, setCompanyStudent] = useState<any>([]);
   const [comNumber, setComNumber] = useState<any>([0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
   });
@@ -96,8 +97,8 @@ export default (props: any, childRef: any) => {
     ment();
   }, [department]);
   useEffect(() => {
-    let numberQ = eval(quantitys.join('+'));
-    let numberS = eval(discountOrder.join('+'));
+    const numberQ = eval(quantitys.join('+'));
+    const numberS = eval(discountOrder.join('+'));
     let numberQ2 = 0;
     quantitys.forEach((item: any, index: number) => {
       numberQ2 = numberQ2 + item * comNumbers[index];
@@ -112,7 +113,7 @@ export default (props: any, childRef: any) => {
     if (renderData.type == 'order' && renderData.orderNumber === 0) {
       // renderData.provider = renderData.provider + ''
       ++renderData.orderNumber;
-      let list: any = [];
+      const list: any = [];
       // request
       //   .get('/sms/business/bizOrder', {
       //     id: renderData.id,
@@ -163,7 +164,7 @@ export default (props: any, childRef: any) => {
       // });
     }
     if (renderData.typee == 'add' && renderData.orderNumber === 0) {
-      let source = renderData.studentSource + '';
+      const source = renderData.studentSource + '';
       //正式默认复购
       // if (renderData.isFormal) source = '9';
       ++renderData.orderNumber;
@@ -207,7 +208,7 @@ export default (props: any, childRef: any) => {
   const getDepartment = async () => {
     // const list = (await request.get('/sms/share/getDepartmentAndUser')).data;
     const listFn = (data: any) => {
-      let arr2: any = [];
+      const arr2: any = [];
       data.forEach((item: any, index: number) => {
         let arr3: any = [];
         if (item.children) {
@@ -215,7 +216,7 @@ export default (props: any, childRef: any) => {
         }
         let str = '';
         let add = false;
-        let obj: any = {};
+        const obj: any = {};
         if (item.departmentName) {
           str = item.departmentName;
           obj.id = item.id;
@@ -263,7 +264,7 @@ export default (props: any, childRef: any) => {
     return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   };
   function projectClassExamListFn(data: any) {
-    let arr: { label: string; value: any }[] = [];
+    const arr: { label: string; value: any }[] = [];
     data.forEach((item: any) => {
       arr.push({
         label:
@@ -305,7 +306,7 @@ export default (props: any, childRef: any) => {
     } else {
       arr[index] = null;
     }
-    let standardsLsit = formRef?.current?.getFieldValue('standards')
+    const standardsLsit = formRef?.current?.getFieldValue('standards')
       ? formRef?.current?.getFieldValue('standards')
       : [];
 
@@ -328,10 +329,10 @@ export default (props: any, childRef: any) => {
     }, 100);
   }
   const submitAddNew = (value: any) => {
-    const standards = value.standards;
+    const {standards} = value;
     // const providerId = value.provider
     standards.forEach((item: any) => {
-      let obj = JSON.parse(item.JobClassExam);
+      const obj = JSON.parse(item.JobClassExam);
       item.studentUserId = renderData.id;
       item.classId = value.classId
       Object.keys(obj).forEach((key) => {
@@ -367,13 +368,13 @@ export default (props: any, childRef: any) => {
       value.studentUserId = renderData.id;
       delete value.id;
     }
-    let array: any = {};
+    const array: any = {};
     const JobClassExam = JSON.parse(value.JobClassExam);
     Object.keys(JobClassExam).forEach((key) => {
       array[key] = JobClassExam[key];
     });
     //收费人id
-    let params: {
+    const params: {
       userId?: number;
       id?: number;
       quantity?: number;
@@ -424,7 +425,7 @@ export default (props: any, childRef: any) => {
   };
   const submitEidt = (value: any) => {
     // console.log(JSON.stringify(value))
-    const standards = value.standards;
+    const {standards} = value;
     // value = { ...value, ...value.standards[0] };
     value = { ...value, ...standards[0], ...JSON.parse(standards[0].JobClassExam) };
     value.id = renderData.id;
@@ -654,7 +655,7 @@ export default (props: any, childRef: any) => {
                   marginBottom: 8,
                 }}
               >
-                <ProFormGroup key={index}>
+                <ProFormGroup key={`company-order-${index}`}>
                   <ProForm.Group>
                     <ProFormCascader
                       width="sm"
@@ -721,7 +722,7 @@ export default (props: any, childRef: any) => {
                           name="quantity"
                           width="sm"
                           label="报名人数"
-                          key={index}
+                          key={`company-order-student-count-${index}`}
                           disabled={renderData.type == 0}
                           fieldProps={{
                             onChange: (e: any) => {
@@ -895,7 +896,7 @@ export default (props: any, childRef: any) => {
               </ProCard>
             );
           }}
-        ></ProFormList>
+         />
         <ProForm.Group>
           <ProFormTextArea width={1000} label="备注" name="description" />
         </ProForm.Group>
@@ -918,7 +919,7 @@ export default (props: any, childRef: any) => {
             renderData={{ type: 'order' }}
             companyStudent={companyStudent}
             setStudentId={(e: any) => {
-              let arr = Array.isArray(e) ? e : [e];
+              const arr = Array.isArray(e) ? e : [e];
 
               setCompanyStudent([...companyStudent, ...arr]);
             }}

@@ -33,7 +33,8 @@ import AddQuestion from '@/pages/Business/Question/projectAdd';
 import './index.less';
 import filter from '@/services/util/filter';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProForm, { ProFormDatePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormDatePicker } from '@ant-design/pro-form';
 type GithubIssueItem = {
   studentName: string;
   studentParentName: string;
@@ -120,7 +121,7 @@ export default (props: any) => {
   const [examinationId, setExaminationId] = useState<any>('')
   const [TabListNuber, setTabListNuber] = useState<any>(0);
   const certForm = useRef<ProFormInstance>();
-  let param: any = {
+  const param: any = {
     studentType: TabListNuber,
     enable: true
   };
@@ -143,7 +144,7 @@ export default (props: any) => {
     console.log('examinationId', examinationId);
   }, [examinationId])
   const examination = (boolean: boolean, selectedIds: any = false) => {
-    let data: { id: any; isConfirmExam: boolean; }[] = []
+    const data: { id: any; isConfirmExam: boolean; }[] = []
     const dataId = selectedIds ? selectedIds : examinationId
     if (dataId.length > 0) {
       dataId.forEach((item: any) => {
@@ -172,8 +173,8 @@ export default (props: any) => {
       message.error('暂无报名资料数据')
     } else {
       setQrcodeVisible(true);
-      let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-      let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+      const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+      const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
       const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + data.id + '&' + tokenName + '=' + tokenValue;
       setQrcodeSrc(src)
     }
@@ -324,7 +325,7 @@ export default (props: any) => {
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
                 <a
-                  key={index}
+                  key={`project-link-${item}-${index}`}
                   onClick={() => {
                     setRenderData({
                       parentProject: Dictionaries.getCascaderAllName(
@@ -591,7 +592,7 @@ export default (props: any) => {
       dataIndex: 'createTime',
       valueType: 'dateRange',
       render: (text, record) => (
-        <span key="createTime">{record.createTime}</span>
+        <span key={`createTime-${record.id}`}>{record.createTime}</span>
       ),
       // sorter: true,
       // hideInSearch: true,
@@ -864,19 +865,19 @@ export default (props: any) => {
     });
   };
   const donwLoad = (url: string) => {
-    let tokenName: any = sessionStorage.getItem('tokenName');
-    let tokenValue = sessionStorage.getItem('tokenValue');
-    let obj = {};
+    const tokenName: any = sessionStorage.getItem('tokenName');
+    const tokenValue = sessionStorage.getItem('tokenValue');
+    const obj = {};
     obj[tokenName] = tokenValue;
     fetch(url, {
       method: 'POST',
       headers: { ...obj },
     }).then((res: any) => {
       res.blob().then((ress: any) => {
-        let blobUrl = window.URL.createObjectURL(ress);
+        const blobUrl = window.URL.createObjectURL(ress);
         const a = document.createElement('a'); //获取a标签元素
         document.body.appendChild(a);
-        let filename = '附件'; //设置文件名称
+        const filename = '附件'; //设置文件名称
         a.href = blobUrl; //设置a标签路径
         a.download = filename;
         a.target = '_blank';
@@ -886,11 +887,11 @@ export default (props: any) => {
       });
     });
   };
-  let sortList = {
+  const sortList = {
     ['createTime,status']: 'desc,desc',
   };
 
-  let toolbar = {
+  const toolbar = {
     menu: {
       type: 'tab',
       items: [
@@ -981,7 +982,7 @@ export default (props: any) => {
     <PageContainer
       onTabChange={(e) => {
         setTabListNuber(e);
-        let data = Params
+        const data = Params
         data.studentType = e
         setParams(data)
         callbackRef();

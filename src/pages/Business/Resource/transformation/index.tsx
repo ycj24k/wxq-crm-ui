@@ -1,6 +1,6 @@
 import { PageContainer } from '@ant-design/pro-layout';
 import ProCard from '@ant-design/pro-card';
-import { ProColumns } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { Pie } from '@ant-design/plots';
 import { Button, DatePicker } from 'antd';
@@ -89,9 +89,9 @@ export default (props: any) => {
       })
       .then((res) => {
         // 处理响应数据
-        let pieData = Object.keys(res.data).map(key => ({ [key]: res.data[key] }))
+        const pieData = Object.keys(res.data).map(key => ({ [key]: res.data[key] }))
         console.log(pieData, 'pieData====>')
-        let data = []
+        const data = []
         pieData.forEach((item: any) => {
           data.push({
             type: Dictionaries.getCascaderAllName('dict_reg_job', Object.keys(item)),

@@ -293,7 +293,7 @@ export default (props: any) => {
             )
         }
     ];
-    let sortList: any = {
+    const sortList: any = {
         ['receiveNum,circulationTime']: 'asc,desc',
     };
     //   let tabs = [];
@@ -389,7 +389,7 @@ export default (props: any) => {
                     }}
                     toolBarRender={[
                         <Button
-                            key="buttonq"
+                            key="add-sales-lead"
                             icon={<PlusOutlined />}
                             type="primary"
                             onClick={() => {
@@ -406,7 +406,7 @@ export default (props: any) => {
                         </Button>,
 
                         <Button
-                            key="button"
+                            key="button-sales-lead"
                             hidden={TabListNuber == '2' || hidden}
                             icon={<PlusOutlined />}
                             type="primary"

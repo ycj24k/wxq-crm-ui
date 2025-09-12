@@ -1,7 +1,8 @@
 /**
  * 错误边界组件 - 捕获子组件的错误并显示友好的错误界面
  */
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
+import React, { Component } from 'react';
 import { Result, Button } from 'antd';
 
 interface Props {

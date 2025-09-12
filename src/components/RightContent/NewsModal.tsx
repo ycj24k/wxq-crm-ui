@@ -44,7 +44,7 @@ export default (props: any) => {
           return (
             <div
               style={{ display: 'flex', justifyContent: 'space-between', padding: '0 20px' }}
-              key={index}
+              key={`news-modal-${index}`}
             >
               <p>
                 <a

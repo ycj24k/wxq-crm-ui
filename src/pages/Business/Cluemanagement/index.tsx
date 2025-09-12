@@ -155,7 +155,7 @@ export default () => {
             dataIndex: 'createTime',
             valueType: 'dateRange',
             sorter: true,
-            render: (text: any, record: any) => <span>{record.createTime}</span>
+            render: (text: any, record: any) => <span key={`createTime-${record.id}`}>{record.createTime}</span>
         },
         {
             title: '操作',
@@ -253,7 +253,7 @@ export default () => {
                 }}
                 toolBarRender={() => [
                     <Button
-                        key="button"
+                        key="button-bind-sales"
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => {
@@ -264,7 +264,7 @@ export default () => {
                         添加拓展信息
                     </Button>,
                     <Button
-                        key="button"
+                        key="button-bind-media"
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => {

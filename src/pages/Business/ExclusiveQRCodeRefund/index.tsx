@@ -1,22 +1,23 @@
 import Tables from "@/components/Tables"
 import Dictionaries from "@/services/util/dictionaries"
-import { ProColumns } from "@ant-design/pro-table"
+import type { ProColumns } from "@ant-design/pro-table"
 import { Button, Tag, message } from "antd"
 import { useState, useRef } from "react"
 import request from '@/services/ant-design-pro/apiRequest';
 import './index.less'
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import {
     ModalForm,
-    ProFormInstance,
     ProFormUploadDragger
 } from '@ant-design/pro-form';
 
 export default (props: any) => {
     const { getAll = false, type = 0 } = props
 
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let obj: { [key: string]: string } = {};
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const obj: Record<string, string> = {};
     if (tokenValue !== null) {
         obj[tokenName] = tokenValue;
     } else {
@@ -141,13 +142,13 @@ export default (props: any) => {
             formRef={formRef}
             onFinish={async (values) => {
                 if (values.filess) {
-                    let arr: any[] = [];
+                    const arr: any[] = [];
                     values.filess.forEach((item: any) => {
                         arr.push(item.response.data);
                     });
                     delete values.filess;
                     values.files = arr.join(',');
-                    let res = await request.post(`/sms/business/bizChargeLog/refund/${refundId}?file=${values.files}`)
+                    const res = await request.post(`/sms/business/bizChargeLog/refund/${refundId}?file=${values.files}`)
                     if (res.status == 'success') {
                         message.success(res.msg)
                         actionRef.current.reload();

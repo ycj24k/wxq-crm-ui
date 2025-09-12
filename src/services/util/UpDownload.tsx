@@ -1,6 +1,6 @@
-let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-let obj = {};
+const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+const obj = {};
 obj[tokenName] = tokenValue;
 
 const UpDownload = async (url: string, id: number, str: string, upDownType: string = 'look') => {
@@ -33,16 +33,16 @@ const UpDownload = async (url: string, id: number, str: string, upDownType: stri
           // }
           // console.log(URL.createObjectURL(blob))
           if (str.indexOf('.pdf') >= 0) resolve(URL.createObjectURL(ress))
-          let reader = new FileReader();
+          const reader = new FileReader();
           reader.readAsDataURL(ress);
           reader.onload = (e) => {
             resolve(e.target?.result);
           };
         } else {
-          let blobUrl = window.URL.createObjectURL(ress);
+          const blobUrl = window.URL.createObjectURL(ress);
           const a = document.createElement('a'); //获取a标签元素
           document.body.appendChild(a);
-          let filename = upDownType; //设置文件名称
+          const filename = upDownType; //设置文件名称
           a.href = blobUrl; //设置a标签路径
           a.download = filename;
           a.target = '_blank';

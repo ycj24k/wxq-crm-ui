@@ -30,7 +30,7 @@ export default (props: any) => {
     useEffect(() => {
         const arr = localStorage.getItem('dictionariesList')
         const newArr = JSON.parse(arr as string)
-        let arr2 = newArr[42].children.map((item: any) => {
+        const arr2 = newArr[42].children.map((item: any) => {
             return {
                 label: item.name,
                 value: item.code

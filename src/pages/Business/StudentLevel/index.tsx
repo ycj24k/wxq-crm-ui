@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import { Button, Modal, Form, Select, Input, InputNumber, Space, message, Popconfirm, Tag } from 'antd';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import { getCompanyRequest } from '@/services/util/util';

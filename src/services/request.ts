@@ -5,7 +5,7 @@ import { request } from 'umi';
 import { message } from 'antd';
 import { history } from 'umi';
 import { STORAGE_KEYS, API_STATUS, ROUTES } from '@/constants';
-import { ApiResponse, PageParams } from '@/types';
+import type { ApiResponse, PageParams } from '@/types';
 import moment, { isMoment } from 'moment';
 
 class HttpRequest {

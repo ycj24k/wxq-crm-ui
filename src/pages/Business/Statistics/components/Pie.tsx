@@ -73,7 +73,7 @@ export default (props: any) => {
             {todayContent.map((item: any, index: number) => {
               return (
                 <li
-                  key={index}
+                  key={`pie-chart-${index}`}
                   onClick={() => {
                     history.push(
                       '/business/statistics/performance?userId=' +

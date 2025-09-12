@@ -1,5 +1,5 @@
 import Tables from "@/components/Tables"
-import { ProColumns } from "@ant-design/pro-table";
+import type { ProColumns } from "@ant-design/pro-table";
 import { Modal } from "antd"
 import moment from 'moment';
 import Dictionaries from '@/services/util/dictionaries';
@@ -81,7 +81,7 @@ export default (props: any) => {
                     {record.project &&
                         [...new Set(record.project.split(','))].map((item: any, index: number) => {
                             return (
-                                <span key={index}>
+                                <span key={`project-${item}-${index}`}>
                                     {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                                 </span>
                             );
@@ -145,10 +145,10 @@ export default (props: any) => {
             ),
         },
     ]
-    let sortList: any = {
+    const sortList: any = {
         ['num,updateTime']: 'desc,desc',
     };
-    let params = chargeType == 'refundList' ? { enable: true, 'type-in': '1,3', auditType: 4, confirm: true } : { enable: true, confirm: true, 'type-in': '0,2' }
+    const params = chargeType == 'refundList' ? { enable: true, 'type-in': '1,3', auditType: 4, confirm: true } : { enable: true, confirm: true, 'type-in': '0,2' }
     return (
 
         <Modal

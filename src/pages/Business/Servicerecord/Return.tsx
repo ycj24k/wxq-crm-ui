@@ -8,7 +8,8 @@ import ImgUrl from '@/services/util/ImgUrl';
 import Dictionaries from '@/services/util/dictionaries';
 import Tables from '@/components/Tables';
 import StudentInfo from '../SignUpStudent/SignUpData';
-import ProForm, { ModalForm, ProFormDatePicker, ProFormDateTimePicker, ProFormInstance, ProFormRadio, ProFormTextArea } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormDatePicker, ProFormDateTimePicker, ProFormRadio, ProFormTextArea } from '@ant-design/pro-form';
 import moment from 'moment';
 
 type GithubIssueItem = {
@@ -102,7 +103,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -172,7 +173,7 @@ export default (props: any) => {
       ),
     },
   ];
-  let sortList = {
+  const sortList = {
     ['createTime']: 'desc',
   };
 
@@ -189,7 +190,7 @@ export default (props: any) => {
           search={orderId ? false : true}
           toolBarRender={[
             <Button
-              key="button"
+              key="button-service-record"
               icon={<PlusOutlined />}
               type="primary"
               hidden={!orderId}

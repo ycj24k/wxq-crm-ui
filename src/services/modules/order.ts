@@ -2,7 +2,7 @@
  * 订单管理相关API
  */
 import request from '@/services/ant-design-pro/apiRequest';
-import { Order, PageResponse, ApiResponse } from '@/types';
+import type { Order, PageResponse, ApiResponse } from '@/types';
 
 export const orderAPI = {
   /**

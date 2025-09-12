@@ -1,5 +1,6 @@
 import apiRequest from "@/services/ant-design-pro/apiRequest";
-import { ModalForm, ProFormInstance, ProFormText, ProFormTextArea, ProFormSelect, ProFormDigit } from "@ant-design/pro-form"
+import type { ProFormInstance} from "@ant-design/pro-form";
+import { ModalForm, ProFormText, ProFormTextArea, ProFormSelect, ProFormDigit } from "@ant-design/pro-form"
 import { message } from "antd";
 import { useEffect, useRef, useState } from "react";
 
@@ -11,7 +12,7 @@ export default (props: any) => {
     //编辑回显数据
     useEffect(() => {
         if (renderData.type == 'eidt') {
-            let formData = { ...renderData.record }
+            const formData = { ...renderData.record }
             formRef.current?.setFieldsValue(formData)
         }
     }, [renderData])
@@ -24,7 +25,7 @@ export default (props: any) => {
         const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
             _isGetAll: true,
         });
-        let targetID = contentList.data[0].id
+        const targetID = contentList.data[0].id
         const targetData = contentList.data.find((item: any) => item.parentId === targetID)
         const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID && item.parentId != -1) : [];
         const data = result.map((item: any) => {

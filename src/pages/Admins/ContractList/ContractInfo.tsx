@@ -62,7 +62,7 @@ export default (props: any) => {
           </Tag>
         </Descriptions.Item>
       </Descriptions>
-      <iframe src={renderData.viewUrl} style={{ width: '100%', height: '600px' }}></iframe>
+      <iframe src={renderData.viewUrl} style={{ width: '100%', height: '600px' }} />
     </Drawer>
   );
 };

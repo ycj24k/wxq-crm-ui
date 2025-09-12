@@ -5,7 +5,7 @@ import Invoice from './Invoice';
 export default () => {
   return (
     <PageContainer>
-      <Invoice></Invoice>
+      <Invoice />
     </PageContainer>
   );
 };

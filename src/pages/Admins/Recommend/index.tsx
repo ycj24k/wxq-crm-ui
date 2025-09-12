@@ -4,7 +4,7 @@ import Recommend from './Recommend';
 export default () => {
   return (
     <PageContainer>
-      <Recommend></Recommend>
+      <Recommend />
     </PageContainer>
   );
 };

@@ -3,7 +3,7 @@ import { Modal, Tree, Input, TreeDataNode } from 'antd';
 import { useState, useEffect } from 'react';
 const { Search } = Input;
 import request from '@/services/ant-design-pro/apiRequest';
-let CheckedKeys: any = [];
+const CheckedKeys: any = [];
 export default (props: any) => {
   const { setParentIdTree, setParentIdFalg, callbackRef, type } = props;
   // const [treeData, setTreeData] = useState([]);
@@ -43,9 +43,9 @@ export default (props: any) => {
   // };
   
   //递归过滤掉 isDel < 0 的节点
-  const filterDeletedNodes = (data:any) => {
-    return data.filter((item:any) => item.isDel >= 0) // 保留 isDel >= 0 的节点
-      .map((item:any) => {
+  const filterDeletedNodes = (data: any) => {
+    return data.filter((item: any) => item.isDel >= 0) // 保留 isDel >= 0 的节点
+      .map((item: any) => {
         // 如果有子节点，递归处理子节点
         if (item.children && item.children.length) {
           return {
@@ -57,8 +57,8 @@ export default (props: any) => {
       });
   }
 
-  const convertToTreeData = (data:any) => {
-    return data.map((item:any) => ({
+  const convertToTreeData = (data: any) => {
+    return data.map((item: any) => ({
       key: String(item.id), // 确保 key 是字符串
       title: item.name,     // AntD Tree 使用 title
       ...item,              // 保留其他字段

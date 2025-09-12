@@ -1,6 +1,7 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Button, Col, Descriptions, message, Modal, Row, Select, Space, Upload } from 'antd';
-import { ProFormDatePicker, ProFormInstance, ProFormList } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ProFormDatePicker, ProFormList } from '@ant-design/pro-form';
 import ProForm, {
   ProFormText,
   ProFormTextArea,
@@ -71,13 +72,13 @@ export default (props: any, orderRef: any) => {
   const projectName = ['成考', '国家开放大学	'];
   const [fromDataUp, setFromDataUp] = useState<any>(false);
   const userRef: any = useRef(null);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
   });
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const orderTitle = renderData.type == 'orders' ? '退费' : '收费';
   const ment = () => {
@@ -94,7 +95,7 @@ export default (props: any, orderRef: any) => {
       return;
     if (amountOrder == 0) return;
     if (renderData.studentType == 0) {
-      let amount = `1*${amountOrder}`;
+      const amount = `1*${amountOrder}`;
       let amountLeft = '';
       if (ChargeList.length == 0) {
         if (renderData.arrears - amountOrder - discountOrder <= 0) {
@@ -113,12 +114,12 @@ export default (props: any, orderRef: any) => {
         description: amountLeft + ' ' + amount,
       });
     } else {
-      let quantity = renderData.quantity;
-      let amounts = amountOrder - discountOrder;
+      const {quantity} = renderData;
+      const amounts = amountOrder - discountOrder;
       let amountLeft = '';
 
       if (judgeDivisor(amountOrder, quantity)) {
-        let amount = `${quantity} * ${amountOrder / quantity}`;
+        const amount = `${quantity} * ${amountOrder / quantity}`;
         if (ChargeList.length == 0) {
           if (renderData.arrears - amountOrder - discountOrder <= 0) {
             amountLeft = '全款';
@@ -147,9 +148,9 @@ export default (props: any, orderRef: any) => {
   useEffect(() => {
     if (!chargeInfo) return;
     setTimeout(() => {
-      let Data = chargeInfo;
-      let fapiaos = [];
-      let arr: { uid: number; name: any; response: { data: any } }[] = [];
+      const Data = chargeInfo;
+      const fapiaos = [];
+      const arr: { uid: number; name: any; response: { data: any } }[] = [];
       if (chargeInfo.files) {
         chargeInfo.files.split(',').forEach((item: any, index: number) => {
           arr.push({
@@ -218,7 +219,7 @@ export default (props: any, orderRef: any) => {
     if (!fromDataUp) return;
     if (!fromDataUp.chargeTime) return;
     const method = getCorporateName(fromDataUp.corporateName);
-    let chargeTime = fromDataUp.chargeTime.substring(0, 10);
+    const chargeTime = fromDataUp.chargeTime.substring(0, 10);
     let paymentTime =
       fromDataUp.chargeTime.substring(0, 10) + ' ' + fromDataUp.chargeTime.substring(10);
     if (fromDataUp.amount) {
@@ -301,7 +302,7 @@ export default (props: any, orderRef: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`charge-order-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -337,7 +338,7 @@ export default (props: any, orderRef: any) => {
       chargeTime: moment().format('YYYY-MM-DD'),
     });
     if (renderData.type == 'orders') {
-      let data: { parentId?: string; id?: string } = {};
+      const data: { parentId?: string; id?: string } = {};
       renderData.studentType == 1 ? (data.parentId = renderData.id) : (data.id = renderData.id);
       request.get('/sms/business/bizOrder/registration', data).then((res) => {
         setservedOrderTable(res.data.content);
@@ -346,7 +347,7 @@ export default (props: any, orderRef: any) => {
   }, []);
   if (renderData.type == 'eidt') {
     setTimeout(() => {
-      let Data = renderData;
+      const Data = renderData;
       delete Data.files;
       // delete renderData.files;
       formRef?.current?.setFieldsValue({
@@ -365,7 +366,7 @@ export default (props: any, orderRef: any) => {
     if (!fapiaoFalg) delete value.fapiao;
     let arrData = '';
     if (value.files) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -761,7 +762,7 @@ export default (props: any, orderRef: any) => {
                         width="md"
                         fieldProps={{
                           onChange: (e) => {
-                            let falgs = e == 0 ? false : true;
+                            const falgs = e == 0 ? false : true;
                             setinvoiceFalg(falgs);
                           },
                         }}
@@ -782,7 +783,7 @@ export default (props: any, orderRef: any) => {
                   </ProCard>
                 );
               }}
-            ></ProFormList>
+             />
           </div>
           <ProForm.Group title="税票信息">
             <Row

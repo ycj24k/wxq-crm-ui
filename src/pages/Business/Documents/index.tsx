@@ -1,7 +1,7 @@
 import Tables from '@/components/Tables';
 import { PlusOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, message, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
 import Modal from './Modal';
@@ -45,7 +45,7 @@ export default () => {
           size="small"
           onClick={() => {
             record.files.split(',').forEach((item, index) => {
-              let fileName = record.name + item.slice(item.indexOf('.'));
+              const fileName = record.name + item.slice(item.indexOf('.'));
               ImgUrl('/sms/business/bizFile/download', record.id, item, fileName);
             });
           }}
@@ -103,7 +103,7 @@ export default () => {
       新增下载文件
     </Button>,
   ];
-  let sortList: any = {
+  const sortList: any = {
     updateTime: 'desc',
   };
   return (

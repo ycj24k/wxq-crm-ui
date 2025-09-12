@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -111,7 +111,7 @@ export default (props: any) => {
       dataIndex: 'createTime',
       valueType: 'dateRange',
       sorter: true,
-      render: (text, record) => <span>{record.createTime}</span>,
+      render: (text, record) => <span key={`createTime-${record.id}`}>{record.createTime}</span>,
     },
     {
       title: '要求付款时间',
@@ -119,7 +119,7 @@ export default (props: any) => {
       dataIndex: 'paymentTime',
       valueType: 'dateRange',
       sorter: true,
-      render: (text, record) => <span>{record.paymentTime}</span>,
+      render: (text, record) => <span key={`paymentTime-${record.id}`}>{record.paymentTime}</span>,
     },
     {
       width: 100,
@@ -127,7 +127,7 @@ export default (props: any) => {
       dataIndex: 'hasInvoice',
       search: false,
       sorter: true,
-      render: (text, record) => <span>{record.hasInvoice ? '有发票' : '无发票'}</span>,
+      render: (text, record) => <span key={`hasInvoice-${record.id}`}>{record.hasInvoice ? '有发票' : '无发票'}</span>,
     },
     {
       title: '备注',
@@ -174,9 +174,9 @@ export default (props: any) => {
       search: false,
       width: 180,
       render: (text, record) => [
-        <Tooltip placement="topLeft" key="eidts" title={'查看'}>
+        <Tooltip placement="topLeft" key="eidts-view" title={'查看'}>
           <Button
-            key="eidt"
+            key="eidt-payment-audit"
             type="primary"
             size="small"
             icon={<SearchOutlined />}
@@ -189,9 +189,9 @@ export default (props: any) => {
             查看
           </Button>
         </Tooltip>,
-        <Tooltip placement="topLeft" key="eidts" title={'重新提交'}>
+        <Tooltip placement="topLeft" key="eidts-resubmit" title={'重新提交'}>
           <Button
-            key="eidt"
+            key="eidt-payment-audit-resubmit"
             type="primary"
             size="small"
             hidden={record.isSubmit}
@@ -211,11 +211,11 @@ export default (props: any) => {
             重新提交
           </Button>
         </Tooltip>,
-        <Tooltip placement="topLeft" title={'审核'} key="looks">
+        <Tooltip placement="topLeft" title={'审核'} key="looks-audit">
           <Popconfirm
             title="审核"
             okText="通过"
-            key="look"
+            key="look-payment-audit"
             cancelText="未通过"
             onConfirm={(e) => {
               // callbackRef();
@@ -239,7 +239,7 @@ export default (props: any) => {
           >
             <Button
               type="primary"
-              key="audit"
+              key="audit-payment-audit"
               size="small"
               hidden={!record.isSubmit}
               icon={<FileDoneOutlined />}
@@ -251,7 +251,7 @@ export default (props: any) => {
         </Tooltip>,
         <Tooltip placement="topLeft" title={'编辑'} key="editables">
           <Button
-            key="editable"
+            key="editable-payment-audit"
             type="primary"
             size="small"
             icon={<EditOutlined />}
@@ -269,7 +269,7 @@ export default (props: any) => {
           <Popconfirm
             title="是否废除"
             okText="废除"
-            key="enable"
+            key="enable-payment-audit"
             cancelText="取消"
             onConfirm={(e) => {
               request.post('/sms/business/bizPaymentApply/disable/' + record.id).then((res) => {
@@ -281,7 +281,7 @@ export default (props: any) => {
             }}
           >
             <Button
-              key="enable"
+              key="enable-payment-audit-btn"
               type="primary"
               size="small"
               danger
@@ -293,10 +293,10 @@ export default (props: any) => {
             </Button>
           </Popconfirm>
         </Tooltip>,
-        <Tooltip placement="topLeft" key="dapchu" title={'导出付费信息'}>
+        <Tooltip placement="topLeft" key="dapchu-payment-audit" title={'导出付费信息'}>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-payment-audit-btn"
             hidden={Params.auditNum != '8'}
             size="small"
             style={{ marginRight: '10px', marginBottom: '8px' }}
@@ -308,7 +308,7 @@ export default (props: any) => {
             导出付费信息
           </Button>
         </Tooltip>,
-        <Tooltip placement="topLeft" key="dayin" title={'打印'}>
+        <Tooltip placement="topLeft" key="dayin-print" title={'打印'}>
           <Button
             type="primary"
             key="打印"
@@ -317,9 +317,9 @@ export default (props: any) => {
             style={{ marginRight: '10px', marginBottom: '8px' }}
             icon={<DownloadOutlined />}
             onClick={() => {
-              let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-              let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-              let headers = {}
+              const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+              const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+              const headers = {}
               headers[tokenName] = tokenValue;
               fetch('/sms/business/bizPaymentApply/export/2?id=' + record.id, {
                 method: 'GET',
@@ -364,8 +364,8 @@ export default (props: any) => {
     //   totalFields: 'amount',
     // });
   }, []);
-  let params: any = Params;
-  let sortList = {
+  const params: any = Params;
+  const sortList = {
     ['num,updateTime']: 'desc,desc',
   };
   // params['auditNum-isNull'] = true;

@@ -7,7 +7,7 @@ import Dictionaries from '@/services/util/dictionaries';
 import React from 'react';
 import { getInfo, getSession } from './util';
 
-var number = 0;
+let number = 0;
 const loginPath = '/user/login';
 class Socket {
   sockets: any;
@@ -22,9 +22,9 @@ class Socket {
 
   open(token = undefined) {
     clearTimeout();
-    let tokenValue = token ? token : sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const tokenValue = token ? token : sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
     // if (!tokenValue) return;
-    var socket: any;
+    let socket: any;
     if (typeof WebSocket == 'undefined') {
 
       message.error('您的浏览器不支持WebSocket');

@@ -43,7 +43,7 @@ export default () => {
                 </ProForm>
             </ProCard>
             {
-                searchData.studentName == '财务查询' ? <span></span> : <Order admin={true} searchFalg={searchData} type='all' />
+                searchData.studentName == '财务查询' ? <span /> : <Order admin={true} searchFalg={searchData} type='all' />
             }
 
         </PageContainer>

@@ -1,3 +1,5 @@
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import {
     ProForm,
     ProFormGroup,
@@ -6,7 +8,6 @@ import {
     ProFormCascader,
     ProFormDigit,
     ProFormText,
-    ProFormInstance,
     ProFormTreeSelect,
     ProFormTextArea
 } from '@ant-design/pro-form';
@@ -16,9 +17,9 @@ import request from '@/services/ant-design-pro/apiRequest';
 import React, { forwardRef, useImperativeHandle, useEffect, useRef, useState } from 'react';
 import { Button, message } from 'antd';
 
-let JobClassExamA: any[] = [];
-let quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-let comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+const JobClassExamA: any[] = [];
+const quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+const comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 
 interface ClassListMethods {
@@ -116,7 +117,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             handleChangeProject([renderData.project], 0);
         }
 
-        let list: any = [];
+        const list: any = [];
         const orderList = [renderData];
         setOrderList(orderList);
 
@@ -126,7 +127,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             }
             quantitys[index] = item.quantity || 1;
             comNumbers[index] = item.receivable || 0;
-            let scoreName = Dictionaries.getName('dict_source', item.studentSource)
+            const scoreName = Dictionaries.getName('dict_source', item.studentSource)
             list.push({
                 project: item.project ? Dictionaries.getCascaderValue('dict_reg_job', item.project) : [],
                 quantity: item.quantity || 1,
@@ -219,7 +220,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     }
 
     function projectClassExamListFn(data: any) {
-        let arr: { label: string; value: any }[] = [];
+        const arr: { label: string; value: any }[] = [];
         data.forEach((item: any) => {
             arr.push({
                 label:
@@ -243,7 +244,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     //获取部门
     const getDepartment = async () => {
         const listFn = (data: any) => {
-            let arr2: any = [];
+            const arr2: any = [];
             data.forEach((item: any, index: number) => {
                 let arr3: any = [];
                 if (item.children) {
@@ -251,7 +252,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 }
                 let str = '';
                 let add = false;
-                let obj: any = {};
+                const obj: any = {};
                 if (item.departmentName) {
                     str = item.departmentName;
                     obj.id = item.id;
@@ -426,7 +427,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             }}
                         >
 
-                            <ProFormGroup key={index}>
+                            <ProFormGroup key={`charge-log-class-${index}`}>
                                 <ProForm.Group>
                                     {/* 报考岗位下拉框，无条件渲染 */}
                                     <ProFormCascader
@@ -624,9 +625,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                         </ProCard>
                     );
                 }}
-            >
-
-            </ProFormList>
+             />
             <ProFormTextArea
                 width={1100}
                 label={'备注'}

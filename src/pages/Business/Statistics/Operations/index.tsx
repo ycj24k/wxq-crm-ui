@@ -3,12 +3,13 @@ import { PageContainer } from '@ant-design/pro-layout';
 import UserManageCard from '@/pages/Admins/Department/UserManageCard';
 import { useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
-import ProForm, { ProFormDateRangePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import { useModel, history } from 'umi';
 import moment from 'moment';
 import { message, Table } from 'antd';
 import Tables from '@/components/Tables';
-import { ProColumns } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import DownTable from '@/services/util/timeFn';
 import DownHeader from './DownHeader';
@@ -39,13 +40,13 @@ export default () => {
     }, [userId]);
 
     const getXinmeiTi = (arr: any[], value: any) => {
-        for (let item of arr) {
+        for (const item of arr) {
             if (item.departmentName == value) {
                 console.log('item.departmentName', item.departmentName, value);
                 return item;
             }
             if (item.children) {
-                let data: any = getXinmeiTi(item.children, value);
+                const data: any = getXinmeiTi(item.children, value);
                 if (data) {
                     return data;
                 }
@@ -258,7 +259,7 @@ export default () => {
             message.error('请先左侧勾选招生老师')
             return
         }
-        let data = {
+        const data = {
             parentId: -1,
             enable: true,
             //  'provider-in': userId.join(','), 
@@ -272,7 +273,7 @@ export default () => {
         } else if (type == 1) {
             data['userId-in'] = userId.join(',')
         }
-        const content = (await request.get('/sms/business/bizOrder', data)).data.content
+        const {content} = (await request.get('/sms/business/bizOrder', data)).data
 
         DownTable(content, DownHeader, '订单信息', 'charge')
     }
@@ -281,7 +282,7 @@ export default () => {
             message.error('请先左侧勾选招生老师')
             return
         }
-        let data = {
+        const data = {
             enable: true,
             //  'provider-in': userId.join(','), 
             'chargeTime-start': perTime[0],

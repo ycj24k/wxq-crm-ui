@@ -1,8 +1,9 @@
-import ProTable, { ActionType, ListToolBarProps, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ListToolBarProps} from '@ant-design/pro-table';
+import ProTable, { ProColumns } from '@ant-design/pro-table';
 import requests from '@/services/ant-design-pro/apiRequest';
-import { FormInstance, TablePaginationConfig } from 'antd';
-import { ExpandableConfig, GetRowKey, TableRowSelection } from 'antd/lib/table/interface';
-import { AlertRenderType } from '@ant-design/pro-table/lib/components/Alert';
+import type { FormInstance, TablePaginationConfig } from 'antd';
+import type { ExpandableConfig, GetRowKey, TableRowSelection } from 'antd/lib/table/interface';
+import type { AlertRenderType } from '@ant-design/pro-table/lib/components/Alert';
 import { SearchConfig } from '@ant-design/pro-form/lib/components/Submitter';
 import { useState } from 'react';
 import './index.less';
@@ -138,7 +139,7 @@ export default (props: propsType) => {
             _direction: '',
           };
         }
-        let searchParams = params;
+        const searchParams = params;
         Object.keys(searchParams).forEach((key) => {
           if (searchParams[key] === '') {
             delete searchParams[key];

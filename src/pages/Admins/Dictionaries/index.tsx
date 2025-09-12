@@ -45,7 +45,7 @@ export default () => {
     }, 100);
   };
   const deleteContent = async (id: number | string) => {
-    let msg: any = await request.delete('/sms/system/sysDict', { id: id });
+    const msg: any = await request.delete('/sms/system/sysDict', { id: id });
     if (msg.status == 'success') {
       message.success('删除成功');
       callbackRef();
@@ -229,7 +229,7 @@ export default () => {
       parentId: '-1',
       _isGetAll: true,
     });
-    let arr: any = [];
+    const arr: any = [];
     contentList.data.content.forEach((item: any) => {
       arr.push({ title: item.name, key: item.id });
     });
@@ -262,11 +262,11 @@ export default () => {
         resolve();
         return;
       }
-      let arr = key.toString().split('-');
-      let id = arr[arr.length - 1];
+      const arr = key.toString().split('-');
+      const id = arr[arr.length - 1];
       request.get('/sms/system/sysDict', { parentId: id }).then((res: any) => {
         if (res.data.content.length > 0) {
-          let arr: any = [];
+          const arr: any = [];
           res.data.content.forEach((item: any) => {
             arr.push({ title: item.name, key: `${key}-${item.id}` });
           });
@@ -308,8 +308,8 @@ export default () => {
             height={600}
             onSelect={(selectedKeys, e) => {
               if (!selectedKeys[0]) return;
-              let arr = selectedKeys[0].toString().split('-');
-              let id = arr[arr.length - 1];
+              const arr = selectedKeys[0].toString().split('-');
+              const id = arr[arr.length - 1];
               setParentIdTree(id);
               setParentIdFalg(false);
               setTitleName(e.node.title);
@@ -417,7 +417,7 @@ export default () => {
                 icon={<RedoOutlined />}
                 onClick={async () => {
                   setLoadingBtn(true);
-                  let msg: any = await request.post('/sms/system/sysDict/reload');
+                  const msg: any = await request.post('/sms/system/sysDict/reload');
                   if (msg.status == 'success') {
                     message.success('操作成功');
                     setLoadingBtn(false);

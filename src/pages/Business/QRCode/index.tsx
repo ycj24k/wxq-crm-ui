@@ -1,8 +1,9 @@
 import ProCard from '@ant-design/pro-card';
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormCascader,
-  ProFormInstance,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
@@ -14,7 +15,7 @@ import { Button, message } from 'antd';
 import { useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
 import Tables from '@/components/Tables';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import moment from 'moment';
 import ImgUrl from '@/services/util/ImgUrl';
 import { PlusOutlined } from '@ant-design/icons';
@@ -40,7 +41,7 @@ export default () => {
       value.isInWhiteList = false;
     }
 
-    let data: any = {
+    const data: any = {
       p: value.projectId[value.projectId.length - 1],
     };
     data.t = CodeType
@@ -92,7 +93,7 @@ export default () => {
           size="small"
           onClick={() => {
             record.files.split(',').forEach((item, index) => {
-              let fileName = record.name + item.slice(item.indexOf('.'));
+              const fileName = record.name + item.slice(item.indexOf('.'));
               ImgUrl('/sms/business/bizFile/download', record.id, item, fileName);
             });
           }}
@@ -102,7 +103,7 @@ export default () => {
       ],
     },
   ];
-  let sortList: any = {
+  const sortList: any = {
     updateTime: 'desc',
   };
   const toolBarRender = [
@@ -151,7 +152,7 @@ export default () => {
 
   }
   function projectClassExamListFn(data: any) {
-    let arr: { label: string; value: any }[] = [];
+    const arr: { label: string; value: any }[] = [];
     data.forEach((item: any) => {
       arr.push({
         label:

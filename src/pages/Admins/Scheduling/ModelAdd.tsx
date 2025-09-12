@@ -1,8 +1,9 @@
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ModalForm,
     ProFormDateTimePicker,
     ProFormGroup,
-    ProFormInstance,
     ProFormList,
     ProFormSwitch,
     ProFormText,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Tables from "@/components/Tables"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import Dictionaries from '@/services/util/dictionaries';
 import { Badge, Button, message, Popconfirm, Space, Table, Tag } from "antd";
 import HasInvoiceInfo from "@/pages/Admins/AdminCharge/HasInvoiceInfo";
@@ -14,7 +14,8 @@ import DownHeader from "./DownHeader";
 import DownTable from '@/services/util/timeFn';
 import DownFn from "./DownFn";
 import chargeDownload from '@/services/util/chargeDownload'
-import { ModalForm, ProFormInstance, ProFormUploadDragger } from "@ant-design/pro-form";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import { ModalForm, ProFormUploadDragger } from "@ant-design/pro-form";
 import * as XLSX from 'XLSX';
 import { biuldDataFromExcelJson, deleteUndefined } from "@/services/util/util";
 export default (props: any) => {
@@ -37,7 +38,7 @@ export default (props: any) => {
     useEffect(() => {
         if (chargeId) {
             const data = JSON.parse(JSON.stringify(params))
-            let chargeIds = chargeId.id
+            const chargeIds = chargeId.id
             // // chargeId.forEach((item: { id: any; }) => {
             // //     ids.push(item.id)
             // // })
@@ -134,8 +135,8 @@ export default (props: any) => {
                 const result = localStorage.getItem('dictionariesList')
                 let newCharge = []
                 if(result){
-                    let newResult = JSON.parse(result)[13].children
-                    let chargeTypeNames = newResult.map((item:any)=>{
+                    const newResult = JSON.parse(result)[13].children
+                    const chargeTypeNames = newResult.map((item: any)=>{
                         return {
                             value: item.value,
                             name: item.name
@@ -417,7 +418,7 @@ export default (props: any) => {
             loading={exportLoading}
             onClick={(e) => {
                 setExportLoading(true)
-                let param = formRef.current?.getFieldsValue();
+                const param = formRef.current?.getFieldsValue();
                 Object.keys(param).forEach(key => {
                     if (!param[key]) delete param[key]
                 })
@@ -439,10 +440,10 @@ export default (props: any) => {
             条件导出
         </Button>,
     ];
-    let sortList: any = {
+    const sortList: any = {
         ['createTime']: 'desc'
     };
-    let toolbar = {
+    const toolbar = {
         menu: {
             type: 'tab',
             items: inWin ? [{
@@ -500,10 +501,10 @@ export default (props: any) => {
     }
     const chargeInvoiceDown = (data: any) => {
         let arr: any = []
-        let idList: any = []
+        const idList: any = []
         data.forEach((item: any) => {
             if (item.chargeNum) {
-                let idArr = item.chargeIds.split()
+                const idArr = item.chargeIds.split()
                 idArr.forEach((itemArr) => {
                     if (itemArr != ',') {
                         idList.push(itemArr)
@@ -528,7 +529,7 @@ export default (props: any) => {
         chargeDownload(idList.join(','), arr)
 
     }
-    const invoiceDown = (data: Array<any>) => {
+    const invoiceDown = (data: any[]) => {
         if (!data || data.length == 0) {
             message.error('未选择数据！')
             return
@@ -699,7 +700,7 @@ export default (props: any) => {
                         beforeUpload: (file: any, fileList: any[]) => {
                             const reader = new FileReader();
                             reader.onload = (e: any) => {
-                                let dataResult = e.target.result;
+                                const dataResult = e.target.result;
                                 const workbook = XLSX.read(dataResult, { type: 'binary' });
                                 // 假设我们的数据在第一个标签
                                 const firstWorksheet = workbook.Sheets[workbook.SheetNames[0]];

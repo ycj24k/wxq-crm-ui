@@ -152,7 +152,7 @@ export default () => {
   };
   const deleteContent = async (id: number | string) => {
     console.log(id,'iid')
-    let msg: any = await request.delete('/sms/system/sysRoleMenu', { id: id });
+    const msg: any = await request.delete('/sms/system/sysRoleMenu', { id: id });
     if (msg.status == 'success') {
       message.success('删除成功');
       callbackRef();

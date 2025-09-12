@@ -31,7 +31,7 @@ export default (props: any) => {
     const getList = async () => {
         const data = (await request.get('/sms/business/bizAuthorityLog', { ...renderData, _isGetAll: true })).data.content
 
-        let configData = data.reduce((acc: { [x: string]: number; }, obj: { creator: string | number; }) => {
+        const configData = data.reduce((acc: Record<string, number>, obj: { creator: string | number; }) => {
             acc[obj.creator] = acc[obj.creator] ? acc[obj.creator] + 1 : 1;
             return acc;
         }, {});

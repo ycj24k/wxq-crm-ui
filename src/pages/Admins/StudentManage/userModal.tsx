@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Image, Upload, Modal, Input } from 'antd';
 const { TextArea } = Input;
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import {
   ProFormCascader,
   ProFormDatePicker,
-  ProFormInstance,
   ProFormUploadDragger,
   ProFormRadio,
 } from '@ant-design/pro-form';
@@ -27,12 +28,12 @@ import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import ModbileListOrder from './ModbileListOrder';
 import { Typography } from 'antd';
 const { confirm } = Modal;
-let content: any = null;
+const content: any = null;
 export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [company, setCompany] = useState('学员姓名');
   const { modalVisible, setModalVisible, callbackRef, url, type, sourceType, isShowMedium } = props;
-  let { renderData } = props;
+  const { renderData } = props;
   console.log(renderData.from, 'isShowMedium')
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [Student, setStudentId] = useState<any>(null);
@@ -43,7 +44,7 @@ export default (props: any) => {
   const [CardVisible, setCardVisible] = useState<boolean>(false);
   const [ModbileListVisible, setModbileListVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
-  let [department, setDepartment] = useState<any>({});
+  const [department, setDepartment] = useState<any>({});
   const [intention, setIntention] = useState<'normal' | 'hight' | ''>('');
 
   const userRef: any = useRef(null);
@@ -106,7 +107,7 @@ export default (props: any) => {
         console.log(renderData.project, 'renderData.project')
         console.log(Dictionaries.getCascaderName('dict_reg_job', renderData.project))
         let data = {}
-        let datas = {
+        const datas = {
           id: renderData.userId,
           name: renderData.userName
         }
@@ -174,7 +175,7 @@ export default (props: any) => {
     const contentList: any = await request.get('/sms/share/getDepartment', {
       _isGetAll: true,
     });
-    let targetID = contentList.data[0].id
+    const targetID = contentList.data[0].id
     const targetData = contentList.data.find((item: any) => item.parentId === targetID)
     const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID || item.parentId === -1) : [];
     console.log(contentList.data, '=====>contentList.data')
@@ -253,19 +254,19 @@ export default (props: any) => {
     });
 
     if (sourceType == 1) {
-      let data = renderData.newMedia ? [value] : value
+      const data = renderData.newMedia ? [value] : value
       request.post2('/sms/business/bizStudent/addCirculationRepository', { departmentId }, [data])
       message.success('操作成功');
       setModalVisible();
       callbackRef();
       return
     } else {
-      let url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
-      let data = renderData.newMedia ? [value] : value
+      const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
+      const data = renderData.newMedia ? [value] : value
       const callBackFn = (res) => {
         if (res.status == 'success') {
           if (renderData.typee == 'eidt') {
-            let dataValue: any = {
+            const dataValue: any = {
               id: renderData.id,
               project: value.project,
               studentSource: value.source,
@@ -313,7 +314,7 @@ export default (props: any) => {
 
   //处理输入的文本信息
   const handleChangeText = () => {
-    let text = textContent;
+    const text = textContent;
     return text.trim().split('\n').reduce((acc: any, line) => {
       // 使用正则匹配键值对（兼容中文冒号"："和英文冒号":"）
       const match = line.match(/^([^:：]+)[:：](.+)$/);
@@ -404,9 +405,9 @@ export default (props: any) => {
   }
 
   function onChange(value: any, selectedOptions: any) { }
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj: any = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj: any = {};
   obj[tokenName] = tokenValue;
   return (
     <ModalForm<{
@@ -738,7 +739,7 @@ export default (props: any) => {
       <UserTreeSelect
         ref={userRef2}
         userLabel={'信息所有人'}
-        filter={(e: Array<any>) => {
+        filter={(e: any[]) => {
           e.unshift({
             title: '无',
             userId: -1,

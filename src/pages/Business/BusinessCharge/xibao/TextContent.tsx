@@ -3,7 +3,7 @@ import { Button, message, Modal, Popconfirm, Switch } from 'antd';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Tables from '@/components/Tables';
 import request from '@/services/ant-design-pro/apiRequest';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import Dictionaries from '@/services/util/dictionaries';
 import AddTextConten from './addText';

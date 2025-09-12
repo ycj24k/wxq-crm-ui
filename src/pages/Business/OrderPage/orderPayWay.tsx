@@ -1,8 +1,9 @@
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ProFormText,
     ProFormDateTimePicker,
     ProFormSelect,
-    ProFormInstance,
     ProFormDigit,
     ProFormTextArea,
     ProFormMoney,
@@ -28,10 +29,10 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
     const { renderData, payMessage, totalReceivable } = props;
     console.log(totalReceivable, 'totalReceivable')
     const [payWayList, setPayWayList] = useState<number[]>([0]); // 用于管理多个支付方式表单
-    const formRefs = useRef<{ [key: number]: ProFormInstance }>({});
+    const formRefs = useRef<Record<number, ProFormInstance>>({});
 
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
-    const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+    const [chargeLog, setChargeLog] = useState<any[] | null>();
 
     const { initialState } = useModel('@@initialState');
     useImperativeHandle(ref, () => ({
@@ -137,11 +138,11 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
 
     const userRefs: any = useRef({});
     //显示收款记录
-    const [userNameIds, setUserNameIds] = useState<{ [key: number]: any }>({});
+    const [userNameIds, setUserNameIds] = useState<Record<number, any>>({});
     const [chargeType, setChargeType] = useState<string>('6');
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let obj: { [key: string]: string } = {};
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const obj: Record<string, string> = {};
     if (tokenValue !== null) {
         obj[tokenName] = tokenValue;
     } else {
@@ -271,7 +272,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                     marginBlockEnd: 8,
                     margin: '0 auto',
                     position: 'relative', marginBottom: index !== payWayList[payWayList.length - 1] ? 16 : 0
-                }} key={index} >
+                }} key={`payway-${index}`} >
                 {/* {payWayList.length > 1 && (
                         <Button
                             type="link"

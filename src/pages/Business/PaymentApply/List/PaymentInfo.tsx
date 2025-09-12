@@ -153,7 +153,7 @@ export default (props: any) => {
               };
             }}
             pagination={false}
-          ></ProTable>
+           />
         </Descriptions.Item>
       </Descriptions>
       <div style={{ display: 'none' }}>

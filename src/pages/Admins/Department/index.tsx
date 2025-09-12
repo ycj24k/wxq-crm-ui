@@ -54,7 +54,7 @@ export default () => {
     }, 100);
   };
   const deleteContent = async (id: number | string) => {
-    let msg: any = await request.delete('/sms/system/sysDepartment', { id: id });
+    const msg: any = await request.delete('/sms/system/sysDepartment', { id: id });
     if (msg.status == 'success') {
       message.success('删除成功');
       callbackRef();

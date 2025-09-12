@@ -137,7 +137,7 @@ export default (props: any) => {
             dataIndex: 'providerName',
         }
     ];
-    let params: any = {
+    const params: any = {
         isPay: true,
         isFormal: true,
         'userId-isNull': false,
@@ -148,7 +148,7 @@ export default (props: any) => {
         _size: 10
     };
 
-    let sortList: any = {};
+    const sortList: any = {};
     Object.assign(params, paramsA);
     return (
         <>
@@ -169,7 +169,7 @@ export default (props: any) => {
                 toolbar={toolbar}
                 toolBarRender={[
                     <Button
-                        key="ordere"
+                        key="add-formal-student"
                         type="primary"
                         icon={<PlusOutlined />}
                         onClick={() => {

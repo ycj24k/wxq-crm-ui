@@ -13,7 +13,7 @@ import Dictionaries from '@/services/util/dictionaries';
 import Tables from '@/components/Tables';
 import filter from '@/services/util/filter';
 import AddModals from './projectAdd'
-import { ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
 type GithubIssueItem = {
   name: string;
   days: number;
@@ -48,7 +48,7 @@ export default (props: any) => {
   }, [type]);
 
   useEffect(() => {
-    setColumns([...columns.filter((item:any) => item.dataIndex != 'productId'),{
+    setColumns([...columns.filter((item: any) => item.dataIndex != 'productId'),{
       title: '题库/课程',
       dataIndex: 'productId',
       key: 'productId',
@@ -109,10 +109,10 @@ export default (props: any) => {
   }, [productType]);
   useEffect(() => {
     (async function init() {
-      let SmallProgram = (await getSmallProgram())
-      let Subjectlist = (await getSubjectlist())
-      let Questionlist = (await getQuestionBankList())
-      let Course = (await getCourselist())
+      const SmallProgram = (await getSmallProgram())
+      const Subjectlist = (await getSubjectlist())
+      const Questionlist = (await getQuestionBankList())
+      const Course = (await getCourselist())
 
       setColumns([
         {
@@ -286,7 +286,7 @@ export default (props: any) => {
   const getSmallProgram = async () => {
     const res = await requestApi.get('/sms/business/bizQuestionAccredit/getAgentList');
     if (res && res.data) {
-      let newArr = res.data.map((item: any) => {
+      const newArr = res.data.map((item: any) => {
         return {
           ...item,
           label: item.name,
@@ -303,7 +303,7 @@ export default (props: any) => {
     const res = await requestApi.get('/sms/business/bizQuestionAccredit/getCourseSubjectList/0/0');
     console.log(res,'科目------>科目')
     if (res && res.data) {
-      let newArr1 = res.data.map((item: any) => {
+      const newArr1 = res.data.map((item: any) => {
         return {
           ...item,
           label: item.subjectName,
@@ -319,7 +319,7 @@ export default (props: any) => {
   const getQuestionBankList = async () => {
     const res = await requestApi.get('/sms/business/bizQuestionAccredit/getSubjectTreeList/0')
     if (res && res.data) {
-      let newArr1 = Dictionaries.addLabelToChildren(res.data);
+      const newArr1 = Dictionaries.addLabelToChildren(res.data);
       setQuestionList(newArr1)
       return newArr1;
     }
@@ -329,7 +329,7 @@ export default (props: any) => {
   const getCourselist = async () => {
     const res = await requestApi.get('/sms/business/bizQuestionAccredit/getCourseList/0');
     if (res && res.data) {
-      let newArr1 = res.data.map((item: any) => {
+      const newArr1 = res.data.map((item: any) => {
         return {
           ...item,
           label: item.title,
@@ -388,7 +388,7 @@ export default (props: any) => {
         // }}
         toolBarRender={[
           <Button
-            key="buttonq"
+            key="add-question"
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => {

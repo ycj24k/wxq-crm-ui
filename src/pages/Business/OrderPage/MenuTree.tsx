@@ -46,7 +46,7 @@ export default (props: any) => {
   useEffect(() => {
     const dictionariesList = localStorage.getItem('dictionariesList');
     if (dictionariesList) {
-      let dictionariesArray = JSON.parse(dictionariesList)[1].children
+      const dictionariesArray = JSON.parse(dictionariesList)[1].children
       const formattedData = convertToTreeData(dictionariesArray)
       console.log(formattedData, 'handleOpenProject()')
       setTreeData(formattedData);
@@ -58,7 +58,7 @@ export default (props: any) => {
     if (awaylsUseProject) {
       const dictionariesList = localStorage.getItem('dictionariesList');
       if (dictionariesList) {
-        let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        const dictionariesArray = JSON.parse(dictionariesList)[1].children
         const result = Dictionaries.findDataByValues(awaylsUseProject, dictionariesArray);
         if (result) {
           const newResult = [result]
@@ -73,7 +73,7 @@ export default (props: any) => {
     } else {
       const dictionariesList = localStorage.getItem('dictionariesList');
       if (dictionariesList) {
-        let dictionariesArray = JSON.parse(dictionariesList)[1].children
+        const dictionariesArray = JSON.parse(dictionariesList)[1].children
         const formattedData = convertToTreeData(dictionariesArray)
         setTreeData(formattedData);
         setFilteredTreeData(formattedData);

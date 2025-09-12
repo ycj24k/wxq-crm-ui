@@ -4,7 +4,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import { useState } from 'react';
 import './index.less';
 import sokect from '../../services/util/websocket';
-const menu = <Menu></Menu>;
+const menu = <Menu />;
 
 export default () => {
   const [menus, setMenus] = useState(menu);
@@ -90,7 +90,7 @@ export default () => {
               setvisible(!visible);
             }}
             // style={{ position: 'absolute', top: '700px', right: '-20px' }}
-          ></Button>
+           />
         </Dropdown>
       </Badge>
       <Modal
@@ -109,7 +109,7 @@ export default () => {
           onChange={(e) => {
             contents = e.target.value;
           }}
-        ></Input>
+         />
       </Modal>
     </div>
   );

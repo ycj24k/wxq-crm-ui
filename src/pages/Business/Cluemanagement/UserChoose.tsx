@@ -42,7 +42,7 @@ export default (props: any) => {
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const listFn = (data: any) => {
-        let arr2: any = [];
+        const arr2: any = [];
         data.forEach((item: any, index: number) => {
             if ((item.enable || value) || item.departmentName) {
                 let arr3: any = [];
@@ -165,7 +165,7 @@ export default (props: any) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [UserChooseVisible]);
     const getParentKey = (title: any, tree: any[]): [] => {
-        let parentKey = []
+        const parentKey = []
         for (let i = 0; i < tree.length; i++) {
             const node = tree[i];
             if (node.children) {
@@ -255,7 +255,7 @@ export default (props: any) => {
                         defaultCheckedKeys={CheckedKeys}
                         onCheck={(checkedKeysValue, e) => {
                             const arr = e.checkedNodes
-                            let idsList: any = []
+                            const idsList: any = []
                             arr.forEach((item: any) => {
                                 if (item.userId) {
                                     idsList.push(item.userId)

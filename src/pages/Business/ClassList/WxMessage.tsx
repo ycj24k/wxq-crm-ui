@@ -44,14 +44,14 @@ export default (props: any) => {
         错误信息: 'errcode'
     }
     const checkMobileById = async () => {
-        let url = renderData.messageType == 'class' ? '/sms/business/bizClass/checkMobileById' : '/sms/business/bizOrder/checkMobileById'
-        let data = { idList: renderData.id }
+        const url = renderData.messageType == 'class' ? '/sms/business/bizClass/checkMobileById' : '/sms/business/bizOrder/checkMobileById'
+        const data = { idList: renderData.id }
         const dataDataSour = await request.get(url, data)
         setdataSourceNull(dataDataSour.data)
     }
     const submitok = async (values: valueType) => {
         setspinning(true)
-        let requestData: any = {
+        const requestData: any = {
             idList: renderData.id,
             templateId: values.templateId,
             page: values.page,
@@ -65,7 +65,7 @@ export default (props: any) => {
         } else {
             url = '/sms/business/bizOrder/sendMessageById'
         }
-        let data = {}
+        const data = {}
         const templateData = values.templateParam[0]
         Object.keys(templateData).forEach((key) => {
             data[key] = { "value": templateData[key] }
@@ -74,8 +74,8 @@ export default (props: any) => {
         console.log('requestData', requestData);
 
         const resData = (await request.post(url, requestData)).data
-        let okArr: any = []
-        let errArr: any = []
+        const okArr: any = []
+        const errArr: any = []
         resData.forEach((item: { errmsg: string; name: any; mobile: any; errcode: string | number; }) => {
             if (item.errmsg == 'ok') {
                 okArr.push({
@@ -100,7 +100,7 @@ export default (props: any) => {
     const onChange = (e: string) => {
         setTemplate(e)
         const data = JSON.parse(Dictionaries.getDescription('Wx_message', e))
-        let arr: any = []
+        const arr: any = []
         data.forEach((item: any) => {
             arr.push({ label: item.label, value: '', name: item.name })
         })
@@ -109,7 +109,7 @@ export default (props: any) => {
     }
     const onFormChange = (e: any) => {
         const formValue = formRef.current?.getFieldsValue().templateParam[0];
-        let data = JSON.parse(JSON.stringify(templateContentMessage));
+        const data = JSON.parse(JSON.stringify(templateContentMessage));
         Object.keys(formValue).forEach((key) => {
             data.forEach((item: any) => {
                 if (key == item.name && formValue[key]) {
@@ -168,7 +168,7 @@ export default (props: any) => {
                                                 </div>
                                                 <ProFormText
                                                     fieldProps={{ onChange: e => onFormChange(e) }}
-                                                    key={index}
+                                                    key={`wx-message-${index}`}
                                                     name={item.name}
                                                     label={item.label}
                                                     rules={[{ required: true, message: `请输入${item.label}` }]}
@@ -179,7 +179,7 @@ export default (props: any) => {
                                     })
                                 )
                             }}
-                        ></ProFormList>
+                         />
                     }
                     <ProFormSelect
                         label="小程序页面"
@@ -222,7 +222,7 @@ export default (props: any) => {
                             {
                                 templateContentMessage.map((item: any, index) => {
                                     return (
-                                        <div key={index}>
+                                        <div key={`wx-message-template-${index}`}>
                                             <span>{item.label}</span>{item.value}
                                         </div>
                                     )
@@ -239,7 +239,7 @@ export default (props: any) => {
                         </div>
                     </div>
                     <div className='send'>
-                        <Button loading={spinning} key="button" type="primary" onClick={() => {
+                        <Button loading={spinning} key="button-wx-message" type="primary" onClick={() => {
                             const sub = formRef.current
                             sub?.submit()
                         }}>发送</Button>

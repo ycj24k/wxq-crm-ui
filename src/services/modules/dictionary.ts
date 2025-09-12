@@ -2,7 +2,7 @@
  * 字典管理相关API
  */
 import request from '@/services/ant-design-pro/apiRequest';
-import { DictItem, Department, ApiResponse } from '@/types';
+import type { DictItem, Department, ApiResponse } from '@/types';
 import { STORAGE_KEYS } from '@/constants';
 
 export const dictionaryAPI = {

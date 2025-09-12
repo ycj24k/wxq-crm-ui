@@ -1,8 +1,8 @@
 import { message } from 'antd';
 
-let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-let obj = {};
+const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+const obj = {};
 obj[tokenName] = tokenValue;
 const fetchDownload = (
   url: string,
@@ -27,7 +27,7 @@ const fetchDownload = (
     res.blob().then((ress: any) => {
       let blob;
       blob = new Blob([ress], { type: 'text/piain' });
-      var reader: any = new FileReader();
+      const reader: any = new FileReader();
       reader.readAsText(blob, 'utf-8');
       reader.onload = function () {
         if (reader.result.indexOf('error') > 0) {
@@ -35,10 +35,10 @@ const fetchDownload = (
           message.error(err.msg);
           return;
         } else {
-          let blobUrl = window.URL.createObjectURL(ress);
+          const blobUrl = window.URL.createObjectURL(ress);
           const a = document.createElement('a'); //获取a标签元素
           document.body.appendChild(a);
-          let filename = '附件' + doc; //设置文件名称
+          const filename = '附件' + doc; //设置文件名称
           a.href = blobUrl; //设置a标签路径
           a.download = filename;
           a.target = '_blank';

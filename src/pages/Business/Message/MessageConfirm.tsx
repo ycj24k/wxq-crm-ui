@@ -1,6 +1,6 @@
 import Tables from "@/components/Tables";
 import DownTable from "@/services/util/timeFn";
-import { ProColumns } from "@ant-design/pro-table";
+import type { ProColumns } from "@ant-design/pro-table";
 import { Modal, Tag } from "antd"
 import moment from "moment";
 import request from '@/services/ant-design-pro/apiRequest';

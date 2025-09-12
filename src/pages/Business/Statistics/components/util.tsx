@@ -1,15 +1,15 @@
 import Dictionaries from '@/services/util/dictionaries';
 const contentData = (content: any) => {
-  let arr2: any = []; //
-  let arr3: any = { amount: 0, num: 0 }; //饼图业绩和人数
-  let arr4: any = []; //业绩排名
-  let arrProject: any = [];
+  const arr2: any = []; //
+  const arr3: any = { amount: 0, num: 0 }; //饼图业绩和人数
+  const arr4: any = []; //业绩排名
+  const arrProject: any = [];
   content.forEach((item: any) => {
     if (arrProject.indexOf(item.project) == '-1') {
       arrProject.push(item.project);
     }
-    let a = item.project ? item.project.split(',') : [''];
-    let dataItem = {
+    const a = item.project ? item.project.split(',') : [''];
+    const dataItem = {
       project: Dictionaries.getCascaderName('dict_reg_job', a[0]),
       amount: item.amount,
       num: item.quantity ? item.quantity : 1,
@@ -17,10 +17,10 @@ const contentData = (content: any) => {
       userId: item.userId,
     };
     if (arr2.length > 0) {
-      let filterValue = arr2.filter((v: any) => {
+      const filterValue = arr2.filter((v: any) => {
         return v.project == dataItem.project;
       });
-      let filterName = arr4.filter((v: any) => {
+      const filterName = arr4.filter((v: any) => {
         return v.name == dataItem.name;
       });
 

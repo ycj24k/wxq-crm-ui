@@ -3,7 +3,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import UserManageCard from '@/pages/Admins/Department/UserManageCard';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
-import ProForm, { ProFormDateRangePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import { useModel, history } from 'umi';
 import moment from 'moment';
 // import { Pie } from '@ant-design/plots';
@@ -138,7 +139,7 @@ export default (props: any) => {
               合计招生 {peopleNumber} 人,业绩金额 {projectAll.amount} 元。
             </div> */}
 
-            <Pies data={projectContent}></Pies>
+            <Pies data={projectContent} />
             <SourcePies ref={PieRef} orderContent={orderContent} />
             {/* <Pie data={orderContent} {...config} /> */}
             <div key="tablxe">

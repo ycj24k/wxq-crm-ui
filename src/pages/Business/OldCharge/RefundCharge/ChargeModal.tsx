@@ -1,9 +1,10 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormCascader,
   ProFormDatePicker,
   ProFormDigit,
-  ProFormInstance,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
@@ -43,7 +44,7 @@ export default forwardRef((props: any, ref) => {
           renderData[keys] = renderData[keys] + '';
         }
       });
-      let arr: { uid: number; name: any; response: { data: any } }[] = [];
+      const arr: { uid: number; name: any; response: { data: any } }[] = [];
       if (renderData.files) {
         renderData.files.split(',').forEach((item: any, index: number) => {
           arr.push({
@@ -85,7 +86,7 @@ export default forwardRef((props: any, ref) => {
       value.id = renderData.id;
     }
     if (value.files) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -106,7 +107,7 @@ export default forwardRef((props: any, ref) => {
     delete value.isCalculation;
     return new Promise(async (resolve) => {
       if (renderData.eidtType == 'eidt') {
-        let url =
+        const url =
           renderData.confirm !== false ? '/sms/business/bizCharge/edit' : '/sms/business/bizCharge';
         let eidts: any = {}
         if (renderData.confirm === false) {
@@ -117,7 +118,7 @@ export default forwardRef((props: any, ref) => {
 
         if (eidts.status != 'success') return;
         if (subType == 'audit') {
-          let auditNum = renderData.auditNum ? Number(renderData.auditNum) + 1 : 1;
+          const auditNum = renderData.auditNum ? Number(renderData.auditNum) + 1 : 1;
           const audits = await request.post(`/sms/business/bizAudit/audit/${auditNum}`, {
             confirm: true,
             entityId: renderData.id,

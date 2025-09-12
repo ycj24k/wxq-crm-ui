@@ -1,5 +1,6 @@
 import ProCard from "@ant-design/pro-card"
-import ProForm, { ProFormDatePicker, ProFormDateRangePicker, ProFormInstance } from "@ant-design/pro-form"
+import type { ProFormInstance } from "@ant-design/pro-form";
+import ProForm, { ProFormDatePicker, ProFormDateRangePicker } from "@ant-design/pro-form"
 import { PageContainer } from "@ant-design/pro-layout"
 import Dictionaries from '@/services/util/dictionaries';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -154,10 +155,10 @@ export default () => {
         }
         const create = (await request.get('/sms/system/sysInterview', date)).data.content
         let entry = 0
-        let entryPople: any[] = []
+        const entryPople: any[] = []
         let reserve = 0
         let adopt = 0
-        let arrNumber = JSON.parse(JSON.stringify(DepNumber))
+        const arrNumber = JSON.parse(JSON.stringify(DepNumber))
         create.forEach((item: { status: number; departmentId: number }) => {
             if (item.status == 2) {
                 reserve = reserve + 1

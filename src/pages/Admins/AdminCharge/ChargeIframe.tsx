@@ -10,7 +10,7 @@ export default (props: any) => {
       width={1200}
       onCancel={() => setPreviewVisible(false)}
     >
-      <iframe src={previewImage} style={{ width: '100%', height: '600px' }}></iframe>
+      <iframe src={previewImage} style={{ width: '100%', height: '600px' }} />
     </Modal>
   );
 };

@@ -27,7 +27,7 @@ export default (props: any) => {
                 {items?.map((item, index) => {
                   const { name, value, color } = item;
                   return (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+                    <div key={`transformation-line-${index}`} style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
                       <span style={{ 
                         display: 'inline-block',
                         width: '8px',

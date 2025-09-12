@@ -61,7 +61,7 @@ export default (props: any) => {
   //   },
   // ]
   // useEffect(() => {
-  let chargeTypeOptions = dictionaries.list.find(x => x.code == "chargeType").children.filter((x: any) => ['0', '4', '5', '6'].includes(x.value)).map((x: any) =>
+  const chargeTypeOptions = dictionaries.list.find(x => x.code == "chargeType").children.filter((x: any) => ['0', '4', '5', '6'].includes(x.value)).map((x: any) =>
   ({
     style: { margin: '20px 150px 0px', display: 'block' },
     label: <><b>{x.name}</b>{x.description && '：' + x.description}</>,
@@ -72,7 +72,7 @@ export default (props: any) => {
   // chargeTypeOptions[0].style = { margin: '50px 150px 0px' }
   console.log("chargeTypeOptions", dictionaries.list)
   console.log("chargeTypeOptions", chargeTypeOptions)
-  let steps = (renderData.type === 1
+  const steps = (renderData.type === 1
     ? [
       {
         title: '下单',
@@ -159,7 +159,7 @@ export default (props: any) => {
         fn();
       },
       onCancel() {
-        let url = `/business/businessorder?studentName=${renderData.name}&project=${data.project}&classType=${data.classType}&classYear=${data.classYear}&examType=${data.examType}`;
+        const url = `/business/businessorder?studentName=${renderData.name}&project=${data.project}&classType=${data.classType}&classYear=${data.classYear}&examType=${data.examType}`;
         history.push(url);
       },
       okText: '继续下单缴费',
@@ -173,13 +173,13 @@ export default (props: any) => {
       let values = childRef.current.formRefs.current.getFieldsValue();
 
 
-      const standards = values.standards;
+      const {standards} = values;
       // if (renderData.provider && !renderData.isFormal) {
       //   values.provider = renderData.provider
       // } else {
       //   values.provider = providerId
       // }
-      let falg: boolean[] = [];
+      const falg: boolean[] = [];
       await standards.forEach(
         async (item: { discount: number; discountRemark: string; provider: any }, index: number) => {
           if (item.provider)
@@ -230,7 +230,7 @@ export default (props: any) => {
         // setloging(false);
         return;
       }
-      let jobClassExam = JSON.parse(values.JobClassExam)
+      const jobClassExam = JSON.parse(values.JobClassExam)
       // if (!jobClassExam.examAmount) delete jobClassExam.examAmount
       setloging(true);
       const dataSearch = {
@@ -244,7 +244,7 @@ export default (props: any) => {
       const fn = () => {
         childRef.current.submitAddNew(values).then(async (res: any) => {
           if (res.status === 'success') {
-            let orderList = (
+            const orderList = (
               await request.get('/sms/business/bizOrder', { 'id-in': res.data.join(',') })
             ).data.content;
             orderList.forEach((item: any) => {
@@ -388,8 +388,8 @@ export default (props: any) => {
             apiRequest.get('/sms/business/bizCharge', { id: res.data[0] }).then(charge => {
               if (charge.status == 'success') {
                 setSubmit(false)
-                let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-                let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+                const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+                const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
                 setChargeInfo(<QrcodeInfo
                   src={'/sms/business/bizChargeQrcode/download?id=' + charge.data.content[0].chargeQrcodeId + '&fileName=' + charge.data.content[0].file + '&' + tokenName + '=' + tokenValue}
                   order={order}

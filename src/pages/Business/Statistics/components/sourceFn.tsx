@@ -51,7 +51,7 @@ const resultContent = (order: any) => {
 
 const userContent = (order: any) => {
     let num = 0
-    let departments2 = JSON.parse(localStorage.getItem('Department') as string)
+    const departments2 = JSON.parse(localStorage.getItem('Department') as string)
     let departments: { departmentName: string; }[] = []
     departments2?.forEach((item: any) => {
         if (item.departmentName == '汇德教育') {

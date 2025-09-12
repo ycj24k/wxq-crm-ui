@@ -3,7 +3,8 @@ import { PageContainer } from '@ant-design/pro-layout';
 import UserManageCard from '@/pages/Admins/Department/UserManageCard';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
-import ProForm, { ProFormDatePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormDatePicker } from '@ant-design/pro-form';
 import './index.less';
 import moment from 'moment';
 import { Column } from '@ant-design/plots';
@@ -25,8 +26,8 @@ export default () => {
   const [spinning, setSpinning] = useState<boolean>(false)
   const SourcePies = forwardRef(SourcePie)
   useEffect(() => {
-    let arr: any = [];
-    let arr2: any = [];
+    const arr: any = [];
+    const arr2: any = [];
     formRef.current?.setFieldsValue({
       createTime: perTime,
     });
@@ -57,7 +58,7 @@ export default () => {
     //   totalFields: 'amount',
     // })).data
 
-    let arrContent: any = [];
+    const arrContent: any = [];
     arrs.forEach((item: any, index: number) => {
       arrContent.push({ name: '缴费', '月份': `${index + 1}月`, '金额': item.amount, time: arr[index] });
     });
@@ -177,7 +178,7 @@ export default () => {
               <Column data={Performances} {...config} onReady={onReadyColumn} />
             </ProCard>
             {todayContent && (
-              <Pie data={projectContent} todayContent={todayContent} moon={moon}></Pie>
+              <Pie data={projectContent} todayContent={todayContent} moon={moon} />
             )}
             <SourcePies orderContent={orderContent} />
             <div className="statistics">

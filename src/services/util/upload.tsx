@@ -33,13 +33,13 @@ export default (props: any) => {
     return `${year}-${month}-${day} 00:00:00`;
   }
   const ExcelList = async (data: any, typeValue: boolean = true) => {
-    let heradKey: any = data[0];
+    const heradKey: any = data[0];
     // let heradKey: any = data[0].splice(0, data[0].indexOf('null'));
-    let array: any = [];
-    let array2: any = [];
+    const array: any = [];
+    const array2: any = [];
     // let postData: string[] = [];
     let flag = false
-    let TimeList = ['consultationTime', 'birthday', 'entryTime', 'formalTime', 'turnoverTime', 'examStartTime', 'examEndTime']
+    const TimeList = ['consultationTime', 'birthday', 'entryTime', 'formalTime', 'turnoverTime', 'examStartTime', 'examEndTime']
     // data[0].forEach((item: string) => {
     //   heradKey.push(item.slice(item.indexOf('.') + 1));
     // });
@@ -59,14 +59,14 @@ export default (props: any) => {
     data.forEach((item: any, index: number) => {
       if (index > 2) {
         if (item.length > 0) {
-          let obj: any = {};
-          let obj2 = {};
+          const obj: any = {};
+          const obj2 = {};
 
           item.forEach((items: string, indexs: number) => {
             let projects: any = [];
 
             if (indexs < heradKey.length) {
-              let str = heradKey[indexs];
+              const str = heradKey[indexs];
               //Excel为空判断,在进行字典匹配返回对应的值
               if ((items + '3').replace(/(^\s*)|(\s*$)/g, '') != '3') {
 
@@ -126,7 +126,7 @@ export default (props: any) => {
                   console.log('obj', obj);
 
                   if (arr.length == 1) {
-                    obj['provider'] = arr[0]
+                    obj.provider = arr[0]
                   } else if (arr.length == 0) {
                     message.error(`系统里没有老师${items}`)
                     flag = true
@@ -146,7 +146,7 @@ export default (props: any) => {
                   console.log('obj', obj);
 
                   if (arr.length == 1) {
-                    obj['owner'] = arr[0]
+                    obj.owner = arr[0]
                   } else if (arr.length == 0) {
                     message.error(`系统里没有老师${items}`)
                     flag = true
@@ -166,7 +166,7 @@ export default (props: any) => {
                 } else if (str == 'companyId' && type == 'studentOrder') {
                   obj[str] = items;
                 } else if (str == 'types' && type == 'student') {
-                  obj2['type'] = dictionaries.getValue('dict_c_type', items);
+                  obj2.type = dictionaries.getValue('dict_c_type', items);
                 } else if (str == 'intention') {
                   obj2[str] = dictionaries.getValue('dict_intention_level', items);
                 } else if (str == 'createBy' && upType == 'post2') {
@@ -213,7 +213,7 @@ export default (props: any) => {
         arrayData = { array: array };
       }
     }
-    let mobileList: any[] = []
+    const mobileList: any[] = []
     //信息提供人
     array.forEach((item: any) => {
       if (item.mobile) {
@@ -226,7 +226,7 @@ export default (props: any) => {
     if (type != 'classlist') {
       const MobileTrue = (await request.get('/sms/business/bizStudent/findOrderByMobile', { mobileList: mobileList.join(','), _isGetAll: true })).data
       if ((MobileTrue.order.length !== 0 || MobileTrue.visit.length !== 0) && typeValue) {
-        let values = array
+        const values = array
         setModileData(values)
         setModiledataSource(MobileTrue)
         setModbileListVisible(true)
@@ -349,18 +349,18 @@ export default (props: any) => {
     >
       <Spin spinning={SpingFalg}>
         <Space>
-          <a hidden={type == 'classlist'} download="新学员导入模板" href="./template/新学员导入模板.xlsx" key="ordera">
+          <a hidden={type == 'classlist'} download="新学员导入模板" href="./template/新学员导入模板.xlsx" key="download-student-template">
             下载导入学员模板
           </a>
-          <a hidden={type != 'classlist'} download="新建班级模板" href="./template/班级模板.xlsx" key="ordera">
+          <a hidden={type != 'classlist'} download="新建班级模板" href="./template/班级模板.xlsx" key="download-class-template">
             下载新建班级模板
           </a>
-          <a hidden={type != 'classlist'} download="批量加入班级模板" href="./template/批量修改班级.xlsx" key="ordera">
+          <a hidden={type != 'classlist'} download="批量加入班级模板" href="./template/批量修改班级.xlsx" key="download-batch-class-template">
             下载批量加入班级模板
           </a>
         </Space>
 
-        <div style={{ marginBottom: '5px' }}></div>
+        <div style={{ marginBottom: '5px' }} />
         <ProFormUploadDragger
           {...uploadprops}
         // fieldProps={{

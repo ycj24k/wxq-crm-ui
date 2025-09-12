@@ -19,10 +19,10 @@ export default (props: any) => {
   console.log('pp', props);
 
   const ExcelList = (data: any) => {
-    let heradKey: any = data[0];
+    const heradKey: any = data[0];
     // let heradKey: any = data[0].splice(0, data[0].indexOf('null'));
-    let array: any = [];
-    let array2: any = [];
+    const array: any = [];
+    const array2: any = [];
 
     // data[0].forEach((item: string) => {
     //   heradKey.push(item.slice(item.indexOf('.') + 1));
@@ -31,11 +31,11 @@ export default (props: any) => {
     data.forEach((item: any, index: number) => {
       if (index > 2) {
         if (item.length > 0) {
-          let obj = {};
-          let parentProject = '';
+          const obj = {};
+          const parentProject = '';
           item.forEach((items: string, indexs: number) => {
             if (indexs < heradKey.length) {
-              let str = heradKey[indexs];
+              const str = heradKey[indexs];
               //Excel为空判断,在进行字典匹配返回对应的值
               if ((items + '3').replace(/(^\s*)|(\s*$)/g, '') != '3') {
                 if (str == 'type' && type == 'student') {
@@ -135,7 +135,7 @@ export default (props: any) => {
       visible={modalVisible}
     >
       <Spin spinning={SpingFalg}>
-        <a download="收费标准导入模板" href="./template/收费标准导入模板.xlsx" key="ordera">
+        <a download="收费标准导入模板" href="./template/收费标准导入模板.xlsx" key="download-charge-template">
           下载导入模板
         </a>
         <ProFormUploadDragger

@@ -133,10 +133,10 @@ export default (props: any) => {
     SetSpingFalg(false);
   };
   useEffect(() => {
-    let arr: any = [];
-    let array: any = [];
-    let array2: any = [];
-    let params: any = {};
+    const arr: any = [];
+    const array: any = [];
+    const array2: any = [];
+    const params: any = {};
 
 
     if (Student) {
@@ -331,7 +331,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -411,7 +411,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -426,10 +426,10 @@ export default (props: any) => {
       search: false,
       sorter: true,
       render: (text, record) => {
-        let res = Dictionaries.getName('dict_class_type', record.classType)
+        const res = Dictionaries.getName('dict_class_type', record.classType)
         if (!res) return (
           <Button
-            key="editable"
+            key="editable-admin-order-1"
             type="primary"
             size="small"
             icon={<EditOutlined />}
@@ -522,14 +522,14 @@ export default (props: any) => {
                   showConfirm(
                     { title: '该订单尚有缴费未审核！', content: '点击确定继续缴费' },
                     () => {
-                      let orders: any = record;
+                      const orders: any = record;
                       orders.orderId = record.id;
                       setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
                       setSuppVisible(true);
                     },
                   );
                 } else {
-                  let orders: any = record;
+                  const orders: any = record;
                   orders.orderId = record.id;
                   setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
                   setSuppVisible(true);
@@ -555,14 +555,14 @@ export default (props: any) => {
                   showConfirm(
                     { title: '该订单尚有缴费未审核！', content: '点击确定继续缴费' },
                     () => {
-                      let orders: any = record;
+                      const orders: any = record;
                       orders.orderId = record.id;
                       setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
                       setChargeNewsVisibleFalg(true);
                     },
                   );
                 } else {
-                  let orders: any = record;
+                  const orders: any = record;
                   orders.orderId = record.id;
                   setRenderData({ list: [orders], type: 'charge', orderNumber: 0 });
                   setChargeNewsVisibleFalg(true);
@@ -574,7 +574,7 @@ export default (props: any) => {
           </Tooltip>
           <Tooltip placement="topLeft" title={'编辑订单'}>
             <Button
-              key="editable"
+              key="editable-admin-order-2"
               type="primary"
               size="small"
               hidden={showType == 'refund' || orderType == 'sp' || refund || suppOrder}
@@ -680,7 +680,7 @@ export default (props: any) => {
               size="small"
               type="primary"
               onClick={async () => {
-                let url = '/sms/business/bizOrder/saveStudentAndOrder';
+                const url = '/sms/business/bizOrder/saveStudentAndOrder';
                 setRenderData({ ...record, order: { ...record, parentId: record.id } });
                 setUrl(url + '?id=' + record.id);
                 setUploadVisible(true);
@@ -932,11 +932,11 @@ export default (props: any) => {
     type == 3
       ? { parentId: '-1', enable: false }
       : { parentId: '-1', ...studentTypes, enable: true };
-  let toolbar = undefined;
+  const toolbar = undefined;
   if (studentUserId) params.studentUserId = studentUserId;
 
   if (orderId) params['id-in'] = orderId;
-  let sortList = {
+  const sortList = {
     ['createTime,status']: 'desc,asc',
   };
   if (searchFalg) {
@@ -945,7 +945,7 @@ export default (props: any) => {
   // if (admins === 'admin') delete params.parentId;
   const getdataSource = async () => {
     if (admins) {
-      const data = (await request.get('/sms/business/bizOrder/lastDealOrder', { id: studentUserId })).data
+      const {data} = await request.get('/sms/business/bizOrder/lastDealOrder', { id: studentUserId })
       setDataSourceList([data])
     }
 
@@ -1019,7 +1019,7 @@ export default (props: any) => {
               //   学员下单
               // </Button>,
               <Button
-                key="ordere"
+                key="add-admin-order"
                 type="primary"
                 icon={<PlusOutlined />}
                 onClick={async () => {

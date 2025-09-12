@@ -1,6 +1,6 @@
 import Tables from "@/components/Tables"
 import { PageContainer } from "@ant-design/pro-layout"
-import { ProColumns } from "@ant-design/pro-table"
+import type { ProColumns } from "@ant-design/pro-table"
 import { Space } from "antd";
 import request from '@/services/ant-design-pro/apiRequest';
 import MessageConfirm from './MessageConfirm'
@@ -64,7 +64,7 @@ export default (props: any) => {
         }
 
     ]
-    let sortList = {
+    const sortList = {
         ['updateTime']: 'desc',
     };
     return (

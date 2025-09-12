@@ -38,7 +38,7 @@ export default (props: any) => {
     const getStudyPlan = async () => {
         const data = (await request.get('/sms/business/bizStudyPlan', { classId: renderData.id })).data.content
         if (data.length > 0) {
-            let info = data[0]
+            const info = data[0]
             setId(info.id)
             info.question = [info.questionStartTime, info.questionEndTime]
             formRef.current?.setFieldsValue(info)

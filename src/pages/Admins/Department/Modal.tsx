@@ -100,14 +100,14 @@ export default (props: any) => {
 
       <ProFormText width="lg" name="parentId" label="父类" disabled />
       <ProFormTextArea width="md" name="description" label="描述" />
-      <ProForm.Group label="喜报配置："></ProForm.Group>
+      <ProForm.Group label="喜报配置：" />
       <ProFormText width="lg" name="chargeTarget" label="每日业绩目标" />
       <ProFormText width="lg" name="bottomTarget" label="本月保底目标" />
       <ProFormText width="lg" name="secondaryTarget" label="本月次级目标" />
       <ProFormText width="lg" name="sprintTarget" label="本月冲刺目标" />
       <ProFormText width="lg" name="challengeTarget" label="本月挑战目标" />
       <ProFormSwitch name="isSend" label="是否发送到喜报" fieldProps={{ defaultChecked: false }} />
-      <ProForm.Group label="配置部门流转规则："></ProForm.Group>
+      <ProForm.Group label="配置部门流转规则：" />
       <ProFormText width="lg" name="personVisitTimeout" label="个人回访超时天数" />
       <ProFormText width="lg" name="personDealTimeout" label="个人成交超时天数" />
       <ProFormText width="lg" name="groupVisitTimeout" label="团组回访超时天数" />

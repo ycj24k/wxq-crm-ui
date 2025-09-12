@@ -688,7 +688,6 @@ export async function currentUser(options?: { [key: string]: any }) {
       {
         name: '个人中心',
         path: '/users',
-        // component: './UserCenter',
         routes: [
           {
             name: '个人中心',

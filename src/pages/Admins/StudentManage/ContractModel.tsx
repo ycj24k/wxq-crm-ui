@@ -1,3 +1,5 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormCascader,
@@ -6,7 +8,6 @@ import ProForm, {
   ProFormDigit,
   ProFormDigitRange,
   ProFormGroup,
-  ProFormInstance,
   ProFormList,
   ProFormSelect,
   ProFormText,
@@ -110,8 +111,8 @@ export default (props: any) => {
   }
 
   const contentText = () => {
-    let arr = ['partBCardBankName', 'partBCardName', 'partBCardNo', 'signatureDate'];
-    let content = JSON.parse(JSON.stringify(formRef?.current?.getFieldValue('parameter')));
+    const arr = ['partBCardBankName', 'partBCardName', 'partBCardNo', 'signatureDate'];
+    const content = JSON.parse(JSON.stringify(formRef?.current?.getFieldValue('parameter')));
     CompanyIds?.parameter?.forEach((item: any) => {
       if (item.code == 'partBCardName') {
         content[0].partBCardBankName = CompanyId?.bank;
@@ -184,7 +185,7 @@ export default (props: any) => {
             fieldProps={{
               precision: 2,
               onChange: (e) => {
-                let content = JSON.parse(
+                const content = JSON.parse(
                   JSON.stringify(formRef?.current?.getFieldValue('parameter')),
                 );
                 content[0][value.code + 'Big'] = convertCurrency(e);
@@ -257,9 +258,9 @@ export default (props: any) => {
     }
   };
 
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj: { [key: string]: string } = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj: Record<string, string> = {};
   if (tokenValue !== null) {
     obj[tokenName] = tokenValue;
   } else {
@@ -267,7 +268,7 @@ export default (props: any) => {
     console.error('Token value is null');
   }
   const submitok = (values: any) => {
-    let url = renderData.type == 'staff' ? '/sms/business/bizCertificateApply/createServiceFile' : '/sms/contract/conContract'
+    const url = renderData.type == 'staff' ? '/sms/business/bizCertificateApply/createServiceFile' : '/sms/contract/conContract'
     return new Promise((resolve) => {
       request
         .post(url, values)
@@ -305,7 +306,7 @@ export default (props: any) => {
           }
         });
         if (renderData.type == 'staff') {
-          let obj: any = {}
+          const obj: any = {}
           obj.id = renderData.id;
           obj.serviceName = values.name
           obj.param = JSON.stringify(values.parameter[0]);
@@ -346,7 +347,7 @@ export default (props: any) => {
                 message: '请填写合同名称',
               },
             ]}
-          ></ProFormText>
+           />
           <ProForm.Group label="合同信息：" >
 
             {/* hidden={renderData.type == 'staff'} */}
@@ -374,7 +375,7 @@ export default (props: any) => {
                     required: renderData.type != 'staff',
                   },
                 ]}
-              ></ProFormDigit>
+               />
             </div>
           </ProForm.Group>
           <ProForm.Group>
@@ -387,7 +388,7 @@ export default (props: any) => {
                   required: true,
                 },
               ]}
-            ></ProFormText>
+             />
             <Button
               style={{ marginTop: '30px', marginLeft: '-30px' }}
               type="primary"
@@ -426,7 +427,7 @@ export default (props: any) => {
                   required: true,
                 },
               ]}
-            ></ProFormText>
+             />
             <Button
               style={{ marginTop: '30px', marginLeft: '-30px' }}
               type="primary"
@@ -456,7 +457,7 @@ export default (props: any) => {
           </ProForm.Group>
         </div>
         <div className='common_right'>
-          {previewImage ? <iframe src={previewImage} style={{ width: '100%', height: '100%' }}></iframe> : <div className='noFile'>暂未选择合同</div>}
+          {previewImage ? <iframe src={previewImage} style={{ width: '100%', height: '100%' }} /> : <div className='noFile'>暂未选择合同</div>}
         </div>
       </div>
 

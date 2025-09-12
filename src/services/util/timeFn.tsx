@@ -18,9 +18,9 @@ const DownTable = (
     return;
   }
 
-  let option: any = { fileName: '', datas: [] };
-  let dataTable = [];
-  let header: any[] = [];
+  const option: any = { fileName: '', datas: [] };
+  const dataTable = [];
+  const header: any[] = [];
   // const headerTables = []
   Object.keys(dataTables).forEach((item: any) => {
     header.push(item);
@@ -51,7 +51,7 @@ const DownTable = (
       return str;
     },
     hasInvoice: (data: any) => {
-      let str = data.hasInvoice ? '是' : '否'
+      const str = data.hasInvoice ? '是' : '否'
       return str
     },
     //项目岗位
@@ -79,8 +79,8 @@ const DownTable = (
       const result = localStorage.getItem('dictionariesList')
       let newCharge = []
       if (result) {
-        let newResult = JSON.parse(result)[13].children
-        let chargeTypeNames = newResult.map((item: any) => {
+        const newResult = JSON.parse(result)[13].children
+        const chargeTypeNames = newResult.map((item: any) => {
           return {
             value: item.value,
             name: item.name
@@ -102,7 +102,7 @@ const DownTable = (
       if (type == 'charge') {
         // str = Dictionaries.getName('invoiceType', data.invoiceType);
         if (data.invoiceType.indexOf(',') >= 0) {
-          let arr = data.invoiceType.split(',')
+          const arr = data.invoiceType.split(',')
           arr.forEach((item: any) => {
             str = str + Dictionaries.getName('invoiceType', item) + ','
           })
@@ -180,14 +180,14 @@ const DownTable = (
       return str;
     },
     sex: (data: any) => {
-      let str = data.sex === false ? '男' : data.sex === true ? '女' : '未知'
+      const str = data.sex === false ? '男' : data.sex === true ? '女' : '未知'
 
       return str;
     },
     chargeMethod: (data: any) => {
       let str = '';
       if (data.chargeMethod) {
-        str = data.chargeMethod.split(',').map((item: String) => Dictionaries.getName('dict_stu_refund_type', item)).join(',')
+        str = data.chargeMethod.split(',').map((item: string) => Dictionaries.getName('dict_stu_refund_type', item)).join(',')
       }
       return str;
     },
@@ -228,7 +228,7 @@ const DownTable = (
       return moment(data.birthday).format('YYYY-MM-DD');
     },
     entryTime: (data: any) => {
-      let str = data.entryTime ? moment(data.entryTime).format('YYYY-MM-DD') : ''
+      const str = data.entryTime ? moment(data.entryTime).format('YYYY-MM-DD') : ''
 
       return str;
     },
@@ -362,7 +362,7 @@ const DownTable = (
     departmentId: async (data: any) => {
       let str = ''
       if (data.departmentId) {
-        let depart = await Dictionaries.getDepartmentName(data.departmentId);
+        const depart = await Dictionaries.getDepartmentName(data.departmentId);
         const departs = await depart.splice(0, depart.length - 1).reverse();
         str = departs.join('-')
       }
@@ -373,7 +373,7 @@ const DownTable = (
     updepartmentId: async (data: any) => {
       let str = ''
       if (data.departmentId) {
-        let depart = await Dictionaries.getDepartmentName(data.departmentId);
+        const depart = await Dictionaries.getDepartmentName(data.departmentId);
         const departs = await depart[depart.length - 2];
         str = departs
         //const departs = await depart.splice(0, depart.length - 1).reverse();
@@ -386,12 +386,12 @@ const DownTable = (
     //根据用户id获取部门
     userNamedepartment: async (data: any) => {
 
-      let depart = await Dictionaries.getDepartmentNames(data.userId);
+      const depart = await Dictionaries.getDepartmentNames(data.userId);
       const departs = await depart.splice(0, depart.length - 1).reverse();
       return departs.join('-');
     },
     providerDepartment: async (data: any) => {
-      let depart = await Dictionaries.getDepartmentNames(data.provider);
+      const depart = await Dictionaries.getDepartmentNames(data.provider);
       const departs = await depart.splice(0, depart.length - 1).reverse();
       return departs.join('-');
     },
@@ -416,22 +416,22 @@ const DownTable = (
     chargeAccount: (data: any) => {
       let str = '';
       if (data.chargeAccount) {
-        str = (data.chargeAccount + '').split(',').map((item: String) => Dictionaries.getName('dict_stu_refund_type', item)).join(',')
+        str = (data.chargeAccount + '').split(',').map((item: string) => Dictionaries.getName('dict_stu_refund_type', item)).join(',')
       }
       return str;
     },
   };
   IsTrue.forEach((item: any) => {
     actions[item] = (data: any) => {
-      let str = data[item] ? '是' : '否';
+      const str = data[item] ? '是' : '否';
       return str;
     };
   });
   if (data) {
 
-    for (let i in data) {
+    for (const i in data) {
       if (data) {
-        let obj: any = {};
+        const obj: any = {};
         Object.keys(dataTables).forEach(async (item: any) => {
           if (actions[dataTables[item]]) {
             obj[item] = await actions[dataTables[item]](data[i]);
@@ -454,7 +454,7 @@ const DownTable = (
   ];
 
   setTimeout(() => {
-    var toExcel = new ExportJsonExcel(option);
+    const toExcel = new ExportJsonExcel(option);
     toExcel.saveExcel();
   }, 1000);
 };

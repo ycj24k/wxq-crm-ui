@@ -1,6 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { Button, Descriptions, message, Image, Tag, Upload, Row, Switch, Modal, Drawer } from 'antd';
-import { ProFormDatePicker, ProFormInstance, ProFormSwitch } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ProFormDatePicker, ProFormSwitch } from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormText,
@@ -18,7 +19,8 @@ import ImgUrl from '@/services/util/UpDownload';
 import Tables from '@/components/Tables';
 import UserManageCard from '../Department/UserManageCard';
 import { useModel } from 'umi';
-import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import ProFormUser from '@/components/ProFormUser';
 import CompanyOrder from '../AdminOrder/companyOrder';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
@@ -65,7 +67,7 @@ export default (props: any) => {
     }),
   );
   const [servedOrderTable, setservedOrderTable] = useState<any>([]);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
   });
@@ -77,9 +79,9 @@ export default (props: any) => {
   useEffect(() => {
     ment();
   }, [department]);
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const orderTitle = renderData.type == '1' ? '退费' : '收费';
   const orderAmountTitle = renderData.type == '1' ? '（-）' : '（+）';
@@ -94,7 +96,7 @@ export default (props: any) => {
     setAmounts({ amount: renderData.amount, discount: renderData.discount });
     getOrder();
     if (renderData.type == '1') {
-      let data: { parentId?: string; id?: string } = {};
+      const data: { parentId?: string; id?: string } = {};
       renderData.studentType == 1
         ? (data.parentId = renderData.orderId)
         : (data.id = renderData.orderId);
@@ -104,8 +106,8 @@ export default (props: any) => {
     }
     if (renderData.types == 'eidt') {
       setTimeout(() => {
-        let Data = renderData;
-        let arr: { uid: number; name: any; response: { data: any } }[] = [];
+        const Data = renderData;
+        const arr: { uid: number; name: any; response: { data: any } }[] = [];
         if (renderData.files) {
           renderData.files.split(',').forEach((item: any, index: number) => {
             arr.push({
@@ -194,7 +196,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`charge-order-audit-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -224,7 +226,7 @@ export default (props: any) => {
   }
   const submitok = (value: any, types: any) => {
     if (value.files.length > 0) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -370,7 +372,7 @@ export default (props: any) => {
                   await submitok(data, 'audit');
                 });
               }}
-              key="edit"
+              key="edit-charge-order-audit-1"
             >
               修改并审核通过
             </Button>,
@@ -383,7 +385,7 @@ export default (props: any) => {
                   setAuditData({ ...renderData, confirm: false });
                   setAuditVisible(true);
                 }}
-                key="edit"
+                key="edit-charge-order-audit-1"
               >
                 不通过
               </Button>
@@ -413,7 +415,7 @@ export default (props: any) => {
                   await submitok(values, 'submit');
                 });
               }}
-              key="edit"
+              key="edit-charge-order-audit-2"
             >
               修改并提交
             </Button>,
@@ -527,7 +529,7 @@ export default (props: any) => {
                       {record.project &&
                         [...new Set(record.project.split(','))].map((item: any, index: number) => {
                           return (
-                            <span key={index}>
+                            <span key={`charge-order-audit-2-${item}-${index}`}>
                               {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                             </span>
                           );
@@ -607,7 +609,7 @@ export default (props: any) => {
           fieldProps={{
             precision: 2,
             onChange: (e) => {
-              let obj = { amount: e };
+              const obj = { amount: e };
               setAmounts({ ...amounts, ...obj });
             },
           }}

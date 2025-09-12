@@ -1,5 +1,5 @@
 import Tables from '@/components/Tables';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';

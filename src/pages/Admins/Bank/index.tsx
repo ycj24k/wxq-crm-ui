@@ -3,7 +3,7 @@ import apiRequest from "@/services/ant-design-pro/apiRequest";
 import dictionaries from "@/services/util/dictionaries";
 import { getCompanyRequest } from "@/services/util/util";
 import { PlusOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from "@ant-design/pro-table";
+import type { ActionType, ProColumns } from "@ant-design/pro-table";
 import { Button, message, Popconfirm, Switch } from "antd";
 import { useEffect, useRef, useState } from "react";
 import Edit from "./edit";

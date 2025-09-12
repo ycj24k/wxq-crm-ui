@@ -3,7 +3,7 @@ import apiRequest from "@/services/ant-design-pro/apiRequest"
 import Preview from "@/services/util/preview"
 import look from "@/services/util/viewLook"
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons"
-import { ActionType } from "@ant-design/pro-table"
+import type { ActionType } from "@ant-design/pro-table"
 import { Button, message, Popconfirm, Space } from "antd"
 import moment from "moment"
 import { useRef, useState } from "react"
@@ -37,14 +37,14 @@ export default () => {
             dataIndex: 'startDate',
             valueType: 'dateRange',
             sorter: true,
-            render: (text: any, record: any) => <span>{record.startDate}</span>
+            render: (text: any, record: any) => <span key={`startDate-${record.id}`}>{record.startDate}</span>
         },
         {
             title: '结束时间',
             dataIndex: 'endDate',
             valueType: 'dateRange',
             sorter: true,
-            render: (text: any, record: any) => <span>{record.endDate}</span>
+            render: (text: any, record: any) => <span key={`endDate-${record.id}`}>{record.endDate}</span>
         },
         {
             title: '备注',
@@ -84,7 +84,7 @@ export default () => {
             dataIndex: 'createTime',
             valueType: 'dateRange',
             sorter: true,
-            render: (text: any, record: any) => <span>{record.createTime}</span>
+            render: (text: any, record: any) => <span key={`createTime-${record.id}`}>{record.createTime}</span>
         },
         {
             title: '操作',

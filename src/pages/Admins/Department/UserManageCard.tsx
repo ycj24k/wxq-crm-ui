@@ -22,9 +22,6 @@ export default (props: any) => {
     getUserList,
     departNameList = false
   } = props;
-  console.log(parentIdTree, 'parentIdTree======>')
-  console.log(departments, 'departments======>')
-
   let obj: any;
   let obj2: any = [];
   let CheckedKeys: any = [];
@@ -34,7 +31,7 @@ export default (props: any) => {
   const [autoExpandParent, setautoExpandParent] = useState(true);
   const [value, setValue] = useState(false);
   const listFn = (data: any) => {
-    let arr2: any = [];
+    const arr2: any = [];
     data.forEach((item: any, index: number) => {
       if ((item.enable || value) || item.departmentName) {
         let arr3: any = [];
@@ -93,11 +90,7 @@ export default (props: any) => {
 
   })
 
-  console.log(listF, 'CardContent222222222222222222')
-
-
   if (CardContent) arr = listFn(listF);
-  console.log('arr', arr);
 
   //处理tree key值
   const arrKey = (data: any, index?: number) => {
@@ -145,7 +138,7 @@ export default (props: any) => {
       });
   }
   const getParentKey = (title: any, tree: any[]): [] => {
-    let parentKey = []
+    const parentKey = []
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i];
       if (node.children) {
@@ -173,7 +166,6 @@ export default (props: any) => {
 
   const onChangeRadio = (e: any) => {
     const { value } = e.target;
-    console.log('e', e);
     setValue(value)
 
   };
@@ -219,7 +211,6 @@ export default (props: any) => {
       function initExpandedKey(e: []) {
         e.forEach((i: any) => {
           if (i.children) {
-            console.log(i.key)
             expandedKeyArr.push(i.key)
             initExpandedKey(i.children)
           }
@@ -229,7 +220,6 @@ export default (props: any) => {
       setexpandedKeys(expandedKeyArr)
     }
   }, [searchValue])
-  console.log('expandedKeys', expandedKeys);
   return (
     <>
       <Radio.Group onChange={onChangeRadio} value={value} defaultValue={value}>
@@ -247,9 +237,8 @@ export default (props: any) => {
             autoExpandParent={autoExpandParent}
             defaultCheckedKeys={CheckedKeys}
             onCheck={(checkedKeysValue, e) => {
-              console.log(e, '-------------------------->')
               const arr = e.checkedNodes
-              let idsList: any = []
+              const idsList: any = []
               arr.forEach((item: any) => {
                 if (item.userId) {
                   idsList.push(item.userId)
@@ -274,8 +263,8 @@ export default (props: any) => {
             setCardVisible(false);
           }}
           onOk={() => {
-            let arr: any = [];
-            let arrid: any = [];
+            const arr: any = [];
+            const arrid: any = [];
             //去掉部门。
             obj2?.forEach((item: any) => {
               if (item.userId) {
@@ -379,9 +368,9 @@ export default (props: any) => {
                 });
             }
             if (CardContent.type == 'achievement') {
-              let dataArr: any = arrid.map((item: any) => ({ id: item, newOrderType: CardContent.typeNum }));
+              const dataArr: any = arrid.map((item: any) => ({ id: item, newOrderType: CardContent.typeNum }));
 
-              let ids: any = departments.map((item: any) => item.id);
+              const ids: any = departments.map((item: any) => item.id);
 
               ids.forEach((item: any) => {
                 if (!arrid.includes(item)) {
@@ -400,8 +389,8 @@ export default (props: any) => {
               });
             }
             if (CardContent.type == 'Groups') {
-              let dataArr: any = arrid.map((item: any) => ({ id: item, groupId: CardContent.groups }));
-              let ids: any = departments.map((item: any) => item.id);
+              const dataArr: any = arrid.map((item: any) => ({ id: item, groupId: CardContent.groups }));
+              const ids: any = departments.map((item: any) => item.id);
               ids.forEach((item: any) => {
                 if (!arrid.includes(item)) {
                   dataArr.push({ id: item, groupId: -1 });
@@ -419,12 +408,9 @@ export default (props: any) => {
               });
             }
             if (CardContent.type == 'sysuser') {
-              console.log(arrid, 'arrid')
-              console.log(parentIdTree, 'parentIdTree')
               request.postAll(
                 `/sms/system/sysUserLevel/correlationUser/${parentIdTree}`,
                 arrid,
-                // selectedLevels  // 直接传递数组作为请求体
               )
                 .then((res: any) => {
                   if (res.status == 'success') {
@@ -454,14 +440,9 @@ export default (props: any) => {
               autoExpandParent={autoExpandParent}
               defaultCheckedKeys={CheckedKeys}
               onCheck={(checkedKeysValue, e) => {
-                console.log('checkedKeysValue', checkedKeysValue);
-                console.log('e', e);
                 obj2 = e.checkedNodes;
               }}
               onSelect={(selectedKeys, e: any) => {
-                console.log('selectedKeys', selectedKeys);
-                console.log('e', e);
-
                 obj = { name: e.node.title, id: e.node.userId };
                 if (CardContent.type == 'pay' && e.node.userId) {
                   setchargePerson({ name: e.node.titles, id: e.node.userId });

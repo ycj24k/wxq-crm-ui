@@ -1,7 +1,9 @@
-import ProForm, { ModalForm, ProFormCheckbox, ProFormDigit, ProFormGroup, ProFormInstance, ProFormList, ProFormRadio, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormCheckbox, ProFormDigit, ProFormGroup, ProFormList, ProFormRadio, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import { useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
-import { Button, Col, Drawer, message, Modal, Radio, RadioChangeEvent, Row } from 'antd';
+import type { RadioChangeEvent} from 'antd';
+import { Button, Col, Drawer, message, Modal, Radio, Row } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
 import Charge from '@/pages/Admins/AdminCharge/Charge';
 import { ExclamationCircleFilled, PlusOutlined } from '@ant-design/icons';
@@ -16,7 +18,7 @@ export default (props: any) => {
     const [hasAccount, setHasAccount] = useState<any>(false);
     const [ModalsCharge, setModalsCharge] = useState<boolean>(false);
     const [ChargeList, setChargeList] = useState<any>([]);
-    let [ChargeLists, setChargeLists] = useState<any>([]);
+    const [ChargeLists, setChargeLists] = useState<any>([]);
     const [steps, setSteps] = useState<any>(0)
 
     useEffect(() => {
@@ -44,7 +46,7 @@ export default (props: any) => {
                             id: chargeIds[i],
                             amount: chargeAmount[i],
                             thisUsedAmount: usedAmounts[i],
-                            usedAmount: (res.data.content as Array<any>).filter((x: any) => x.id == chargeIds[i])[0].usedAmount,
+                            usedAmount: (res.data.content as any[]).filter((x: any) => x.id == chargeIds[i])[0].usedAmount,
                             // surplusAmount: chargeAmount[i] - usedAmounts[i],
                         })
                     }
@@ -80,7 +82,7 @@ export default (props: any) => {
     const getInvoiceInfo = async (userId: string) => {
         const info = (await request.get('/sms/business/bizInvoice', { studentUserId: userId })).data.content
         if (info.length > 0) {
-            let dataInfo = info[0]
+            const dataInfo = info[0]
             Object.keys(dataInfo).forEach((key) => {
                 if (typeof dataInfo[key] == 'number') {
                     dataInfo[key] = dataInfo[key] + ''
@@ -185,7 +187,7 @@ export default (props: any) => {
             }}
         >
             <div hidden={renderDataInvoice.editType == 'edit'}>
-                <ProForm.Group title="首先请选择开票类型"></ProForm.Group>
+                <ProForm.Group title="首先请选择开票类型" />
                 <Radio.Group name="radiogroup" onChange={(e) => setRadio(e)}>
                     <Radio value={1}>已有缴费开具发票</Radio>
                     <Radio value={2}>先开票后缴费</Radio>
@@ -210,9 +212,9 @@ export default (props: any) => {
                                         style={{
                                             marginBottom: 8,
                                         }}
-                                        key={index}
+                                        key={`invoice-modal-${index}`}
                                     >
-                                        <ProFormGroup key={index}>
+                                        <ProFormGroup key={`invoice-form-group-${index}`}>
                                             <ProFormText label='缴费编号' name='num' readonly />
                                             <ProFormText label='缴费金额' name='uamount' readonly />
                                             <ProFormText label='当前缴费剩余可开票金额' name='surplusAmount' readonly />
@@ -233,16 +235,16 @@ export default (props: any) => {
                                                     },
                                                     onBlur: () => {
                                                         if (renderDataInvoice.editType != 'edit') {
-                                                            let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                            let fromValue = fromValues[index]
+                                                            const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                            const fromValue = fromValues[index]
                                                             if (fromValue.surplusAmount < fromValue.usedAmount) {
                                                                 Modal.info({
                                                                     title: '注意！当前开票金额大于剩余可开票金额！',
                                                                     icon: <ExclamationCircleFilled />,
                                                                     onOk() {
 
-                                                                        let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                                        let fromValue = fromValues[index]
+                                                                        const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                                        const fromValue = fromValues[index]
                                                                         delete fromValue.usedAmount
 
                                                                         fromValues[index] = fromValue
@@ -253,16 +255,16 @@ export default (props: any) => {
                                                             }
                                                         }
                                                         if (renderDataInvoice.editType == 'edit') {
-                                                            let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                            let fromValue = fromValues[index]
+                                                            const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                            const fromValue = fromValues[index]
                                                             if (fromValue.surplusAmount < fromValue.usedAmount) {
                                                                 Modal.info({
                                                                     title: '注意！当前开票金额大于剩余可开票金额！',
                                                                     icon: <ExclamationCircleFilled />,
                                                                     onOk() {
 
-                                                                        let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                                        let fromValue = fromValues[index]
+                                                                        const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                                        const fromValue = fromValues[index]
                                                                         delete fromValue.usedAmount
 
                                                                         fromValues[index] = fromValue
@@ -280,9 +282,7 @@ export default (props: any) => {
                                     </ProCard>
                                 )
                             }}
-                        >
-
-                        </ProFormList>
+                         />
                     </ProForm.Group>
                 </div>
 

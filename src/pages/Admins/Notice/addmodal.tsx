@@ -1,6 +1,7 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import {
   ModalForm,
-  ProFormInstance,
   ProFormText,
   ProFormTextArea,
   ProFormUploadDragger,
@@ -27,9 +28,9 @@ export default (props: any) => {
       reader.onerror = (error) => reject(error);
     });
   }
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   return (
     <ModalForm
@@ -38,7 +39,7 @@ export default (props: any) => {
       formRef={formRef}
       onFinish={async (values) => {
         if (values.filess) {
-          let arr: any[] = [];
+          const arr: any[] = [];
           values.filess.forEach((item: any) => {
             arr.push(item.response.data);
           });

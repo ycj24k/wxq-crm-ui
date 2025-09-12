@@ -22,9 +22,9 @@ export default (props: any) => {
   const [datas, setDatas] = useState<any>({});
   const [imgSrc, setImgSrc] = useState();
   const formRef = useRef<ProFormInstance>();
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   useMemo(() => {
     console.log('subimtDatas', subimtDatas);
@@ -38,8 +38,8 @@ export default (props: any) => {
 
     setHtmlProForm(hl);
     setTimeout(() => {
-      let obj = {};
-      let studentName = '';
+      const obj = {};
+      const studentName = '';
       renderData.signup.forEach(async (item: any) => {
         if (item.name == '学员姓名') {
           // studentName = item.fieldId;
@@ -74,7 +74,7 @@ export default (props: any) => {
   const submitData = (id: any) => {
     request.get('/sms/business/bizStudentUser', { id: renderData.studentUserId }).then((res: any) => {
       const data = res.data.content[0]
-      let obj = {
+      const obj = {
         name: data.name,
         mobile: data.mobile,
         idCard: data.idCard,
@@ -274,7 +274,7 @@ export default (props: any) => {
   };
 
   const submitok = (values: any, type: string) => {
-    let array: {
+    const array: {
       orderFieldId?: number;
       fieldId: string;
       value: any;

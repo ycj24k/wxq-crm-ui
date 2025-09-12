@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -35,7 +35,7 @@ export default () => {
   useEffect(() => {
     if (Student) {
       let arr: any = Student;
-      let arrId: any = [];
+      const arrId: any = [];
       if (!(Student?.constructor == Array)) {
         arr = [Student];
       }
@@ -152,7 +152,7 @@ export default () => {
             okText="移除"
             cancelText="取消"
           >
-            <Button type="primary" size="small" key="look" icon={<UserAddOutlined />}>
+            <Button type="primary" size="small" key="look-blacklist" icon={<UserAddOutlined />}>
               移除黑名单
             </Button>
           </Popconfirm>
@@ -160,7 +160,7 @@ export default () => {
       ),
     },
   ];
-  let sortList = {
+  const sortList = {
     ['updateTime']: 'desc',
   };
   return (
@@ -189,7 +189,7 @@ export default () => {
             request={{ url: '/sms/business/bizStudent/getBlacklist', sortList }}
             toolBarRender={[
               <Button
-                key="button"
+                key="button-blacklist"
                 icon={<PlusOutlined />}
                 type="primary"
                 onClick={() => {

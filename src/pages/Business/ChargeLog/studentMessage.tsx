@@ -1,6 +1,6 @@
 import Tables from "@/components/Tables"
 import Dictionaries from "@/services/util/dictionaries"
-import { ProColumns } from "@ant-design/pro-table"
+import type { ProColumns } from "@ant-design/pro-table"
 
 
 export default (props: any) => {

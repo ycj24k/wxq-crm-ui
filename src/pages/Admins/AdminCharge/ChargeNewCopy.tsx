@@ -175,7 +175,7 @@ export default (props: any, orderRef: any) => {
                 </ProForm.Group>
                 <ProCard
                   title="订单班型详情缴费"
-                ></ProCard>
+                 />
               </ProForm>
             </>
           )

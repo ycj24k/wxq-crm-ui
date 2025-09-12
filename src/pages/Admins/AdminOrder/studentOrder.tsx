@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useModel } from 'umi';
 import { Button, Form, Input, message, Space } from 'antd';
-import { ProFormGroup, ProFormInstance, ProFormList } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ProFormGroup, ProFormList } from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormText,
@@ -26,7 +27,7 @@ export default (props: any) => {
   const [JobClassExam, setJobClassExam] = useState<any>(null);
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
   const [companyStudent, setCompanyStudent] = useState<any>([]);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
   });
@@ -102,7 +103,7 @@ export default (props: any) => {
     const data: any = (await request.get('/sms/business/bizChargeStandard?project=' + value.at(-1)))
       .data.content;
     if (data.length != 0) {
-      let arr: { label: string; value: any }[] = [];
+      const arr: { label: string; value: any }[] = [];
       data.forEach((item: any) => {
         arr.push({
           label:
@@ -124,7 +125,7 @@ export default (props: any) => {
     }
   }
   const submitok = (value: any) => {
-    let data: any = {};
+    const data: any = {};
     data.orderId = renderData.orderId;
     data.quantity = value.quantity;
     data.standardId = JSON.parse(value.JobClassExam).standardId;
@@ -272,7 +273,7 @@ export default (props: any) => {
       {companyStudent.length > 0 &&
         companyStudent.map((item: any, index: number) => {
           return (
-            <ProForm.Group key={index}>
+            <ProForm.Group key={`student-order-${index}`}>
               <ProFormText
                 name="studentNames"
                 width="xs"
@@ -288,7 +289,7 @@ export default (props: any) => {
                 fieldProps={{
                   onChange: (e) => {
                     const a = JSON.parse(e);
-                    let objs = {};
+                    const objs = {};
                     objs['receivables' + index] = a.receivable;
                     formRef?.current?.setFieldsValue(objs);
                   },
@@ -337,7 +338,7 @@ export default (props: any) => {
           renderData={{ type: 'order' }}
           companyStudent={companyStudent}
           setStudentId={(e: any) => {
-            let arr = Array.isArray(e) ? e : [e];
+            const arr = Array.isArray(e) ? e : [e];
 
             setCompanyStudent([...companyStudent, ...arr]);
           }}

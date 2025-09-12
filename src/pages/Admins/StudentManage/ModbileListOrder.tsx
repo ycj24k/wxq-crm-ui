@@ -1,6 +1,6 @@
 import Tables from "@/components/Tables";
 import { ModalForm } from "@ant-design/pro-form"
-import { ProColumns } from "@ant-design/pro-table";
+import type { ProColumns } from "@ant-design/pro-table";
 import Dictionaries from '@/services/util/dictionaries';
 import { history } from "umi";
 import { useEffect, useState } from "react";

@@ -1,6 +1,7 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
-  ProFormInstance,
   ProFormList,
   ProFormSelect,
   ProFormText
@@ -19,7 +20,7 @@ export default (props: any) => {
   const getRule = () => {
     request.post('/sms/lead/ladRule/getExpandField').then((res: any) => {
       console.log(res.data,'res------>')
-      let result = res.data.map((item: any) => {
+      const result = res.data.map((item: any) => {
         return {
           ...item,
           operationType: item.operationType.split(',')
@@ -53,7 +54,7 @@ export default (props: any) => {
       width={800}
       formRef={formRef}
       onFinish={async (values) => {
-        let changeValues = values.labels.map((item:any) => {
+        const changeValues = values.labels.map((item: any) => {
             return {
                 ...item,
                 name:item.field,

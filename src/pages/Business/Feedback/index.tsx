@@ -39,7 +39,7 @@ export default () => {
     }, [])
     const filesDom = (value: any, id: number) => {
 
-        let dom = <span></span>
+        let dom = <span />
         if (value) {
             dom = value.split(',').map((items: any, indexs: number) => {
                 return (
@@ -65,7 +65,7 @@ export default () => {
     }
     const agree = (id: number, item: any) => {
         setSpinning(true)
-        let isAgree = item.upUserList.split(',').indexOf(initialState?.currentUser?.userid + '') >= 0 ? true : false
+        const isAgree = item.upUserList.split(',').indexOf(initialState?.currentUser?.userid + '') >= 0 ? true : false
         request.post('/sms/business/bizFeedback/agree', { id, isAgree: !isAgree }).then((res) => {
             if (res.status == 'success') {
                 if (isAgree) {
@@ -122,9 +122,7 @@ export default () => {
                     }}
                     dataSource={contentData}
                     footer={
-                        <div>
-
-                        </div>
+                        <div />
                     }
                     renderItem={(item: any) => (
                         <List.Item

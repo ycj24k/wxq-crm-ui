@@ -4,9 +4,10 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from "@ant-design/pro-card";
 import Tables from "@/components/Tables";
-import { ProColumns } from "@ant-design/pro-table";
+import type { ProColumns } from "@ant-design/pro-table";
 import { Column } from '@ant-design/plots';
-import ProForm, { ProFormDateTimeRangePicker, ProFormInstance, ProFormTimePicker } from "@ant-design/pro-form";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ProFormDateTimeRangePicker, ProFormTimePicker } from "@ant-design/pro-form";
 import './index.less'
 import { history, useModel } from "umi";
 import { getDaysInMonth, getTodayDate, getFirstAndLastDayOfMonth } from '../AchievementUser/getTime'
@@ -23,7 +24,7 @@ type GithubIssueItem = {
     id: number;
     authority: number;
 };
-var configDatas: any[] = []
+const configDatas: any[] = []
 export default () => {
     const { initialState } = useModel('@@initialState');
     const day = getDaysInMonth()
@@ -124,14 +125,14 @@ export default () => {
         },
     };
     const getAuthorityClue = () => {
-        let data = idList.map((item: any) => {
+        const data = idList.map((item: any) => {
             return {
                 'userId': item,
                 'createTime-start': changeDate(time[0]) + ' ' + '00:00:00',
                 'createTime-end': time[1] + ' ' + '00:00:00',
             }
         })
-        let array = {
+        const array = {
             array: JSON.stringify(data)
         }
         return array
@@ -150,8 +151,8 @@ export default () => {
         })).data.content
         const data6 = (await request.get('/sms/business/bizStudent/statistics/provider', getprovider(ids))).data
         const data7 = (await request.get('/sms/business/bizStudent/statistics/provider', getproviders(ids))).data
-        let list: any = []
-        let list2: any = []
+        const list: any = []
+        const list2: any = []
         const usersList = JSON.parse(JSON.stringify(users))
         const usersList2 = JSON.parse(JSON.stringify(users))
         usersList2.forEach((item: { id: any; dealCount: any; amountValue: any; achievementMubiao: any; MonthAmount: any; amount: any; RefundsAmount: any; RefundsMonthAmount: any; authority: any; }, index: string | number) => {
@@ -222,8 +223,8 @@ export default () => {
     }
     const userList = async (list: any) => {
 
-        let userIds: any[] = []
-        let users: { name: any; id: any; }[] = []
+        const userIds: any[] = []
+        const users: { name: any; id: any; }[] = []
         const userListDi = async (listChildren: { userId: any; name: any; children: any; }[]) => {
 
             listChildren.forEach((item: any) => {
@@ -248,10 +249,10 @@ export default () => {
 
     }
     const changeDate = (inputDate: string) => {
-        var dateParts = inputDate.split("-");
-        var year = dateParts[0];
-        var month = dateParts[1];
-        var day = "01"; // Changing the day to 01
+        const dateParts = inputDate.split("-");
+        const year = dateParts[0];
+        const month = dateParts[1];
+        const day = "01"; // Changing the day to 01
 
         return year + '-' + month + '-' + day;
     }
@@ -272,7 +273,7 @@ export default () => {
         }
     }
     const getAuthority = (userIds: any, type: string) => {
-        let data = userIds.map((item: any) => {
+        const data = userIds.map((item: any) => {
             if (type == 'userId') {
                 return {
                     'userId': Number(item),
@@ -290,7 +291,7 @@ export default () => {
             }
 
         })
-        let array = {
+        const array = {
             array: JSON.stringify(data)
         }
         return array
@@ -314,7 +315,7 @@ export default () => {
         }
     }
     const getAuthoritys = (userIds: any, type: string) => {
-        let data = userIds.map((item: any) => {
+        const data = userIds.map((item: any) => {
             if (type == 'userId') {
                 return {
                     'userId': item,
@@ -332,7 +333,7 @@ export default () => {
             }
 
         })
-        let array = {
+        const array = {
             array: JSON.stringify(data)
         }
         return array
@@ -340,25 +341,25 @@ export default () => {
     const getContentList = async (ids: string, users: any[]) => {
         setSpinning(true)
         const timeAll = getFirstAndLastDayOfMonth()
-        const data = (await request.get('/sms/business/bizCharge/getPersonNewOrder', {
+        const {data} = await request.get('/sms/business/bizCharge/getPersonNewOrder', {
             startTime: time[0],
             endTime: time[1],
             userIdList: ids
             //departmentId: initialState?.currentUser?.departmentId
-        })).data
+        })
         const data2 = (await request.get('/sms/business/bizStudent/statistics/user', {
             startTime: changeDate(time[0]),
             endTime: time[1],
             idList: ids,
             type: 0
         })).data
-        let array2 = getArray2(ids)
+        const array2 = getArray2(ids)
         const data3 = (await request.get('/sms/business/bizStudent/statistics/user', array2)).data
-        let array = getArray(ids)
+        const array = getArray(ids)
         const data4 = (await request.get('/sms/business/bizStudent/statistics/user', array)).data
         const data5 = (await request.get('/sms/business/bizTarget', { 'userId-in': ids.split(','), type: 1, startTime: timeAll.firstDay, endTime: timeAll.lastDay, _isGetAll: true })).data.content
         const data6 = (await request.get('/sms/business/bizAuthorityLog/statistics', getAuthority(ids.split(','), 'userId'))).data
-        let arr: any[] = []
+        const arr: any[] = []
         users.forEach((item, index) => {
             data.forEach((itemToDay: { id: any; amount: number; }) => {
                 if (itemToDay.id == item.id) {
@@ -399,8 +400,8 @@ export default () => {
         arr.sort((a, b) => b.MonthAmount - a.MonthAmount)
         console.log('arr', arr);
 
-        let configData: { name: any; type: string; amount: any; }[] = []
-        let configData2: { name: any; type: string; amount: any; }[] = []
+        const configData: { name: any; type: string; amount: any; }[] = []
+        const configData2: { name: any; type: string; amount: any; }[] = []
         arr.forEach((item) => {
             configData.push({
                 name: item.name,
@@ -432,9 +433,9 @@ export default () => {
     }
 
     const monthAmount = (index: number, Mubiao: any) => {
-        let today = new Date();
-        let days: number = today.getDate();
-        let monthDayAmount: any = Math.ceil(Mubiao / day)
+        const today = new Date();
+        const days: number = today.getDate();
+        const monthDayAmount: any = Math.ceil(Mubiao / day)
         return Math.ceil(monthDayAmount * days)
 
 
@@ -652,7 +653,7 @@ export default () => {
     }
     const monthAmountsFn = () => {
         let num: any
-        let today = new Date();
+        const today = new Date();
         num = dayAmountFn() * today.getDate()
         return num
     }
@@ -684,7 +685,7 @@ export default () => {
         Transactionrate: getTransactionrate()
     };
     const getfooter = () => {
-        let columnsNew: JSX.Element[] = []
+        const columnsNew: JSX.Element[] = []
         columns.forEach((item, index) => {
             if (!item.hideInTable) {
                 columnsNew.push(<td key={'Transactionrate' + index} className="ant-table-cell" style={{ width: tableType == 'yeji' ? '210px' : tableType == 'xiansuo' ? '200px' : '230px' }}>{summaryRow[item.dataIndex]}</td>)
@@ -692,7 +693,7 @@ export default () => {
         })
         return columnsNew
     }
-    let toolbar = {
+    const toolbar = {
         menu: {
             type: 'tab',
             items: [

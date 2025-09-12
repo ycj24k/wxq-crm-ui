@@ -16,8 +16,8 @@ export default () => {
 
     const get = (param: object = {}, reload = false) => {
         apiRequest.get('/sms/business/bizFile/chargeQRCode', param).then(res => {
-            let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-            let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+            const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+            const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
             const src = '/sms/business/bizFile/download?id=' + res.data.id + '&fileName=' + res.data.files + '&' + tokenName + '=' + tokenValue;
             setSrc(src);
             setCompanyName(res.data.name)
@@ -53,7 +53,7 @@ export default () => {
                             }).then((res: any) => {
                                 const blob = new Blob([res]);   //注意拿到的是数据流！！
                                 const objectURL = URL.createObjectURL(blob);
-                                let btn = document.createElement('a');
+                                const btn = document.createElement('a');
                                 btn.download = initialState?.currentUser?.name + '专属收款二维码.jpg'; //文件类型
                                 btn.href = objectURL;
                                 btn.click();

@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -173,7 +173,7 @@ export default (props: any) => {
             setRenderData(record);
             setModalVisibles(true);
           }}
-        ></Button>,
+         />,
       ],
     },
     {
@@ -183,7 +183,7 @@ export default (props: any) => {
         <Popconfirm
           title="合同审核"
           okText="通过"
-          key="look"
+          key="look-contract-audit"
           cancelText="未通过"
           onConfirm={(e) => {
             // callbackRef();
@@ -235,7 +235,7 @@ export default (props: any) => {
   useEffect(() => {
     BadgesNumber();
   }, []);
-  let params: any = Params;
+  const params: any = Params;
   // params['auditType-isNull'] = true;
   return (
     <PageContainer
