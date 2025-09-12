@@ -11,7 +11,7 @@ export default forwardRef((props: any, ref) => {
   const { initialState } = useModel('@@initialState');
   const [CardContent, setCardContent] = useState<any>();
   const [CardVisible, setCardVisible] = useState<boolean>(false);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
   });

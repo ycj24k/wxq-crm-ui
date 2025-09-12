@@ -77,7 +77,7 @@ export default () => {
       let aa: any = [];
       aa = Object.values(
         res.data.content.reduce(
-          (res: { [x: string]: any[] }, item: { configGroup: string | number }) => {
+          (res: Record<string, any[]>, item: { configGroup: string | number }) => {
             res[item.configGroup]
               ? res[item.configGroup].push(item)
               : (res[item.configGroup] = [item]);
@@ -326,9 +326,9 @@ export default () => {
                         background: '#eee',
                       }}
                       onClick={() => {
-                        let dom: any = document.getElementsByClassName('contents' + indexs);
-                        let icons: any = document.getElementsByClassName('icons' + indexs);
-                        let a = JSON.parse(JSON.stringify(falgs));
+                        const dom: any = document.getElementsByClassName('contents' + indexs);
+                        const icons: any = document.getElementsByClassName('icons' + indexs);
+                        const a = JSON.parse(JSON.stringify(falgs));
                         a[indexs] = !a[indexs];
                         if (dom[0].style.height == '30px') {
                           dom[0].style.height = `${items.length * 75 + 30}px`;
@@ -357,7 +357,7 @@ export default () => {
                       return (
                         <div
                           style={{ display: 'flex', marginBottom: '30px', alignItems: 'center' }}
-                          key={index}
+                          key={`sys-config-${index}`}
                         >
                           <div className="lables" style={{ width: '300px', color: 'black' }}>
                             <div>{item.name}</div>
@@ -368,7 +368,7 @@ export default () => {
                               <Input
                                 onChange={(e) => {
                                   const arr = JSON.parse(JSON.stringify(IndexNum));
-                                  let values = JSON.parse(JSON.stringify(InputValue));
+                                  const values = JSON.parse(JSON.stringify(InputValue));
                                   values[index] = e.target.value;
                                   if (arr.indexOf(index) >= 0) {
                                   } else {
@@ -378,7 +378,7 @@ export default () => {
                                   setInputValue(values);
                                 }}
                                 defaultValue={item.value}
-                              ></Input>
+                               />
                             )}
                             {item.type == 2 && (
                               <Switch
@@ -407,7 +407,7 @@ export default () => {
                                 defaultValue={item.value}
                                 onChange={(e) => {
                                   const arr = JSON.parse(JSON.stringify(IndexNum));
-                                  let values = JSON.parse(JSON.stringify(InputValue));
+                                  const values = JSON.parse(JSON.stringify(InputValue));
                                   values[index] = e;
                                   if (arr.indexOf(index) >= 0) {
                                   } else {
@@ -425,7 +425,7 @@ export default () => {
                           </div>
                           {Code.indexOf(item.code) >= 0 ? (
                             <Popconfirm
-                              key={index}
+                              key={`sys-config-flow-${index}`}
                               title="立即流转？"
                               onConfirm={() => {
                                 let a = '';
@@ -522,7 +522,7 @@ export default () => {
                               编辑
                             </a>
                             <Popconfirm
-                              key={index}
+                              key={`sys-config-delete-${index}`}
                               title="是否确定删除？"
                               onConfirm={() => {
                                 request

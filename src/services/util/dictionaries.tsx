@@ -6,7 +6,7 @@ const { Option } = Select;
 class dictionaries {
   version: string | null;
   dictionariesList: never[];
-  list: Array<any>;
+  list: any[];
   department: any;
   depart: any;
   contentNews: string | null;
@@ -45,7 +45,7 @@ class dictionaries {
   }
   //根据code 和值 返回对应的名称
   getName(value: string, data?: any) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -68,7 +68,7 @@ class dictionaries {
     if (value == -1) {
       return ['无']
     } else {
-      let list = JSON.parse(localStorage.getItem('Depart') as string);
+      const list = JSON.parse(localStorage.getItem('Depart') as string);
       if (!list) {
         return ['无数据'];
       }
@@ -121,7 +121,7 @@ class dictionaries {
   //获取部门员工
   getDepartmentList(value: number) {
     value = value || JSON.parse(sessionStorage.getItem('userInfo') as string).data.id
-    let list = JSON.parse(localStorage.getItem('Department') as string);
+    const list = JSON.parse(localStorage.getItem('Department') as string);
     if (!list) {
       request.get('/sms/share/getDepartmentAndUser').then((res) => {
         localStorage.setItem('Department', JSON.stringify(res.data));
@@ -131,14 +131,14 @@ class dictionaries {
     }
     let departments: any = []
     function getDepartmens(list, parent) {
-      for (let i in list) {
+      for (const i in list) {
         // console.log('list', list[i], value);
 
         if (list[i].userId == value) {
           return parent;
         }
         if (list[i].children != null) {
-          let node: any = getDepartmens(list[i].children, parent);
+          const node: any = getDepartmens(list[i].children, parent);
           if (node !== undefined) {
 
             return parent;
@@ -165,7 +165,7 @@ class dictionaries {
   }
   //根据招生老师id获取部门
   getDepartmentNames(value: number = 2) {
-    let list = JSON.parse(localStorage.getItem('Department') as string);
+    const list = JSON.parse(localStorage.getItem('Department') as string);
     if (!list) {
       request.get('/sms/share/getDepartmentAndUser').then((res) => {
         localStorage.setItem('Department', JSON.stringify(res.data));
@@ -173,15 +173,15 @@ class dictionaries {
         return;
       });
     }
-    let departments: any = [];
+    const departments: any = [];
 
     function getParentId(list: any, id: any) {
-      for (let i in list) {
+      for (const i in list) {
         if (list[i].userId == id) {
           return [list[i]];
         }
         if (list[i].children != null) {
-          let node: any = getParentId(list[i].children, id);
+          const node: any = getParentId(list[i].children, id);
           if (node !== undefined) {
             return node.concat(list[i]);
           }
@@ -199,7 +199,7 @@ class dictionaries {
   }
   //根据招生老师id获取部门id
   getDepartmentNamesId(value: number = 2) {
-    let list = JSON.parse(localStorage.getItem('Department') as string);
+    const list = JSON.parse(localStorage.getItem('Department') as string);
     if (!list) {
       request.get('/sms/share/getDepartmentAndUser').then((res) => {
         localStorage.setItem('Department', JSON.stringify(res.data));
@@ -207,15 +207,15 @@ class dictionaries {
         return;
       });
     }
-    let departments: any = [];
+    const departments: any = [];
 
     function getParentId(list: any, id: any) {
-      for (let i in list) {
+      for (const i in list) {
         if (list[i].userId == id) {
           return [list[i]];
         }
         if (list[i].children != null) {
-          let node: any = getParentId(list[i].children, id);
+          const node: any = getParentId(list[i].children, id);
           if (node !== undefined) {
             return node.concat(list[i]);
           }
@@ -232,7 +232,7 @@ class dictionaries {
     return departments[departments.length - 2];
   }
   //获取所有部门
-  getDepartmentTree(list: Array<any> = [], parent: any = {}) {
+  getDepartmentTree(list: any[] = [], parent: any = {}) {
     if (list.length == 0) {
       list = JSON.parse(localStorage.getItem('Department') as string)
       if (!list) {
@@ -259,7 +259,7 @@ class dictionaries {
   }
   //根据姓名获取id
   getUserId(value: string = '秘嘉赛') {
-    let list = JSON.parse(localStorage.getItem('Department') as string);
+    const list = JSON.parse(localStorage.getItem('Department') as string);
     if (!list) {
       request.get('/sms/share/getDepartmentAndUser').then((res) => {
         localStorage.setItem('Department', JSON.stringify(res.data));
@@ -269,7 +269,7 @@ class dictionaries {
     }
     const departments: any = []
     function getParentId(list: any, id: any) {
-      for (let i in list) {
+      for (const i in list) {
         if (list[i].name === id && list[i].enable) {
           departments.push(list[i].userId)
         }
@@ -290,7 +290,7 @@ class dictionaries {
   }
   //根据id获取姓名
   getDepartmentUserName(value: number, type = 'user') {
-    let list = JSON.parse(localStorage.getItem('Department') as string);
+    const list = JSON.parse(localStorage.getItem('Department') as string);
     // if (!list) {
     //   request.get('/sms/share/getDepartmentAndUser').then((res) => {
     //     localStorage.setItem('Department', JSON.stringify(res.data));
@@ -301,7 +301,7 @@ class dictionaries {
     let departments: any = '';
 
     function getParentId(list: any, id: any) {
-      for (let i in list) {
+      for (const i in list) {
         if (list[i].userId === id && type == 'user') {
           return [list[i]];
         }
@@ -311,7 +311,7 @@ class dictionaries {
           return [list[i]];
         }
         if (list[i].children != null) {
-          let node: any = getParentId(list[i].children, id);
+          const node: any = getParentId(list[i].children, id);
           if (node !== undefined) {
             return node.concat(list[i]);
           }
@@ -339,7 +339,7 @@ class dictionaries {
   }
   //批量导入时获取项目的value
   getProjectValue(value: string, ParentName: string, children?: string) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -358,7 +358,7 @@ class dictionaries {
   }
   //更具字典 和 名称 获取 对应的value
   getValue(value: string, data?: any) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -379,7 +379,7 @@ class dictionaries {
   }
   //更具字典 和 名称 获取 对应的Descriptio
   getDescription(value: string, data?: any) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -411,7 +411,7 @@ class dictionaries {
   }
   //返回字典存储的正则表达式
   getRegex(data?: string) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -429,7 +429,7 @@ class dictionaries {
   }
   getTreeA(value: string = '') {
     if (value != '') {
-      let arr: any[] = [];
+      const arr: any[] = [];
       if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
       this.list?.forEach((item: any) => {
         if (item.code == value) {
@@ -446,7 +446,7 @@ class dictionaries {
     const arr = this.getTreeA(value);
     let arr1: { name: string; userId: number | string; children?: any }[] = [];
     function arrTree(data: any) {
-      let arr2: any = [];
+      const arr2: any = [];
       data?.forEach((item: any) => {
         let arr3: { name: string; userId: number | string; children?: any }[] = [];
         if (item.children) {
@@ -467,7 +467,7 @@ class dictionaries {
   //根据code 返回对应的下拉选项lable 名称 value 值 不传值返回当前字典所有父级
   getList(value: string = '', data?: string, type = true, enable = true) {
     if (value != '') {
-      let arr: any[] = [];
+      const arr: any[] = [];
       const children: any[] = [];
       const ProChildren: any[] = [];
       if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -484,7 +484,7 @@ class dictionaries {
             if (items.value == data) {
               items.children?.forEach((item: any, index: number) => {
                 children.push(
-                  <Option key={index} value={item.value}>
+                  <Option key={`${item.value}-${index}`} value={item.value}>
                     {item.name}
                   </Option>,
                 );
@@ -496,7 +496,7 @@ class dictionaries {
           arr[0].children?.forEach((item: any, index: number) => {
             if (item.enable == enable) {
               children.push(
-                <Option key={index} value={item.value}>
+                <Option key={`${item.value}-${index}`} value={item.value}>
                   {item.name}
                 </Option>,
               );
@@ -510,7 +510,7 @@ class dictionaries {
             if (items.value == data) {
               items.children.forEach((item: any, index: number) => {
                 children.push(
-                  <Option key={index} value={item.name}>
+                  <Option key={`${item.name}-${index}`} value={item.name}>
                     {item.name}
                   </Option>,
                 );
@@ -522,7 +522,7 @@ class dictionaries {
           arr[0].children?.forEach((items: any, indexs: number) => {
 
             children.push(
-              <Option key={indexs} value={items.name}>
+              <Option key={`${items.name}-${indexs}`} value={items.name}>
                 {items.name}
               </Option>,
             );
@@ -547,10 +547,10 @@ class dictionaries {
 
   //省市联动类型
   getCascader(value: string) {
-    let arr: any = [];
+    const arr: any = [];
     let cascader: any = [];
     const CascaderList = (arrList: any) => {
-      let arr2: any = [];
+      const arr2: any = [];
       arrList?.forEach((item: any) => {
         let arr3: any = [];
         if (item.children) {
@@ -581,10 +581,10 @@ class dictionaries {
   }
   //省市联动类型Id
   getCascaderId(value: string) {
-    let arr: any = [];
+    const arr: any = [];
     let cascader: any = [];
     const CascaderList = (arrList: any) => {
-      let arr2: any = [];
+      const arr2: any = [];
       arrList?.forEach((item: any) => {
         let arr3: any = [];
         if (item.children) {
@@ -615,10 +615,10 @@ class dictionaries {
   }
   //表格搜索格式
   getCascaderSearch(value: string) {
-    let arr: any = [];
+    const arr: any = [];
     let cascader: any = [];
     const CascaderList = (arrList: any) => {
-      let arr2: any = [];
+      const arr2: any = [];
       arrList?.forEach((item: any) => {
         let arr3: any = [];
         if (item.children) {
@@ -648,8 +648,8 @@ class dictionaries {
     return cascader[0].language;
   }
   getCascaderName(value: string, data: string) {
-    let arr: any = this.getCascader(value);
-    let cascader: any = [];
+    const arr: any = this.getCascader(value);
+    const cascader: any = [];
     let str = '';
     const CascaderList = (arrList: any) => {
       arrList?.forEach((item: any) => {
@@ -677,9 +677,9 @@ class dictionaries {
    * @returns 通过project 查找对应的项目总称
    */
   getCascaderAllName = (value: string, data: string, type: string = 'label') => {
-    let arr: any = this.getCascader(value);
-    let cascader: any = [];
-    let str = '';
+    const arr: any = this.getCascader(value);
+    const cascader: any = [];
+    const str = '';
     const CascaderList = (arrList: any, a?: any) => {
       arrList?.forEach((item: any) => {
         let arr3: any = [];
@@ -708,18 +708,18 @@ class dictionaries {
     }
   };
   getCascaderValue(value: string, data: string, names?: string) {
-    let arrList: any = this.getCascader(value);
+    const arrList: any = this.getCascader(value);
     const findIndexArray = (list: any, data: string, indexArray: any) => {
       // 根据自身节点寻找父级
-      let arr = Array.from(indexArray);
+      const arr = Array.from(indexArray);
       for (let i = 0, len = list.length; i < len; i++) {
         arr.push(list[i]);
         if (list[i].value === data) {
           return arr;
         }
-        let children = list[i].children;
+        const {children} = list[i];
         if (children && children.length) {
-          let result: any = findIndexArray(children, data, arr);
+          const result: any = findIndexArray(children, data, arr);
           if (result) return result;
         }
         arr.pop();
@@ -727,9 +727,9 @@ class dictionaries {
       return false;
     };
 
-    let name = findIndexArray(arrList, data, []);
+    const name = findIndexArray(arrList, data, []);
 
-    let arr: any = [];
+    const arr: any = [];
     if (names) {
       name &&
         name?.forEach((item: any) => {
@@ -746,8 +746,8 @@ class dictionaries {
     }
   }
   getChildren(value: string, data: string) {
-    let arrList: any = this.getCascader(value);
-    let arr: any = [];
+    const arrList: any = this.getCascader(value);
+    const arr: any = [];
     arrList.forEach((item: any) => {
       if (item.label == data) arr.push(item);
     });
@@ -755,19 +755,19 @@ class dictionaries {
   }
   //批量导入时根据名字 获取value
   getCascaderValues(value: string, data: string, names?: string) {
-    let arrList: any = this.getCascader(value);
+    const arrList: any = this.getCascader(value);
     const findIndexArray = (list: any, data: string, indexArray: any) => {
       // 根据自身节点寻找父级
-      let arr = Array.from(indexArray);
+      const arr = Array.from(indexArray);
       for (let i = 0, len = list.length; i < len; i++) {
         arr.push(list[i]);
 
         if (list[i].label === data) {
           return list[i].value;
         }
-        let children = list[i].children;
+        const {children} = list[i];
         if (children && children.length) {
-          let result: any = findIndexArray(children, data, arr);
+          const result: any = findIndexArray(children, data, arr);
           if (result) return result;
         }
         arr.pop();
@@ -775,7 +775,7 @@ class dictionaries {
       return false;
     };
 
-    let name = findIndexArray(arrList, data, []);
+    const name = findIndexArray(arrList, data, []);
     return name;
     // let arr: any = [];
     // if (names) {
@@ -795,7 +795,7 @@ class dictionaries {
   }
   //表格头部搜索框使用
   getSearch(value: string) {
-    let arr: any[] = [];
+    const arr: any[] = [];
     const searchChildren: any = {};
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
     this.list?.forEach((item: any) => {
@@ -854,14 +854,14 @@ class dictionaries {
     return '无'
   }
   async filterDataByValue(data: any, value: any): Promise<any[]> {
-    let children = data.children as any[]
+    const children = data.children as any[]
     for (let i = 0; i < children.length; i++) {
       const e = children[i];
       if (e.value == value) {
         console.log(e)
         return [e]
       } else if (e.children) {
-        let childData = await this.filterDataByValue(e, value)
+        const childData = await this.filterDataByValue(e, value)
         if (childData.length > 0) {
           console.log([e, ...childData])
           return [e, ...childData]
@@ -977,10 +977,10 @@ class dictionaries {
   }
 
   findAncestorsName(id: string, data: any) {
-    let result: any = [];
+    const result: any = [];
 
     function recursiveSearch(currentId: string, dataArray: any) {
-      for (let item of dataArray) {
+      for (const item of dataArray) {
         if (item.id === currentId) {
           if (item.name) {
             result.unshift(item.name); // 将找到的名称添加到结果数组的开头
@@ -997,7 +997,7 @@ class dictionaries {
     }
 
     recursiveSearch(id, data);
-    let newResult = result.join('/');
+    const newResult = result.join('/');
     return newResult;
   }
 

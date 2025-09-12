@@ -39,7 +39,8 @@ import IsVerifyModel from './isVerifyModel';
 import ContractModel from './ContractModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
-import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ModalForm, ProFormCascader } from '@ant-design/pro-form';
 import { getNextDay } from '@/pages/Department/AchievementUser/getTime';
 import './index.less'
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
@@ -121,7 +122,7 @@ export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [userNameId, setUserNameId] = useState<any>();
   const [userNameId1, setUserNameId1] = useState<any>();
-  let [department, setDepartment] = useState<any>({});
+  const [department, setDepartment] = useState<any>({});
   const [isTabListNuber, setisTabListNuber] = useState<any>('0');
   const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
@@ -147,8 +148,8 @@ export default (props: any) => {
   }, []);
   useEffect(() => {
     if (JSON.stringify(department) != '{}') {
-      let userId = department.id;
-      let studentIdList: any = [];
+      const userId = department.id;
+      const studentIdList: any = [];
       selectedRowsList.forEach((item: { id: number }) => {
         studentIdList.push(item.id);
       });
@@ -615,7 +616,7 @@ export default (props: any) => {
             <Button
               type="primary"
               size="small"
-              key="looks"
+              key="looks-student-manage"
               icon={<ApiOutlined />}
               style={{ marginRight: '15px', marginBottom: '8px' }}
               onClick={() => {
@@ -657,7 +658,7 @@ export default (props: any) => {
                     // type="primary"
                     // size="small"
                     hidden={parentId}
-                    key="look"
+                    key="look-student"
                     // icon={<SearchOutlined />}
                     onClick={() => {
                       setRenderData({ ...record });
@@ -680,7 +681,7 @@ export default (props: any) => {
                     编辑
                   </a>
                   <a
-                    key="edit"
+                    key="edit-student-manage"
                     hidden={parentId}
                     // size="small"
                     type="primary"
@@ -791,7 +792,7 @@ export default (props: any) => {
                   okText="锁定"
                   cancelText="取消"
                 >
-                  <a key="lock" style={{ color: 'brown' }}>
+                  <a key="lock-student-manage" style={{ color: 'brown' }}>
                     锁定学员
                   </a>
                 </Popconfirm>
@@ -814,7 +815,7 @@ export default (props: any) => {
         }
       });
   };
-  let params: any = {};
+  const params: any = {};
   let sortList: any = {};
   if (parentId) {
     params.parentId = parentId;
@@ -823,7 +824,7 @@ export default (props: any) => {
   //   params.parentId = '-1';
   // }
   if (companyStudent && companyStudent.length > 0) {
-    let arr: any = [];
+    const arr: any = [];
     companyStudent.forEach((item: any) => {
       arr.push(item.id);
     });
@@ -995,7 +996,7 @@ export default (props: any) => {
               <a
                 onClick={() => {
 
-                  let data = selectedRowsList.map((item: { studentId: any; }) => {
+                  const data = selectedRowsList.map((item: { studentId: any; }) => {
                     return {
                       id: item.studentId,
                       isInWhitelist: true
@@ -1015,7 +1016,7 @@ export default (props: any) => {
                 key="orders"
                 hidden={!parentId || order == 'order'}
                 onClick={() => {
-                  let arr: any = [];
+                  const arr: any = [];
                   selectedRowsList.forEach((item: any) => {
                     arr.push({ id: item.id, name: item.name });
                   });
@@ -1134,7 +1135,7 @@ export default (props: any) => {
               </a>
 
               <Button
-                key="buttonq"
+                key="add-student"
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1153,7 +1154,7 @@ export default (props: any) => {
                 新建
               </Button>
               <Button
-                key="buttonq"
+                key="add-newmedia-student"
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1173,7 +1174,7 @@ export default (props: any) => {
               </Button>
 
               <Button
-                key="ordere"
+                key="recommend-student"
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
@@ -1188,7 +1189,7 @@ export default (props: any) => {
                 推荐已有学员给他人
               </Button>
               <Button
-                key="ordere"
+                key="reassign-teacher"
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
@@ -1286,7 +1287,7 @@ export default (props: any) => {
                 合同签署
               </Button>
               <Button
-                key="butto"
+                key="butto-import-other"
                 hidden={order == 'order' || isFormal || recommend}
                 icon={<DownloadOutlined />}
                 type="primary"
@@ -1298,7 +1299,7 @@ export default (props: any) => {
                 批量导入获客数据
               </Button>
               <Button
-                key="butto"
+                key="butto-import"
                 hidden={order == 'order' || isFormal || recommend}
                 icon={<DownloadOutlined />}
                 type="primary"
@@ -1484,7 +1485,7 @@ export default (props: any) => {
           formRef={formRefs}
           onFinish={async (value: any) => {
             console.log('value', value);
-            let project = value.project[value.project.length - 1];
+            const project = value.project[value.project.length - 1];
             new Promise((resolve) => {
               request
                 .post('/sms/business/bizStudentUser/presentation', {

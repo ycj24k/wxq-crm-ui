@@ -1,5 +1,5 @@
 import Tables from '@/components/Tables';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import request from '@/services/ant-design-pro/apiRequest';
 import { useRef, useState } from 'react';
@@ -103,7 +103,7 @@ export default (props: any) => {
       render: (text, record) => <span>{Dictionaries.getName('visitStatus', record.studentStatus)}</span>
     },
   ];
-  let params: any = {};
+  const params: any = {};
   if (studentUserId) params.studentUserId = studentUserId;
   return (
     <>

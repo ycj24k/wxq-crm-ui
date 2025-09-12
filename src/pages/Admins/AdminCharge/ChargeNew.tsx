@@ -1,10 +1,11 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Button, Col, message, Modal, Row, Space, Spin } from 'antd';
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import {
   ProFormCheckbox,
   ProFormDatePicker,
   ProFormGroup,
-  ProFormInstance,
   ProFormList,
 } from '@ant-design/pro-form';
 import ProForm, {
@@ -43,7 +44,7 @@ export default (props: any, orderRef: any) => {
   const [ChargeModals, setChargeModals] = useState<boolean>(false);
   const [previewurl, setPreviewurl] = useState<any>();
   const [thisChargeType, setThisChargeType] = useState<any>();
-  const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+  const [chargeLog, setChargeLog] = useState<any[] | null>();
   const [CardContent, setCardContent] = useState<any>();
   const [CorderVisibleFalg, setCOrderVisible] = useState<boolean>(false);
   const [order, setorder] = useState<any>(false);
@@ -68,7 +69,7 @@ export default (props: any, orderRef: any) => {
   const userRef: any = useRef(null);
   const childRef = useRef();
   const CompanyOrders = forwardRef(CompanyOrder);
-  let [department, setDepartment] = useState<any>({
+  const [department, setDepartment] = useState<any>({
     name: initialState?.currentUser?.name,
     id: initialState?.currentUser?.userid,
     departmentId: initialState?.currentUser?.departmentId,
@@ -91,9 +92,9 @@ export default (props: any, orderRef: any) => {
       // actionRefs.current?.reload();
     });
   };
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const orderTitle = renderData.type == 'orders' ? '退费' : '收费';
   const orderAmountTitle = renderData.type == 'orders' ? '（-）' : '（+）';
@@ -127,7 +128,7 @@ export default (props: any, orderRef: any) => {
   useEffect(() => {
     if (chargeLog) {
       setChargeLogVisible(false)
-      let chargeLists = formRef?.current?.getFieldsValue().chargeLists;
+      const chargeLists = formRef?.current?.getFieldsValue().chargeLists;
       chargeLists[0].amount = chargeLog.reduce((x, y) => x + y.amount, 0)
       formRef?.current?.setFieldsValue({
         chargeLogName: chargeLog.map(x => x.name).join('、') + '的收款记录',
@@ -148,14 +149,14 @@ export default (props: any, orderRef: any) => {
   }, [chargeLog]);
   const genOrder = () => {
     setspinning(true);
-    const list = renderData.list;
+    const {list} = renderData;
 
     const asyncList = async (lists: any) => {
       const PaymentLengthList = await getPaymentLength(list);
       return new Promise((resolve, reject) => {
-        let promiseList: any = [];
+        const promiseList: any = [];
         lists.forEach(async (item: any, index: number) => {
-          let str =
+          const str =
             Dictionaries.getName('dict_class_type', item.classType) +
             '/' +
             Dictionaries.getName('dict_class_year', item.classYear) +
@@ -188,7 +189,7 @@ export default (props: any, orderRef: any) => {
 
           } else {
             // const Invoice = (await request.get('/sms/business/bizInvoice', { chargeIds: item.id, _isGetAll: true, enable: true })).data.content
-            let arr: any = JSON.parse(JSON.stringify(InvoiceList));
+            const arr: any = JSON.parse(JSON.stringify(InvoiceList));
             arr[index] = item
             setInvoiceList(arr)
             // if (renderData.types == 'eidt' && item.invoiceTitle) {
@@ -258,7 +259,7 @@ export default (props: any, orderRef: any) => {
         setchargeNewList(res);
         const fiedsValue = renderData.list[0];
         if (fiedsValue?.files && typeof fiedsValue?.files == 'string') {
-          let arr: { uid: number; name: any; response: { data: any } }[] = [];
+          const arr: { uid: number; name: any; response: { data: any } }[] = [];
           fiedsValue?.files?.split(',').forEach((item: any, index: number) => {
             arr.push({
               uid: index + 1,
@@ -332,7 +333,7 @@ export default (props: any, orderRef: any) => {
     } else {
       const listInfo = (await request.get('/sms/business/bizInvoice', { studentUserId: renderData.list[index].studentUserId })).data.content[0]
       if (listInfo) {
-        let formValue = formRef?.current?.getFieldValue('chargeLists')
+        const formValue = formRef?.current?.getFieldValue('chargeLists')
         const valueInfo = formValue[index]
         delete listInfo.amount
         listInfo.amounts = valueInfo.amount
@@ -352,7 +353,7 @@ export default (props: any, orderRef: any) => {
   }
   const getPaymentLength = async (list: any) => {
     if (renderData.type == 'add') return;
-    let listId = list.map((item: any) => {
+    const listId = list.map((item: any) => {
       return { orderId: item.orderId };
     });
     const arr = (
@@ -377,9 +378,9 @@ export default (props: any, orderRef: any) => {
   };
   const amountFn = async (index: any) => {
     //chargeNewList
-    let chargeList = formRef?.current?.getFieldsValue().chargeLists;
+    const chargeList = formRef?.current?.getFieldsValue().chargeLists;
     const charge = chargeList[index]
-    const amount = charge.amount
+    const {amount} = charge
     charge.surplus = Number(charge.arrears) - amount;
     charge.fFalg = fapiaoFalg[index] ? 'true' : 'false';
     if (
@@ -400,8 +401,8 @@ export default (props: any, orderRef: any) => {
         } else {
           many = '第' + cNumber[charge.PaymentLength] + '次';
         }
-        let people = charge.quantity + '*';
-        let money = (amount - (charge.collectedAmount || 0)) / charge.quantity;
+        const people = charge.quantity + '*';
+        const money = (amount - (charge.collectedAmount || 0)) / charge.quantity;
         charge.description = many + people + money;
       }
     }
@@ -419,7 +420,7 @@ export default (props: any, orderRef: any) => {
     });
   };
   const CalculationFn = async (e: any, index: any) => {
-    let chargeList = formRef?.current?.getFieldsValue().chargeLists[index];
+    const chargeList = formRef?.current?.getFieldsValue().chargeLists[index];
     await request.post('/sms/business/bizCharge/reports/setIsCalculation', {
       ids: chargeList.chargeId,
       isCalculation: e,
@@ -447,8 +448,8 @@ export default (props: any, orderRef: any) => {
 
 
   const priceChange = (e: any) => {
-    let formValue = formRef?.current?.getFieldValue('chargeLists')
-    let from = formValue[e]
+    const formValue = formRef?.current?.getFieldValue('chargeLists')
+    const from = formValue[e]
     const price = from.price || 0
     const quantity = from.quantity || 0
     from.amounts = price * quantity;
@@ -466,10 +467,10 @@ export default (props: any, orderRef: any) => {
     setSpinngs(true)
     if (!fapiaoFalg) delete value.fapiao;
     let arrData = '';
-    let data: any = [];
-    let dataFapiao: any = [];
+    const data: any = [];
+    const dataFapiao: any = [];
     if (value.files) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -545,11 +546,11 @@ export default (props: any, orderRef: any) => {
     objDelete(data);
     objDelete(value);
     return new Promise((resolve) => {
-      let url =
+      const url =
         renderData.types == 'eidt'
           ? '/sms/business/bizCharge/edit'
           : '/sms/business/bizCharge/saves';
-      let reqData = renderData.types == 'eidt' ? data : { array: data, array2: dataFapiao };
+      const reqData = renderData.types == 'eidt' ? data : { array: data, array2: dataFapiao };
       request
         .postAll(url, reqData)
         .then((res: any) => {
@@ -564,7 +565,7 @@ export default (props: any, orderRef: any) => {
               resolve(res);
             };
             if (renderData.types == 'eidt') {
-              let fapiaoList: any = [];
+              const fapiaoList: any = [];
               dataFapiao.forEach((item: any) => {
                 console.log('123', Object.keys(item));
 
@@ -577,7 +578,7 @@ export default (props: any, orderRef: any) => {
             if (type == 'audit') {
               console.log('value.chargeLists', value.chargeLists);
 
-              let auditIds: any = []
+              const auditIds: any = []
               value.chargeLists.forEach(async (item: any) => {
                 auditIds.push(request.post('/sms/business/bizAudit', {
                   entityId: item.chargeId,
@@ -655,7 +656,7 @@ export default (props: any, orderRef: any) => {
                                 await submitok(values, 'audit');
                               });
                           }}
-                          key="edit"
+                          key="edit-charge-new-1"
                         >
                           修改并审核通过
                         </Button>
@@ -666,14 +667,14 @@ export default (props: any, orderRef: any) => {
                           type="dashed"
                           hidden={renderData.types != 'eidt'}
                           onClick={async () => {
-                            let id = []
+                            const id = []
                             for (let i = 0; i < renderData.list.length; i++) {
                               id[i] = renderData.list[i].id
                             }
                             setAuditData({ id: id, type: 0, confirm: false });
                             setAuditVisible(true);
                           }}
-                          key="edit"
+                          key="edit-charge-new-2"
                         >
                           不通过
                         </Button>
@@ -865,10 +866,10 @@ export default (props: any, orderRef: any) => {
                   style={{
                     marginBottom: 8,
                   }}
-                  key={index}
+                  key={`charge-new-${index}`}
                   title="订单班型详情缴费"
                 >
-                  <ProFormGroup key={index}>
+                  <ProFormGroup key={`charge-new-form-${index}`}>
                     <ProForm.Group>
                       <ProFormText label="报名学员/企业" name="studentName" readonly />
                       <ProFormText label="项目总称" name="parentProjectList" readonly />
@@ -971,7 +972,7 @@ export default (props: any, orderRef: any) => {
                       name="description2"
                     />
                     <div hidden={renderData.types != 'eidt'}>
-                      <ProForm.Group title='发票信息'></ProForm.Group>
+                      <ProForm.Group title='发票信息' />
                       <Invoice chargeId={InvoiceList[index]} />
                     </div>
                     <div hidden={renderData.type == 'orders' || renderData.types == 'eidt'}>
@@ -1151,7 +1152,7 @@ export default (props: any, orderRef: any) => {
                 </ProCard>
               );
             }}
-          ></ProFormList>
+           />
 
           <ProForm.Group>
             <UploadDragger

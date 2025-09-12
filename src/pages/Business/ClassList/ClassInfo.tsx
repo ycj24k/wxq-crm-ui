@@ -27,6 +27,6 @@ export default (props: any) => {
       width={1200}
       onCancel={() => setModalVisible()}
       onOk={() => setModalVisible()}
-    ></Modal>
+     />
   );
 };

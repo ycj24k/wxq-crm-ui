@@ -17,7 +17,7 @@ export default (props: any) => {
     value.confirm = renderData.confirm;
     value.entityId = renderData.id;
     if (value.entityId instanceof Array) {
-      let arr = []
+      const arr = []
       for (let i = 0; i < value.entityId.length; i++) {
         arr[i] = { ...value, entityId: value.entityId[i] }
       }

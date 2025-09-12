@@ -3,7 +3,7 @@ import apiRequest from "@/services/ant-design-pro/apiRequest"
 import Dictionaries from "@/services/util/dictionaries"
 import DownTable from "@/services/util/timeFn"
 import { ExportOutlined, RedoOutlined } from "@ant-design/icons"
-import { ProColumns } from "@ant-design/pro-table"
+import type { ProColumns } from "@ant-design/pro-table"
 import { Button, Space, Tag, Modal, Row, Col, message, Popconfirm } from "antd"
 import { useState, useRef, useEffect } from "react"
 import { useModel } from 'umi';
@@ -15,10 +15,11 @@ import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import SchoolList from '@/pages/Business/ClassList'
 import AllStudent from './allStudentlist'
 import './index.less'
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import {
     ModalForm,
     ProFormCascader,
-    ProFormInstance,
     ProFormUploadDragger
 } from '@ant-design/pro-form';
 import ProForm, {
@@ -34,7 +35,7 @@ export default (props: any) => {
     const actionRef = useRef<ActionType>();
     const { reBuild, select, getAll = false, type = 0, showBtn, num, Orderpage } = props
     const [exportLoading, setExportLoading] = useState<boolean>();
-    const [selectData, setSelectData] = useState<Array<any>>();
+    const [selectData, setSelectData] = useState<any[]>();
     const [studentlistmessage, setStudentlistmessage] = useState<any>();
     const [selectStudentData, setSelectStudentData] = useState<any>();
     //学生详情下单
@@ -42,7 +43,7 @@ export default (props: any) => {
     //下单弹窗
     const [isPayModalOpen, setIsPayModalOpen] = useState<boolean>(false)
     //存储根据电话号码查询的数据
-    const [phoneTableData, setPhoneTableData] = useState<Array<any>>([])
+    const [phoneTableData, setPhoneTableData] = useState<any[]>([])
     //存储支付信息
     const [payMessage, setPayMessage] = useState<any>({})
     //选择新建学员或选择学员弹窗
@@ -67,9 +68,9 @@ export default (props: any) => {
     const [userNameId2, setUserNameId2] = useState<any>();
     const [totalReceivable, setTotalReceivable] = useState<number>(0);
 
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let obj = {};
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const obj = {};
     obj[tokenName] = tokenValue;
 
 
@@ -193,7 +194,7 @@ export default (props: any) => {
             })
 
             let data = {}
-            let datas = {
+            const datas = {
                 id: studentlistmessage.userId,
                 name: studentlistmessage.userName
             }
@@ -422,7 +423,7 @@ export default (props: any) => {
 
 
         //根据processedUsers数组长度创建auditsParam数组
-        let auditsParam: any = processedUsers.map((order: any, index: number) => ({
+        const auditsParam: any = processedUsers.map((order: any, index: number) => ({
             "student": studentMsg,
             "order": order,
             "charge": payWayValues[index]
@@ -615,7 +616,7 @@ export default (props: any) => {
                         width={300}
                         userLabel={'信息所有人'}
                         disabled={selectStudentData}
-                        filter={(e: Array<any>) => {
+                        filter={(e: any[]) => {
                             e.unshift({
                                 title: '无',
                                 userId: -1,
@@ -726,7 +727,7 @@ export default (props: any) => {
             formRef={formRef}
             onFinish={async (values) => {
                 if (values.filess) {
-                    let arr: any[] = [];
+                    const arr: any[] = [];
                     values.filess.forEach((item: any) => {
                         arr.push(item.response.data);
                     });
@@ -796,7 +797,7 @@ export default (props: any) => {
             onOk={handleChooseStudentMessageOrder}
             onCancel={() => setRefund(false)}
         >
-            <a download="下载退费申请书模板" href="./template/新学员导入模板.xlsx" key="ordera">
+            <a download="下载退费申请书模板" href="./template/新学员导入模板.xlsx" key="download-refund-template">
                 下载退费申请书模板
             </a>
             <UploadDragger

@@ -1,0 +1,1 @@
+(self.webpackChunkant_design_pro=self.webpackChunkant_design_pro||[]).push([[2576,2331],{28364:function(t,s,n){"use strict";n.r(s);var _=n(7e3),e=n(85893);s.default=function(){return(0,e.jsx)(_.default,{type:1})}}}]);

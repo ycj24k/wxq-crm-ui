@@ -1,8 +1,9 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormDateTimePicker,
   ProFormDigit,
-  ProFormInstance,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -23,9 +24,9 @@ export default (props: any) => {
   const { setModalVisible, modalVisible, callbackRef, renderData } = props;
   console.log('renderData', renderData);
   const [url, setUrl] = useState<string>('/sms/business/bizPaymentApply');
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default (props: any) => {
       renderData.renderDataNum === 0
     ) {
       // delete renderData.files;
-      let arr: any = [];
+      const arr: any = [];
       if (renderData.files) {
         renderData.files.split(',').forEach((item: any, index: number) => {
           arr.push({ uid: index, name: item, response: { data: item } });
@@ -89,7 +90,7 @@ export default (props: any) => {
     }
     if (values.files) {
       //values.files = values.files.at(-1).response.data;
-      let a: any = [];
+      const a: any = [];
       values.files.forEach((item: any) => {
         a.push(item.response.data);
       });
@@ -103,7 +104,7 @@ export default (props: any) => {
         .then((res: any) => {
           if (res.status == 'success') {
             if (types == 'audit') {
-              let auditNumber = renderData.auditNum ? renderData.auditNum + 1 : 7;
+              const auditNumber = renderData.auditNum ? renderData.auditNum + 1 : 7;
               request.post(`/sms/business/bizAudit/audit/${auditNumber}`, {
                 // auditType: '0',
                 confirm: true,

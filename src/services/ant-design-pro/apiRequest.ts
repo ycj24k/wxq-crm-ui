@@ -5,12 +5,12 @@ import { message } from 'antd';
 import Socket from '../util/websocket';
 import Dictionaries from '@/services/util/dictionaries';
 import moment, { isMoment } from 'moment';
-var num = 0;
+const num = 0;
 class httpRequest {
   request = request;
 
   throttle(fn: () => void, delay: number | undefined) {
-    var flag = true;
+    let flag = true;
     return () => {
       if (flag) {
         setTimeout(() => {
@@ -23,9 +23,9 @@ class httpRequest {
   }
 
   async baseOptions(param: any, method = 'GET', type = '', err = true): Promise<any> {
-    let tokenName = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let { url, data, params } = param;
+    const tokenName = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const { url, data, params } = param;
     const option: any = {
       data: data ? data : '',
       // params: params ? params : '',
@@ -132,7 +132,7 @@ class httpRequest {
     });
     if (data.parentProjects) {
       const dataParent = data.parentProjects;
-      let list: any = [];
+      const list: any = [];
       dataParent.forEach((item: string | undefined) => {
         const Projects = Dictionaries.getList('dict_reg_job', item);
         if (Projects) {
@@ -146,7 +146,7 @@ class httpRequest {
     }
     if (data.dealParentProjects) {
       const dataParent = data.dealParentProjects;
-      let list: any = [];
+      const list: any = [];
       dataParent.forEach((item: string | undefined) => {
         const Projects = Dictionaries.getList('dict_reg_job', item);
         if (Projects) {
@@ -159,8 +159,8 @@ class httpRequest {
       data['dealProject-in'] = list.join(',') + ',' + data.dealParentProjects;
     }
     if (data) {
-      let arr: string[] = [];
-      let arr2: string[] = [];
+      const arr: string[] = [];
+      const arr2: string[] = [];
       Object.keys(data).forEach((key: any) => {
         arr.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
       });
@@ -173,7 +173,7 @@ class httpRequest {
         url = url + '?' + arr.join('&');
       }
     }
-    let option = { url };
+    const option = { url };
 
     // return this.throttle(await this.baseOptions(option), 1000);
     return this.baseOptions(option);
@@ -184,21 +184,21 @@ class httpRequest {
     // return this.baseOptions(params, 'POST');
 
     if (data) {
-      let arr: string[] = [];
+      const arr: string[] = [];
       Object.keys(data).forEach((key: string | number) => {
         arr.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
       });
       url = url + '?' + arr.join('&');
     }
-    let option = { url };
+    const option = { url };
     return this.baseOptions(option, 'POST');
   }
   postAll(url: string, data: any = '') {
-    let option = { url, data };
+    const option = { url, data };
     return this.baseOptions(option, 'POST', 'up');
   }
   getAll(url: string, data: any = '') {
-    let option = { url, data };
+    const option = { url, data };
     return this.baseOptions(option, 'GET', 'up');
   }
   /**
@@ -210,13 +210,13 @@ class httpRequest {
    */
   post2(url: string, data2: any = '', data: any = '') {
     if (data2) {
-      let arr: string[] = [];
+      const arr: string[] = [];
       Object.keys(data2).forEach((key: string | number) => {
         arr.push(encodeURIComponent(key) + '=' + encodeURIComponent(data2[key]));
       });
       url = url + '?' + arr.join('&');
     }
-    let option = { url, data };
+    const option = { url, data };
 
     return this.baseOptions(option, 'POST', 'up');
   }
@@ -224,13 +224,13 @@ class httpRequest {
     // let params = { url, data };
     // return this.baseOptions(params, 'POST');
     if (data) {
-      let arr: string[] = [];
+      const arr: string[] = [];
       Object.keys(data).forEach((key: string | number) => {
         arr.push(key + '=' + data[key]);
       });
       url = url + '?' + arr.join('&');
     }
-    let option = { url };
+    const option = { url };
     return this.baseOptions(option, 'DELETE');
   }
 

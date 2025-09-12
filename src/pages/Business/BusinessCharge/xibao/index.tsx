@@ -25,7 +25,7 @@ import Tables from '@/components/Tables';
 import Department from './department';
 import TextContent from './TextContent';
 import filter from '@/services/util/filter';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import type { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import Preview from '@/services/util/preview';
 
 type GithubIssueItem = {
@@ -56,7 +56,7 @@ type GithubIssueItem = {
 };
 export default (props: any) => {
   const { admin, studentid = false, studentType = '0', auditType = '' } = props;
-  let params: any = {};
+  const params: any = {};
   params.isSendOver = true;
   params.isSend = true;
   params.auditType = 0;
@@ -80,9 +80,9 @@ export default (props: any) => {
   const [imageURL0, setImageURL0] = useState('');
   const [imageURL1, setImageURL1] = useState('');
   const [arr, setArr] = useState([])
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const callbackRef = (value: any = true) => {
     // @ts-ignore
@@ -174,7 +174,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -407,12 +407,12 @@ export default (props: any) => {
       },
     },
   };
-  let sortList: any = {
+  const sortList: any = {
     ['updateTime,num']: 'desc,asc',
   };
   // let arr: any = [];
   const onChanges = (value: CheckboxChangeEvent) => {
-    let arrs = JSON.parse(JSON.stringify(arr))
+    const arrs = JSON.parse(JSON.stringify(arr))
     if (arrs.indexOf(value) >= 0) {
       arrs.splice(arrs.indexOf(value), 1);
     } else {
@@ -554,7 +554,7 @@ export default (props: any) => {
                   message.error('请至少选择一种发送喜报的方式!', 5);
                   return;
                 }
-                let data: {
+                const data: {
                   typeList: string;
                   idList?: string;
                 } = {

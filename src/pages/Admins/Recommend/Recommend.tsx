@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -126,13 +126,13 @@ export default (props: any) => {
       return '';
     }
     console.log('1');
-    let obj = JSON.parse(value);
+    const obj = JSON.parse(value);
     console.log('value', obj);
     if (type == 'project') {
       return Dictionaries.getCascaderAllName('dict_reg_job', obj.project);
     } else if (type == 'oldData' || type == 'newData') {
-      let percent = obj.percent * 100 + '%';
-      let user = Dictionaries.getDepartmentUserName(obj.userId);
+      const percent = obj.percent * 100 + '%';
+      const user = Dictionaries.getDepartmentUserName(obj.userId);
       return `项目接收人${user}推荐人所占业绩比例${percent}`;
     } else {
       return '';
@@ -188,7 +188,7 @@ export default (props: any) => {
     },
   ];
   const [TableColumns, setColumns] = useState<any>(columns);
-  let toolbar = {
+  const toolbar = {
     menu: {
       type: 'tab',
       items: [
@@ -214,7 +214,7 @@ export default (props: any) => {
       },
     },
   };
-  let sortList: any = {
+  const sortList: any = {
     ['updateTime']: 'desc',
   };
   return (

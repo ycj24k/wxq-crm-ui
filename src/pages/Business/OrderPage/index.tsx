@@ -1,9 +1,10 @@
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ProFormList,
     ProFormText,
-    ProFormInstance,
     ProFormSelect,
     ProFormCascader,
     ModalForm,
@@ -11,7 +12,8 @@ import ProForm, {
     ProFormTextArea
 } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
-import { Button, message, Modal, Radio, RadioChangeEvent, Switch } from 'antd';
+import type { RadioChangeEvent} from 'antd';
+import { Button, message, Modal, Radio, Switch } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -144,7 +146,7 @@ export default () => {
         setBackProject(res.data)
         let data;
         if (dictionariesList) {
-            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
                 const formattedData = convertToTreeData(result)
@@ -192,11 +194,11 @@ export default () => {
         setRenderData(record)
         //setModalStudentInfo(true)
         setModalOrderVisible(true)
-        let farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
-        let son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
-        let text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
-        let text2 = Dictionaries.getCascaderName('dict_reg_job', son)
-        let commonText = `${text1}/${text2}`
+        const farther = Dictionaries.getCascaderValue('dict_reg_job', record.project)[0]
+        const son = Dictionaries.getCascaderValue('dict_reg_job', record.project)[1]
+        const text1 = Dictionaries.getCascaderName('dict_reg_job', farther)
+        const text2 = Dictionaries.getCascaderName('dict_reg_job', son)
+        const commonText = `${text1}/${text2}`
         setTimeout(() => {
             formRef?.current?.setFieldsValue({
                 name: record.name,
@@ -208,7 +210,7 @@ export default () => {
                 project: commonText,
             })
             let data = {}
-            let datas = {
+            const datas = {
                 id: record.userId,
                 name: record.userName
             }
@@ -249,7 +251,7 @@ export default () => {
         setBackProject(res.data)
         const dictionariesList = localStorage.getItem('dictionariesList');
         if (dictionariesList) {
-            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
 
             const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, record.project)
@@ -267,7 +269,7 @@ export default () => {
                 newData = [...(result || []), [formattedData1.parent][0]];
                 // setProjectslist(newProject)
             }
-            let nextData = convertToTreeData(newData)
+            const nextData = convertToTreeData(newData)
             console.log(nextData, 'newData')
             setProjectslist(nextData)
 
@@ -323,7 +325,7 @@ export default () => {
                 project: Dictionaries.getCascaderValue('dict_reg_job', record.project),
             })
             let data = {}
-            let datas = {
+            const datas = {
                 id: record.userId,
                 name: record.userName
             }
@@ -385,8 +387,8 @@ export default () => {
             });
     }
     const handleQrCode = async () => {
-        let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-        let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+        const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+        const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
         const src = '/sms/business/bizOrder/buildSubmitQrcode?id=' + ID + '&' + tokenName + '=' + tokenValue;
         setQrcodeVisible(true)
         setQrcodeSrc(src)
@@ -401,7 +403,7 @@ export default () => {
             // setDefaultChecked(false)
         }
     }
-    let params: any = {
+    const params: any = {
         isPay: true,
         isFormal: true,
         'userId-isNull': false,
@@ -411,7 +413,7 @@ export default () => {
         _page: 0,
         _size: 10,
     };
-    let sortList: any = {}
+    const sortList: any = {}
     const url = '/sms/business/bizStudentUser'
     type GithubIssueItem = {
         name: string;
@@ -976,7 +978,7 @@ export default () => {
                     <UserTreeSelect
                         ref={userRef2}
                         userLabel={'出镜人'}
-                        filter={(e: Array<any>) => {
+                        filter={(e: any[]) => {
                             e.unshift({
                                 title: '无',
                                 userId: -1,
@@ -1109,7 +1111,7 @@ export default () => {
                     // setLoading(true);
                     let classListValues;
                     classListValues = await classListRef.current?.getFormValues();
-                    let newSubmitValue = classListValues.users.map((item: any) => {
+                    const newSubmitValue = classListValues.users.map((item: any) => {
                         return {
                             charge: {
                                 amount: item.amount,
@@ -1479,7 +1481,7 @@ export default () => {
                             icon={<DownloadOutlined />}
                             type="primary"
                             onClick={() => {
-                                let url = '/sms/business/bizOrder/saveStudentAndOrder';
+                                const url = '/sms/business/bizOrder/saveStudentAndOrder';
                                 setUrl(url + '?id=' + ID);
                                 setUploadVisible(true);
                             }}
@@ -1546,7 +1548,7 @@ export default () => {
                                     {record.project &&
                                         [...new Set(record.project.split(','))].map((item: any, index: number) => {
                                             return (
-                                                <span key={index}>
+                                                <span key={`project-${item}-${index}`}>
                                                     {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                                                 </span>
                                             );
@@ -1648,7 +1650,7 @@ export default () => {
                         type: 'multiple',
                         //editableKeys,
                         onSave: async (rowKey, data, row) => {
-                            let array = [
+                            const array = [
                                 {
                                     amount: data.amount,
                                     id: data.id,
@@ -1690,7 +1692,7 @@ export default () => {
                             total: dataList.data.totalElements,
                         };
                     }}
-                ></ProTable>
+                 />
             </Modal>
 
 

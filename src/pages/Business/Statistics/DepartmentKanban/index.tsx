@@ -12,7 +12,7 @@ export default (props: any) => {
         </ProCard>
         <ProCard>
           <div>
-            <span>{initialState?.currentUser?.name}</span><span></span>
+            <span>{initialState?.currentUser?.name}</span><span />
           </div>
         </ProCard>
       </ProCard>

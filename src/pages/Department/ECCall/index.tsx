@@ -4,8 +4,9 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from "@ant-design/pro-card";
 import Tables from "@/components/Tables";
-import { ProColumns } from "@ant-design/pro-table";
-import ProForm, { ProFormDateTimeRangePicker, ProFormInstance, ProFormTimePicker } from "@ant-design/pro-form";
+import type { ProColumns } from "@ant-design/pro-table";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ProFormDateTimeRangePicker, ProFormTimePicker } from "@ant-design/pro-form";
 type GithubIssueItem = {
     name: string;
     num: string;
@@ -13,10 +14,10 @@ type GithubIssueItem = {
 };
 export default () => {
     const getTodayDate = (num: number = 0) => {
-        let today = new Date();
-        let year = today.getFullYear();
-        let month = String(today.getMonth() + 1).padStart(2, '0'); // Adding 1 because January is 0
-        let day = num ? String(today.getDate() + num).padStart(2, '0') : String(today.getDate()).padStart(2, '0');
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0'); // Adding 1 because January is 0
+        const day = num ? String(today.getDate() + num).padStart(2, '0') : String(today.getDate()).padStart(2, '0');
 
         return year + '-' + month + '-' + day;
     }
@@ -35,8 +36,8 @@ export default () => {
     }, [time, timeLength])
     const userList = async (list: any) => {
 
-        let userIds: any[] = []
-        let users: { name: any; id: any; }[] = []
+        const userIds: any[] = []
+        const users: { name: any; id: any; }[] = []
         const userListDi = async (listChildren: { userId: any; name: any; children: any; }[]) => {
 
             listChildren.forEach((item: any) => {
@@ -57,7 +58,7 @@ export default () => {
         EcContent(userIds, users)
     }
     const getArray = (userIds: any) => {
-        let array = userIds.map((item: any) => {
+        const array = userIds.map((item: any) => {
             return {
                 'userId': item,
                 'startTime-start': time[0],
@@ -68,7 +69,7 @@ export default () => {
         return array
     }
     const getArray3 = (userIds: any) => {
-        let array = userIds.map((item: any) => {
+        const array = userIds.map((item: any) => {
             return {
                 'userId': item,
                 'startTime-start': time[0],
@@ -79,7 +80,7 @@ export default () => {
         return array
     }
     const getArray2 = (userIds: any) => {
-        let data = userIds.map((item: any) => {
+        const data = userIds.map((item: any) => {
             return {
                 'userId': item,
                 'startTime-start': time[0],
@@ -87,20 +88,20 @@ export default () => {
                 'timeLength-start': timeLength,
             }
         })
-        let array = {
+        const array = {
             array: JSON.stringify(data),
             totalFields: 'timeLength',
         }
         return array
     }
     const EcContent = async (userId: any[], users: any[]) => {
-        let array = getArray(userId)
-        let array2 = getArray2(userId)
-        let array3 = getArray3(userId)
-        const data = (await request.get('/sms/ec/ecCallLog/statistics', { array: JSON.stringify(array) })).data
+        const array = getArray(userId)
+        const array2 = getArray2(userId)
+        const array3 = getArray3(userId)
+        const {data} = await request.get('/sms/ec/ecCallLog/statistics', { array: JSON.stringify(array) })
         const data3 = (await request.get('/sms/ec/ecCallLog/statistics', { array: JSON.stringify(array3) })).data
         const data2 = (await request.get('/sms/ec/ecCallLog/totals', array2)).data
-        let list: any[] = []
+        const list: any[] = []
         users.forEach((item: any, index: number) => {
             if (data[index]) {
                 list.push(
@@ -122,16 +123,16 @@ export default () => {
 
     const secondsToHms = (d: number) => {
         d = Number(d);
-        var h = Math.floor(d / 3600);
-        var m = Math.floor(d % 3600 / 60);
-        var s = Math.floor(d % 3600 % 60);
+        const h = Math.floor(d / 3600);
+        const m = Math.floor(d % 3600 / 60);
+        const s = Math.floor(d % 3600 % 60);
 
-        var hDisplay = h > 0 ? h + (h == 1 ? " 时, " : " 时, ") : "";
-        var mDisplay = m > 0 ? m + (m == 1 ? " 分, " : " 分, ") : "";
-        var sDisplay = s > 0 ? s + (s == 1 ? " 秒" : " 秒") : "";
+        const hDisplay = h > 0 ? h + (h == 1 ? " 时, " : " 时, ") : "";
+        const mDisplay = m > 0 ? m + (m == 1 ? " 分, " : " 分, ") : "";
+        const sDisplay = s > 0 ? s + (s == 1 ? " 秒" : " 秒") : "";
         return hDisplay + mDisplay + sDisplay;
     }
-    let toolbar = {
+    const toolbar = {
         menu: {
             type: 'tab',
             items: [

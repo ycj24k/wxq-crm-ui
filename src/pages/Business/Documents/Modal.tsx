@@ -1,4 +1,5 @@
-import { ModalForm, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import { useEffect, useRef } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -9,7 +10,7 @@ export default (props: any) => {
   const formRef = useRef<ProFormInstance>();
   useEffect(() => {
     if (renderData.eidtType == 'eidt') {
-      let arr: { uid: number; name: any; response: { data: any } }[] = [];
+      const arr: { uid: number; name: any; response: { data: any } }[] = [];
       if (renderData.files) {
         renderData.files.split(',').forEach((item: any, index: number) => {
           arr.push({
@@ -25,7 +26,7 @@ export default (props: any) => {
   }, []);
   const submits = (value: any) => {
     if (value.files) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });

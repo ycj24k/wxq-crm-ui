@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from "@ant-design/pro-table";
+import type { ActionType, ProColumns } from "@ant-design/pro-table";
 import { Button, Space, Tag } from "antd";
 import Dictionaries from '@/services/util/dictionaries';
 import filter from '@/services/util/filter';
@@ -21,7 +21,7 @@ export default () => {
     const [params, setParams] = useState<Object>({ provider: provide });
 
     const actionRef = useRef<ActionType>();
-    let url = '/sms/business/bizStudentUser'
+    const url = '/sms/business/bizStudentUser'
     const callbackRef = () => {
         // @ts-ignore
         actionRef.current.reload();
@@ -230,7 +230,7 @@ export default () => {
                 <Space>
 
                     <a
-                        key="look"
+                        key="look-provide-user"
                         // icon={<SearchOutlined />}
                         onClick={() => {
                             setRenderData({ ...record });
@@ -257,13 +257,13 @@ export default () => {
     // let sortList = {
     //     ['dealTime,visitTime,circulationTime,createTime']: 'asc,asc,desc,desc',
     // };
-    let sortList = {
+    const sortList = {
         ['circulationTime,createTime']: 'desc,desc',
     };
     // let params = {
     //     provider: provide
     // }
-    let toolbar = {
+    const toolbar = {
         menu: {
             type: 'tab',
             items: [

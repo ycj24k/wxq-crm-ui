@@ -41,7 +41,8 @@ import ProCard from '@ant-design/pro-card';
 import HasInvoiceInfo from './HasInvoiceInfo';
 import './Charge.less';
 import filter from '@/services/util/filter';
-import { ModalForm, ProFormDigit, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ModalForm, ProFormDigit } from '@ant-design/pro-form';
 import Invoice from '@/pages/Business/Invoice/Invoice';
 import DownTable from '@/services/util/timeFn';
 import DownHeader from './DownHeader';
@@ -54,8 +55,8 @@ export default (props: any) => {
     auditType = '',
     chargeType = 'charge',
   } = props;
-  let params: any = { enable: true };
-  let param: any = {
+  const params: any = { enable: true };
+  const param: any = {
     'auditNum-isNull': true,
     // 'chargeIds-isNull': false, enable: true,
     'isSubmit': true,
@@ -89,7 +90,7 @@ export default (props: any) => {
     ? []
     : [
       <Button
-        key="button"
+        key="button-charge-audit"
         icon={<PlusOutlined />}
         type="primary"
         onClick={() => {
@@ -126,7 +127,7 @@ export default (props: any) => {
     }
   }
   const BadgesNumbers = () => {
-    let studentTypes = studentType != 'all' ? { studentType: studentType } : {};
+    const studentTypes = studentType != 'all' ? { studentType: studentType } : {};
     request
       .get('/sms/business/bizCharge/statistics', {
         array: JSON.stringify([
@@ -152,7 +153,7 @@ export default (props: any) => {
         setBadges(res.data);
       });
   };
-  const auditAll = (data: Array<any>) => {
+  const auditAll = (data: any[]) => {
     console.log("data", data)
     let auditsParam: any[] = []
     data.forEach(x => {
@@ -275,7 +276,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`charge-audit-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -586,7 +587,7 @@ export default (props: any) => {
             style={{ marginBottom: 5 }}
             hidden={!record.isSubmit}
             type="primary"
-            key="editable"
+            key="editable-charge-audit-1"
             size="small"
             icon={<EditOutlined />}
             onClick={async () => {
@@ -633,7 +634,7 @@ export default (props: any) => {
             style={{ marginBottom: 5 }}
             hidden={record.isSubmit}
             type="primary"
-            key="editable"
+            key="editable-charge-audit-2"
             size="small"
             icon={<EditOutlined />}
             onClick={async () => {
@@ -846,7 +847,7 @@ export default (props: any) => {
       },
     },
   };
-  let sortList = {
+  const sortList = {
     ['num,updateTime']: 'desc,desc',
   };
   Object.assign(params, Params);

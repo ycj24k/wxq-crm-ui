@@ -1,5 +1,5 @@
 import { PageContainer } from "@ant-design/pro-layout"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { useEffect, useRef, useState } from "react";
 import Tables from "@/components/Tables"
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
@@ -9,7 +9,8 @@ import { Badge, Button, message, Modal, Popconfirm, Space, Tag } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined, FileDoneOutlined, PlusOutlined, SyncOutlined } from "@ant-design/icons";
 import ModalAdd from "./ModalAdd"
 import ModalAddAdmin from "../Certificateadmin/ModalAdd"
-import { ModalForm, ProFormInstance, ProFormTextArea } from "@ant-design/pro-form";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import { ModalForm, ProFormTextArea } from "@ant-design/pro-form";
 import UserInfo from "@/pages/Admins/UserManage/UserInfo";
 import IsVerifyModel from '../../Admins/StudentManage/isVerifyModel';
 import ContractS from "@/pages/Admins/StudentManage/ContractS";
@@ -257,7 +258,7 @@ export default () => {
                     <Popconfirm
                         title="审核"
                         okText="通过"
-                        key="look"
+                        key="look-certificate"
                         cancelText="未通过"
                         onConfirm={(e) => {
                             // callbackRef();
@@ -320,7 +321,7 @@ export default () => {
             ]
         }
     ]
-    let sortList: any = {
+    const sortList: any = {
         ['createTime']: 'desc',
     };
     let toolbar = undefined;
@@ -390,7 +391,7 @@ export default () => {
                 request={{ url: '/sms/business/bizCertificateApply', sortList, params }}
                 toolBarRender={[
                     <Button
-                        key="buttonq"
+                        key="add-certificate"
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => {
@@ -447,7 +448,7 @@ export default () => {
                 onCancel={() => setContractModal(false)}
                 width={1000}
             >
-                <iframe src={renderData.viewUrl} style={{ width: '100%', height: '600px' }}></iframe>
+                <iframe src={renderData.viewUrl} style={{ width: '100%', height: '600px' }} />
 
             </Modal>
             {userInfoFalg && (

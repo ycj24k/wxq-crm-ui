@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -122,7 +122,7 @@ export default (props: any = null) => {
           <div hidden={renderDatas || setClassRef != null}>
             <Space>
               <a
-                key="editable"
+                key="editable-class-list"
                 onClick={() => {
                   setRenderData({ ...record, typee: 'eidt' });
                   setModalVisible(true);
@@ -130,7 +130,7 @@ export default (props: any = null) => {
                 编辑
               </a>
               <a
-                key="look"
+                key="look-class-list"
                 onClick={() => {
                   setClassId(record.id);
                   setSignUoFalg(true);
@@ -138,7 +138,7 @@ export default (props: any = null) => {
               >查看
               </a>
               <a
-                key="phone"
+                key="phone-class-list"
                 onClick={() => {
                   setRenderData(record);
                   setModalCallVisible(true);
@@ -146,7 +146,7 @@ export default (props: any = null) => {
               >通话记录
               </a>
               <a
-                key="plan"
+                key="plan-class-list"
                 onClick={() => {
                   setRenderData(record);
                   setModalPlanVisible(true);
@@ -154,7 +154,7 @@ export default (props: any = null) => {
               >学习计划
               </a>
               <a
-                key="message"
+                key="message-class-list"
                 onClick={() => {
                   setRenderData({ messageType: 'class', ...record })
                   setMessageVisible(true)
@@ -163,7 +163,7 @@ export default (props: any = null) => {
                 发送短信
               </a>
               <a
-                key="wxmessage"
+                key="wxmessage-class-list"
                 onClick={() => {
                   setRenderData({ messageType: 'class', ...record })
                   setWXMessageVisible(true)
@@ -191,7 +191,7 @@ export default (props: any = null) => {
                 批量加入学员
               </a>
               <Popconfirm
-                key="deletes"
+                key="deletes-class-list"
                 title="是否删除班级?"
                 onConfirm={() => {
                   request.delete('/sms/business/bizClass', { id: record.id }).then((res) => {
@@ -211,7 +211,7 @@ export default (props: any = null) => {
 
           <div hidden={!renderDatas && !setClassRef}>
             <Button
-              key="click"
+              key="click-class-list"
               size="small"
               style={{ marginRight: '15px', marginBottom: '8px' }}
               type="primary"
@@ -235,7 +235,7 @@ export default (props: any = null) => {
                       }
                     });
                 } else {
-                  let array: any = [];
+                  const array: any = [];
                   selectedIds.forEach((item: any) => {
                     array.push({ classId: record.id, id: item });
                   });
@@ -259,9 +259,9 @@ export default (props: any = null) => {
     },
   ];
   const donwLoad = (id: number, type: number) => {
-    let tokenName: any = sessionStorage.getItem('tokenName');
-    let tokenValue = sessionStorage.getItem('tokenValue');
-    let obj = {};
+    const tokenName: any = sessionStorage.getItem('tokenName');
+    const tokenValue = sessionStorage.getItem('tokenValue');
+    const obj = {};
     obj[tokenName] = tokenValue;
     fetch('/sms/business/bizOrderField/export/fileByClassId?classId=' + id + '&type=' + type, {
       method: 'POST',
@@ -270,10 +270,10 @@ export default (props: any = null) => {
       console.log('res', res);
 
       res.blob().then((ress: any) => {
-        let blobUrl = window.URL.createObjectURL(ress);
+        const blobUrl = window.URL.createObjectURL(ress);
         const a = document.createElement('a'); //获取a标签元素
         document.body.appendChild(a);
-        let filename = '附件'; //设置文件名称
+        const filename = '附件'; //设置文件名称
         a.href = blobUrl; //设置a标签路径
         a.download = filename;
         a.target = '_blank';
@@ -288,7 +288,7 @@ export default (props: any = null) => {
   const sendMessage = () => {
     setMessageVisible(true)
   }
-  let sortList = {
+  const sortList = {
     ['createTime']: 'desc',
   };
   return (
@@ -338,7 +338,7 @@ export default (props: any = null) => {
             //   下载批量加入班级模板
             // </a>,
             <Button
-              key="button"
+              key="button-class-list-1"
               icon={<DownloadOutlined />}
               hidden={renderDatas}
               type="primary"
@@ -354,7 +354,7 @@ export default (props: any = null) => {
               导出报名资料
             </Button>,
             <Button
-              key="button"
+              key="button-class-list-2"
               hidden={renderDatas}
               icon={<DownloadOutlined />}
               type="primary"
@@ -370,7 +370,7 @@ export default (props: any = null) => {
               导出考试资料
             </Button>,
             <Button
-              key="button"
+              key="button-class-list-3"
               icon={<UserDeleteOutlined />}
               type="primary"
               danger
@@ -392,7 +392,7 @@ export default (props: any = null) => {
               移出班级
             </Button>,
             <Button
-              key="button"
+              key="button-class-list-4"
               icon={<PlusOutlined />}
               type="primary"
               onClick={() => {
@@ -404,7 +404,7 @@ export default (props: any = null) => {
               批量新建班级
             </Button>,
             <Button
-              key="button"
+              key="button-class-list-5"
               icon={<PlusOutlined />}
               type="primary"
               onClick={() => {

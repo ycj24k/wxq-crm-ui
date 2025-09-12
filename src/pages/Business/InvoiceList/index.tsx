@@ -1,12 +1,14 @@
 
 import { PageContainer } from '@ant-design/pro-layout';
 import ProCard from '@ant-design/pro-card';
-import { Radio, Button, RadioChangeEvent, Drawer, Modal, Checkbox, message } from 'antd';
+import type { RadioChangeEvent} from 'antd';
+import { Radio, Button, Drawer, Modal, Checkbox, message } from 'antd';
 import request from '@/services/ant-design-pro/apiRequest';
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ProFormDigit,
     ProFormGroup,
-    ProFormInstance,
     ProFormList,
     ProFormSelect,
     ProFormText,
@@ -26,7 +28,7 @@ export default () => {
     const [hasAccount, setHasAccount] = useState<any>(false);
     const [invoiceFalg, setinvoiceFalg] = useState<any>(true);
     const [invoicelist, setInvoicelist] = useState<any>([])
-    let [ChargeLists, setChargeLists] = useState<any>([]);
+    const [ChargeLists, setChargeLists] = useState<any>([]);
     const [checked, setChecked] = useState(false)
     const formRefInvoice = useRef<ProFormInstance>();
     const formRefInvoiceelse = useRef<ProFormInstance>();
@@ -75,7 +77,7 @@ export default () => {
 
     const getTitleName = async () => {
         const res = await request.get('/sms/business/bizInvoice', { enable: true, _orderBy: 'createTime' })
-        let newArr = res.data.content.map((item: any) => {
+        const newArr = res.data.content.map((item: any) => {
             return {
                 ...item,
                 label: item.title,
@@ -101,7 +103,7 @@ export default () => {
     const getInvoiceInfo = async (userId: string) => {
         const info = (await request.get('/sms/business/bizInvoice', { studentUserId: userId })).data.content
         if (info.length > 0) {
-            let dataInfo = info[0]
+            const dataInfo = info[0]
             Object.keys(dataInfo).forEach((key) => {
                 if (typeof dataInfo[key] == 'number') {
                     dataInfo[key] = dataInfo[key] + ''
@@ -162,13 +164,13 @@ export default () => {
             if (combinedValues.type == '专票') {
                 newType = 1
             }
-            let newCombinedValues = {
+            const newCombinedValues = {
                 ...combinedValues,
                 type: newType,
                 chargeAccount: Dictionaries.getValue('dict_stu_refund_type', combinedValues.chargeAccount),
                 productType: Dictionaries.getValue('invoiceProductType', combinedValues.productType),
             }
-            let url = '/sms/business/bizInvoice'
+            const url = '/sms/business/bizInvoice'
             return new Promise(async (resolve) => {
                 request
                     .postAll(url, newCombinedValues)
@@ -198,7 +200,7 @@ export default () => {
                 style={{ minHeight: '900px' }}
             >
                 <div>
-                    <ProForm.Group title="首先请选择开票类型"></ProForm.Group>
+                    <ProForm.Group title="首先请选择开票类型" />
                     <Radio.Group name="radiogroup" onChange={(e) => setRadio(e)}>
                         <Radio value={1}>已有缴费开具发票</Radio>
                         <Radio value={2}>先开票后缴费</Radio>
@@ -228,9 +230,9 @@ export default () => {
                                                 style={{
                                                     marginBottom: 8,
                                                 }}
-                                                key={index}
+                                                key={`invoice-list-${index}`}
                                             >
-                                                <ProFormGroup key={index}>
+                                                <ProFormGroup key={`invoice-list-form-${index}`}>
                                                     <ProFormText label='缴费编号' name='num' readonly />
                                                     <ProFormText label='缴费金额' name='uamount' readonly />
                                                     <ProFormText label='当前缴费剩余可开票金额' name='surplusAmount' readonly />
@@ -249,16 +251,16 @@ export default () => {
                                                                 // formRefInvoice.current?.setFieldValue('chargeList', fromValues)
                                                             },
                                                             onBlur: () => {
-                                                                let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                                let fromValue = fromValues[index]
+                                                                const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                                const fromValue = fromValues[index]
                                                                 if (fromValue.surplusAmount < fromValue.usedAmount) {
                                                                     Modal.info({
                                                                         title: '注意！当前开票金额大于剩余可开票金额！',
                                                                         icon: <ExclamationCircleFilled />,
                                                                         onOk() {
 
-                                                                            let fromValues = formRefInvoice.current?.getFieldValue('chargeList')
-                                                                            let fromValue = fromValues[index]
+                                                                            const fromValues = formRefInvoice.current?.getFieldValue('chargeList')
+                                                                            const fromValue = fromValues[index]
                                                                             delete fromValue.usedAmount
 
                                                                             fromValues[index] = fromValue
@@ -275,9 +277,7 @@ export default () => {
                                             </ProCard>
                                         )
                                     }}
-                                >
-
-                                </ProFormList>
+                                 />
                             </ProForm>
                         </ProForm.Group>
                     </div>
@@ -400,7 +400,7 @@ export default () => {
                                         rules={[{ required: true, message:'请选择付款方式' }]}
                                         width="md"
                                         fieldProps={{
-                                            onChange: (e:any) => {
+                                            onChange: (e: any) => {
                                                 setTimeout(() => {
                                                     formRefInvoiceelse?.current?.setFieldsValue({
                                                         chargeAccount: Dictionaries.getName('dict_stu_refund_type', e),

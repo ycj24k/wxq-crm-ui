@@ -3,7 +3,7 @@ import { Button, DatePicker, message, Modal, Spin, Switch } from 'antd';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import Tables from '@/components/Tables';
 import request from '@/services/ant-design-pro/apiRequest';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { EditOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import TableContentFn from '@/services/util/TableContentFn';
@@ -36,8 +36,8 @@ export default (props: any) => {
   }, []);
 
   const getTable = async () => {
-    let vStartDate = searchTime[0]
-    let vEndDate = searchTime[1]
+    const vStartDate = searchTime[0]
+    const vEndDate = searchTime[1]
     const list = await TableContentFn('admin', vStartDate, vEndDate);
     console.log('list', list);
 
@@ -155,7 +155,7 @@ export default (props: any) => {
       ),
     },
   ];
-  let sortList = {
+  const sortList = {
     // chargeTarget: 'desc',
   };
   const getType = (type: string) => {
@@ -223,8 +223,8 @@ export default (props: any) => {
                 'sprintTargetId',
                 'challengeTargetId',
               ];
-              let dataObj = {};
-              let arrs: { count: any; type: number; departmentId: any; startTime: string; endTime: string; id?: number }[] = []
+              const dataObj = {};
+              const arrs: { count: any; type: number; departmentId: any; startTime: string; endTime: string; id?: number }[] = []
               const time = getFirstAndLastDayOfMonth()
               Object.keys(data).forEach((key) => {
                 if (arr.indexOf(key) >= 0) {

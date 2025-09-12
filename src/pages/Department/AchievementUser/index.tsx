@@ -4,10 +4,11 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import ProCard from "@ant-design/pro-card";
 import Tables from "@/components/Tables";
-import { ProColumns } from "@ant-design/pro-table";
+import type { ProColumns } from "@ant-design/pro-table";
 import { Column } from '@ant-design/plots';
 import { DualAxes } from '@ant-design/plots';
-import ProForm, { ProFormDateTimeRangePicker, ProFormInstance, ProFormTimePicker } from "@ant-design/pro-form";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ProFormDateTimeRangePicker, ProFormTimePicker } from "@ant-design/pro-form";
 import './index.less'
 import { useModel } from "umi";
 import Modals from './Modal'
@@ -24,11 +25,11 @@ type GithubIssueItem = {
     RefundsMonthAmount: number;
     time: number;
 };
-var configDatas: any[] = []
+const configDatas: any[] = []
 export default () => {
     const { initialState } = useModel('@@initialState');
-    let userId = history.location.query?.userId ? history.location.query.userId : initialState?.currentUser?.userid
-    let name = history.location.query?.userId ? history.location.query.name : initialState?.currentUser?.name
+    const userId = history.location.query?.userId ? history.location.query.userId : initialState?.currentUser?.userid
+    const name = history.location.query?.userId ? history.location.query.name : initialState?.currentUser?.name
     const formRef = useRef<ProFormInstance>();
     const [usersList, setUsersList] = useState<any>([])
     const [culeList, setCuleList] = useState<any>([])
@@ -62,7 +63,7 @@ export default () => {
     }, [tableType])
     const getMuBiao = async () => {
         const time = getFirstAndLastDayOfMonth()
-        let data: any = {
+        const data: any = {
             startTime: time.firstDay,
             endTime: time.lastDay,
             userId: userId
@@ -100,7 +101,7 @@ export default () => {
     }
     const getClueContent = async () => {
         if (culeList.length > 0) return
-        let list = (await request.get('/sms/business/bizStudent/statistics/providerOfDay', getArrayClue(timeArr))).data
+        const list = (await request.get('/sms/business/bizStudent/statistics/providerOfDay', getArrayClue(timeArr))).data
         const clueLists = timeArr.map((item: any, index: number) => {
             return {
                 time: item,
@@ -120,7 +121,7 @@ export default () => {
     }
     const getDayClue = () => {
         let num: any = '尚未设置本月目标';
-        let cule = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
+        const cule = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
         if (cule) num = Math.ceil(cule / day)
         return num
     }
@@ -177,20 +178,20 @@ export default () => {
     const getContentList = async (Mubiao: any) => {
         if (usersList.length > 0 && LsitFalg) return
         setSpinning(true)
-        let array = getArray(timeArr)
-        let array2 = getArray2(timeArr)
+        const array = getArray(timeArr)
+        const array2 = getArray2(timeArr)
 
-        const data = (await request.get('/sms/business/bizStudent/statistics/userOfDay', array)).data
+        const {data} = await request.get('/sms/business/bizStudent/statistics/userOfDay', array)
         const data2 = (await request.get('/sms/business/bizStudent/statistics/userOfDay', array2)).data
-        let List = timeArr.map((item: any, index: string | number) => {
+        const List = timeArr.map((item: any, index: string | number) => {
             return {
                 time: item,
                 amount: data[item]?.amount,
                 RefundsAmount: data2[item]?.amount
             }
         })
-        let configData: any = []
-        let configData2: any = []
+        const configData: any = []
+        const configData2: any = []
         List.forEach((item: any, index: number) => {
             configData.push({
                 time: item.time,
@@ -224,7 +225,7 @@ export default () => {
 
     const toDayAmount = (index: number) => {
 
-        let list = tableType == 'yeji' ? usersList : tableType == 'xiansuo' ? culeList : provideList
+        const list = tableType == 'yeji' ? usersList : tableType == 'xiansuo' ? culeList : provideList
         let amount = 0
         list.forEach((item: { amount: number; }, indexs: number) => {
             if (indexs <= index) {
@@ -235,15 +236,15 @@ export default () => {
     }
     const toDayAmountB = (index: number) => {
         let num = '0%'
-        let clue = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
+        const clue = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
         if (clue) {
             num = (index / (clue / day) * 100).toFixed(2) + '%'
         }
         return num
     }
     const monthAmount = (index: number, Mubiao: any = achievementMubiao) => {
-        let num = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
-        let monthDayAmount: any = (num / day).toFixed(2)
+        const num = tableType == 'yeji' ? achievementMubiao : tableType == 'xiansuo' ? clueNumber : provideNumber
+        const monthDayAmount: any = (num / day).toFixed(2)
         return Math.ceil(monthDayAmount * (index + 1))
 
 
@@ -384,7 +385,7 @@ export default () => {
         amountb: '',
         RefundsAmount: usersList.reduce((total: any, item: { RefundsAmount: any; }) => total + item.RefundsAmount, 0),
     };
-    let toolbar = {
+    const toolbar = {
         menu: {
             type: 'tab',
             items: [
@@ -407,7 +408,7 @@ export default () => {
         }
     }
     const getfooter = () => {
-        let columnsNew: JSX.Element[] = []
+        const columnsNew: JSX.Element[] = []
         columns.forEach((item, index) => {
             if (!item.hideInTable) {
                 columnsNew.push(<td key={'Transactionrate' + index} className="ant-table-cell" style={{ width: '180px' }}>{summaryRow[item.dataIndex]}</td>)

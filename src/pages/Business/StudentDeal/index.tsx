@@ -1,12 +1,12 @@
 import StudentInfo from "@/pages/Admins/StudentManage/studentInfo";
 import Dictionaries from "@/services/util/dictionaries";
 import { DownloadOutlined, SearchOutlined } from "@ant-design/icons";
-import { ActionType, ProColumns } from "@ant-design/pro-table";
+import type { ActionType, ProColumns } from "@ant-design/pro-table";
 import { Button, Tag } from "antd";
 import moment from 'moment';
 import filter from '@/services/util/filter';
 import { useEffect, useRef, useState } from "react";
-import { ProFormInstance } from "@ant-design/pro-form";
+import type { ProFormInstance } from "@ant-design/pro-form";
 import Tables from "@/components/Tables";
 import { history } from "umi";
 import DownTable from "@/services/util/timeFn";
@@ -54,7 +54,7 @@ export default () => {
     const [exportloading, setExportloading] = useState<boolean>(false);
     const url = '/sms/business/bizStudentUser/studentDeal';
     const exportUrl = '/sms/business/bizStudentUser/export/studentDeal';
-    let sortList = {
+    const sortList = {
         createTime: 'desc',
     }
     const downObj = {
@@ -126,7 +126,7 @@ export default () => {
             valueType: 'dateRange',
             sorter: true,
             render: (text, record) => (
-                <span>{record.createTime}</span>
+                <span key={`createTime-${record.id}`}>{record.createTime}</span>
             ),
         },
         {

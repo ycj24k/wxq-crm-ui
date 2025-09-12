@@ -24,16 +24,16 @@ export default (props: any) => {
         <div>用户:{renderData.level != null ? Dictionaries.getName('ProfessionalTitle', renderData.level) : '专员'} - {renderData.name} <span className={`statusTitle ${getStatue[renderData.status]}`}>{Dictionaries.getName('onJobStatus', renderData.status)}员工</span></div>
     )
     const getAgeFromIdCard = (idCard: string) => {
-        var birthYear = idCard.substring(6, 10);
-        var birthMonth = idCard.substring(10, 12);
-        var birthDay = idCard.substring(12, 14);
+        const birthYear = idCard.substring(6, 10);
+        const birthMonth = idCard.substring(10, 12);
+        const birthDay = idCard.substring(12, 14);
 
-        var currentDate = new Date();
-        var currentYear = currentDate.getFullYear();
-        var currentMonth = currentDate.getMonth() + 1;
-        var currentDay = currentDate.getDate();
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentDay = currentDate.getDate();
 
-        var age = currentYear - parseInt(birthYear);
+        let age = currentYear - parseInt(birthYear);
 
         if (currentMonth < parseInt(birthMonth) || (currentMonth == parseInt(birthMonth) && currentDay < parseInt(birthDay))) {
             age--;
@@ -42,17 +42,17 @@ export default (props: any) => {
         return age;
     }
     const getEmploymentDuration = (startDate: { getFullYear: () => any; getMonth: () => number; getDate: () => any; }) => {
-        var currentDate = new Date();
-        var startYear = startDate.getFullYear();
-        var startMonth = startDate.getMonth() + 1;
-        var startDay = startDate.getDate();
+        const currentDate = new Date();
+        const startYear = startDate.getFullYear();
+        const startMonth = startDate.getMonth() + 1;
+        const startDay = startDate.getDate();
 
-        var currentYear = currentDate.getFullYear();
-        var currentMonth = currentDate.getMonth() + 1;
-        var currentDay = currentDate.getDate();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentDay = currentDate.getDate();
 
-        var years = currentYear - startYear;
-        var months = currentMonth - startMonth;
+        let years = currentYear - startYear;
+        let months = currentMonth - startMonth;
 
         if (currentMonth < startMonth || (currentMonth == startMonth && currentDay < startDay)) {
             years--;
@@ -68,7 +68,7 @@ export default (props: any) => {
     }
     const filesDom = (value: any) => {
 
-        let dom = <span></span>
+        let dom = <span />
         if (value) {
             dom = value.split(',').map((items: any, indexs: number) => {
                 return (

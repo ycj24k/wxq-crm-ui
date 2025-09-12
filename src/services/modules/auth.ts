@@ -2,7 +2,7 @@
  * 认证相关API
  */
 import request from '@/services/ant-design-pro/apiRequest';
-import { User, ApiResponse } from '@/types';
+import type { User, ApiResponse } from '@/types';
 import { STORAGE_KEYS } from '@/constants';
 
 export const authAPI = {

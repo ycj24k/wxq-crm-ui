@@ -4,8 +4,10 @@
 
 
 import { useEffect, useRef, useState } from "react";
-import { ActionType, ProColumns } from "@ant-design/pro-table";
-import { Badge, BadgeProps, Button, Calendar, message, Space, Tag } from "antd";
+import type { ActionType} from "@ant-design/pro-table";
+import { ProColumns } from "@ant-design/pro-table";
+import type { BadgeProps} from "antd";
+import { Badge, Button, Calendar, message, Space, Tag } from "antd";
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
 import ModelAdd from './ModelAdd';
@@ -21,7 +23,7 @@ export default () => {
     const [MonthToday, setMonthToday] = useState<any>(moment().month() + 1)
     // const [time, setTime] = useState<any>({ createTime: '', endTime: '' })
     const actionRef = useRef<ActionType>();
-    let url = '/sms/business/BizSchedule'
+    const url = '/sms/business/BizSchedule'
     const callbackRef = () => {
     };
 
@@ -47,7 +49,7 @@ export default () => {
         SetListData(list)
     }
     const getListData = (value: Moment) => {
-        let listData: any = [];
+        const listData: any = [];
         const currentMonth = value.month();
 
         listContent.forEach((item: any) => {

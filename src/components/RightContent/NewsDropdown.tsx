@@ -91,7 +91,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
       return (
         <div
           id="newsss"
-          key={index}
+          key={`news-dropdown-${index}`}
           onClick={() => {
             if (item.userName) {
               if (item.isConfirm) {
@@ -132,7 +132,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
               position: 'absolute',
               opacity: '0.5',
             }}
-          ></div>
+           />
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div className="newsDiv">
               <MailOutlined className="icons" />
@@ -160,7 +160,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
         // @ts-ignore
         placement="bottom"
         onVisibleChange={(e) => {
-          let arr: any = [];
+          const arr: any = [];
           if (e) {
             // if (localStorage.getItem('contentNews')) {
             //   // @ts-ignore

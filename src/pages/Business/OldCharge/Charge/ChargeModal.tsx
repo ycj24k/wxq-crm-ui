@@ -1,10 +1,11 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormCascader,
   ProFormDatePicker,
   ProFormDateTimePicker,
   ProFormDigit,
-  ProFormInstance,
   ProFormList,
   ProFormSelect,
   ProFormSwitch,
@@ -44,7 +45,7 @@ export default forwardRef((props: any, ref) => {
           renderData[keys] = renderData[keys] + '';
         }
       });
-      let arr: { uid: number; name: any; response: { data: any } }[] = [];
+      const arr: { uid: number; name: any; response: { data: any } }[] = [];
       if (renderData.files) {
         renderData.files.split(',').forEach((item: any, index: number) => {
           arr.push({
@@ -55,7 +56,7 @@ export default forwardRef((props: any, ref) => {
         });
         renderData.files = arr;
       }
-      let fapiao = [];
+      const fapiao = [];
       if (renderData.invoiceTitle) {
         fapiao.push({
           title: renderData.invoiceTitle,
@@ -104,7 +105,7 @@ export default forwardRef((props: any, ref) => {
       // value.paymentTime = moment(value.paymentTime).toDate();
     }
     if (value.files) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.files.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -463,7 +464,7 @@ export default forwardRef((props: any, ref) => {
                         width="md"
                         fieldProps={{
                           onChange: (e) => {
-                            let falgs = e == 0 ? false : true;
+                            const falgs = e == 0 ? false : true;
                             setinvoiceFalg(falgs);
                           },
                         }}
@@ -484,7 +485,7 @@ export default forwardRef((props: any, ref) => {
                   </ProCard>
                 );
               }}
-            ></ProFormList>
+             />
           </div>
         )}
       </ProForm.Group>

@@ -1,6 +1,7 @@
 import Tables from '@/components/Tables';
 import ProCard from '@ant-design/pro-card';
-import ProForm, { ProFormDateRangePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ProFormDateRangePicker } from '@ant-design/pro-form';
 import { PageContainer } from '@ant-design/pro-layout';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -33,8 +34,8 @@ export default (props: any) => {
     // console.log('Received values from form: ', moment(values[0]).format('YYYY-MM-DD'));
   };
   const onChange = async (checkedValues: any) => {
-    let arr: any = [];
-    let data: any = [];
+    const arr: any = [];
+    const data: any = [];
     checkedValues &&
       checkedValues?.forEach((item: any) => {
         if (time) {
@@ -48,7 +49,7 @@ export default (props: any) => {
           arr.push({ isFormal: true, source: item });
         }
       });
-    let sourcecontent = await request.get('/sms/business/bizStudent/statistics', {
+    const sourcecontent = await request.get('/sms/business/bizStudent/statistics', {
       array: JSON.stringify(arr),
     });
     checkedValues.forEach((item: any, index: number) => {
@@ -110,7 +111,7 @@ export default (props: any) => {
           <Row>
             {Dictionaries.getList('dict_source')?.map((item: any, index: number) => {
               return (
-                <Col span={4} key={index}>
+                <Col span={4} key={`source-${item.value}-${index}`}>
                   <Checkbox value={item.value}>{item.label}</Checkbox>
                 </Col>
               );

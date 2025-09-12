@@ -5,7 +5,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import UserManageCard from '../../pages/Admins/Department/UserManageCard';
 import { useModel } from 'umi';
 
-let content: any = null;
+const content: any = null;
 export default forwardRef((props: any, ref) => {
   const {
     userLabel,
@@ -17,7 +17,7 @@ export default forwardRef((props: any, ref) => {
     setFalgUser = () => { },
     flag = false,
     enable = true,
-    filter = (e: Array<any>) => e,
+    filter = (e: any[]) => e,
     userName,
     formRefs,
     userNameChange = false,
@@ -57,7 +57,7 @@ export default forwardRef((props: any, ref) => {
   const getDepartment = async () => {
     // const list = (await request.get('/sms/share/getDepartmentAndUser')).data;
     const listFn = (data: any) => {
-      let arr2: any = [];
+      const arr2: any = [];
       data.forEach((item: any, index: number) => {
         let arr3: any = [];
         if (item.children) {
@@ -65,7 +65,7 @@ export default forwardRef((props: any, ref) => {
         }
         let str = '';
         let add = false;
-        let obj: any = {};
+        const obj: any = {};
         if (item.departmentName) {
           str = item.departmentName;
           obj.id = item.id;

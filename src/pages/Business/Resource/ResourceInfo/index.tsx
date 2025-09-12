@@ -343,7 +343,7 @@ export default (props: any) => {
       )
     }
   ];
-  let sortList: any = {
+  const sortList: any = {
     ['receiveNum,circulationTime']: 'asc,desc',
   };
   let tabs = [];
@@ -380,7 +380,7 @@ export default (props: any) => {
     ]
   }
 
-  let toolbar = {
+  const toolbar = {
     menu: {
       type: 'tab',
       items: tabs,
@@ -452,7 +452,7 @@ export default (props: any) => {
             </a>,
             // 新增学员
             <Button
-              key="buttonq"
+              key="add-resource"
               icon={<PlusOutlined />}
               type="primary"
               // hidden={order == 'order' || isFormal || recommend}

@@ -94,7 +94,7 @@ export default (props: any) => {
     //获取题库/课程
     const getProject = (agentId: string) => {
         requestApi.get(`/sms/business/bizQuestionAccredit/getCourseList/${agentId}`).then(res => {
-            let newArr = res.data.map((item: any) => {
+            const newArr = res.data.map((item: any) => {
                 return {
                     label: item.title,
                     value: item.id,
@@ -106,7 +106,7 @@ export default (props: any) => {
     //获取科目
     const getSubject = (agentId: string, courseId: string) => {
         requestApi.get(`/sms/business/bizQuestionAccredit/getCourseSubjectList/${agentId}/${courseId}`).then(res => {
-            let newArr = res.data.map((item: any) => {
+            const newArr = res.data.map((item: any) => {
                 return {
                     label: item.title,
                     value: item.id,
@@ -119,7 +119,7 @@ export default (props: any) => {
     const getTikulist = async (agentId: string) => {
         try {
             const res = await requestApi.get(`/sms/business/bizQuestionAccredit/getSubjectTreeList/${agentId}`);
-            let newArr1 = Dictionaries.addLabelToChildren(res.data);
+            const newArr1 = Dictionaries.addLabelToChildren(res.data);
             setCourselist(newArr1);
             return newArr1; // 返回处理后的数据
         } catch (error) {

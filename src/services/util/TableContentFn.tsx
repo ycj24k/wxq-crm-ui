@@ -27,8 +27,8 @@ const TableContentFn = async (type = 'user', vStartDate: moment.MomentInput, vEn
 
   }
   const content = data1;
-  let arr: any = [];
-  let childrenId: any[] = []
+  const arr: any = [];
+  const childrenId: any[] = []
   content.forEach((item: any) => {
     childrenId.push(item.id)
     arr.push(item.id);

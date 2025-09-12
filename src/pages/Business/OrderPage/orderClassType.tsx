@@ -1,3 +1,5 @@
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import {
     ProForm,
     ProFormGroup,
@@ -7,7 +9,6 @@ import {
     ProFormDigit,
     ProFormText,
     ProFormMoney,
-    ProFormInstance,
     ProFormDateTimePicker,
     ProFormTreeSelect,
     ProFormTextArea,
@@ -22,9 +23,9 @@ import { forwardRef, useImperativeHandle, useEffect, useRef, useState } from 're
 import { Button, message, Modal } from 'antd';
 import ChargeLog from '@/pages/Business/ChargeLog';
 
-let JobClassExamA: any[] = [];
-let quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-let comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+const JobClassExamA: any[] = [];
+const quantitys: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+const comNumbers: any[] = [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
 
 
@@ -97,13 +98,13 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const [discountRemake, setDiscountRemake] = useState<boolean>(false)
     const [chargeType, setChargeType] = useState<string[]>([]);
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
-    const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+    const [chargeLog, setChargeLog] = useState<any[] | null>();
     const [chargeLogIndex, setChargeLogIndex] = useState<any>()
     const [newProjectslist, setProjectslist] = useState<any>();
 
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let obj: { [key: string]: string } = {};
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const obj: Record<string, string> = {};
     if (tokenValue !== null) {
         obj[tokenName] = tokenValue;
     } else {
@@ -130,17 +131,17 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
         const res = await request.get('/sms/commonProjects')
         const dictionariesList = localStorage.getItem('dictionariesList');
         if (dictionariesList) {
-            let dictionariesArray = JSON.parse(dictionariesList)[1].children
+            const dictionariesArray = JSON.parse(dictionariesList)[1].children
             const result = Dictionaries.extractMatchingItems(dictionariesArray, res.data);
             if (result) {
                 const formattedData1 = Dictionaries.findObjectAndRelated(dictionariesArray, renderData.project)
-                let newData = convertToTreeData([[formattedData1.parent][0]])
+                const newData = convertToTreeData([[formattedData1.parent][0]])
 
                 const foundObject = projectslist?.find((item: any) => JSON.stringify(item) === JSON.stringify(newData[0]))
                 if (foundObject) {
                     setProjectslist(projectslist)
                 } else {
-                    let newProject = [...(projectslist || []), newData[0]];
+                    const newProject = [...(projectslist || []), newData[0]];
                     setProjectslist(newProject)
                 }
             }
@@ -182,7 +183,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             handleChangeProject([renderData.project], 0);
         }
 
-        let list: any = [];
+        const list: any = [];
         const orderList = [renderData];
         setOrderList(orderList);
 
@@ -192,7 +193,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
             }
             quantitys[index] = item.quantity || 1;
             comNumbers[index] = item.receivable || 0;
-            let scoreName = Dictionaries.getName('dict_source', item.source)
+            const scoreName = Dictionaries.getName('dict_source', item.source)
             list.push({
                 project: item.project ? Dictionaries.getCascaderValue('dict_reg_job', item.project) : [],
                 quantity: item.quantity || 1,
@@ -292,7 +293,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     }
 
     function projectClassExamListFn(data: any) {
-        let arr: { label: string; value: any }[] = [];
+        const arr: { label: string; value: any }[] = [];
         data.forEach((item: any) => {
             arr.push({
                 label:
@@ -316,7 +317,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     //获取部门
     const getDepartment = async () => {
         const listFn = (data: any) => {
-            let arr2: any = [];
+            const arr2: any = [];
             data.forEach((item: any, index: number) => {
                 let arr3: any = [];
                 if (item.children) {
@@ -324,7 +325,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                 }
                 let str = '';
                 let add = false;
-                let obj: any = {};
+                const obj: any = {};
                 if (item.departmentName) {
                     str = item.departmentName;
                     obj.id = item.id;
@@ -404,7 +405,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
     const handlejisuan = () => {
         const users = formRef?.current?.getFieldValue('users') || [];
         let totalReceivable = 0;
-        users.forEach((item:any) => {
+        users.forEach((item: any) => {
             const jobClassExam = JSON.parse(item.JobClassExam);
             totalReceivable += jobClassExam.receivable * item.quantity - item.discount;
         })
@@ -571,7 +572,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                     }}
                                 >
 
-                                    <ProFormGroup key={index}>
+                                    <ProFormGroup key={`class-type-${index}`}>
                                         <ProForm.Group>
                                             {/* 报考岗位下拉框，无条件渲染 */}
                                             <ProFormCascader
@@ -597,7 +598,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                         showSearch: true,
                                                         onSelect: (e: string) => {
                                                             handlejisuan()
-                                                            let newE = JSON.parse(e)
+                                                            const newE = JSON.parse(e)
                                                             
                                                             // const users = formRef?.current?.getFieldValue('users') || [];
                                                             // const TotalSum = users.reduce((total: number, user: any) => {
@@ -1074,7 +1075,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                                                     onChange(e) {
                                                         const users = formRef?.current?.getFieldValue('users') || [];
                                                         const collectedAmount = Number(e) || 0;
-                                                        const amount = users[index].amount;
+                                                        const {amount} = users[index];
                                                         const performance = amount - collectedAmount;
                                                         if (collectedAmount > amount) {
                                                             Modal.info({
@@ -1177,9 +1178,7 @@ const ClassList = forwardRef<ClassListMethods, ClassListProps>((props, ref) => {
                             </>
                         );
                     }}
-                >
-
-                </ProFormList>
+                 />
                 {/* <ProFormTextArea
                 width={1100}
                 label={'备注'}

@@ -62,7 +62,7 @@ export default (props: any) => {
     // if (renderData.type != 'order') setJobClassExam(arr);
   }
   function projectClassExamListFn(data: any) {
-    let arr: { label: string; value: any }[] = [];
+    const arr: { label: string; value: any }[] = [];
     data.forEach((item: any) => {
       arr.push({
         label:

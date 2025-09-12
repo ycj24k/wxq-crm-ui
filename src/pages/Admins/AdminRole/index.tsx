@@ -20,10 +20,10 @@ type GithubIssueItem = {
   method: string;
   userList: any[];
   permissionList: any[];
-  menuList:any[];
+  menuList: any[];
 };
 let content: any = null;
-let menuContentlist: any = null;
+const menuContentlist: any = null;
 let roleContent: any = null;
 let roleContent2: any = null;
 export default () => {
@@ -40,12 +40,12 @@ export default () => {
   const [menuRenderData, setMenuRenderData] = useState<any>();
 
   const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
-  let [department, setDepartment] = useState<any>();
+  const [department, setDepartment] = useState<any>();
   const [CardContent, setCardContent] = useState<any>();
   const [roleCardContent, setRoleCardContent] = useState<any>();
   const [TabListNuber, setTabListNuber] = useState<any>('1');
   let departmentsList: { name: any; id: any }[] = [];
-  let url = TabListNuber == '1' ? '/sms/system/sysRole' : '/sms/system/sysPermission';
+  const url = TabListNuber == '1' ? '/sms/system/sysRole' : '/sms/system/sysPermission';
   const callbackRef = () => {
     roleContent = null;
     roleContent2 = null;

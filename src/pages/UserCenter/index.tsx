@@ -2,7 +2,8 @@ import { Tabs, Radio, Image, message, Divider, Pagination } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
 import ProCard from '@ant-design/pro-card';
-import ProForm, { ProFormInstance, ProFormSelect, ProFormText } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import ProForm, { ProFormSelect, ProFormText } from '@ant-design/pro-form';
 import { useModel, history } from 'umi';
 import Dictionaries from '@/services/util/dictionaries';
 import './index.less';
@@ -96,7 +97,7 @@ export default () => {
                       message: '不能包含空格/请输入正确的用户名',
                     },
                   ]}
-                ></ProFormText>
+                 />
                 <ProFormText
                   label="登陆账号"
                   name="userName"
@@ -108,7 +109,7 @@ export default () => {
                       message: '不能包含空格/请输入正确的账号',
                     },
                   ]}
-                ></ProFormText>
+                 />
                 <ProFormText
                   label="手机号"
                   name="mobile"
@@ -121,8 +122,8 @@ export default () => {
                 //     message: '请输入正确的手机号',
                 //   },
                 // ]}
-                ></ProFormText>
-                <ProFormText label="部门" name="departmentName" width="lg" readonly></ProFormText>
+                 />
+                <ProFormText label="部门" name="departmentName" width="lg" readonly />
 
                 <ProForm.Group>
                   <ProFormSelect
@@ -146,8 +147,8 @@ export default () => {
                       message: '请输入正确的身份证号',
                     },
                   ]}
-                ></ProFormText>
-                <ProFormText label="微信号" name="weChat" width="lg"></ProFormText>
+                 />
+                <ProFormText label="微信号" name="weChat" width="lg" />
               </ProForm>
             </ProCard>
             <ProCard title="员工信息设置">
@@ -192,7 +193,7 @@ export default () => {
                     required: true,
                   },
                 ]}
-              ></ProFormText.Password>
+               />
               <ProFormText.Password
                 label="新密码"
                 name="Password"
@@ -206,7 +207,7 @@ export default () => {
                     message: '密码长度为8-16位字母加数字组合',
                   },
                 ]}
-              ></ProFormText.Password>
+               />
               <ProFormText.Password
                 label="确认新密码"
                 placeholder="请再次输入您的密码..."
@@ -228,7 +229,7 @@ export default () => {
                     },
                   }),
                 ]}
-              ></ProFormText.Password>
+               />
             </ProForm>
           </ProCard>
         </TabPane>
@@ -247,10 +248,10 @@ export default () => {
                 }}
               />
             </div>
-            <Divider></Divider>
+            <Divider />
             {bizNotices?.map((item: any, index: number) => {
               return (
-                <div className="notice" key={index}>
+                <div className="notice" key={`notice-${item.title}-${index}`}>
                   <div className="notice-Title">{item.title}</div>
                   <div className="notice-content">{item.content}</div>
                   {item?.files
@@ -273,7 +274,7 @@ export default () => {
                   <div className="notice-createBy">
                     {item.userName} 与 {item.createTime} 发布
                   </div>
-                  <Divider></Divider>
+                  <Divider />
                 </div>
               );
             })}

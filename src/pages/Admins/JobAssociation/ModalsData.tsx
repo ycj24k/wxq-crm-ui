@@ -11,7 +11,7 @@ import ProForm, {
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import request from '@/services/ant-design-pro/apiRequest';
-import { TransferDirection } from 'antd/lib/transfer';
+import type { TransferDirection } from 'antd/lib/transfer';
 interface RecordType {
   key: string;
   title: string;
@@ -86,9 +86,9 @@ export default (props: any) => {
         destroyOnClose: true,
       }}
       onFinish={async (values: any) => {
-        let arr: any = [];
-        let array: any = [];
-        let types: any = [];
+        const arr: any = [];
+        const array: any = [];
+        const types: any = [];
         if (targetKeys.length > 0) {
           targetKeys.forEach((item: any) => {
             arr.push(Number(item));
@@ -122,7 +122,7 @@ export default (props: any) => {
           });
       }}
     >
-      <ProForm.Group title="报考所需资料（将所需要的资料字段选中放入右侧栏点击确定即可）："></ProForm.Group>
+      <ProForm.Group title="报考所需资料（将所需要的资料字段选中放入右侧栏点击确定即可）：" />
       <div>
         注意：默认报名学员信息：学员姓名、手机号、身份证、报考岗位、招生老师、招生老师部门，不需要重复添加；非必要可以不用勾选。
       </div>

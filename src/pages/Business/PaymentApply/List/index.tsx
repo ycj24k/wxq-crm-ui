@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -49,13 +49,13 @@ const downObj = {
   是否有发票: 'hasInvoice',
 };
 export default (props: any) => {
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
   const { initialState, setInitialState } = useModel('@@initialState');
   // @ts-ignore
   const { currentUser } = initialState;
 
-  let obj = {};
+  const obj = {};
   obj[tokenName] = tokenValue;
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
@@ -125,7 +125,7 @@ export default (props: any) => {
       dataIndex: 'createTime',
       valueType: 'dateRange',
       sorter: true,
-      render: (text, record) => <span>{record.createTime}</span>,
+      render: (text, record) => <span key={`createTime-${record.id}`}>{record.createTime}</span>,
     },
     {
       title: '要求付款时间',
@@ -133,7 +133,7 @@ export default (props: any) => {
       dataIndex: 'paymentTime',
       valueType: 'dateRange',
       sorter: true,
-      render: (text, record) => <span>{record.paymentTime}</span>,
+      render: (text, record) => <span key={`paymentTime-${record.id}`}>{record.paymentTime}</span>,
     },
     {
       title: '备注',
@@ -197,7 +197,7 @@ export default (props: any) => {
       dataIndex: 'hasInvoice',
       search: false,
       sorter: true,
-      render: (text, record) => <span>{record.hasInvoice ? '有发票' : '无发票'}</span>,
+      render: (text, record) => <span key={`hasInvoice-${record.id}`}>{record.hasInvoice ? '有发票' : '无发票'}</span>,
     },
     {
       title: '操作',
@@ -206,7 +206,7 @@ export default (props: any) => {
       render: (text, record) => [
         <Tooltip placement="topLeft" title={'编辑'} key="editables">
           <Button
-            key="editable"
+            key="editable-payment-list"
             type="primary"
             size="small"
             hidden={Boolean(record.auditNum)}
@@ -220,9 +220,9 @@ export default (props: any) => {
             编辑
           </Button>
         </Tooltip>,
-        <Tooltip placement="topLeft" title={'查看'} key="look">
+        <Tooltip placement="topLeft" title={'查看'} key="look-payment-apply">
           <Button
-            key="eidt"
+            key="eidt-payment-list"
             type="primary"
             size="small"
             icon={<SearchOutlined />}
@@ -239,7 +239,7 @@ export default (props: any) => {
           <Popconfirm
             title="是否废除"
             okText="废除"
-            key="enable"
+            key="enable-payment-list"
             cancelText="取消"
             onConfirm={(e) => {
               request.post('/sms/business/bizPaymentApply/disable/' + record.id).then((res) => {
@@ -251,7 +251,7 @@ export default (props: any) => {
             }}
           >
             <Button
-              key="enable"
+              key="enable-payment-list-btn"
               type="primary"
               size="small"
               danger
@@ -262,10 +262,10 @@ export default (props: any) => {
             </Button>
           </Popconfirm>
         </Tooltip>,
-        <Tooltip placement="topLeft" key="dapchu" title={'导出付费信息'}>
+        <Tooltip placement="topLeft" key="dapchu-payment-list" title={'导出付费信息'}>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-payment-list-btn"
             hidden={record.auditNum != '8'}
             size="small"
             icon={<FieldNumberOutlined />}
@@ -279,8 +279,8 @@ export default (props: any) => {
       ],
     },
   ];
-  let params: any = {};
-  let sortList = {
+  const params: any = {};
+  const sortList = {
     ['confirm,num,updateTime']: 'asc,desc,desc',
   };
   // params.auditNum = 8;

@@ -1,6 +1,6 @@
 import apiRequest from "@/services/ant-design-pro/apiRequest"
 import { PlusOutlined } from "@ant-design/icons"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { Button } from "antd"
 import { useEffect, useRef, useState } from "react"
 import { PageContainer } from "@ant-design/pro-layout"

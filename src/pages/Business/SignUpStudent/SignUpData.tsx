@@ -12,8 +12,8 @@ export default (props: any) => {
   const [isModalVisibles, setisModalVisibles] = useState<boolean>(false);
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   useEffect(() => {
-    let arr1: any = [];
-    let arr2: any = [];
+    const arr1: any = [];
+    const arr2: any = [];
     if (renderData.signUp.length > 0) {
       renderData.signUp.forEach((item: any) => {
         if (item.valueType == 0) {
@@ -38,7 +38,7 @@ export default (props: any) => {
       }
     });
   };
-  let nameInfo = '学员';
+  const nameInfo = '学员';
   return (
     <Drawer
       onClose={() => {
@@ -130,7 +130,7 @@ export default (props: any) => {
             {signUpData &&
               signUpData[0].map((item: any, index: number) => {
                 return (
-                  <Descriptions.Item label={item.name} key={index}>
+                  <Descriptions.Item label={item.name} key={`signup-0-${item.name}-${index}`}>
                     {item?.value?.indexOf('.') > 0 ? (
                       <a
                         onClick={() => {
@@ -152,7 +152,7 @@ export default (props: any) => {
               signUpData[1].length &&
               signUpData[1].map((item: any, index: number) => {
                 return (
-                  <Descriptions.Item label={item.name} key={index}>
+                  <Descriptions.Item label={item.name} key={`signup-1-${item.name}-${index}`}>
                     {item?.value?.indexOf('.') > 0 ? (
                       <a
                         onClick={() => {

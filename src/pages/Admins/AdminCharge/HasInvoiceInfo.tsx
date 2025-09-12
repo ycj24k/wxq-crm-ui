@@ -96,10 +96,10 @@ export default (props: any) => {
         })
       }
 
-      <Descriptions title="缴费信息" bordered size="small"></Descriptions>
+      <Descriptions title="缴费信息" bordered size="small" />
       {chargeList.map((item: any, index: number) => {
         return (
-          <Descriptions title={<span>{`缴费编号:${item.num ? item.num : '未审核'}`} {`开票金额:${chargeUsedAmount[item.id]}`}  学员姓名:{item.studentUserId ? <a onClick={() => studentInfo(item.studentUserId)}>{item.studentName}</a> : item.studentName}</span>} bordered size="small" key={index} style={{ marginBottom: '30px' }}>
+          <Descriptions title={<span>{`缴费编号:${item.num ? item.num : '未审核'}`} {`开票金额:${chargeUsedAmount[item.id]}`}  学员姓名:{item.studentUserId ? <a onClick={() => studentInfo(item.studentUserId)}>{item.studentName}</a> : item.studentName}</span>} bordered size="small" key={`has-invoice-info-${index}`} style={{ marginBottom: '30px' }}>
             <Descriptions.Item label="收费金额">{item.amount}</Descriptions.Item>
             {/* <Descriptions.Item label="实收金额">
               {item.discount ? item.amount - item.discount : item.amount}

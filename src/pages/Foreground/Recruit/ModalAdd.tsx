@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Descriptions } from 'antd';
-import { ProFormDatePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 import ProForm, {
     DrawerForm,
     ProFormText,
@@ -260,9 +261,7 @@ export default (props: any) => {
                         request={async () => Dictionaries.getList('recruit_status') as any}
                     />
                 </ProForm.Group>
-                <ProForm.Group>
-
-                </ProForm.Group>
+                <ProForm.Group />
                 <ProFormTextArea
                     name="suggestion"
                     label="面试关键印象及意见"

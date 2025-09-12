@@ -13,7 +13,8 @@ import UserInfo from './UserInfo'
 import Upload from '@/services/util/upload';
 import downObj from './DownHeard'
 import ProCard from '@ant-design/pro-card';
-import ProForm, { ModalForm, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import ProForm, { ModalForm } from '@ant-design/pro-form';
 import UploadDragger from '@/components/UploadDragger/UploadDragger';
 import mammoth from 'mammoth';
 import fetchDownload from '@/services/util/fetchDownload';
@@ -57,7 +58,7 @@ export default (props: any) => {
   const [parentIdTree, setParentIdTree] = useState<string | number>('-1');
   const [UploadFalg, setUploadVisible] = useState<boolean>(false);
   const [CardContent, setCardContent] = useState<any>();
-  let [department, setDepartment] = useState<any>();
+  const [department, setDepartment] = useState<any>();
   const [selectedRowsList, setselectedRowsList] = useState<any>([]);
   const [userInfoFalg, setUserInfoFalg] = useState<boolean>(false)
   const [infoFileVisible, setInfoFileVisible] = useState<boolean>(false)
@@ -71,13 +72,13 @@ export default (props: any) => {
   };
   const getUserList = async () => {
     const list1 = (await request.get('/sms/system/sysUser', { newOrderType: '1', _isGetAll: true })).data.content
-    let L1: any = { userName: [], userId: [] }
+    const L1: any = { userName: [], userId: [] }
     list1.forEach((item: any) => {
       L1.userName.push(item.name);
       L1.userId.push({ id: item.id, name: item.name })
     })
     const list2 = (await request.get('/sms/system/sysUser', { newOrderType: '2', _isGetAll: true })).data.content
-    let L2: any = { userName: [], userId: [] }
+    const L2: any = { userName: [], userId: [] }
     list2.forEach((item: any) => {
       L2.userName.push(item.name);
       L2.userId.push({ id: item.id, name: item.name })
@@ -316,9 +317,9 @@ export default (props: any) => {
           hidden={!record.infoFile}
           // icon={<SearchOutlined />}
           onClick={async (e) => {
-            let tokenName: any = sessionStorage.getItem('tokenName');
-            let tokenValue = sessionStorage.getItem('tokenValue');
-            let obj = {};
+            const tokenName: any = sessionStorage.getItem('tokenName');
+            const tokenValue = sessionStorage.getItem('tokenValue');
+            const obj = {};
             obj[tokenName] = tokenValue;
             fetch('/sms/system/sysUser/download?id=' + record.id + '&fileName=' + record.infoFile, {
               method: 'GET',
@@ -334,7 +335,7 @@ export default (props: any) => {
                         // var html = result.value; // 生成的HTML
                         // var messages = result.messages; // 转换期间的警告消息等
                         console.log(result)
-                        let doc = document.getElementById('infoFileDocx')
+                        const doc = document.getElementById('infoFileDocx')
                         if (doc) doc.innerHTML = result.value
                       })
                       .catch(function (error) {
@@ -412,7 +413,7 @@ export default (props: any) => {
       hideInTable: props?.params,
       render: (text, record, _, action) => [
         <Button
-          key="editable"
+          key="editable-user-manage"
           type="primary"
           size="small"
           onClick={() => {
@@ -542,7 +543,7 @@ export default (props: any) => {
   ];
 
   const getContent = (key: string) => {
-    let Dom = <span></span>
+    let Dom = <span />
     if (key == '1') {
       Dom = (
         <ProTable<GithubIssueItem>
@@ -557,7 +558,7 @@ export default (props: any) => {
             if (props?.params) params.groupId = props.params.id;
             const dataList: any = await request.get('/sms/system/sysUser', params);
             if (props?.params) {
-              let L1: any = { userName: [], userId: [] }
+              const L1: any = { userName: [], userId: [] }
               dataList.data.content.forEach((item: any) => {
                 L1.userName.push(item.name);
                 L1.userId.push({ id: item.id, name: item.name })
@@ -857,7 +858,7 @@ export default (props: any) => {
         footer={null}
         onCancel={() => setDocxVisible(false)}
       >
-        <div id="infoFileDocx"></div>
+        <div id="infoFileDocx" />
       </Modal>
     </PageContainer>
   );

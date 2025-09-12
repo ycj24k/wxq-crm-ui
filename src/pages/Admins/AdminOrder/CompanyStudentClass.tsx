@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, message, Popconfirm, Button, Tooltip } from 'antd';
 import Student from '../StudentManage/student';
-import ProTable, { ActionType } from '@ant-design/pro-table';
+import type { ActionType } from '@ant-design/pro-table';
+import ProTable from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import request from '@/services/ant-design-pro/apiRequest';
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -24,7 +25,7 @@ export default (props: any) => {
   let objData = {};
   // let url = '/sms/business/bizOrder/batch/import';
   useEffect(() => {
-    let arr: string[] = [];
+    const arr: string[] = [];
     objData = {
       classType: renderData.order.classType,
       examType: renderData.order.examType,
@@ -120,7 +121,7 @@ export default (props: any) => {
                 {record.project &&
                   [...new Set(record.project.split(','))].map((item: any, index: number) => {
                     return (
-                      <span key={index}>
+                      <span key={`company-student-class-${item}-${index}`}>
                         {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                       </span>
                     );
@@ -222,7 +223,7 @@ export default (props: any) => {
           type: 'multiple',
           editableKeys,
           onSave: async (rowKey, data, row) => {
-            let array = [
+            const array = [
               {
                 amount: data.amount,
                 id: data.id,
@@ -263,7 +264,7 @@ export default (props: any) => {
             total: dataList.data.totalElements,
           };
         }}
-      ></ProTable>
+       />
       {UploadFalg && (
         <Upload
           setModalVisible={() => setUploadVisible(false)}

@@ -12,7 +12,7 @@ function convertCurrency(idList: any, arr: any = []) {
       }).then((ress) => {
         if (ress.status == 'success') {
           //缴费信息
-          let chargeList: any = ress.data
+          const chargeList: any = ress.data
           // request
           //   .get('/sms/business/bizInvoice/getByChargeIds', {
           //     idList: idList, _isGetAll: true

@@ -31,7 +31,7 @@ export default (props: any) => {
   const [autoExpandParent, setautoExpandParent] = useState(true);
   const [value, setValue] = useState(false);
   const listFn = (data: any) => {
-    let arr2: any = [];
+    const arr2: any = [];
     data.forEach((item: any, index: number) => {
       if ((item.enable || value) || item.departmentName) {
         let arr3: any = [];
@@ -138,7 +138,7 @@ export default (props: any) => {
       });
   }
   const getParentKey = (title: any, tree: any[]): [] => {
-    let parentKey = []
+    const parentKey = []
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i];
       if (node.children) {
@@ -238,7 +238,7 @@ export default (props: any) => {
             defaultCheckedKeys={CheckedKeys}
             onCheck={(checkedKeysValue, e) => {
               const arr = e.checkedNodes
-              let idsList: any = []
+              const idsList: any = []
               arr.forEach((item: any) => {
                 if (item.userId) {
                   idsList.push(item.userId)
@@ -263,8 +263,8 @@ export default (props: any) => {
             setCardVisible(false);
           }}
           onOk={() => {
-            let arr: any = [];
-            let arrid: any = [];
+            const arr: any = [];
+            const arrid: any = [];
             //去掉部门。
             obj2?.forEach((item: any) => {
               if (item.userId) {
@@ -368,9 +368,9 @@ export default (props: any) => {
                 });
             }
             if (CardContent.type == 'achievement') {
-              let dataArr: any = arrid.map((item: any) => ({ id: item, newOrderType: CardContent.typeNum }));
+              const dataArr: any = arrid.map((item: any) => ({ id: item, newOrderType: CardContent.typeNum }));
 
-              let ids: any = departments.map((item: any) => item.id);
+              const ids: any = departments.map((item: any) => item.id);
 
               ids.forEach((item: any) => {
                 if (!arrid.includes(item)) {
@@ -389,8 +389,8 @@ export default (props: any) => {
               });
             }
             if (CardContent.type == 'Groups') {
-              let dataArr: any = arrid.map((item: any) => ({ id: item, groupId: CardContent.groups }));
-              let ids: any = departments.map((item: any) => item.id);
+              const dataArr: any = arrid.map((item: any) => ({ id: item, groupId: CardContent.groups }));
+              const ids: any = departments.map((item: any) => item.id);
               ids.forEach((item: any) => {
                 if (!arrid.includes(item)) {
                   dataArr.push({ id: item, groupId: -1 });

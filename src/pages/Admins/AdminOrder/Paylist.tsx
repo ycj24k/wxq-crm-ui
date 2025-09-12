@@ -1,8 +1,9 @@
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ProFormText,
     ProFormDateTimePicker,
     ProFormSelect,
-    ProFormInstance,
     ProFormDigit
 } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
@@ -23,10 +24,10 @@ interface PayWayMethods {
 const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
     const { renderData, payMessage } = props;
     const [payWayList, setPayWayList] = useState<number[]>([0]); // 用于管理多个支付方式表单
-    const formRefs = useRef<{ [key: number]: ProFormInstance }>({});
+    const formRefs = useRef<Record<number, ProFormInstance>>({});
 
     const [chargeLogVisible, setChargeLogVisible] = useState<any>(false);
-    const [chargeLog, setChargeLog] = useState<Array<any> | null>();
+    const [chargeLog, setChargeLog] = useState<any[] | null>();
 
     useImperativeHandle(ref, () => ({
         getFormValues: async () => {
@@ -130,7 +131,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
     }));
     const userRefs: any = useRef({});
     //显示收款记录
-    const [userNameIds, setUserNameIds] = useState<{ [key: number]: any }>({});
+    const [userNameIds, setUserNameIds] = useState<Record<number, any>>({});
     const [chargeType, setChargeType] = useState<string>('6');
 
     useEffect(() => {
@@ -241,7 +242,7 @@ const PayWay = forwardRef<PayWayMethods, any>((props, ref) => {
                 style={{
                     marginBlockEnd: 8,
                     position: 'relative', marginBottom: index !== payWayList[payWayList.length - 1] ? 16 : 0
-                }} key={index} >
+                }} key={`admin-order-paylist-${index}`} >
                 {/* {payWayList.length > 1 && (
                         <Button
                             type="link"

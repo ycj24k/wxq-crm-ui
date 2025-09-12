@@ -1,6 +1,7 @@
 import UploadDragger from "@/components/UploadDragger/UploadDragger"
 import apiRequest from "@/services/ant-design-pro/apiRequest";
-import ProForm, { ModalForm, ProFormDatePicker, ProFormInstance, ProFormMoney, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ModalForm, ProFormDatePicker, ProFormMoney, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
 import { message } from "antd";
 import { useEffect, useRef } from "react";
 
@@ -11,9 +12,9 @@ export default (props: any) => {
         if (visible) {
             console.log(formRef)
             console.log(renderData)
-            let formData = { ...renderData }
+            const formData = { ...renderData }
             if (formData.file && typeof renderData.file == 'string') {
-                let arr: { uid: number; name: any; response: { data: any } }[] = [];
+                const arr: { uid: number; name: any; response: { data: any } }[] = [];
                 formData.file.split(',').forEach((item: any, index: number) => {
                     arr.push({
                         uid: index + 1,
@@ -39,7 +40,7 @@ export default (props: any) => {
         }}
         onFinish={async (from) => {
             if (from.file) {
-                let arr: any[] = [];
+                const arr: any[] = [];
                 from.file.forEach((item: any) => {
                     arr.push(item.response.data);
                 });

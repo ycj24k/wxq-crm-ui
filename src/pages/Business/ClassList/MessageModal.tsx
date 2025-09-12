@@ -28,12 +28,12 @@ export default (props: any) => {
     const formRef = useRef<ProFormInstance>();
     const { modalVisible, setModalVisible, callbackRef, renderData } = props;
     const [contentMessage, setContentMessage] = useState<string>('')
-    const [contentMessageNew, setContentMessageNew] = useState<String>('')
+    const [contentMessageNew, setContentMessageNew] = useState<string>('')
     const [formInput, SetFormInput] = useState<string[]>([])
     const [signName, setsignName] = useState<string>('')
     useEffect(() => {
-        let str = contentMessage
-        let formList = []
+        const str = contentMessage
+        const formList = []
         const regex = /\${(.*?)}/g;
         let match;
         while ((match = regex.exec(str)) !== null) {
@@ -78,7 +78,7 @@ export default (props: any) => {
         setContentMessageNew(formattedMessage)
     }
     const onChangeText = (item: string) => {
-        let formValue = formRef.current?.getFieldsValue().templateParam[0]
+        const formValue = formRef.current?.getFieldsValue().templateParam[0]
         formValue[item] = '$' + item
         formRef.current?.setFieldValue('templateParam', [formValue])
     }

@@ -7,9 +7,11 @@ import Dictionaries from "@/services/util/dictionaries"
 import ClassType from './ClassType';
 import Paylist from './Paylist'
 import request from '@/services/ant-design-pro/apiRequest';
-import {
-    ProFormCascader,
+import type {
     ProFormInstance
+} from '@ant-design/pro-form';
+import {
+    ProFormCascader
 } from '@ant-design/pro-form';
 import ProForm, {
     ProFormText,
@@ -101,7 +103,7 @@ export default (props: any) => {
             })
 
             let data = {}
-            let datas = {
+            const datas = {
                 id: student.userId,
                 name: student.userName
             }
@@ -212,7 +214,7 @@ export default (props: any) => {
         }
 
         //根据processedUsers数组长度创建auditsParam数组
-        let auditsParam: any = processedUsers.map((order: any, index: number) => ({
+        const auditsParam: any = processedUsers.map((order: any, index: number) => ({
             "student": studentMsg,
             "order": order,
             "charge": newPay[index]
@@ -390,7 +392,7 @@ export default (props: any) => {
                             width={300}
                             userLabel={'信息所有人'}
                             //disabled={selectStudentData}
-                            filter={(e: Array<any>) => {
+                            filter={(e: any[]) => {
                                 e.unshift({
                                     title: '无',
                                     userId: -1,

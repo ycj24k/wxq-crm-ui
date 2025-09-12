@@ -33,6 +33,7 @@ interface RuleLine {
   operator?: number;
   value: string;
   ruleGroupId?: number;
+  uid: string; // 本地唯一键，避免同 id 规则联动
   // 删除多余元信息字段
   type?: number;
 }
@@ -94,7 +95,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
   const [userPickVisible, setUserPickVisible] = useState<boolean>(false);
-  const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleId: number; fieldKey: string } | null>(null);
+  const [userPickRule, setUserPickRule] = useState<{ groupId: number; ruleUid: string; fieldKey: string } | null>(null);
 
   // 加载字段列表
   const loadFieldTypes = async () => {
@@ -154,11 +155,14 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
       if (response.status === 'success' && response.data) {
         // 转换API数据格式为组件需要的格式
         const data = Array.isArray(response.data) ? response.data : [response.data];
-        const convertedGroups: RuleGroup[] = data.map((group: any) => ({
+        const convertedGroups: RuleGroup[] = data.map((group: any, gi: number) => ({
           id: group.id || 0,
           name: `规则组${group.id || 1}`,
           relation: group.operator === 0 ? 'and' : 'or',
-          rules: group.ruleList || [],
+          rules: (group.ruleList || []).map((r: any, ri: number) => ({
+            ...r,
+            uid: `${gi}-${ri}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
+          })),
           userGroupId: group.userGroupId || userGroupId,
           // 移除 isDel
           operator: group.operator || 0
@@ -259,7 +263,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           type: undefined,
           value: '',
           ruleGroupId: groupId,
-          // 移除 isDel
+          uid: `${groupId}-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
         };
         return {
           ...group,
@@ -271,12 +275,12 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 删除规则行
-  const removeRuleLine = (groupId: number, ruleId: number) => {
+  const removeRuleLine = (groupId: number, ruleUid: string) => {
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
           ...group,
-          rules: group.rules.filter(rule => rule.id !== ruleId)
+          rules: group.rules.filter(rule => rule.uid !== ruleUid)
         };
       }
       return group;
@@ -312,13 +316,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 更新规则值
-  const updateRuleValue = (groupId: number, ruleId: number, field: string, value: any) => {
+  const updateRuleValue = (groupId: number, ruleUid: string, field: string, value: any) => {
     setRuleGroups(prev => prev.map(group => {
       if (group.id === groupId) {
         return {
           ...group,
           rules: group.rules.map(rule => {
-            if (rule.id === ruleId) {
+            if (rule.uid === ruleUid) {
               const updatedRule = { ...rule, [field]: value };
               // 如果修改了字段：置空运算类型与值
               if (field === 'field') {
@@ -497,7 +501,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                   shape="round"
                   icon={<UserAddOutlined />}
                   onClick={() => {
-                    setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleId: rule.id, fieldKey });
+                    setUserPickRule({ groupId: rule.ruleGroupId || 0, ruleUid: rule.uid, fieldKey });
                     setUserPickVisible(true);
                   }}
                 >选择人员</Button>
@@ -520,7 +524,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Input
             value={rule.value}
-            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', e.target.value)}
             placeholder="请输入值"
           />
         );
@@ -528,7 +532,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
         return (
           <Input
             value={rule.value}
-            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.id, 'value', e.target.value)}
+            onChange={(e) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', e.target.value)}
             placeholder="请输入值"
           />
         );
@@ -587,12 +591,12 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             }
           >
             {group.rules.map((rule, _ruleIndex) => (
-              <Row key={rule.id} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
+              <Row key={rule.uid} gutter={8} style={{ marginBottom: '12px', alignItems: 'center' }}>
                 <Col span={5}>
                   <Select
                     value={rule.field}
                     style={{ width: '100%' }}
-                    onChange={(value) => updateRuleValue(group.id, rule.id, 'field', value)}
+                    onChange={(value) => updateRuleValue(group.id, rule.uid, 'field', value)}
                   >
                     {fieldTypes.map(field => (
                       <Option key={field.key} value={field.key}>{field.name}</Option>
@@ -603,7 +607,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                   <Select
                     value={rule.type}
                     style={{ width: '100%' }}
-                    onChange={(value) => updateRuleValue(group.id, rule.id, 'type', value)}
+                    onChange={(value) => updateRuleValue(group.id, rule.uid, 'type', value)}
                     placeholder="请选择运算类型"
                   >
                     {getAvailableOperators(rule.field).map(op => (
@@ -625,7 +629,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                       type="text"
                       danger
                       icon={<MinusCircleOutlined />}
-                      onClick={() => removeRuleLine(group.id, rule.id)}
+                      onClick={() => removeRuleLine(group.id, rule.uid)}
                     />
                   </Space>
                 </Col>
@@ -655,7 +659,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
           renderData={{}}
           onConfirmSelected={(ids: number[]) => {
             if (!userPickRule) return;
-            updateRuleValue(userPickRule.groupId, userPickRule.ruleId, 'value', ids.join(','));
+            updateRuleValue(userPickRule.groupId, userPickRule.ruleUid, 'value', ids.join(','));
           }}
         />
       )}

@@ -2,7 +2,8 @@ import UploadDragger from "@/components/UploadDragger/UploadDragger"
 import apiRequest from "@/services/ant-design-pro/apiRequest";
 import dictionaries from "@/services/util/dictionaries";
 import { getCompanyRequest } from "@/services/util/util";
-import ProForm, { ModalForm, ProFormDatePicker, ProFormInstance, ProFormMoney, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ModalForm, ProFormDatePicker, ProFormMoney, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form"
 import { message } from "antd";
 import { useEffect, useRef } from "react";
 

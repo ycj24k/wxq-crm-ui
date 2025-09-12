@@ -12,7 +12,7 @@ export default (props: any) => {
   const [Piesource, setPieSource] = useState<any>(false);
   const [source, setSource] = useState<any>(false);
   // const [tiem, setTiem] = useState<any>(false);
-  let time: any[] | null = null;
+  const time: any[] | null = null;
   const [statisticsData, setStatisticsData] = useState<any>(0);
   useEffect(() => {
     // console.log(Dictionaries.getList('dict_source'));
@@ -24,7 +24,7 @@ export default (props: any) => {
     statisticsAll()
   }, []);
   const statisticsAll = async () => {
-    let all = (await request.get('/sms/business/bizStudentUser/statistics', {
+    const all = (await request.get('/sms/business/bizStudentUser/statistics', {
       array: JSON.stringify([{
         source: 1,
         'userId-isNull': true,
@@ -33,12 +33,12 @@ export default (props: any) => {
     setStatisticsData(all)
   }
   const onChange = async (checkedValues: any) => {
-    let data: any = [];
+    const data: any = [];
     let PieData: any = []
     let statisticsDatas = statisticsData
-    let arr: any[] = checkedValues.map((item: string | undefined) => {
+    const arr: any[] = checkedValues.map((item: string | undefined) => {
       const Projects = Dictionaries.getList('dict_reg_job', item);
-      let projectIn = Projects.map((itemList: any) => itemList.value).join(',');
+      const projectIn = Projects.map((itemList: any) => itemList.value).join(',');
       return {
         source: 1,
         'userId-isNull': true,
@@ -46,7 +46,7 @@ export default (props: any) => {
       };
     });
 
-    let sourcecontent = await request.get('/sms/business/bizStudentUser/statistics', {
+    const sourcecontent = await request.get('/sms/business/bizStudentUser/statistics', {
       array: JSON.stringify(arr),
     });
     checkedValues.forEach((item: any, index: number) => {
@@ -116,7 +116,7 @@ export default (props: any) => {
           <Row>
             {Dictionaries.getList('dict_reg_job')?.map((item: any, index: number) => {
               return (
-                <Col span={4} key={index}>
+                <Col span={4} key={`reg-job-${item.value}-${index}`}>
                   <Checkbox value={item.value}>{item.label}</Checkbox>
                 </Col>
               );

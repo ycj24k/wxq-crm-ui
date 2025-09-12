@@ -1,6 +1,7 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
-  ProFormInstance,
   ProFormText,
   ProFormTextArea,
   ProFormUploadDragger,
@@ -19,7 +20,7 @@ export default (props: any) => {
   useEffect(() => {
     if (renderData?.type == 'eidt') {
       if (renderData.file) {
-        let arr: { uid: number; name: any; response: { data: any } }[] = [];
+        const arr: { uid: number; name: any; response: { data: any } }[] = [];
         renderData.file.split(',').forEach((item: any, index: number) => {
           arr.push({
             uid: index + 1,
@@ -44,7 +45,7 @@ export default (props: any) => {
 
   const submitok = (value: any) => {
     if (value.file) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.file.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -99,7 +100,7 @@ export default (props: any) => {
             message: '请填写具体内容',
           },
         ]}
-      ></ProFormTextArea>
+       />
       <UploadDragger
         width={630}
         label="反馈意见附件"

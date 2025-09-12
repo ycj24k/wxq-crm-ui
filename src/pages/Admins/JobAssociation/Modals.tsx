@@ -64,7 +64,7 @@ export default (props: any) => {
       onFinish={async (values: any) => {
         // values.project = values.project[values.project.length - 1];
         // if (renderData.types == 'edit') values.id = renderData.id;
-        let arr: any = [];
+        const arr: any = [];
         values.projects.forEach((item: any) => {
           if (renderData.types == 'edit') {
             arr.push({

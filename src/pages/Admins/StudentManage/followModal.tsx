@@ -67,9 +67,9 @@ export default (props: any) => {
     const formRef = useRef<ProFormInstance>();
     const userRefs: any = useRef(null);
 
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-    let obj: { [key: string]: string } = {};
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const obj: Record<string, string> = {};
     if (tokenValue !== null) {
         obj[tokenName] = tokenValue;
     } else {
@@ -80,8 +80,8 @@ export default (props: any) => {
 
 
     const handleWatch = async (id: any, file: any) => {
-        let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-        let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+        const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+        const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
         const src = '/sms/business/bizReturnVisit/download?id=' + id + '&fileName=' + file + '&' + tokenName + '=' + tokenValue;
         setImageUrl(src)
         setFollowImage(true)
@@ -174,7 +174,7 @@ export default (props: any) => {
                         />
                     </div>
                     <div className='search_right'>
-                        <Button key="ordere"
+                        <Button key="add-follow-record"
                             type="primary"
                             onClick={handleAddfollow}>添加跟进记录</Button>
                     </div>
@@ -238,7 +238,7 @@ export default (props: any) => {
                         columns={columns}
                         toolBarRender={[
                             <Button
-                                key="ordere"
+                                key="add-follow-record-toolbar"
                                 type="primary"
                                 onClick={handleAddfollow}
                             >
@@ -272,7 +272,7 @@ export default (props: any) => {
                     values.studentUserId = renderData.id;
                     values.updateBy = initialState?.currentUser?.userid;
                     if (values.filess) {
-                        let arr: any[] = [];
+                        const arr: any[] = [];
                         values.filess.forEach((item: any) => {
                             arr.push(item.response.data);
                         });
@@ -425,7 +425,7 @@ export default (props: any) => {
                     setFollowImage(false);
                 }}
             >
-                <img style={{ width: '100%' }} src={ImgUrl}></img>
+                <img style={{ width: '100%' }} src={ImgUrl} />
             </Modal>
         </>
     );

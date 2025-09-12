@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Descriptions } from 'antd';
-import { ProFormDatePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 import ProForm, {
     ModalForm,
     ProFormText,
@@ -28,7 +29,7 @@ export default (props: any) => {
                     }
                 })
                 if (renderData.file) {
-                    let arr: { uid: number; name: any; response: { data: any } }[] = [];
+                    const arr: { uid: number; name: any; response: { data: any } }[] = [];
                     renderData.file.split(',').forEach((item: any, index: number) => {
                         arr.push({
                             uid: index + 1,
@@ -59,7 +60,7 @@ export default (props: any) => {
         }
         delete value.createBy
         if (value.file) {
-            let arr: any[] = [];
+            const arr: any[] = [];
             value.file.forEach((item: any) => {
                 arr.push(item.response.data);
             });

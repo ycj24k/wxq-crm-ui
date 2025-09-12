@@ -33,7 +33,7 @@ import {
 import TableContentFn from '@/services/util/TableContentFn';
 import { getNextDay } from '../Department/AchievementUser/getTime'
 const { RangePicker } = DatePicker;
-var timss: any = null;
+let timss: any = null;
 let i = 0;
 const Welcome: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
@@ -205,9 +205,9 @@ const Welcome: React.FC = () => {
       volume(str2, str3);
     }
     if (val === 1) {
-      let weekOfday = parseInt(moment().format('d'));
-      let start = moment().subtract(weekOfday, 'days').format('YYYY-MM-DD'); // 周一日期
-      let end = moment()
+      const weekOfday = parseInt(moment().format('d'));
+      const start = moment().subtract(weekOfday, 'days').format('YYYY-MM-DD'); // 周一日期
+      const end = moment()
         .add(7 - weekOfday - 1, 'days')
         .format('YYYY-MM-DD'); // 周日日期
       volume(start, end);
@@ -236,8 +236,8 @@ const Welcome: React.FC = () => {
     let userDep = Dictionaries.getDepartmentName(currentUser.departmentId);
     userDep = userDep[userDep.length - 2];
     const DepatrmentAchievement = await TableContentFn();
-    let Achievement: any[] = [];
-    let configs: any = [];
+    const Achievement: any[] = [];
+    const configs: any = [];
     DepatrmentAchievement.forEach((item: any) => {
       if (item.name == userDep) {
         Achievement.push(item);
@@ -305,8 +305,8 @@ const Welcome: React.FC = () => {
       .then((res: any) => {
         // setContentList(['1111111111111']);
         const list = res.data.content;
-        let contentlist: any = [];
-        let content: any = [];
+        const contentlist: any = [];
+        const content: any = [];
         list.forEach((item: any, index: number) => {
           if (
             content.find((e: any) => {
@@ -323,7 +323,7 @@ const Welcome: React.FC = () => {
           }
           if (f == 'effect') {
             contentlist.push(
-              <li key={index} className="content">
+              <li key={`effect-${item.userName}-${item.project}-${index}`} className="content">
                 <p>
                   <a className="bianpao" />
                   <span>{`${item.userName}成交了一笔${Dictionaries.getCascaderName(
@@ -367,14 +367,14 @@ const Welcome: React.FC = () => {
   };
 
   const FnTime = (value: number) => {
-    let list = document.getElementsByClassName('content');
+    const list = document.getElementsByClassName('content');
     if (value > 5) {
       timss = setInterval(() => {
         if (list[i] === undefined) {
           i = 0;
         }
 
-        let obj = list[i];
+        const obj = list[i];
         if (obj != undefined) {
           obj.setAttribute('style', 'display:none');
           setTimeout(() => obj.setAttribute('style', 'display:block'), 500);
@@ -657,7 +657,7 @@ const Welcome: React.FC = () => {
                       return (
                         <RangePicker
                           defaultValue={timeChange}
-                          key={index}
+                          key={`time-picker-${index}`}
                           style={{ width: '250px' }}
                           onChange={(e: any) => {
                             volume(
@@ -671,7 +671,7 @@ const Welcome: React.FC = () => {
                     } else {
                       return (
                         <span
-                          key={index}
+                          key={`content-title-${index}`}
                           style={{ color: index == contentTitleIndex ? '#1890ff' : 'black' }}
                           onClick={() => {
                             setTitleIndex(index);
@@ -695,7 +695,7 @@ const Welcome: React.FC = () => {
                 {todayContent &&
                   todayContent.map((item: any, index: number) => {
                     return (
-                      <li key={index}>
+                      <li key={`ranking-${item.name}-${index}`}>
                         <div className="indexSpan">{index + 1}</div>
                         <div>{item.name}</div>
                         <div>{item.amount}元</div>
@@ -751,7 +751,7 @@ const Welcome: React.FC = () => {
               {navigationTabr.map((item: any, index: number) => {
                 return (
                   <div
-                    key={index}
+                    key={`navigation-${item.name}-${index}`}
                     className="navigation-icon"
                     onClick={() => {
                       history.push(item.url);

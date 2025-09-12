@@ -3,7 +3,7 @@ import { Modal, Tree, Input } from 'antd';
 import { useState, useEffect } from 'react';
 const { Search } = Input;
 import request from '@/services/ant-design-pro/apiRequest';
-let CheckedKeys: any = [];
+const CheckedKeys: any = [];
 export default (props: any) => {
   const { setParentIdTree, setParentIdFalg, callbackRef, type } = props;
   const [treeData, setTreeData] = useState([]);
@@ -41,9 +41,9 @@ export default (props: any) => {
   };
   
   // 递归过滤掉 isDel < 0 的节点
-  const filterDeletedNodes = (data:any) => {
-    return data.filter((item:any) => item.isDel >= 0) // 保留 isDel >= 0 的节点
-      .map((item:any) => {
+  const filterDeletedNodes = (data: any) => {
+    return data.filter((item: any) => item.isDel >= 0) // 保留 isDel >= 0 的节点
+      .map((item: any) => {
         // 如果有子节点，递归处理子节点
         if (item.children && item.children.length) {
           return {
@@ -60,7 +60,7 @@ export default (props: any) => {
     const contentList: any = await request.get('/sms/share/getDepartment', {
       _isGetAll: true,
     });
-    let arr: any = [];
+    const arr: any = [];
     let arr2 = contentList.data.reverse();
     arr2 = filterDeletedNodes(arr2);
 

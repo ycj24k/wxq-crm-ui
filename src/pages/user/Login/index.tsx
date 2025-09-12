@@ -347,7 +347,7 @@ const Login: React.FC = () => {
           layout="LAYOUT_TYPE_HORIZONTAL"
           onFinish={async (values) => {
             delete values.Passwords;
-            let headers: any = {};
+            const headers: any = {};
             headers[userInfo.data.tokenName] = [userInfo.data.tokenValue];
             console.log('userInfo', userInfo);
 
@@ -396,7 +396,7 @@ const Login: React.FC = () => {
                 required: true,
               },
             ]}
-          ></ProFormText.Password>
+           />
           <ProFormText.Password
             label="新密码"
             name="Password"
@@ -410,7 +410,7 @@ const Login: React.FC = () => {
                 message: '密码长度为8-16位字母加数字组合',
               },
             ]}
-          ></ProFormText.Password>
+           />
           <ProFormText.Password
             label="确认新密码"
             placeholder="请再次输入您的密码..."
@@ -432,7 +432,7 @@ const Login: React.FC = () => {
                 },
               }),
             ]}
-          ></ProFormText.Password>
+           />
         </ModalForm>
       </div>
       {/* <Footer /> */}

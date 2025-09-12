@@ -1,26 +1,26 @@
 function convertCurrency(money: any) {
   //汉字的数字
-  var cnNums = new Array('零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖');
+  const cnNums = new Array('零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖');
   //基本单位
-  var cnIntRadice = new Array('', '拾', '佰', '仟');
+  const cnIntRadice = new Array('', '拾', '佰', '仟');
   //对应整数部分扩展单位
-  var cnIntUnits = new Array('', '万', '亿', '兆');
+  const cnIntUnits = new Array('', '万', '亿', '兆');
   //对应小数部分单位
-  var cnDecUnits = new Array('角', '分', '毫', '厘');
+  const cnDecUnits = new Array('角', '分', '毫', '厘');
   //整数金额时后面跟的字符
-  var cnInteger = '整';
+  const cnInteger = '整';
   //整型完以后的单位
-  var cnIntLast = '元';
+  const cnIntLast = '元';
   //最大处理的数字
-  var maxNum = 999999999999999.9999;
+  const maxNum = 999999999999999.9999;
   //金额整数部分
-  var integerNum;
+  let integerNum;
   //金额小数部分
-  var decimalNum;
+  let decimalNum;
   //输出的中文金额字符串
-  var chineseStr = '';
+  let chineseStr = '';
   //分离金额后用的数组，预定义
-  var parts;
+  let parts;
   if (money == '') {
     return '';
   }
@@ -45,13 +45,13 @@ function convertCurrency(money: any) {
   }
   //获取整型部分转换
   if (parseInt(integerNum, 10) > 0) {
-    var zeroCount = 0;
-    var IntLen = integerNum.length;
+    let zeroCount = 0;
+    const IntLen = integerNum.length;
     for (var i = 0; i < IntLen; i++) {
       var n = integerNum.substr(i, 1);
-      var p = IntLen - i - 1;
-      var q = p / 4;
-      var m = p % 4;
+      const p = IntLen - i - 1;
+      const q = p / 4;
+      const m = p % 4;
       if (n == '0') {
         zeroCount++;
       } else {
@@ -70,7 +70,7 @@ function convertCurrency(money: any) {
   }
   //小数部分
   if (decimalNum != '') {
-    var decLen = decimalNum.length;
+    const decLen = decimalNum.length;
     for (var i = 0; i < decLen; i++) {
       var n = decimalNum.substr(i, 1);
       if (n != '0') {

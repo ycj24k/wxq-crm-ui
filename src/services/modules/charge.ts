@@ -2,7 +2,7 @@
  * 缴费管理相关API
  */
 import request from '@/services/ant-design-pro/apiRequest';
-import { Charge, PageResponse, ApiResponse } from '@/types';
+import type { Charge, PageResponse, ApiResponse } from '@/types';
 
 export const chargeAPI = {
   /**

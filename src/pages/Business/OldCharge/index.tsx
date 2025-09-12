@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import Tables from '@/components/Tables';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import { useRef } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
@@ -244,7 +244,7 @@ export default forwardRef((props: any, ref) => {
           {record.oldProject &&
             [...new Set(record.oldProject.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`old-project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -455,7 +455,7 @@ export default forwardRef((props: any, ref) => {
       render: (text, record) => (
         <>
           <Button
-            key="look"
+            key="look-old-charge"
             type="primary"
             size="small"
             icon={<SearchOutlined />}
@@ -495,7 +495,7 @@ export default forwardRef((props: any, ref) => {
             }}
           >
             <Button
-              key="look"
+              key="look-old-charge-2"
               type="primary"
               hidden={params.list || params.type == 3}
               size="small"
@@ -521,7 +521,7 @@ export default forwardRef((props: any, ref) => {
             }}
           >
             <Button
-              key="look"
+              key="look-old-charge-3"
               type="primary"
               hidden={
                 record.isSubmit === false ||
@@ -549,7 +549,7 @@ export default forwardRef((props: any, ref) => {
           </Button>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-old-charge-1"
             size="small"
             style={{ marginTop: '10px' }}
             icon={<FieldNumberOutlined />}
@@ -562,7 +562,7 @@ export default forwardRef((props: any, ref) => {
           </Button>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-old-charge-2"
             size="small"
             style={{ marginTop: '10px' }}
             icon={<FieldNumberOutlined />}
@@ -604,7 +604,7 @@ export default forwardRef((props: any, ref) => {
           </Popconfirm>
           <Button
             type="primary"
-            key="editable"
+            key="editable-old-charge"
             size="small"
             hidden={record.isSubmit !== false}
             icon={<EditOutlined />}

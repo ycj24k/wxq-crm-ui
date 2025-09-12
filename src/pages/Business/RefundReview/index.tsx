@@ -1,14 +1,15 @@
 import Tables from "@/components/Tables"
 import Dictionaries from "@/services/util/dictionaries"
-import { ProColumns } from "@ant-design/pro-table"
+import type { ProColumns } from "@ant-design/pro-table"
 import { Button, Tag, message, Popconfirm, Badge } from "antd"
 import { useState, useRef, useEffect } from "react"
 import request from '@/services/ant-design-pro/apiRequest';
 import fetchDownload from '@/services/util/fetchDownload';
 import './index.less'
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import {
     ModalForm,
-    ProFormInstance,
     ProFormTextArea
 } from '@ant-design/pro-form';
 
@@ -37,7 +38,7 @@ export default (props: any) => {
     const actionRef = useRef<any>();
 
     //const param = getAll ? {} : { isUseUp: false }
-    let param: any = { isRefund: true, 'auditNum-isNull': true };
+    const param: any = { isRefund: true, 'auditNum-isNull': true };
     const [Params, setParams] = useState<any>(param);
     useEffect(() => {
         BadgesNumbers()
@@ -324,7 +325,7 @@ export default (props: any) => {
             width={600}
             formRef={formRef}
             onFinish={async (values) => {
-                let res = await request.post(`/sms/business/bizAudit/audit/${12}?entityId=${refundID}&confirm=false&remark=${values.description}`)
+                const res = await request.post(`/sms/business/bizAudit/audit/${12}?entityId=${refundID}&confirm=false&remark=${values.description}`)
                 if (res.status == 'success') {
                     message.success('成功');
                     actionRef.current.reload();

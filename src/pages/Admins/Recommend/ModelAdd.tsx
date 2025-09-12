@@ -1,7 +1,8 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormDigit,
-  ProFormInstance,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,

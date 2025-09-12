@@ -30,10 +30,10 @@ export default (props: any) => {
   const [windowSize, setWindowSize] = useState(getWindowSize());
   const contents = [
     <div hidden={renderData.type == 'refund' || renderData.type == 'refundList'}>
-      <Descriptions title="缴费信息" bordered size="small"></Descriptions>
+      <Descriptions title="缴费信息" bordered size="small" />
       {chargelist.map((item: any, index: number) => {
         return (
-          <Descriptions bordered size="small" key={index} style={{ marginBottom: '30px' }}>
+          <Descriptions bordered size="small" key={`charge-info-${index}`} style={{ marginBottom: '30px' }}>
             <Descriptions.Item label="缴费编号">
               {
                 item.num
@@ -121,7 +121,7 @@ export default (props: any) => {
       })}
     </div>,
     <div>
-      <Descriptions title="退费信息" bordered size="small"></Descriptions>
+      <Descriptions title="退费信息" bordered size="small" />
       {refundList.map((item: any, key: number) => {
         return (
           <Descriptions key={key} bordered size="small" style={{ marginBottom: '30px' }}>
@@ -140,7 +140,7 @@ export default (props: any) => {
               {item.project &&
                 [...new Set(item.project.split(','))].map((item: any, index: number) => {
                   return (
-                    <span key={index}>
+                    <span key={`charge-info-project-${item}-${index}`}>
                       {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                     </span>
                   );
@@ -291,8 +291,8 @@ export default (props: any) => {
     });
   };
   const look2 = async (item: any) => {
-    let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-    let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+    const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+    const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
     const src = '/sms/business/bizChargeQrcode/download?id=' + item.chargeQrcodeId + '&fileName=' + item.file + '&' + tokenName + '=' + tokenValue;
     setQrcodeSrc(src);
     setQrcodeVisible(true)
@@ -384,7 +384,7 @@ export default (props: any) => {
         return item;
       })}
 
-      <a id="downloadDiv" style={{ display: 'none' }}></a>
+      <a id="downloadDiv" style={{ display: 'none' }} />
       {previewVisible && (
         <ChargeIframe
           previewImage={imgSrc}

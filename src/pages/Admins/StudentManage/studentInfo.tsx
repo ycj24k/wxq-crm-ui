@@ -28,31 +28,31 @@ export default (props: any) => {
   const [windowSize, setWindowSize] = useState(getWindowSize());
   useEffect(() => {
     if (tabsKey == '1' && !tabsReturnVisit && renderData.id) {
-      let a = <Return admin={renderData.admin} studentUserId={renderData.id} />;
+      const a = <Return admin={renderData.admin} studentUserId={renderData.id} />;
       setTabsReturnVisit(a);
     }
     if (tabsKey == '2' && !tabsOrder && renderData.id) {
-      let a = <Order studentUserId={renderData.id} type={renderData.type} />;
+      const a = <Order studentUserId={renderData.id} type={renderData.type} />;
       setTabsOrder(a);
     }
     if (tabsKey == '8' && !tabsOrders && renderData.id) {
-      let a = <Order admins={renderData.lastDealTime} studentUserId={renderData.id} type={renderData.type} />;
+      const a = <Order admins={renderData.lastDealTime} studentUserId={renderData.id} type={renderData.type} />;
       setTabsOrder(a);
     }
     if (tabsKey == '4' && !tabReceive && renderData.id) {
-      let a = <Receive studentUserId={renderData.id} />;
+      const a = <Receive studentUserId={renderData.id} />;
       setTabsReceive(a);
     }
     if (tabsKey == '6' && !tabsStudent && renderData.id) {
-      let a = <Student parentId={renderData.id} isFormal={null} />;
+      const a = <Student parentId={renderData.id} isFormal={null} />;
       setTabsStudent(a);
     }
     if (tabsKey == '5' && !tabContract && renderData.id) {
-      let a = <Contract mobile={renderData.mobile} />;
+      const a = <Contract mobile={renderData.mobile} />;
       setTabsContract(a);
     }
     if (tabsKey == '3' && !tabCharget && renderData.id) {
-      let a = (
+      const a = (
         <Charge
           type="1"
           studentType={renderData.type}
@@ -63,7 +63,7 @@ export default (props: any) => {
       setTabsCharge(a);
     }
     if (tabsKey == '7' && !tabChargets && renderData.id) {
-      let a = (
+      const a = (
         <Charge
           type="0"
           studentType={renderData.type}
@@ -74,7 +74,7 @@ export default (props: any) => {
       setTabsCharges(a);
     }
     if (tabsKey == '9') {
-      let a = <Invoice param={{ studentUserIds: ',' + renderData.id + ',' }} />;
+      const a = <Invoice param={{ studentUserIds: ',' + renderData.id + ',' }} />;
       setTabInvoice(a);
     }
   }, [tabsKey, renderData]);

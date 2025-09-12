@@ -14,7 +14,8 @@ import Tables from '@/components/Tables';
 import filter from '@/services/util/filter';
 import AddResource from './AddResource'
 import { useModel } from 'umi';
-import ProForm, { ModalForm, ProFormInstance, ProFormText } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import ProForm, { ModalForm, ProFormText } from '@ant-design/pro-form';
 type GithubIssueItem = {
     name: string;
     sex: number;
@@ -48,8 +49,8 @@ export default (props: any) => {
     const actionRef = useRef<ActionType>();
     const [ModalVisible, setModalVisible] = useState<boolean>(false);
     const [CardVisible, setCardVisible] = useState<boolean>(false);
-    let [department, setDepartment] = useState<any>({ name: '' });
-    let [departmentId, setDepartmentId] = useState<any>(initialState?.currentUser?.departmentId);
+    const [department, setDepartment] = useState<any>({ name: '' });
+    const [departmentId, setDepartmentId] = useState<any>(initialState?.currentUser?.departmentId);
     const formRef = useRef<ProFormInstance>();
 
     const callbackRef = () => {
@@ -227,7 +228,7 @@ export default (props: any) => {
             tip: '备注过长会自动收缩',
         },
     ];
-    let sortList: any = {
+    const sortList: any = {
         ['circulationTime']: 'desc',
     };
     return (

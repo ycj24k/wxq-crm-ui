@@ -1,4 +1,4 @@
-import { ProColumns } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import { Tag } from 'antd';
 import moment from 'moment';
 import Dictionaries from '@/services/util/dictionaries';
@@ -36,7 +36,7 @@ export default (type: any) => {
           width: 120,
           dataIndex: 'chargeTime',
           valueType: 'dateRange',
-          render: (text, record) => <span>{record.createTime}</span>,
+          render: (text, record) => <span key={`createTime-${record.id}`}>{record.createTime}</span>,
         },
         {
           title: '到账日期',
@@ -84,7 +84,7 @@ export default (type: any) => {
               {record.project &&
                 [...new Set(record.project.split(','))].map((item: any, index: number) => {
                   return (
-                    <span key={index}>
+                    <span key={`project-${item}-${index}`}>
                       {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                     </span>
                   );

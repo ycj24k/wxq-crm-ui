@@ -45,7 +45,8 @@ import DownHeader from './DownHeader';
 import chargeDownload from '@/services/util/chargeDownload'
 import './Charge.less';
 import filter from '@/services/util/filter';
-import { ModalForm, ProFormDigit, ProFormInstance, ProFormTextArea, ProFormUploadDragger } from '@ant-design/pro-form';
+import type { ProFormInstance} from '@ant-design/pro-form';
+import { ModalForm, ProFormDigit, ProFormTextArea, ProFormUploadDragger } from '@ant-design/pro-form';
 import Invoice from '@/pages/Business/Invoice/Invoice';
 import ChargeNew from './ChargeNew';
 import * as XLSX from 'XLSX';
@@ -68,8 +69,8 @@ export default (props: any) => {
     setChargeList,
     formParam = {}
   } = props;
-  let params: any = { enable: true };
-  let param: any = formParam;
+  const params: any = { enable: true };
+  const param: any = formParam;
   params.type = type;
   if (chargeType == 'refundList') {
     // param.auditType = 4;
@@ -118,7 +119,7 @@ export default (props: any) => {
     ? []
     : [
       <Button
-        key="button"
+        key="button-charge"
         icon={<PlusOutlined />}
         type="primary"
         onClick={() => {
@@ -136,7 +137,7 @@ export default (props: any) => {
     if (value && chargeType == 'charge') BadgesNumbers();
   };
   const BadgesNumber = () => {
-    let studentTypes = studentType != 'all' ? { studentType: studentType } : {};
+    const studentTypes = studentType != 'all' ? { studentType: studentType } : {};
     request
       .get('/sms/business/bizCharge/statistics', {
         array: JSON.stringify([
@@ -152,7 +153,7 @@ export default (props: any) => {
       });
   };
   const BadgesNumbers = () => {
-    let studentTypes = studentType != 'all' ? { studentType: studentType } : {};
+    const studentTypes = studentType != 'all' ? { studentType: studentType } : {};
     request
       .get('/sms/business/bizCharge/statistics', {
         array: JSON.stringify([{ type: 0, ...studentTypes, 'auditType-isNull': true }]),
@@ -432,7 +433,7 @@ export default (props: any) => {
           {record.project &&
             [...new Set(record.project.split(','))].map((item: any, index: number) => {
               return (
-                <span key={index}>
+                <span key={`project-${item}-${index}`}>
                   {Dictionaries.getCascaderName('dict_reg_job', item)} <br />
                 </span>
               );
@@ -679,7 +680,7 @@ export default (props: any) => {
       render: (text, record, _, action) => (
         <>
           <Button
-            key="look"
+            key="look-charge"
             type="primary"
             size="small"
             icon={<SearchOutlined />}
@@ -699,7 +700,7 @@ export default (props: any) => {
           </Button>
           <Button
             type="primary"
-            key="editable"
+            key="editable-charge-1"
             size="small"
             // hidden={record.isSubmit !== false}
             hidden={!record.isSubmit || chargeType != 'refund'}
@@ -715,7 +716,7 @@ export default (props: any) => {
           </Button>
           <Button
             type="primary"
-            key="editable"
+            key="editable-charge-2"
             size="small"
             // hidden={record.isSubmit !== false}
             // hidden={!record.isSubmit || chargeType == 'chargeList' || chargeType == 'refundList'}
@@ -749,7 +750,7 @@ export default (props: any) => {
           </Button>
           <Button
             type="primary"
-            key="editable"
+            key="editable-charge-3"
             size="small"
             hidden={record.isSubmit || record.type == 2 || record.type == 3}
             icon={<EditOutlined />}
@@ -806,7 +807,7 @@ export default (props: any) => {
             }}
           >
             <Button
-              key="look"
+              key="look-charge-2"
               type="primary"
               hidden={
                 record.auditType == 4 ||
@@ -837,7 +838,7 @@ export default (props: any) => {
             }}
           >
             <Button
-              key="look"
+              key="look-charge-3"
               type="primary"
               hidden={record.isSubmit === false || record.auditType == 0 || type == '0'}
               size="small"
@@ -852,7 +853,7 @@ export default (props: any) => {
             key={record.id}
             title="是否废除？"
             onConfirm={() => {
-              let url = record.auditNum === null ? '/sms/business/bizCharge/unAuditDisable/' : '/sms/business/bizCharge/disable/'
+              const url = record.auditNum === null ? '/sms/business/bizCharge/unAuditDisable/' : '/sms/business/bizCharge/disable/'
 
               request.post(url + record.id).then((res: any) => {
                 if (res.status == 'success') {
@@ -862,7 +863,7 @@ export default (props: any) => {
               });
             }}
             onCancel={() => {
-              let url = record.auditNum === null ? '/sms/business/bizCharge/unAuditDisable/' : '/sms/business/bizCharge/disable/'
+              const url = record.auditNum === null ? '/sms/business/bizCharge/unAuditDisable/' : '/sms/business/bizCharge/disable/'
               request.post(url + record.id).then((res: any) => {
                 if (res.status == 'success') {
                   if (record.type == '0' || record.type == '1') {
@@ -898,7 +899,7 @@ export default (props: any) => {
           </Popconfirm>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-charge-1"
             size="small"
             icon={<FieldNumberOutlined />}
             style={{ marginRight: '10px', marginBottom: '8px' }}
@@ -911,7 +912,7 @@ export default (props: any) => {
           </Button>
           <Button
             type="primary"
-            key="dapchu"
+            key="dapchu-charge-2"
             size="small"
             style={{ marginRight: '10px', marginBottom: '8px' }}
             icon={<FieldNumberOutlined />}
@@ -1148,7 +1149,7 @@ export default (props: any) => {
                 <a
                   hidden={!setModalsCharge}
                   onClick={() => {
-                    let err: any[] = []
+                    const err: any[] = []
                     if (setModalsCharge) {
                       selectedRows.forEach(e => {
                         if (e.usedAmount >= e.amount) {
@@ -1417,7 +1418,7 @@ export default (props: any) => {
               beforeUpload: (file: any, fileList: any[]) => {
                 const reader = new FileReader();
                 reader.onload = (e: any) => {
-                  let dataResult = e.target.result;
+                  const dataResult = e.target.result;
                   const workbook = XLSX.read(dataResult, { type: 'binary' });
                   // 假设我们的数据在第一个标签
                   const firstWorksheet = workbook.Sheets[workbook.SheetNames[0]];

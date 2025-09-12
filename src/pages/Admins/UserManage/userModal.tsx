@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, message, Descriptions } from 'antd';
-import { ProFormDatePicker, ProFormInstance } from '@ant-design/pro-form';
+import type { ProFormInstance } from '@ant-design/pro-form';
+import { ProFormDatePicker } from '@ant-design/pro-form';
 import ProForm, {
   DrawerForm,
   ProFormText,
@@ -21,15 +22,15 @@ export default (props: any) => {
   const [CardVisible, setCardVisible] = useState<boolean>(false);
   const [groupVisible, setGroupisible] = useState<boolean>(false);
   let [department, setDepartment] = useState<any>({ name: '' });
-  let [groupment, setGrouptment] = useState<any>({ name: '' });
+  const [groupment, setGrouptment] = useState<any>({ name: '' });
   const formRef = useRef<ProFormInstance>();
   const userRef: any = useRef(null);
   const [userNameId, setUserNameId] = useState<any>(false);
   const { modalVisible, setModalVisible, callbackRef, renderData, typeStatus, setStatus } = props;
   const typeUser = renderData.typeUser == 'user' ? true : false
-  let url = renderData.typeUser == 'user' ? '/sms/user' : '/sms/system/sysUser'
-  let uploadUrl = renderData.typeUser == 'user' ? '/sms/user/upload' : '/sms/system/sysUser/upload'
-  let downloadUrl = renderData.typeUser == 'user' ? '/sms/user/download' : '/sms/system/sysUser/download'
+  const url = renderData.typeUser == 'user' ? '/sms/user' : '/sms/system/sysUser'
+  const uploadUrl = renderData.typeUser == 'user' ? '/sms/user/upload' : '/sms/system/sysUser/upload'
+  const downloadUrl = renderData.typeUser == 'user' ? '/sms/user/download' : '/sms/system/sysUser/download'
   const ment = () => {
     formRef?.current?.setFieldsValue({
       departmentId: department.name,
@@ -79,7 +80,7 @@ export default (props: any) => {
 
         }
         if (renderData.idCardPhoto) {
-          let arr: { uid: number; name: any; response: { data: any } }[] = [];
+          const arr: { uid: number; name: any; response: { data: any } }[] = [];
           renderData.idCardPhoto.split(',').forEach((item: any, index: number) => {
             arr.push({
               uid: index + 1,
@@ -90,7 +91,7 @@ export default (props: any) => {
           renderData.idCardPhoto = arr;
         }
         if (renderData.graduationPhoto) {
-          let arr: { uid: number; name: any; response: { data: any } }[] = [];
+          const arr: { uid: number; name: any; response: { data: any } }[] = [];
           renderData.graduationPhoto.split(',').forEach((item: any, index: number) => {
             arr.push({
               uid: index + 1,
@@ -101,7 +102,7 @@ export default (props: any) => {
           renderData.graduationPhoto = arr;
         }
         if (renderData.gradePhoto) {
-          let arr: { uid: number; name: any; response: { data: any } }[] = [];
+          const arr: { uid: number; name: any; response: { data: any } }[] = [];
           renderData.gradePhoto.split(',').forEach((item: any, index: number) => {
             arr.push({
               uid: index + 1,
@@ -123,7 +124,7 @@ export default (props: any) => {
       }, 100);
     }
     if (renderData.type == 'addUser') {
-      let data: any = {
+      const data: any = {
         name: renderData.name,
         privateMobile: renderData.mobile,
         degree: renderData.degree + '',
@@ -133,7 +134,7 @@ export default (props: any) => {
         newOrderType: '0'
       }
       if (renderData.presenter) {
-        let presenter = {
+        const presenter = {
           name: Dictionaries.getDepartmentUserName(Number(renderData.presenter)),
           id: renderData.presenter
         }
@@ -158,21 +159,21 @@ export default (props: any) => {
     if (userNameId) value.presenter = userNameId.id
     delete value.userId
     if (value.idCardPhoto) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.idCardPhoto.forEach((item: any) => {
         arr.push(item.response.data);
       });
       value.idCardPhoto = arr.join(',');
     }
     if (value.graduationPhoto) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.graduationPhoto.forEach((item: any) => {
         arr.push(item.response.data);
       });
       value.graduationPhoto = arr.join(',');
     }
     if (value.gradePhoto) {
-      let arr: any[] = [];
+      const arr: any[] = [];
       value.gradePhoto.forEach((item: any) => {
         arr.push(item.response.data);
       });
@@ -434,7 +435,7 @@ export default (props: any) => {
                   required: true,
                 },
               ]}
-            ></ProFormSelect>
+             />
             <ProFormSelect
               label="销售等级"
               name="salesLevel"
@@ -446,7 +447,7 @@ export default (props: any) => {
               //     required: true,
               //   },
               // ]}
-            ></ProFormSelect>
+             />
             <ProFormText
               name="percent"
               width="md"

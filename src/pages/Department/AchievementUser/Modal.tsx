@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Image, message, Upload } from 'antd';
+import type {
+    ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
     ModalForm,
-    ProFormDigit,
-    ProFormInstance,
+    ProFormDigit
 } from '@ant-design/pro-form';
 import request from '@/services/ant-design-pro/apiRequest';
 import { getFirstAndLastDayOfMonth } from './getTime'
@@ -18,7 +19,7 @@ export default (props: any) => {
     const getTarget = async () => {
         const { type } = renderData
         const time = getFirstAndLastDayOfMonth()
-        let data: any = {
+        const data: any = {
             startTime: time.firstDay,
             endTime: time.lastDay,
             userId: renderData.userId
@@ -31,7 +32,7 @@ export default (props: any) => {
     }
     const submitok = (values: any) => {
         const time = getFirstAndLastDayOfMonth()
-        let data: any = {
+        const data: any = {
             startTime: time.firstDay,
             endTime: time.lastDay
         }

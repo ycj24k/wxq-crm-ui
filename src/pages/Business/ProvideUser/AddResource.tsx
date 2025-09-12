@@ -1,5 +1,6 @@
 import filter from "@/services/util/filter";
-import ProForm, { ModalForm, ProFormCascader, ProFormDatePicker, ProFormInstance, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form";
+import type { ProFormInstance} from "@ant-design/pro-form";
+import ProForm, { ModalForm, ProFormCascader, ProFormDatePicker, ProFormSelect, ProFormText, ProFormTextArea } from "@ant-design/pro-form";
 import { Button, message } from "antd";
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
@@ -15,7 +16,7 @@ export default (props: any) => {
     const [company, setCompany] = useState('学员姓名');
     // const [department, setDepartment] = useState({});
     const [CardVisible, setCardVisible] = useState<boolean>(false);
-    let [department, setDepartment] = useState<any>({ name: '' });
+    const [department, setDepartment] = useState<any>({ name: '' });
     const formRef = useRef<ProFormInstance>();
     const ment = () => {
         formRef?.current?.setFieldsValue({

@@ -1,7 +1,8 @@
+import type {
+  ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ModalForm,
   ProFormDigit,
-  ProFormInstance,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -58,9 +59,9 @@ export default (props: any) => {
 
     ++renderData.renderDataNumber;
   }
-  let tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
-  let tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
-  let obj = {};
+  const tokenName: any = sessionStorage.getItem('tokenName'); // 从本地缓存读取tokenName值
+  const tokenValue = sessionStorage.getItem('tokenValue'); // 从本地缓存读取tokenValue值
+  const obj = {};
   obj[tokenName] = tokenValue;
   const submitok = (values: any) => {
     return new Promise((resolve) => {
@@ -116,7 +117,7 @@ export default (props: any) => {
             message: '请填写公司名称',
           },
         ]}
-      ></ProFormText>
+       />
       <ProFormText
         label="统一社会信用代码"
         name="code"
@@ -127,7 +128,7 @@ export default (props: any) => {
             message: '请输入正确的社会信用代码',
           },
         ]}
-      ></ProFormText>
+       />
       <ProFormDigit
         name="mobile"
         label="法人手机号"
@@ -159,7 +160,7 @@ export default (props: any) => {
             required: true,
           },
         ]}
-      ></ProFormText>
+       />
       <ProFormText
         label="开户行"
         name="bank"
@@ -168,7 +169,7 @@ export default (props: any) => {
             required: true,
           },
         ]}
-      ></ProFormText>
+       />
       <ProFormText
         label="银行账号"
         name="account"
@@ -177,11 +178,11 @@ export default (props: any) => {
             required: true,
           },
         ]}
-      ></ProFormText>
-      <ProFormText label="银行行号" name="bankNum"></ProFormText>
+       />
+      <ProFormText label="银行行号" name="bankNum" />
       <ProFormDigit name="mobile2" label="税票手机号" />
-      <ProFormTextArea label="税票地址" name="address"></ProFormTextArea>
-      <ProFormTextArea label="注释" name="description"></ProFormTextArea>
+      <ProFormTextArea label="税票地址" name="address" />
+      <ProFormTextArea label="注释" name="description" />
       <ProForm.Group>
         <ProFormUploadDragger
           width={400}

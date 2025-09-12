@@ -1,6 +1,6 @@
 import Tables from '@/components/Tables';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ActionType, ProColumns } from '@ant-design/pro-table';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 import request from '@/services/ant-design-pro/apiRequest';
@@ -347,7 +347,7 @@ export default (props: any) => {
       ],
     },
   ];
-  let params: any = {};
+  const params: any = {};
   params.auditType = 5;
   params.confirm = true;
   if (mobile) params.mobile = mobile;

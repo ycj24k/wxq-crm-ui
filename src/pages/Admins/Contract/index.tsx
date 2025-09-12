@@ -4,7 +4,7 @@ import Contract from './Contract';
 export default () => {
   return (
     <PageContainer>
-      <Contract></Contract>
+      <Contract />
     </PageContainer>
   );
 };

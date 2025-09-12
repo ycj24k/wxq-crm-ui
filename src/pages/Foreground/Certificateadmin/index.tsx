@@ -1,5 +1,5 @@
 import { PageContainer } from "@ant-design/pro-layout"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { useEffect, useRef, useState } from "react";
 import Tables from "@/components/Tables"
 import Dictionaries from '@/services/util/dictionaries';
@@ -30,7 +30,7 @@ export default () => {
     };
     const filesDom = (value: any) => {
 
-        let dom = <span></span>
+        let dom = <span />
         if (value) {
             dom = value.file?.split(',').map((items: any, indexs: number) => {
                 return (
@@ -55,19 +55,19 @@ export default () => {
         return dom
     }
     const donwLoad = (id: string) => {
-        let tokenName: any = sessionStorage.getItem('tokenName');
-        let tokenValue = sessionStorage.getItem('tokenValue');
-        let obj = {};
+        const tokenName: any = sessionStorage.getItem('tokenName');
+        const tokenValue = sessionStorage.getItem('tokenValue');
+        const obj = {};
         obj[tokenName] = tokenValue;
         fetch('/sms/business/bizCertificate/export?idList=' + id, {
             method: 'GET',
             headers: { ...obj },
         }).then((res: any) => {
             res.blob().then((ress: any) => {
-                let blobUrl = window.URL.createObjectURL(ress);
+                const blobUrl = window.URL.createObjectURL(ress);
                 const a = document.createElement('a'); //获取a标签元素
                 document.body.appendChild(a);
-                let filename = '附件'; //设置文件名称
+                const filename = '附件'; //设置文件名称
                 a.href = blobUrl; //设置a标签路径
                 a.download = filename;
                 a.target = '_blank';
@@ -222,7 +222,7 @@ export default () => {
             ]
         }
     ]
-    let sortList: any = {
+    const sortList: any = {
         ['createTime,num']: 'desc,desc',
     };
     let toolbar = undefined;
@@ -266,7 +266,7 @@ export default () => {
                 search={{ defaultCollapsed: false, labelWidth: 120 }}
                 toolBarRender={[
                     <Button
-                        key="buttonq"
+                        key="add-certificate-admin"
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => {

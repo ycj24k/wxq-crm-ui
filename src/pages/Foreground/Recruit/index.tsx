@@ -1,7 +1,7 @@
 import Tables from "@/components/Tables"
 import { DownloadOutlined, DownOutlined, PlusOutlined } from "@ant-design/icons"
 import { PageContainer } from "@ant-design/pro-layout"
-import { ActionType, ProColumns } from "@ant-design/pro-table"
+import type { ActionType, ProColumns } from "@ant-design/pro-table"
 import { Badge, Button, Dropdown, Menu, message, Popconfirm, Space, Tag, Table, DatePicker } from "antd"
 import { useEffect, useRef, useState } from "react"
 import ModalAdd from "./ModalAdd"
@@ -13,7 +13,7 @@ import DownHeader from './DownHeader'
 import DownTable from '@/services/util/timeFn';
 import ProCard from "@ant-design/pro-card"
 import { getFirstAndLastDayOfMonthDate } from '../../Department/AchievementUser/getTime'
-import { ProFormInstance } from "@ant-design/pro-form"
+import type { ProFormInstance } from "@ant-design/pro-form"
 export default () => {
     const [ModalVisible, setModalVisible] = useState<boolean>(false)
     const [UserModalVisible, setUserModalVisible] = useState<boolean>(false)
@@ -33,7 +33,7 @@ export default () => {
 
     };
     const BadgesNumbers = () => {
-        let data = []
+        const data = []
         for (let i = 0; i <= 9; i++) {
             data.push({ status: i })
         }
@@ -500,7 +500,7 @@ export default () => {
             },
         },
     };
-    let sortList: any = {
+    const sortList: any = {
         ['time']: 'desc',
     };
     return (
@@ -566,7 +566,7 @@ export default () => {
                         </Button>
                     </Popconfirm>,
                     <Button
-                        key="buttonq"
+                        key="add-recruit"
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => {
