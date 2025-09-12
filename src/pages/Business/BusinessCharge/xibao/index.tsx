@@ -669,7 +669,7 @@ export default (props: any) => {
           >
             设置部门目标
           </Button>,
-          <Dropdown overlay={menu} open={openTrue} destroyPopupOnHide={true}>
+          <Dropdown menu={{ items: menu }} open={openTrue} destroyPopupOnHide={true}>
             <Button
               type="primary"
               icon={<DownOutlined />}

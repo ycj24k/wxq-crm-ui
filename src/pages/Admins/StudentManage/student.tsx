@@ -39,8 +39,7 @@ import IsVerifyModel from './isVerifyModel';
 import ContractModel from './ContractModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
-import type { ProFormInstance } from '@ant-design/pro-form';
-import { ModalForm, ProFormCascader } from '@ant-design/pro-form';
+import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
 import { getNextDay } from '@/pages/Department/AchievementUser/getTime';
 import './index.less'
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
@@ -122,7 +121,7 @@ export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [userNameId, setUserNameId] = useState<any>();
   const [userNameId1, setUserNameId1] = useState<any>();
-  const [department, setDepartment] = useState<any>({});
+  let [department, setDepartment] = useState<any>({});
   const [isTabListNuber, setisTabListNuber] = useState<any>('0');
   const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
@@ -130,7 +129,7 @@ export default (props: any) => {
   const formRef = useRef<ProFormInstance>();
   const formRefs = useRef<ProFormInstance>();
   useEffect(() => {
-    // �?TabListNuber 变化时，重新加载表格数据
+    // 当 TabListNuber 变化时，重新加载表格数据
     // setisTabListNuber(TabListNuber);
     if (actionRef.current) {
       actionRef.current.reload();
@@ -147,9 +146,11 @@ export default (props: any) => {
     // actionRef?.current?.reload();
   }, []);
   useEffect(() => {
+    let isMounted = true;
+    
     if (JSON.stringify(department) != '{}') {
-      const userId = department.id;
-      const studentIdList: any = [];
+      let userId = department.id;
+      let studentIdList: any = [];
       selectedRowsList.forEach((item: { id: number }) => {
         studentIdList.push(item.id);
       });
@@ -159,22 +160,32 @@ export default (props: any) => {
           studentUserIdList: studentIdList.join(','),
         })
         .then((res) => {
+          if (!isMounted) return; // 组件已卸载，不更新状态
+          
           if (res.status == 'success') {
-            message.success('操作成功�?);
+            message.success('操作成功！');
             setselectedRowsList([]);
             setDepartment({});
             callbackRef();
           }
+        })
+        .catch((error) => {
+          if (!isMounted) return; // 组件已卸载，不处理错误
+          console.error('操作失败:', error);
         });
     }
+    
+    return () => {
+      isMounted = false;
+    };
   }, [department]);
   const dynamicToolbar = propToolbar == '潜在学员' ? {
     menu: {
       type: 'tab',
       items: [
         { key: '0', label: <span>全部</span> },
-        { key: '1', label: <span>今日待跟�?/span> },
-        { key: '2', label: <span>今日已联�?/span> },
+        { key: '1', label: <span>今日待跟进</span> },
+        { key: '2', label: <span>今日已联系</span> },
         { key: '3', label: <span>从未跟进</span> },
       ],
       onChange: (key: any) => {
@@ -185,7 +196,7 @@ export default (props: any) => {
   } : undefined;
   const downObj = {
     姓名: 'name',
-    报考岗�? 'project',
+    报考岗位: 'project',
     学员类型: 'type',
     客户来源: 'source',
     备注: 'description',
@@ -206,7 +217,7 @@ export default (props: any) => {
   };
 
   const highlightRow = (record: { provider: any; userId: any; }) => {
-    // 判断是否为目标行，这里以 id �?2 的行为例
+    // 判断是否为目标行，这里以 id 为 2 的行为例
     if (record.provider != record.userId) {
       return 'highlight-row'; // 返回自定义的样式类名
     }
@@ -215,7 +226,7 @@ export default (props: any) => {
   const placeAnOrder = (record: any) => {
     if (type == '学员' || type == '个人代理') {
       // if (!record.idCard) {
-      //   message.error('请先补充学员身份证后在进行下�?);
+      //   message.error('请先补充学员身份证后在进行下单');
       // } else 
       if (!record.mobile || !record.name) {
         message.error('请先补充学员姓名、手机号后在进行下单');
@@ -262,24 +273,25 @@ export default (props: any) => {
           <div>{record.isPeer && <Tag color="#87CEEB">同行企业</Tag>}</div>
           <div hidden={isFormal}>
             <Tag color={record.visitTime ? 'success' : 'error'}>
-              {record.visitTime ? '已回�? : '未回�?}
+              {record.visitTime ? '已回访' : '未回访'}
             </Tag>
             {
-              record.lastDealTime ? <Tooltip title="同手机号已有他人下过�?点击查看)"><Tag color='success'
+              record.lastDealTime ? <Tooltip title="同手机号已有他人下过单(点击查看)"><Tag color='success'
                 onClick={() => {
                   setRenderData({ ...record, admin: admin, lastDealTime: true, key: '8' });
                   setInfoVisible(true);
                 }}
                 style={{ cursor: 'pointer' }}
               >
-                !已下�?              </Tag></Tooltip> : ''
+                !已下单
+              </Tag></Tooltip> : ''
             }
           </div>
         </div>
       ),
     },
     {
-      title: '微信�?,
+      title: '微信号',
       dataIndex: 'weChat',
       key: 'weChat',
       hideInTable: isFormal,
@@ -287,7 +299,7 @@ export default (props: any) => {
       render: (text, record) => <span style={{ userSelect: 'none' }}>{record.weChat}</span>,
     },
     {
-      title: '手机�?,
+      title: '手机号',
       dataIndex: 'mobile',
       key: 'mobile',
       hideInTable: isFormal,
@@ -320,7 +332,7 @@ export default (props: any) => {
     },
     {
       width: 100,
-      title: '信息提供�?,
+      title: '信息提供人',
       dataIndex: 'providerName',
     },
     {
@@ -355,7 +367,7 @@ export default (props: any) => {
     },
     {
       width: 100,
-      title: '企业负责�?,
+      title: '企业负责人',
       dataIndex: 'chargePersonName',
       key: 'chargePersonName',
       hideInTable: type == '学员' ? true : false,
@@ -371,11 +383,11 @@ export default (props: any) => {
       ),
     },
     // {
-    //   title: '未下单天�?,
+    //   title: '未下单天数',
     //   align: 'center',
     //   search: false,
     //   hideInTable: isFormal || recommend,
-    //   render: (text, record) => <span>{record.dealDate}�?/span>,
+    //   render: (text, record) => <span>{record.dealDate}天</span>,
     // },
     {
       title: '性别',
@@ -385,11 +397,11 @@ export default (props: any) => {
       valueType: 'select',
       key: 'sex',
       valueEnum: {
-        false: '�?,
-        true: '�?,
+        false: '男',
+        true: '女',
       },
       render: (text, record) => (
-        <span>{record.sex == null ? '未知' : record.sex ? '�? : '�?}</span>
+        <span>{record.sex == null ? '未知' : record.sex ? '女' : '男'}</span>
       ),
     },
     {
@@ -421,7 +433,7 @@ export default (props: any) => {
       render: (text, record) => <span style={{ userSelect: 'none' }}>{record.qq}</span>,
     },
     {
-      title: '身份�?,
+      title: '身份证',
       dataIndex: 'idCard',
       key: 'idCard',
       hideInTable: true,
@@ -433,20 +445,20 @@ export default (props: any) => {
       hideInTable: true,
     },
     {
-      title: '是否是同行企�?,
+      title: '是否是同行企业',
       dataIndex: 'isPeer',
       // width: 80,
       // search: false,
       valueType: 'select',
       key: 'isPeer',
       valueEnum: {
-        false: '�?,
-        true: '�?,
+        false: '否',
+        true: '是',
       },
       hideInTable: true,
     },
     {
-      // title: '手机�?,
+      // title: '手机号',
       dataIndex: 'isFormal',
       search: false,
       key: 'isFormal',
@@ -459,7 +471,7 @@ export default (props: any) => {
       ),
     },
     // {
-    //   title: '所属企业名�?,
+    //   title: '所属企业名称',
     //   dataIndex: 'parentName',
     //   hideInTable: type != '学员' ? true : false,
     //   // valueType: 'select',
@@ -481,7 +493,7 @@ export default (props: any) => {
       ),
     },
     // {
-    //   title: '信息提供�?,
+    //   title: '信息提供人',
     //   dataIndex: 'referrerName',
     //   search: false,
     //   key: 'referrerName',
@@ -489,7 +501,7 @@ export default (props: any) => {
     // },
     {
       width: 100,
-      title: '接收信息负责�?,
+      title: '接收信息负责人',
       dataIndex: 'userName',
       key: 'userNames',
       search: false,
@@ -497,20 +509,20 @@ export default (props: any) => {
     },
     {
       width: 110,
-      title: '信息提供人所占业绩比�?%)',
+      title: '信息提供人所占业绩比例(%)',
       sorter: true,
       dataIndex: 'percent',
       hideInTable: !recommend,
       render: (text, record) => <span key="parentProjects">{record.percent * 100}%</span>,
     },
     // {
-    //   title: '是否为领取资�?,
+    //   title: '是否为领取资源',
     //   key: 'receiveNum',
     //   align: 'center',
     //   dataIndex: 'receiveNum',
     //   sorter: true,
     //   hideInTable: isFormal || recommend,
-    //   render: (text, record) => <span>{record.receiveNum > 0 ? '�? : '�?}</span>,
+    //   render: (text, record) => <span>{record.receiveNum > 0 ? '是' : '否'}</span>,
     // },
     {
       width: 100,
@@ -549,7 +561,7 @@ export default (props: any) => {
           {record.lastDealTime ? (
             record.lastDealTime
           ) : (
-            <Tag color="error">未下�?/Tag>
+            <Tag color="error">未下单</Tag>
           )}
         </span>
       ),
@@ -586,8 +598,8 @@ export default (props: any) => {
       dataIndex: 'isLive',
       valueType: 'select',
       valueEnum: {
-        true: '�?,
-        false: '�?
+        true: '是',
+        false: '否'
       },
       hideInTable: true
     },
@@ -600,7 +612,7 @@ export default (props: any) => {
       key: 'descriptions',
       search: false,
       ellipsis: true,
-      tip: '备注过长会自动收�?,
+      tip: '备注过长会自动收缩',
     },
     {
       title: '操作',
@@ -609,12 +621,13 @@ export default (props: any) => {
       key: 'options',
       fixed: 'right',
       render: (text, record, _, action) => (
-        //order为选择学员时所用，parentId为企业添加学员时所�?        <>
+        //order为选择学员时所用，parentId为企业添加学员时所用
+        <>
           {order ? (
             <Button
               type="primary"
               size="small"
-              key="looks-student-manage"
+              key="looks"
               icon={<ApiOutlined />}
               style={{ marginRight: '15px', marginBottom: '8px' }}
               onClick={() => {
@@ -634,7 +647,7 @@ export default (props: any) => {
                   {source != 8 || record.userId != undefined ||
                     <Popconfirm
                       key="receivePop"
-                      title="是否确定认领�?
+                      title="是否确定认领？"
                       style={{ marginRight: '15px', marginBottom: '8px' }}
                       onConfirm={() => {
                         request.post('/sms/business/bizStudentUser/receive', { ids: record.id, source: 8 }).then((res: any) => {
@@ -656,7 +669,7 @@ export default (props: any) => {
                     // type="primary"
                     // size="small"
                     hidden={parentId}
-                    key="look-student"
+                    key="look"
                     // icon={<SearchOutlined />}
                     onClick={() => {
                       setRenderData({ ...record });
@@ -679,7 +692,7 @@ export default (props: any) => {
                     编辑
                   </a>
                   <a
-                    key="edit-student-manage"
+                    key="edit"
                     hidden={parentId}
                     // size="small"
                     type="primary"
@@ -752,12 +765,13 @@ export default (props: any) => {
                         setStudentOrderOpen(true);
                       }}
                     >
-                      退�?                    </a>
+                      退费
+                    </a>
                   </Space>
                 </div>
                 <Popconfirm
                   key="deletePop"
-                  title="是否确定删除�?
+                  title="是否确定删除？"
                   style={{ marginRight: '15px', marginBottom: '8px' }}
                   onConfirm={() => {
                     request.delete('/sms/business/bizStudentUser', { id: record.id }).then((res: any) => {
@@ -776,12 +790,12 @@ export default (props: any) => {
                 </Popconfirm>
                 <Popconfirm
                   key="deletePop"
-                  title="是否确定锁定�?
+                  title="是否确定锁定？"
                   style={{ marginRight: '15px', marginBottom: '8px' }}
                   onConfirm={() => {
                     request.post(`/sms/business/bizStudent/lock/${record.id}`, ).then((res: any) => {
                       if (res.status == 'success') {
-                        message.success('已锁�?);
+                        message.success('已锁定');
                         callbackRef();
                       }
                     });
@@ -789,11 +803,7 @@ export default (props: any) => {
                   okText="锁定"
                   cancelText="取消"
                 >
-
-                  <a key="lock-student-manage" style={{ color: 'brown' }}>
-
                   <a key="lock" style={{ color: 'brown' }}>
-
                     锁定学员
                   </a>
                 </Popconfirm>
@@ -816,7 +826,7 @@ export default (props: any) => {
         }
       });
   };
-  const params: any = {};
+  let params: any = {};
   let sortList: any = {};
   if (parentId) {
     params.parentId = parentId;
@@ -825,7 +835,7 @@ export default (props: any) => {
   //   params.parentId = '-1';
   // }
   if (companyStudent && companyStudent.length > 0) {
-    const arr: any = [];
+    let arr: any = [];
     companyStudent.forEach((item: any) => {
       arr.push(item.id);
     });
@@ -902,7 +912,7 @@ export default (props: any) => {
             key: '1',
           },
           {
-            tab: '代理�?,
+            tab: '代理人',
             key: '2'
           },
 
@@ -936,7 +946,7 @@ export default (props: any) => {
             }
         }
         rowSelection={{
-          // 自定义选择项参�? https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+          // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
           // 注释该行则默认不显示下拉选项
           // selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
           onChange: (e, selectedRows) => {
@@ -953,20 +963,20 @@ export default (props: any) => {
                 onClick={() => {
                   console.log('type', selectedRowsList[0]);
                   if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-                    message.error('请只选择一位学�?');
+                    message.error('请只选择一位学员!');
                     return;
                   }
                   if (type == '学员') {
                     buildAccount();
                   } else {
                     if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-                      message.error('请选择一位学员签署合�?');
+                      message.error('请选择一位学员签署合同!');
                       return;
                     }
                     if (!selectedRowsList[0].codeFile && !selectedRowsList[0].powerAttorneyFile) {
                       Modal.info({
                         title: '尚未上传企业授权信息!',
-                        content: <p>请先补充信息在签署合�?/p>,
+                        content: <p>请先补充信息在签署合同</p>,
                         okText: '补充',
                         onOk: () => {
                           setRenderData({
@@ -983,7 +993,8 @@ export default (props: any) => {
                   }
                 }}
               >
-                重构法大大账�?              </a>
+                重构法大大账号
+              </a>
               {/*导出数据可用，已注释 */}
               {/* <a
                 hidden={parentId}
@@ -996,7 +1007,7 @@ export default (props: any) => {
               <a
                 onClick={() => {
 
-                  const data = selectedRowsList.map((item: { studentId: any; }) => {
+                  let data = selectedRowsList.map((item: { studentId: any; }) => {
                     return {
                       id: item.studentId,
                       isInWhitelist: true
@@ -1010,12 +1021,13 @@ export default (props: any) => {
                   })
                 }}
               >
-                加入白名�?              </a>
+                加入白名单
+              </a>
               <a
                 key="orders"
                 hidden={!parentId || order == 'order'}
                 onClick={() => {
-                  const arr: any = [];
+                  let arr: any = [];
                   selectedRowsList.forEach((item: any) => {
                     arr.push({ id: item.id, name: item.name });
                   });
@@ -1066,7 +1078,8 @@ export default (props: any) => {
           //     setFromFalg(true);
           //   }}
           // >
-          //   推荐已有学员/企业给别�?          // </Button>,
+          //   推荐已有学员/企业给别人
+          // </Button>,
           // <Button
           //   key="buttons"
           //   icon={<FormOutlined />}
@@ -1078,7 +1091,7 @@ export default (props: any) => {
           //     if (status && autoSign) {
           //       if (initialState?.currentUser?.idCard) {
           //         if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-          //           message.error('请选择一位学员签署合�?');
+          //           message.error('请选择一位学员签署合同!');
           //           return;
           //         }
           //         setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
@@ -1096,7 +1109,7 @@ export default (props: any) => {
           //         ) {
           //           Modal.info({
           //             title: '尚未上传企业授权信息!',
-          //             content: <p>请先补充信息在签署合�?/p>,
+          //             content: <p>请先补充信息在签署合同</p>,
           //             okText: '补充',
           //             onOk: () => {
           //               setCompanyContractVisible(true);
@@ -1112,7 +1125,7 @@ export default (props: any) => {
           //     } else {
           //       setRenderData([status, autoSign]);
           //       setIsVerifyModelVisible(true);
-          //       // message.error('您还未实名，已为您跳转实名页面。实名才能签署合�?, 5);
+          //       // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
           //       // const urls = (await request.post('/sms/share/verify')).data;
           //       // setpreviewImage(urls);
           //       // setPreviewVisible(true);
@@ -1125,19 +1138,15 @@ export default (props: any) => {
             <Space style={{ marginLeft: 'auto' }}>
               <a
                 hidden={order == 'order' || isFormal || recommend}
-                download="新学员导入模�?
-                href="./template/新学员导入模�?xlsx"
+                download="新学员导入模板"
+                href="./template/新学员导入模板.xlsx"
                 key="ordera"
               >
                 下载导入模板
               </a>
 
               <Button
-
-                key="add-student"
-
                 key="buttonq"
-
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1149,17 +1158,14 @@ export default (props: any) => {
                   }
 
                   setModalVisible(true);
-                  //新建或者新建新媒体学员导入的显示隐�?                  setShowisShowMedium(false)
+                  //新建或者新建新媒体学员导入的显示隐藏
+                  setShowisShowMedium(false)
                 }}
               >
                 新建
               </Button>
               <Button
-
-                key="add-newmedia-student"
-
                 key="buttonq"
-
                 icon={<PlusOutlined />}
                 type="primary"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1171,17 +1177,15 @@ export default (props: any) => {
                   }
 
                   setModalVisible(true);
-                  //新建或者新建新媒体学员导入的显示隐�?                  setShowisShowMedium(true)
+                  //新建或者新建新媒体学员导入的显示隐藏
+                  setShowisShowMedium(true)
                 }}
               >
-                新建新媒体学�?              </Button>
+                新建新媒体学员
+              </Button>
 
               <Button
-
-                key="recommend-student"
-
                 key="ordere"
-
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
@@ -1193,13 +1197,10 @@ export default (props: any) => {
                   setUserFrom(true);
                 }}
               >
-                推荐已有学员给他�?              </Button>
+                推荐已有学员给他人
+              </Button>
               <Button
-
-                key="reassign-teacher"
-
                 key="ordere"
-
                 type="primary"
                 hidden={isFormal || recommend}
                 icon={<PlusOutlined />}
@@ -1253,7 +1254,7 @@ export default (props: any) => {
                   if (status && autoSign) {
                     if (initialState?.currentUser?.idCard) {
                       if (selectedRowsList.length == 0 || selectedRowsList.length > 1) {
-                        message.error('请选择一位学员签署合�?');
+                        message.error('请选择一位学员签署合同!');
                         return;
                       }
                       setRenderData({ ...(selectedRowsList[0] as any), addNumber: 0, typee: 'eidt' });
@@ -1271,7 +1272,7 @@ export default (props: any) => {
                       ) {
                         Modal.info({
                           title: '尚未上传企业授权信息!',
-                          content: <p>请先补充信息在签署合�?/p>,
+                          content: <p>请先补充信息在签署合同</p>,
                           okText: '补充',
                           onOk: () => {
                             setCompanyContractVisible(true);
@@ -1287,7 +1288,7 @@ export default (props: any) => {
                   } else {
                     setRenderData([status, autoSign]);
                     setIsVerifyModelVisible(true);
-                    // message.error('您还未实名，已为您跳转实名页面。实名才能签署合�?, 5);
+                    // message.error('您还未实名，已为您跳转实名页面。实名才能签署合同', 5);
                     // const urls = (await request.post('/sms/share/verify')).data;
                     // setpreviewImage(urls);
                     // setPreviewVisible(true);
@@ -1297,7 +1298,7 @@ export default (props: any) => {
                 合同签署
               </Button>
               <Button
-                key="butto-import-other"
+                key="butto"
                 hidden={order == 'order' || isFormal || recommend}
                 icon={<DownloadOutlined />}
                 type="primary"
@@ -1309,7 +1310,7 @@ export default (props: any) => {
                 批量导入获客数据
               </Button>
               <Button
-                key="butto-import"
+                key="butto"
                 hidden={order == 'order' || isFormal || recommend}
                 icon={<DownloadOutlined />}
                 type="primary"
@@ -1318,7 +1319,8 @@ export default (props: any) => {
                   setUploadUrl('/sms/business/bizStudent/batch/import');
                 }}
               >
-                批量导入学员和回访记�?              </Button>
+                批量导入学员和回访记录
+              </Button>
               <Button
                 key="buttona"
                 hidden={order == 'order' || isFormal || recommend}
@@ -1494,7 +1496,7 @@ export default (props: any) => {
           formRef={formRefs}
           onFinish={async (value: any) => {
             console.log('value', value);
-            const project = value.project[value.project.length - 1];
+            let project = value.project[value.project.length - 1];
             new Promise((resolve) => {
               request
                 .post('/sms/business/bizStudentUser/presentation', {
@@ -1515,9 +1517,9 @@ export default (props: any) => {
           <ProFormCascader
             width="sm"
             name="project"
-            placeholder="咨询报考岗�?
+            placeholder="咨询报考岗位"
             label="推荐岗位"
-            rules={[{ required: true, message: '请选择报考岗�? }]}
+            rules={[{ required: true, message: '请选择报考岗位' }]}
             fieldProps={{
               options: Dictionaries.getCascader('dict_reg_job'),
               showSearch: { filter },
@@ -1541,7 +1543,7 @@ export default (props: any) => {
           formRef={formRefs}
           onFinish={async (value: any) => {
             if (!userNameId1) {
-              message.error('请选择老师�?)
+              message.error('请选择老师！')
               return
             }
             console.log('selectedRowsId', selectedRowsId);
@@ -1563,7 +1565,7 @@ export default (props: any) => {
         >
           <UserTreeSelect
             ref={null}
-            userLabel={'推荐�?}
+            userLabel={'推荐给'}
             userNames="userId"
             enable={true}
             // newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
@@ -1589,7 +1591,7 @@ export default (props: any) => {
           formRef={formRefs}
           onFinish={async (value: any) => {
             if (!userNameId) {
-              message.error('请选择招生老师�?)
+              message.error('请选择招生老师！')
               return
             }
             console.log('value', value);
@@ -1612,7 +1614,7 @@ export default (props: any) => {
         >
           <UserTreeSelect
             ref={null}
-            userLabel={'推荐�?}
+            userLabel={'推荐给'}
             userNames="userId"
             enable={true}
             // newMedia={renderData?.teacher && !(renderData.typee == 'eidt')}
