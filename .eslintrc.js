@@ -26,20 +26,7 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
-    'import/order': ['warn', {
-      groups: [
-        'builtin',
-        'external',
-        'internal',
-        ['parent', 'sibling'],
-        'index',
-      ],
-      'newlines-between': 'always',
-      alphabetize: {
-        order: 'asc',
-        caseInsensitive: true,
-      },
-    }],
+    'import/order': 'off',
     'import/no-unresolved': 'off',
     'import/no-extraneous-dependencies': 'off',
     'jsx-a11y/no-static-element-interactions': 'off',
