@@ -146,8 +146,6 @@ export default (props: any) => {
     // actionRef?.current?.reload();
   }, []);
   useEffect(() => {
-    let isMounted = true;
-    
     if (JSON.stringify(department) != '{}') {
       let userId = department.id;
       let studentIdList: any = [];
@@ -160,24 +158,14 @@ export default (props: any) => {
           studentUserIdList: studentIdList.join(','),
         })
         .then((res) => {
-          if (!isMounted) return; // 组件已卸载，不更新状态
-          
           if (res.status == 'success') {
             message.success('操作成功！');
             setselectedRowsList([]);
             setDepartment({});
             callbackRef();
           }
-        })
-        .catch((error) => {
-          if (!isMounted) return; // 组件已卸载，不处理错误
-          console.error('操作失败:', error);
         });
     }
-    
-    return () => {
-      isMounted = false;
-    };
   }, [department]);
   const dynamicToolbar = propToolbar == '潜在学员' ? {
     menu: {
