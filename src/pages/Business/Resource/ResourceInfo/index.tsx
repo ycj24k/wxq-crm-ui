@@ -39,13 +39,7 @@ type GithubIssueItem = {
 
 export default (props: any) => {
   const { hidden, isPerson, isGroup, showMyself } = props;
-<<<<<<< HEAD
-  console.log(isPerson, '===>')
-  console.log(showMyself, '===>')
   const formRefs = useRef<ProFormInstance>();
-=======
-  // 调试输出移除，避免影响性能
->>>>>>> 358ead471f6d44c99bc012d8a4252e30b691532d
   const { initialState } = useModel('@@initialState');
   const [userNameId1, setUserNameId1] = useState<any>();
   const [renderData, setRenderData] = useState<any>(null);
