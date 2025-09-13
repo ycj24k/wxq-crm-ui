@@ -65,7 +65,7 @@ export function getSession() {
 
 export async function getCompanyRequest() {
   return (await apiRequest.get('/sms/share/getCompany')).data?.map((e: any) => {
-    console.log('getCompanyRequest',e)
+    // console.log('getCompanyRequest',e)
     return {
       label: e.name,
       value: e.id + ''
@@ -74,13 +74,24 @@ export async function getCompanyRequest() {
 }
 export async function getsysUserLevel() {
   return (await apiRequest.get('/sms/system/sysUserLevel')).data?.content?.map((e: any) => {
-    console.log('getsysUserLevel',e)
+    // console.log('getsysUserLevel',e)
     return {
       label: e.name,
       value: e.id + ''
     }
   })
 }
+export async function getLevel() {
+  return (await apiRequest.get('/sms/business/bizStudent/getLevel')).data?.map((e: any) => {
+    // console.log('getLevel',e)
+    return {
+      label: e.name,
+      value: e.id + ''
+    }
+  })
+}
+
+
 export function getInfo() {
   return {
     origin: 'http://10.168.1.10:80'

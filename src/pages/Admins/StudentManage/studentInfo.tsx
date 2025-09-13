@@ -77,6 +77,10 @@ export default (props: any) => {
       const a = <Invoice param={{ studentUserIds: ',' + renderData.id + ',' }} />;
       setTabInvoice(a);
     }
+    if (tabsKey == '10' && !tabsOrder && renderData.id) {
+      const a = <Order studentUserId={renderData.id} type={renderData.type} />;
+      setTabsOrder(a);
+    }
   }, [tabsKey, renderData]);
   let nameInfo = '学员';
   switch (renderData.type) {
@@ -90,7 +94,7 @@ export default (props: any) => {
       nameInfo = '介绍人';
       break;
   }
-
+console.log(renderData)
   return (
     <Drawer
       onClose={() => {
@@ -180,14 +184,20 @@ export default (props: any) => {
                 setTabsKey(e);
               }}
             >
+              
               <TabPane tab="跟进/回访进度" key="1">
                 {tabsReturnVisit}
               </TabPane>
               <TabPane tab="同项目订单" key="8">
                 {tabsOrder}
               </TabPane>
+              <TabPane tab="资源列表" key="10">
+                    {tabsOrder}
+                  </TabPane>
               {renderData.isFormal ? (
                 <>
+                
+                
                   <TabPane tab="订单记录" key="2">
                     {tabsOrder}
                   </TabPane>

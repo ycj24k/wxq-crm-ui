@@ -1,4 +1,4 @@
-import { Tabs, Radio, Image, message, Divider, Pagination } from 'antd';
+import { Tabs, Radio, Image, message, Divider, Pagination, Button, Space, Tag, Badge } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
 import ProCard from '@ant-design/pro-card';
@@ -11,6 +11,7 @@ import moment from 'moment';
 import ImgUrl from '@/services/util/UpDownload';
 import ChargeIframe from '@/pages/Admins/AdminCharge/ChargeIframe';
 import UserModal from "@/pages/Admins/UserManage/userModal"
+import { EyeOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 const { TabPane } = Tabs;
 
@@ -26,10 +27,89 @@ export default () => {
   const [bizNotices, setbizNotice] = useState(bizNotice?.data?.content);
   const [renderData, setRenderData] = useState<any>({});
   const [UserModalVisible, setUserModalVisible] = useState<boolean>(false)
+  const [noticeData, setNoticeData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
   const { query = { key: '1' } } = history.location;
+  
   const callbackRef = () => {
-
+    // 回调函数
   }
+
+  // 获取消息通知列表
+  const fetchNoticeList = async (params:any = {}) => {
+    setLoading(true);
+    try {
+      const response = await request.get('/sms/business/bizNotice', {
+        _page: params.current || pagination.current - 1,
+        _size: params.pageSize || pagination.pageSize,
+        ...params
+      });
+      
+      if (response.status === 'success') {
+        setNoticeData(response.data.content);
+        setPagination({
+          ...pagination,
+          total: response.data.totalElements,
+          current: params.current || pagination.current,
+          pageSize: params.pageSize || pagination.pageSize
+        });
+      } else {
+        message.error('获取通知列表失败');
+      }
+    } catch (error) {
+      message.error('获取通知列表失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 全部已读处理函数
+  const handleConfirmAll = async () => {
+    setConfirmLoading(true);
+    try {
+      const response = await request.post('/sms/business/bizNotice/confirmAll');
+      
+      if (response.status === 'success') {
+        message.success('全部标记为已读成功');
+        // 更新本地数据状态
+        const updatedData:any = noticeData.map((item :any) => ({
+          ...item,
+          isConfirm: true
+        }));
+        setNoticeData(updatedData);
+      } else {
+        message.error('操作失败');
+      }
+    } catch (error) {
+      message.error('操作失败');
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  // 单条消息标记为已读
+  const handleConfirmOne = async (id:any) => {
+    try {
+      const response = await request.post(`/sms/business/bizNotice/confirm/${id}`);
+      
+      if (response.status === 'success') {
+        // 更新单条消息状态
+        const updatedData:any = noticeData.map((item:any) => 
+          item.id === id ? { ...item, isConfirm: true } : item
+        );
+        setNoticeData(updatedData);
+      }
+    } catch (error) {
+      console.error('标记已读失败', error);
+    }
+  };
+
   useEffect(() => {
     request.get('/sms/public/getRegex').then((res) => {
       setGetRegex(res.data);
@@ -39,8 +119,11 @@ export default () => {
       ...initialState?.currentUser,
       sex: initialState?.currentUser?.sex ? '1' : '0',
     });
-    // settotalAll(bizNotice?.data.totalPages);
+    
+    // 初始化获取通知列表
+    fetchNoticeList();
   }, []);
+
   const look = async (id: number, item: string) => {
     const type = item.slice(item.indexOf('.'));
     await ImgUrl('/sms/business/bizNotice/download', id, item).then((res: any) => {
@@ -52,10 +135,101 @@ export default () => {
       }
     });
   };
+
+  // 查看详情处理函数
+  const handleViewDetail = (record: any) => {
+    setRenderData(record);
+    setUserModalVisible(true);
+    // 如果消息未读，查看时标记为已读
+    if (!record.isConfirm) {
+      handleConfirmOne(record.id);
+    }
+  };
+
+  // 格式化日期
+  const formatDate = (dateString  :any) => {
+    return moment(dateString).format('YYYY-MM-DD HH:mm:ss');
+  };
+
+  // 渲染通知列表
+  const renderNoticeList = () => {
+    // 计算未读消息数量
+    const unreadCount = noticeData.filter((item:any) => !item.isConfirm).length;
+    
+    return (
+      <div className="notice-list">
+        <div className="notice-list-header">
+          <Space>
+            <h3>消息通知</h3>
+            {unreadCount > 0 && (
+              <Badge count={unreadCount} showZero={false} />
+            )}
+          </Space>
+          <Button 
+            type="primary" 
+            icon={<CheckCircleOutlined />}
+            loading={confirmLoading}
+            onClick={handleConfirmAll}
+          >
+            全部已读
+          </Button>
+        </div>
+        
+        {noticeData.map((item:any) => (
+          <div key={item.id} className={`notice-item ${item.isConfirm ? 'read' : 'unread'}`}>
+            <div className="notice-header">
+              <Space>
+                {!item.isConfirm && (
+                  <Badge dot color="red" />
+                )}
+                <h3 className="notice-title">{item.title}</h3>
+              </Space>
+              <Tag color="blue">{formatDate(item.createTime)}</Tag>
+            </div>
+            <div className="notice-content">
+              <p>{item.content}</p>
+            </div>
+            <div className="notice-footer">
+              <Space>
+                <span>发布人: {item.userName}</span>
+                <Button 
+                  type="link" 
+                  icon={<EyeOutlined />} 
+                  onClick={() => handleViewDetail(item)}
+                >
+                  查看详情
+                </Button>
+              </Space>
+            </div>
+            <Divider />
+          </div>
+        ))}
+        
+        <Pagination
+          current={pagination.current}
+          pageSize={pagination.pageSize}
+          total={pagination.total}
+          onChange={(page, pageSize) => {
+            setPagination({
+              ...pagination,
+              current: page,
+              pageSize: pageSize
+            });
+            fetchNoticeList({ current: page, pageSize });
+          }}
+          style={{ textAlign: 'right', marginTop: 16 }}
+          showSizeChanger
+          showQuickJumper
+          showTotal={(total, range) => `第 ${range[0]}-${range[1]} 条/共 ${total} 条`}
+        />
+      </div>
+    );
+  };
+
   return (
     <ProCard>
       <Tabs tabPosition="left" defaultActiveKey={query.key as string}>
-        <TabPane tab="基本设置" key="1">
+      <TabPane tab="基本设置" key="1">
           <ProCard split="vertical">
             <ProCard title="基本设置" colSpan="40%" >
               <ProForm
@@ -234,7 +408,7 @@ export default () => {
           </ProCard>
         </TabPane>
         <TabPane tab="消息通知" key="3">
-          <ProCard title="消息通知">
+          <ProCard loading={loading}>
             <div style={{ display: 'none' }}>
               <Image
                 width={200}
@@ -248,53 +422,12 @@ export default () => {
                 }}
               />
             </div>
-            <Divider />
-            {bizNotices?.map((item: any, index: number) => {
-              return (
-                <div className="notice" key={`notice-${item.title}-${index}`}>
-                  <div className="notice-Title">{item.title}</div>
-                  <div className="notice-content">{item.content}</div>
-                  {item?.files
-                    ? item.files.split(',').map((items: any, indexs: number) => {
-                      return (
-                        <div key={indexs} className="notice-files">
-                          附件内容：{' '}
-                          <a
-                            onClick={() => {
-                              look(item.id, items);
-                            }}
-                          >
-                            {items}
-                          </a>
-                        </div>
-                      );
-                    })
-                    : ''}
-
-                  <div className="notice-createBy">
-                    {item.userName} 与 {item.createTime} 发布
-                  </div>
-                  <Divider />
-                </div>
-              );
-            })}
-            <Pagination
-              defaultCurrent={1}
-              total={bizNotice?.data.totalPages * 10}
-              style={{ textAlign: 'right', marginRight: '50px' }}
-              onChange={(page, pageSize) => {
-                request
-                  .get('/sms/business/bizNotice', { _page: page - 1, _size: pageSize })
-                  .then((res: any) => {
-                    if (res.status == 'success') {
-                      setbizNotice(res.data.content);
-                    }
-                  });
-              }}
-            />
+            
+            {renderNoticeList()}
           </ProCard>
         </TabPane>
       </Tabs>
+      
       {previewVisible && (
         <ChargeIframe
           previewImage={imgSrc}
@@ -304,6 +437,7 @@ export default () => {
           }}
         />
       )}
+      
       {UserModalVisible && (
         <UserModal
           setModalVisible={() => setUserModalVisible(false)}
