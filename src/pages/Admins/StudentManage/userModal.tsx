@@ -17,6 +17,7 @@ import ProForm, {
   ProFormSwitch,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
+import { getLevel} from '@/services/util/util';
 import Dictionaries from '@/services/util/dictionaries';
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
@@ -654,6 +655,13 @@ export default (props: any) => {
           width={200}
           rules={[{ required: true, message: '请选择客户来源' }]}
           request={async () => Dictionaries.getList('dict_source') as any}
+        />
+        <ProFormSelect
+          label="会员等级"
+          name="Level"
+          width={200}
+          rules={[{ message: '会员等级' }]}
+          request={getLevel}
         />
         <ProFormDatePicker
           name="consultationTime"

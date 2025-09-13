@@ -46,6 +46,7 @@ import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 type GithubIssueItem = {
   name: string;
   mobile: string;
+  isLocked?: boolean;
   sex: number;
   receiveNum: number;
   id: number;
@@ -79,6 +80,7 @@ export default (props: any) => {
     admin,
     oncancel,
     type,
+    pageType,
     toolbar: propToolbar,
     setStudentId,
     setStudentVisible,
@@ -198,7 +200,7 @@ export default (props: any) => {
           callbackRef();
         },
       }
-    } : isFormal ? {
+    } : pageType == "正式学员" ? {
       menu: {
         type: 'tab',
         items: [
@@ -641,7 +643,35 @@ export default (props: any) => {
       render: (text, record, _, action) => (
         //order为选择学员时所用，parentId为企业添加学员时所用
         <>
-          {order ? (
+          {followStatus == '11' ? (
+            <>
+              <div>
+                <Space>
+
+                  <Popconfirm
+                    key="receivePop"
+                    title="是否确定领取？"
+                    style={{ marginRight: '15px', marginBottom: '8px' }}
+                    onConfirm={() => {
+                      request.postAll('/sms/business/bizStudent/receiveCompanyShare',[record.id]).then((res: any) => {
+                        if (res.status == 'success') {
+                          message.success('领取成功');
+                          callbackRef();
+                        }
+                      });
+                    }}
+                    okText="领取"
+                    cancelText="取消"
+                  >
+                    <a key="receive">
+                      领取
+                    </a>
+                  </Popconfirm>
+                </Space>
+              </div>
+
+            </>
+          ) : order ? (
             <Button
               type="primary"
               size="small"
@@ -663,6 +693,7 @@ export default (props: any) => {
 
                 <Space>
                   {source != 8 || record.userId != undefined ||
+
                     <Popconfirm
                       key="receivePop"
                       title="是否确定认领？"
@@ -787,6 +818,7 @@ export default (props: any) => {
                     </a>
                   </Space>
                 </div>
+
                 <Popconfirm
                   key="deletePop"
                   title="是否确定删除？"
@@ -806,28 +838,54 @@ export default (props: any) => {
                     删除
                   </a>
                 </Popconfirm>
-                <Popconfirm
-                  key="deletePop"
-                  title="是否确定锁定？"
-                  style={{ marginRight: '15px', marginBottom: '8px' }}
-                  onConfirm={() => {
-                    request.post(`/sms/business/bizStudent/lock/${record.id}`,).then((res: any) => {
-                      if (res.status == 'success') {
-                        message.success('已锁定');
-                        callbackRef();
-                      }
-                    });
-                  }}
-                  okText="锁定"
-                  cancelText="取消"
-                >
-                  <a key="lock" style={{ color: 'brown' }}>
-                    锁定学员
-                  </a>
-                </Popconfirm>
+                <div hidden={!(pageType === "正式学员" && !record.isLocked)}>
+                  <Popconfirm
+                    key="deletePop"
+                    title="是否确定锁定？"
+                    style={{ marginRight: '15px', marginBottom: '8px' }}
+                    onConfirm={() => {
+                      request.post(`/sms/business/bizStudent/lock/${record.id}`,).then((res: any) => {
+                        if (res.status == 'success') {
+                          message.success('已锁定');
+                          callbackRef();
+                          console.log('record:', record.isLocked)
+                        }
+                      });
+                    }}
+                    okText="锁定"
+                    cancelText="取消"
+                  >
+                    <a key="lock" style={{ color: '#fa8c16' }}>
+                      锁定学员
+                    </a>
+                  </Popconfirm>
+                </div>
+                <div hidden={!(pageType === "正式学员" && record.isLocked)}>
+                  <Popconfirm
+                    key="deletePop"
+                    title="是否解除锁定？"
+                    style={{ marginRight: '15px', marginBottom: '8px' }}
+                    onConfirm={() => {
+                      request.post(`/sms/business/bizStudent/unlock/${record.id}`,).then((res: any) => {
+                        if (res.status == 'success') {
+                          message.success('已解锁');
+                          callbackRef();
+                          console.log('record:', record.isLocked)
+                        }
+                      });
+                    }}
+                    okText="解锁"
+                    cancelText="取消"
+                  >
+                    <a key="lock" style={{ color: '#52c41a' }}>
+                      解除锁定
+                    </a>
+                  </Popconfirm>
+                </div>
               </Space>
             </>
           )}
+
         </>
       ),
     },
@@ -957,15 +1015,15 @@ export default (props: any) => {
           order === 'BlacklistStudent'
             ? { url: url }
             : {
-              url: followStatus == '11' 
-                ? '/sms/business/bizStudent/companyShare' 
-                : followStatus == '00' 
-                  ? '/sms/business/bizStudent' 
+              url: followStatus == '11'
+                ? '/sms/business/bizStudent/companyShare'
+                : followStatus == '00'
+                  ? '/sms/business/bizStudent'
                   : url,
               params: {
                 ...params,
-                ...(followStatus !== undefined && followStatus != '0' && !isFormal && { followStatus })
-              }, 
+                ...(followStatus !== undefined && followStatus != '0' && pageType != "正式学员" && { followStatus })
+              },
               sortList: sortList
             }
         }
@@ -1258,6 +1316,22 @@ export default (props: any) => {
             </Space>
 
             <Space style={{ marginLeft: 'auto' }}>
+              <Button
+
+                key="ordere"
+                type="primary"
+                hidden={!(pageType == "正式学员" && followStatus == '00')}
+                icon={<PlusOutlined />}
+                onClick={async () => {
+                  if (selectedRowsList.length == 0) {
+                    message.error('请先勾选至少一个学员再进行分配!');
+                    return;
+                  }
+                  setuserFromTeacher(true);
+                }}
+              >
+                重新分配老师
+              </Button>
               <Button
                 // key="buttons"
                 // icon={<FormOutlined />}
@@ -1573,7 +1647,7 @@ export default (props: any) => {
             console.log('selectedRowsId', selectedRowsId);
             new Promise((resolve) => {
               request
-                .postAll(`/sms/business/bizStudentUser/assign/${userNameId1.id}`,
+                .postAll(pageType == "正式学员" && followStatus == '00' ? `/sms/business/bizStudent/assign/${userNameId1.id}` : `/sms/business/bizStudentUser/assign/${userNameId1.id}`,
                   selectedRowsId,
                 )
                 .then((res) => {
