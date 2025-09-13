@@ -78,9 +78,9 @@ ol {
 }
 
 .ant-modal-body {
+  max-height: calc(100vh - 250px);
   margin-left: 25px;
   overflow-y: scroll;
-  max-height: calc(100vh - 250px);
 }
 
 // 全局表格滚动优化
@@ -88,11 +88,16 @@ ol {
   .ant-table {
     .ant-table-thead > tr > th,
     .ant-table-tbody > tr > td {
-      white-space: nowrap;
       overflow: hidden;
+      white-space: nowrap;
       text-overflow: ellipsis;
     }
   }
+}
+
+.ant-pro-global-footer {
+  margin: 0;
+  padding: 0 0 20px;
 }
 
 // 响应式表格设置
