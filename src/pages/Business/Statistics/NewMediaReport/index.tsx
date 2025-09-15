@@ -83,7 +83,7 @@ const NewMediaReport: React.FC = () => {
         const convertToTreeData = (nodes: any[]): any[] => {
           const result: any[] = [];
 
-          nodes.forEach((node, index) => {
+          nodes.forEach((node) => {
             // 如果是部门节点
             if (node.departmentName) {
               const deptNode: any = {
@@ -141,11 +141,11 @@ const NewMediaReport: React.FC = () => {
           return result;
         };
 
-        const treeData = convertToTreeData(data);
-        setTreeData(treeData);
+        const treeNodes = convertToTreeData(data);
+        setTreeData(treeNodes);
 
         // 默认只展开汇德教育相关的部门，不展开历史离职员工
-        const defaultExpandedKeys = treeData
+        const defaultExpandedKeys = treeNodes
           .filter(
             (node) =>
               !node.isLeaf &&
@@ -164,60 +164,9 @@ const NewMediaReport: React.FC = () => {
         setCheckedKeys([]);
       }
     } catch (error) {
-      console.error('获取人员树数据失败:', error);
-      message.warning('获取人员数据失败，使用模拟数据');
-
-      // 使用模拟数据作为fallback
-      const mockData = [
-        {
-          title: '新媒体运营部',
-          key: 'dept_1',
-          children: [
-            { title: '姚冲', key: 'user_1', isLeaf: true, userId: 1, userName: '姚冲' },
-            { title: '杨嘉坤', key: 'user_2', isLeaf: true, userId: 2, userName: '杨嘉坤' },
-            { title: '张光静', key: 'user_3', isLeaf: true, userId: 3, userName: '张光静' },
-            { title: '孟琪琪', key: 'user_4', isLeaf: true, userId: 4, userName: '孟琪琪' },
-            { title: '陈思瑶', key: 'user_5', isLeaf: true, userId: 5, userName: '陈思瑶' },
-            { title: '谢家豪', key: 'user_6', isLeaf: true, userId: 6, userName: '谢家豪' },
-            { title: '刘敏', key: 'user_7', isLeaf: true, userId: 7, userName: '刘敏' },
-            { title: '曾朗', key: 'user_8', isLeaf: true, userId: 8, userName: '曾朗' },
-            { title: '罗颖', key: 'user_9', isLeaf: true, userId: 9, userName: '罗颖' },
-            { title: '郑文凯', key: 'user_10', isLeaf: true, userId: 10, userName: '郑文凯' },
-            { title: '熊婉莹', key: 'user_11', isLeaf: true, userId: 11, userName: '熊婉莹' },
-            { title: '王惟洋', key: 'user_12', isLeaf: true, userId: 12, userName: '王惟洋' },
-            { title: '杨非凡', key: 'user_13', isLeaf: true, userId: 13, userName: '杨非凡' },
-            { title: '蒲娅', key: 'user_14', isLeaf: true, userId: 14, userName: '蒲娅' },
-            { title: '尹慧', key: 'user_15', isLeaf: true, userId: 15, userName: '尹慧' },
-            { title: '王巍', key: 'user_16', isLeaf: true, userId: 16, userName: '王巍' },
-            { title: '邓鑫', key: 'user_17', isLeaf: true, userId: 17, userName: '邓鑫' },
-          ],
-        },
-        {
-          title: '应急组',
-          key: 'dept_2',
-          children: [
-            { title: '黄金枝', key: 'user_18', isLeaf: true, userId: 18, userName: '黄金枝' },
-            { title: '刘慧萍', key: 'user_19', isLeaf: true, userId: 19, userName: '刘慧萍' },
-            { title: '李雪晨', key: 'user_20', isLeaf: true, userId: 20, userName: '李雪晨' },
-            { title: '邓丽君', key: 'user_21', isLeaf: true, userId: 21, userName: '邓丽君' },
-          ],
-        },
-        {
-          title: '投放组',
-          key: 'dept_3',
-          children: [{ title: '吴沙', key: 'user_22', isLeaf: true, userId: 22, userName: '吴沙' }],
-        },
-        {
-          title: '无人机组',
-          key: 'dept_4',
-          children: [{ title: '高萌', key: 'user_23', isLeaf: true, userId: 23, userName: '高萌' }],
-        },
-      ];
-
-      setTreeData(mockData);
-      // 默认展开汇德教育相关的部门
-      setExpandedKeys(['dept_1', 'dept_2', 'dept_4']); // 新媒体运营部、应急组、无人机组
-      setCheckedKeys([]); // 默认不选中任何部门
+      setTreeData([]);
+      setExpandedKeys([]);
+      setCheckedKeys([]);
     }
   };
 
@@ -231,10 +180,7 @@ const NewMediaReport: React.FC = () => {
         .map((key) => key.replace('user_', ''));
 
       // 根据tab选择不同的接口
-      const apiUrl =
-        activeTab === '1'
-          ? '/sms/business/bizCharge/resourceReport' // 资源量统计接口
-          : '/sms/business/bizCharge/providerReport'; // 成交量统计接口
+      const apiUrl = '/sms/business/bizCharge/providerReport';
 
       // 构建请求参数，只传递有值的参数
       const requestParams: any = {
