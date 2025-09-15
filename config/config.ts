@@ -54,6 +54,8 @@ export default defineConfig({
   manifest: {
     basePath: '/',
   },
+  // 输出目录改为 sms
+  outputPath: 'sms',
 
   // Fast Refresh 热更新
   fastRefresh: {},

@@ -2,6 +2,7 @@
 /src/.umi-production
 /.vscode
 /dist
+/sms
 /node_modules
 /.svn
 /package-lock.json
