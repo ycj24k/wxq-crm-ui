@@ -70,7 +70,7 @@ const SalesPerformanceReport: React.FC = () => {
         // 转换数据格式
         const convertToTreeData = (nodes: any[]): any[] => {
           const result: any[] = [];
-          nodes.forEach((node, index) => {
+          nodes.forEach((node) => {
             if (node.departmentName) {
               // 部门节点
               const deptNode: any = {
@@ -145,72 +145,9 @@ const SalesPerformanceReport: React.FC = () => {
         setCheckedKeys([]);
       }
     } catch (error) {
-      console.error('获取人员树数据失败:', error);
-      message.warning('获取人员数据失败，使用模拟数据');
-
-      // 使用模拟数据
-      const mockData = [
-        {
-          title: '翼祥无人机',
-          key: 'dept_0',
-          children: [
-            {
-              title: '后台',
-              key: 'dept_1',
-              children: [
-                { title: '阿彪', key: 'user_1', isLeaf: true, userId: 1, userName: '阿彪' },
-                { title: '小程序开发', key: 'user_2', isLeaf: true, userId: 2, userName: '小程序开发' },
-              ],
-            },
-            {
-              title: '中台',
-              key: 'dept_2',
-              children: [
-                { title: '刘洁', key: 'user_3', isLeaf: true, userId: 3, userName: '刘洁' },
-                { title: '欧阳俊', key: 'user_4', isLeaf: true, userId: 4, userName: '欧阳俊' },
-              ],
-            },
-            {
-              title: '汇德培训',
-              key: 'dept_3',
-              children: [
-                { title: '泰银', key: 'user_5', isLeaf: true, userId: 5, userName: '泰银' },
-                { title: '刘新怡', key: 'user_6', isLeaf: true, userId: 6, userName: '刘新怡' },
-              ],
-            },
-            {
-              title: '湖南楚怡',
-              key: 'dept_4',
-              children: [
-                { title: '黄金枝', key: 'user_7', isLeaf: true, userId: 7, userName: '黄金枝' },
-                { title: '刘慧萍', key: 'user_8', isLeaf: true, userId: 8, userName: '刘慧萍' },
-              ],
-            },
-            {
-              title: '湖南汇诚',
-              key: 'dept_5',
-              children: [
-                { title: '李雪晨', key: 'user_9', isLeaf: true, userId: 9, userName: '李雪晨' },
-                { title: '邓丽君', key: 'user_10', isLeaf: true, userId: 10, userName: '邓丽君' },
-              ],
-            },
-            {
-              title: '汇德安全',
-              key: 'dept_6',
-              children: [
-                { title: '高萌', key: 'user_11', isLeaf: true, userId: 11, userName: '高萌' },
-                { title: '戴柏强', key: 'user_12', isLeaf: true, userId: 12, userName: '戴柏强' },
-                { title: '李逸豪', key: 'user_13', isLeaf: true, userId: 13, userName: '李逸豪' },
-              ],
-            },
-          ],
-        },
-      ];
-
-      setTreeData(mockData);
-      // 默认展开汇德教育相关的部门
-      setExpandedKeys(['dept_1', 'dept_2', 'dept_3', 'dept_4', 'dept_5', 'dept_6']);
-      setCheckedKeys([]); // 默认不选中任何部门
+      setTreeData([]);
+      setExpandedKeys([]);
+      setCheckedKeys([]);
     }
   };
 
@@ -224,10 +161,7 @@ const SalesPerformanceReport: React.FC = () => {
         .map((key) => key.replace('user_', ''));
 
       // 根据tab选择不同的接口
-      const apiUrl =
-        activeTab === '1'
-          ? '/sms/business/bizCharge/salesResourceReport' // 资源量统计接口
-          : '/sms/business/bizCharge/salesReport'; // 成交量统计接口
+      const apiUrl = '/sms/business/bizCharge/salesReport';
 
       // 构建请求参数，只传递有值的参数
       const requestParams: any = {
