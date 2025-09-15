@@ -49,7 +49,7 @@ import type { ProFormInstance} from '@ant-design/pro-form';
 import { ModalForm, ProFormDigit, ProFormTextArea, ProFormUploadDragger } from '@ant-design/pro-form';
 import Invoice from '@/pages/Business/Invoice/Invoice';
 import ChargeNew from './ChargeNew';
-import * as XLSX from 'XLSX';
+import * as XLSX from 'xlsx';
 import { biuldDataFromExcelJson } from '@/services/util/util';
 import StudentOrders from '@/pages/Admins/StudentManage/StudentOrder';
 

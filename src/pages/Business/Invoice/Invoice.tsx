@@ -16,7 +16,7 @@ import DownFn from "./DownFn";
 import chargeDownload from '@/services/util/chargeDownload'
 import type { ProFormInstance} from "@ant-design/pro-form";
 import { ModalForm, ProFormUploadDragger } from "@ant-design/pro-form";
-import * as XLSX from 'XLSX';
+import * as XLSX from 'xlsx';
 import { biuldDataFromExcelJson, deleteUndefined } from "@/services/util/util";
 export default (props: any) => {
     const { chargeId = false, param = {} } = props

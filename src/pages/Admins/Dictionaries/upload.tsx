@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import ProForm, { ModalForm, ProFormUploadDragger } from '@ant-design/pro-form';
-import * as XLSX from 'XLSX';
+import * as XLSX from 'xlsx';
 import request from '../../../services/ant-design-pro/apiRequest';
 import dictionaries from '../../../services/util/dictionaries';
 import { message, Spin } from 'antd';
