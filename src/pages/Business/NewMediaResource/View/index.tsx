@@ -261,7 +261,17 @@ export default () => {
     { key: 'col-wechat', title: '微信', dataIndex: 'weChat', width: 100 },
     { key: 'col-qq', title: 'QQ', dataIndex: 'qq', width: 100 },
     { key: 'col-sex', title: '性别', dataIndex: 'sex', width: 60, render: (_, r) => (r.sex ? '女' : '男') },
-    { key: 'col-project', title: '报考岗位', dataIndex: 'project', width: 120, ellipsis: true },
+    {
+      key: 'col-project',
+      title: '报考岗位',
+      dataIndex: 'project',
+      width: 120,
+      ellipsis: true,
+      render: (_, r) => {
+        const name = (Dictionaries.getCascaderAllName('dict_reg_job', r.project) as any) || '';
+        return <span>{name || r.project}</span>;
+      },
+    },
     {
       key: 'col-source',
       title: '客户来源',
@@ -364,18 +374,6 @@ export default () => {
         }}
         toolBarRender={() => [
           <Space key="toolbar">
-            <Button
-              key="reset"
-              onClick={() => {
-                searchFormRef.current?.resetFields();
-                actionRef.current?.reload();
-              }}
-            >
-              重置
-            </Button>
-            <Button key="search" type="primary" onClick={() => actionRef.current?.reload()}>
-              查询
-            </Button>
             <Button
               key="create"
               type="primary"

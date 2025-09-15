@@ -98,26 +98,26 @@
     path: '/business/refund',
     component: './Business/Refund',
   },
-  {
-    name: '线索列表',
-    path: '/business/cluelist',
-    component: './Business/ClueList',
-  },
-  {
-    name: '新媒体线索视图',
-    path: '/business/cluelist/personview',
-    component: './Business/ClueList/PersonView',
-  },
-  {
-    name: '线索池',
-    path: '/business/cluelist/managerview',
-    component: './Business/ClueList/ManagerView',
-  },
-  {
-    name: '销售线索视图',
-    path: '/business/saleslead',
-    component: './Business/SalesLead',
-  },
+  // {
+  //   name: '线索列表',
+  //   path: '/business/cluelist',
+  //   component: './Business/ClueList',
+  // },
+  // {
+  //   name: '新媒体线索视图',
+  //   path: '/business/cluelist/personview',
+  //   component: './Business/ClueList/PersonView',
+  // },
+  // {
+  //   name: '线索池',
+  //   path: '/business/cluelist/managerview',
+  //   component: './Business/ClueList/ManagerView',
+  // },
+  // {
+  //   name: '销售线索视图',
+  //   path: '/business/saleslead',
+  //   component: './Business/SalesLead',
+  // },
   {
     name: '个人视图',
     path: '/business/salelead/salepersonlead',

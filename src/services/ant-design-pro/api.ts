@@ -672,28 +672,28 @@ export async function currentUser(options?: { [key: string]: any }) {
               },
             ],
           },
-          {
-            name: '线索列表',
-            icon: 'table',
-            routes: [
-              {
-                name: '新媒体线索视图',
-                path: '/business/cluelist/personview',
-                component: './Business/Cluelist/PersonView',
-              },
-              {
-                name: '线索池',
-                path: '/business/cluelist/managerview',
-                component: './Business/Cluelist/Managerview',
-              },
-            ],
-          },
-          {
-            name: '销售线索视图',
-            icon: 'ClusterOutlined',
-            path: '/business/saleslead',
-            component: './Business/SalesLead',
-          },
+          // {
+          //   name: '线索列表',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name: '新媒体线索视图',
+          //       path: '/business/cluelist/personview',
+          //       component: './Business/Cluelist/PersonView',
+          //     },
+          //     {
+          //       name: '线索池',
+          //       path: '/business/cluelist/managerview',
+          //       component: './Business/Cluelist/Managerview',
+          //     },
+          //   ],
+          // },
+          // {
+          //   name: '销售线索视图',
+          //   icon: 'ClusterOutlined',
+          //   path: '/business/saleslead',
+          //   component: './Business/SalesLead',
+          // },
           // {
           //   name:'销售线索管理',
           //   icon: 'table',
