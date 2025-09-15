@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Divider, Descriptions, Tabs, Drawer, Tag } from 'antd';
+import  { useEffect, useState } from 'react';
+import {  Divider, Descriptions, Tabs, Drawer, Tag } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
-import request from '@/services/ant-design-pro/apiRequest';
-import moment from 'moment';
+// import request from '@/services/ant-design-pro/apiRequest';
+// import moment from 'moment';
 import getWindowSize from '@/services/util/windowSize';
 import Order from '../AdminOrder/Order';
 import Return from '../AdminReturnVisit/Return';

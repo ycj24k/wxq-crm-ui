@@ -21,7 +21,7 @@ import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 // import DownTable from '@/services/util/timeFn';
 import Dictionaries from '@/services/util/dictionaries';
-import { PageContainer } from '@ant-design/pro-layout';
+// import { PageContainer } from '@ant-design/pro-layout';
 import Modals from './userModal';
 import FollowModal from './followModal';
 import StudentInfo from './studentInfo';
@@ -40,10 +40,12 @@ import ContractModel from './ContractModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
 import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
-import { getNextDay } from '@/pages/Department/AchievementUser/getTime';
+// import { getNextDay } from '@/pages/Department/AchievementUser/getTime';
 import './index.less'
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 type GithubIssueItem = {
+  qq: any;
+  weChat: any;
   name: string;
   mobile: string;
   isLocked?: boolean;
@@ -124,7 +126,7 @@ export default (props: any) => {
   const [userNameId, setUserNameId] = useState<any>();
   const [userNameId1, setUserNameId1] = useState<any>();
   let [department, setDepartment] = useState<any>({});
-  const [isTabListNuber, setisTabListNuber] = useState<any>('0');
+  // const [isTabListNuber, setisTabListNuber] = useState<any>('0');
   const [isShowMedium, setShowisShowMedium] = useState<boolean>(false)
   // const url = isFormal || recommend ? '/sms/business/bizStudentUser' : '/sms/business/bizStudentUser/potentialStudent';
   const url = isFormal ? '/sms/business/bizStudent' : '/sms/business/bizStudentUser/potentialStudent';
@@ -137,20 +139,20 @@ export default (props: any) => {
       actionRef.current.reload();
     }
   }, [TabListNuber]);
-  const tabs = [
-    {
-      key: 'fen',
-      label: (<span>分公司资源库</span>)
-    },
-    {
-      key: 'zong',
-      label: (<span>总公司资源库</span>)
-    },
-    {
-      key: 'all',
-      label: (<span>所有资源</span>)
-    },
-  ]
+  // const tabs = [
+  //   {
+  //     key: 'fen',
+  //     label: (<span>分公司资源库</span>)
+  //   },
+  //   {
+  //     key: 'zong',
+  //     label: (<span>总公司资源库</span>)
+  //   },
+  //   {
+  //     key: 'all',
+  //     label: (<span>所有资源</span>)
+  //   },
+  // ]
   // const url = '/sms/business/bizStudent';
   useEffect(() => {
     callbackRef();
@@ -214,14 +216,14 @@ export default (props: any) => {
         },
       }
     } : undefined;
-  const downObj = {
-    姓名: 'name',
-    报考岗位: 'project',
-    学员类型: 'type',
-    客户来源: 'source',
-    备注: 'description',
-    咨询时间: 'createTime',
-  };
+  // const downObj = {
+  //   姓名: 'name',
+  //   报考岗位: 'project',
+  //   学员类型: 'type',
+  //   客户来源: 'source',
+  //   备注: 'description',
+  //   咨询时间: 'createTime',
+  // };
   // const getProvider = () =>{
   //   request.get('/sms/business/bizStudent/totals',[
   //     {

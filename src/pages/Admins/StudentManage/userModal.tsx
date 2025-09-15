@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, message, Image, Upload, Modal, Input } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Button, message, Image, Upload,
+  //  Modal,
+    Input } from 'antd';
 const { TextArea } = Input;
 import type {
   ProFormInstance} from '@ant-design/pro-form';
@@ -14,7 +16,7 @@ import ProForm, {
   ProFormText,
   ProFormTextArea,
   ProFormSelect,
-  ProFormSwitch,
+  // ProFormSwitch,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
 import { getLevel} from '@/services/util/util';
@@ -23,17 +25,21 @@ import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
 import UserManageCard from '../Department/UserManageCard';
 import StudentModals from '../AdminOrder/Modals';
-import { history, useModel } from 'umi';
-import { ExclamationCircleFilled } from '@ant-design/icons';
+import { 
+  // history, 
+  useModel } from 'umi';
+// import { ExclamationCircleFilled } from '@ant-design/icons';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import ModbileListOrder from './ModbileListOrder';
 import { Typography } from 'antd';
-const { confirm } = Modal;
-const content: any = null;
+// const { confirm } = Modal;
+// const content: any = null;
 export default (props: any) => {
   const { initialState } = useModel('@@initialState');
   const [company, setCompany] = useState('学员姓名');
-  const { modalVisible, setModalVisible, callbackRef, url, type, sourceType, isShowMedium } = props;
+  const { modalVisible, setModalVisible, callbackRef,
+    //  url,
+      type, sourceType, isShowMedium } = props;
   const { renderData } = props;
   console.log(renderData.from, 'isShowMedium')
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
@@ -266,7 +272,7 @@ export default (props: any) => {
     } else {
       const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
       const data = renderData.newMedia ? [value] : value
-      const callBackFn = (res) => {
+      const callBackFn = (res: any) => {
         if (res.status == 'success') {
           if (renderData.typee == 'eidt') {
             const dataValue: any = {

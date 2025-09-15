@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { DownloadOutlined, PlusOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Button, Table, message, Tag, Popconfirm ,Space } from 'antd';
+import { Button, Table, message,
+  //  Tag,
+    Popconfirm ,Space } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
-import moment from 'moment';
-import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
+// import moment from 'moment';
+import { ModalForm,
+  //  ProFormCascader,
+    ProFormInstance } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
 import Upload from '@/services/util/upload';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -451,57 +455,57 @@ export default (props: any) => {
             },
           }}
           toolBarRender={[
-            <a
-              hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
-              download="新学员导入模板"
-              href="./template/新学员导入模板.xlsx"
-            >
-              下载导入模板
-            </a>,
-            // 新增学员
-            <Button
-              key="add-resource"
-              icon={<PlusOutlined />}
-              type="primary"
-              // hidden={order == 'order' || isFormal || recommend}
-              hidden={ TabListNuber == '9' || hidden}
-              onClick={() => {
-                if (parentId) {
-                  setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
-                } else {
-                  setRenderData({ typee: 'add', newMedia: false, teacher: true });
-                }
+            // <a
+            //   hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
+            //   download="新学员导入模板"
+            //   href="./template/新学员导入模板.xlsx"
+            // >
+            //   下载导入模板
+            // </a>,
+            // // 新增学员
+            // <Button
+            //   key="add-resource"
+            //   icon={<PlusOutlined />}
+            //   type="primary"
+            //   // hidden={order == 'order' || isFormal || recommend}
+            //   hidden={ TabListNuber == '9' || hidden}
+            //   onClick={() => {
+            //     if (parentId) {
+            //       setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
+            //     } else {
+            //       setRenderData({ typee: 'add', newMedia: false, teacher: true });
+            //     }
 
-                setModalVisible(true);
-              }}
-            >
-              新建
-            </Button>,
+            //     setModalVisible(true);
+            //   }}
+            // >
+            //   新建
+            // </Button>,
 
-            <Button
-              key="button"
-              hidden={TabListNuber == '2'|| TabListNuber == '9' || hidden}
-              icon={<DownloadOutlined />}
-              type="primary"
-              onClick={() => {
-                setUploadUrl('/sms/business/bizStudent/batch/importForOtherOfSpecial')
-                setUploadVisible(true);
-              }}
-            >
-              导入特殊资源
-            </Button>,
-            <Button
-              key="button"
-              hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
-              icon={<DownloadOutlined />}
-              type="primary"
-              onClick={() => {
-                setUploadUrl('/sms/business/bizStudent/addSystemRepository')
-                setUploadVisible(true);
-              }}
-            >
-              批量导入
-            </Button>,
+            // <Button
+            //   key="button"
+            //   hidden={TabListNuber == '2'|| TabListNuber == '9' || hidden}
+            //   icon={<DownloadOutlined />}
+            //   type="primary"
+            //   onClick={() => {
+            //     setUploadUrl('/sms/business/bizStudent/batch/importForOtherOfSpecial')
+            //     setUploadVisible(true);
+            //   }}
+            // >
+            //   导入特殊资源
+            // </Button>,
+            // <Button
+            //   key="button"
+            //   hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
+            //   icon={<DownloadOutlined />}
+            //   type="primary"
+            //   onClick={() => {
+            //     setUploadUrl('/sms/business/bizStudent/addSystemRepository')
+            //     setUploadVisible(true);
+            //   }}
+            // >
+            //   批量导入
+            // </Button>,
             <Button
             key="ordere"
             type="primary"

@@ -1,4 +1,6 @@
-import { Tabs, Radio, Image, message, Divider, Pagination, Button, Space, Tag, Badge } from 'antd';
+import { Tabs,
+  //  Radio,
+    Image, message, Divider, Pagination, Button, Space, Tag, Badge } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import request from '@/services/ant-design-pro/apiRequest';
 import ProCard from '@ant-design/pro-card';
@@ -8,7 +10,7 @@ import { useModel, history } from 'umi';
 import Dictionaries from '@/services/util/dictionaries';
 import './index.less';
 import moment from 'moment';
-import ImgUrl from '@/services/util/UpDownload';
+// import ImgUrl from '@/services/util/UpDownload';
 import ChargeIframe from '@/pages/Admins/AdminCharge/ChargeIframe';
 import UserModal from "@/pages/Admins/UserManage/userModal"
 import { EyeOutlined, CheckCircleOutlined } from '@ant-design/icons';
@@ -18,13 +20,13 @@ const { TabPane } = Tabs;
 export default () => {
   const formRef = useRef<ProFormInstance>();
   const formRefs = useRef<ProFormInstance>();
-  const bizNotice = JSON.parse(sessionStorage.getItem('bizNotice') as string);
+  // const bizNotice = JSON.parse(sessionStorage.getItem('bizNotice') as string);
   const { initialState } = useModel('@@initialState');
   const [getRegex, setGetRegex] = useState<any>();
   const [imgSrc, setImgSrc] = useState();
   const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [isModalVisibles, setisModalVisibles] = useState<boolean>(false);
-  const [bizNotices, setbizNotice] = useState(bizNotice?.data?.content);
+  // const [bizNotices, setbizNotice] = useState(bizNotice?.data?.content);
   const [renderData, setRenderData] = useState<any>({});
   const [UserModalVisible, setUserModalVisible] = useState<boolean>(false)
   const [noticeData, setNoticeData] = useState([]);
@@ -124,17 +126,17 @@ export default () => {
     fetchNoticeList();
   }, []);
 
-  const look = async (id: number, item: string) => {
-    const type = item.slice(item.indexOf('.'));
-    await ImgUrl('/sms/business/bizNotice/download', id, item).then((res: any) => {
-      setImgSrc(res);
-      if (type == '.png' || type == '.jpg' || type == '.jpeg') {
-        setisModalVisibles(true);
-      } else {
-        setPreviewVisible(true);
-      }
-    });
-  };
+  // const look = async (id: number, item: string) => {
+  //   const type = item.slice(item.indexOf('.'));
+  //   await ImgUrl('/sms/business/bizNotice/download', id, item).then((res: any) => {
+  //     setImgSrc(res);
+  //     if (type == '.png' || type == '.jpg' || type == '.jpeg') {
+  //       setisModalVisibles(true);
+  //     } else {
+  //       setPreviewVisible(true);
+  //     }
+  //   });
+  // };
 
   // 查看详情处理函数
   const handleViewDetail = (record: any) => {

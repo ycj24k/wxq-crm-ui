@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -69,7 +69,7 @@ export default () => {
         onOk={async () => {
           const values = await form.validateFields();
           if (editing) {
-            await apiRequest.post('/sms/sales/level/update', { id: editing.id, ...values });
+            await apiRequest.post('/sms/sales/level/update', {...values ,id: editing.id  });
             message.success('更新成功');
           } else {
             await apiRequest.post('/sms/sales/level', values);

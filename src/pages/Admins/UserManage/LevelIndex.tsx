@@ -1,8 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import
+// React,
+{ useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { EditOutlined, PlusOutlined, DeleteOutlined, RedoOutlined } from '@ant-design/icons';
+import {
+  // EditOutlined,
+  PlusOutlined,
+  //  DeleteOutlined, 
+  //  RedoOutlined 
+} from '@ant-design/icons';
 import { Button, Modal, Select, Form, Input, InputNumber, message, Popconfirm, Spin } from 'antd';
 import UserManageCard from '../Department/UserManageCard';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
@@ -23,7 +30,7 @@ type SalesLevel = {
 // 获取学生等级选项
 async function getsysUserLevel() {
   const res = await apiRequest.get('/sms/business/bizStudentLevel/getAll');
-  console.log('等级选项',res.data);
+  console.log('等级选项', res.data);
   return res.data?.map((e: any) => ({
     label: e.name,
     value: e.id
@@ -45,17 +52,17 @@ export default () => {
   const [studentLevelOptions, setStudentLevelOptions] = useState<any[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
-  
+
   const callbackRef = () => {
     actionRef?.current?.reload();
   };
-  
+
   // 获取分公司名称
   useEffect(() => {
     getCompanyName();
     getStudentLevelOptions();
   }, []);
-  
+
   // 获取分公司名称
   const getCompanyName = async () => {
     const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
@@ -73,7 +80,7 @@ export default () => {
     });
     setDepartmentList(data);
   }
-  
+
   // 获取学生等级选项
   const getStudentLevelOptions = async () => {
     try {
@@ -83,16 +90,16 @@ export default () => {
       message.error('获取客戶等级选项失败');
     }
   };
-  
+
   // 提交关联学生等级
   const handleCorrelationSubmit = async () => {
     if (!renderData?.id) return;
-    
+
     try {
       setLoading(true);
       await apiRequest.postAll(
         `/sms/system/sysUserLevel/correlationStudentLevel/${renderData.id}`,
-         selectedLevels,
+        selectedLevels,
         // selectedLevels  // 直接传递数组作为请求体
       );
       message.success('关联成功');
@@ -105,7 +112,7 @@ export default () => {
       setLoading(false);
     }
   };
-  
+
   const columns: ProColumns<SalesLevel>[] = [
     { title: '名称', dataIndex: 'name' },
     {
@@ -121,13 +128,14 @@ export default () => {
     },
     { title: '客户容量', dataIndex: 'customerCapacity', sorter: true },
     { title: '锁定数量容量', dataIndex: 'lockedCustomerLimit', sorter: true },
-    { title: '描述', dataIndex: 'description', sorter: true,
+    {
+      title: '描述', dataIndex: 'description', sorter: true,
       render: (_, record) => (
-            <span>
-              {record.description!="undefined"?record.description: '无'}
-            </span>
-          )
-     },
+        <span>
+          {record.description != "undefined" ? record.description : '无'}
+        </span>
+      )
+    },
     // { 
     //   title: '可见等级', 
     //   colSpan: 2,
@@ -140,20 +148,20 @@ export default () => {
     //   )
     // },
     {
-         title: '可见等级',
-         search: false,
-         colSpan: 2,
-         dataIndex: 'studentLevelList',
-         key: 'studentLevelList',
-         valueType: 'select',
-         request: getsysUserLevel,
-            render: (_, record) => (
+      title: '可见等级',
+      search: false,
+      colSpan: 2,
+      dataIndex: 'studentLevelList',
+      key: 'studentLevelList',
+      valueType: 'select',
+      request: getsysUserLevel,
+      render: (_, record) => (
         <span>
-          {record.studentLevelNameList|| '无'}
+          {record.studentLevelNameList || '无'}
         </span>
       )
-       },
-    {                   
+    },
+    {
       search: false,
       colSpan: 0,
       render: (text, record: any, _, action) => (
@@ -197,7 +205,7 @@ export default () => {
             console.log(record);
             const content = await apiRequest.get('/sms/share/getDepartmentAndUser');
             setCardContent({ content: content.data, type: 'sysuser' });
-            
+
             // 省略类型注解
             setDepartment(record?.userIdList?.map((id: any) => ({ id })));
             setParentIdTree(record.id);
@@ -209,8 +217,8 @@ export default () => {
       ),
     },
     {
-      title: '操作', 
-      valueType: 'option', 
+      title: '操作',
+      valueType: 'option',
       render: (_, record) => [
         <a key={`edit-${record.id || Math.random()}`} onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
         <Popconfirm key="del" title="确认删除该等级？" onConfirm={async () => {
@@ -234,7 +242,7 @@ export default () => {
           departments={department}
         />
       )}
-      
+
       {/* 关联学生等级的弹窗 */}
       <Modal
         title={`关联学生等级 - ${renderData?.name || ''}`}
@@ -261,7 +269,7 @@ export default () => {
           </Form>
         </Spin>
       </Modal>
-      
+
       <ProTable<SalesLevel>
         rowKey="id"
         columns={columns}
@@ -294,7 +302,7 @@ export default () => {
           actionRef.current?.reload();
         }}
       >
-      {/* 提交测试 */}
+        {/* 提交测试 */}
         <Form form={form} layout="vertical">
           <Form.Item label="等级名称" name="name" rules={[{ required: true, message: '请输入等级名称' }]}>
             <Input placeholder="请输入" />
@@ -305,7 +313,7 @@ export default () => {
           <Form.Item label="客户容量" name="customerCapacity" rules={[{ required: true, message: '请输入客户容量' }]}>
             <InputNumber min={0} precision={0} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item label="锁定数量容量" name="lockedCustomerLimit"  rules={[{ required: true, message: '锁定数量容量' }]}>
+          <Form.Item label="锁定数量容量" name="lockedCustomerLimit" rules={[{ required: true, message: '锁定数量容量' }]}>
             <InputNumber min={0} precision={0} style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item label="描述" name="description">

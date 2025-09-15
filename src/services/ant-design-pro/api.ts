@@ -234,12 +234,12 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/studentmanage',
                 component: './Business/StudentManage',
               },
-              {
-                name: '潜在团组',
-                icon: 'TeamOutlined',
-                path: '/business/companymanage',
-                component: './Business/CompanyManage',
-              },
+              // {
+              //   name: '潜在团组',
+              //   icon: 'TeamOutlined',
+              //   path: '/business/companymanage',
+              //   component: './Business/CompanyManage',
+              // },
               {
                 name: '待支付学员',
                 icon: 'SolutionOutlined',

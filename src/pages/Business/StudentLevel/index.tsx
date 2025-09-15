@@ -1,9 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import
+//  React, 
+{ useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
-import { Button, Modal, Form, Select, Input, InputNumber, Space, message, Popconfirm, Tag } from 'antd';
+import {
+  Button, Modal, Form, Select, Input, InputNumber,
+  //  Space,
+  message, Popconfirm,
+  //  Tag
+} from 'antd';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
-import { getCompanyRequest } from '@/services/util/util';
+// import { getCompanyRequest } from '@/services/util/util';
 import Dictionaries from '@/services/util/dictionaries';
 type LevelItem = {
   id?: number;
@@ -54,26 +61,27 @@ export default () => {
     //      valueType: 'select',
     //      request: getCompanyRequest,
     //    },
-     {
-          title: '部门',
-          dataIndex: 'departmentId',
-          search: false,
-          sorter: true,
-          render: (text, record) => (
-            <span>{Dictionaries.getDepartmentName(record.departmentId)[0]}</span>
-          ),
-        },
+    {
+      title: '部门',
+      dataIndex: 'departmentId',
+      search: false,
+      sorter: true,
+      render: (text, record) => (
+        <span>{Dictionaries.getDepartmentName(record.departmentId)[0]}</span>
+      ),
+    },
     // { title: '等级编码', dataIndex: 'code' },
     { title: '优先级', dataIndex: 'weight', sorter: true },
     // { title: '状态', dataIndex: 'enable', valueType: 'select', valueEnum: { true: { text: '启用', status: 'Success' }, false: { text: '停用', status: 'Default' } }, render: (_, r) => <Tag color={r.enable ? 'green' : 'default'}>{r.enable ? '启用' : '停用'}</Tag> },
-    { title: '描述', dataIndex: 'description', ellipsis: true,
+    {
+      title: '描述', dataIndex: 'description', ellipsis: true,
       render: (_, record) => (
-            <span>
-              {record.description!="undefined"?record.description: '无'}
-            </span>
-          )
+        <span>
+          {record.description != "undefined" ? record.description : '无'}
+        </span>
+      )
 
-     },
+    },
     // { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
     {
       title: '操作',

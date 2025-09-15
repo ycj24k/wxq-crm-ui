@@ -1,8 +1,12 @@
-import React, { useRef, useState } from 'react';
+import
+//  React, 
+{ useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { Button, Modal, Form, Input, InputNumber, message, Popconfirm } from 'antd';
+import { Button, Modal, Form, Input, 
+  // InputNumber, 
+  message, Popconfirm } from 'antd';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 
 type SalesItem = {
@@ -63,7 +67,7 @@ export default () => {
         onOk={async () => {
           const values = await form.validateFields();
           if (editing) {
-            await apiRequest.post('/sms/sales/update', { id: editing.id, ...values });
+            await apiRequest.post('/sms/sales/update', {  ...values,id: editing.id });
             message.success('更新成功');
           } else {
             await apiRequest.post('/sms/sales', values);

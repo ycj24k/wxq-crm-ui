@@ -1,7 +1,7 @@
 import request from '../ant-design-pro/apiRequest';
 import { message, Select } from 'antd';
-import { values } from 'lodash';
-import { useModel } from 'umi';
+// import { values } from 'lodash';
+// import { useModel } from 'umi';
 const { Option } = Select;
 class dictionaries {
   version: string | null;
@@ -130,7 +130,7 @@ class dictionaries {
       });
     }
     let departments: any = []
-    function getDepartmens(list, parent) {
+    function getDepartmens(list: any, parent: any) {
       for (const i in list) {
         // console.log('list', list[i], value);
 
@@ -339,7 +339,7 @@ class dictionaries {
   }
   //批量导入时获取项目的value
   getProjectValue(value: string, ParentName: string, children?: string) {
-    const arr: any[] = [];
+    // const arr: any[] = [];
     // const children: any[] = [];
     let str: string = '';
     if (!this.list) this.list = JSON.parse(localStorage.getItem('dictionariesList') as string);
@@ -679,7 +679,7 @@ class dictionaries {
   getCascaderAllName = (value: string, data: string, type: string = 'label') => {
     const arr: any = this.getCascader(value);
     const cascader: any = [];
-    const str = '';
+    // const str = '';
     const CascaderList = (arrList: any, a?: any) => {
       arrList?.forEach((item: any) => {
         let arr3: any = [];
@@ -1102,7 +1102,7 @@ class dictionaries {
           const itemCopy = { ...item };
           // 如果有子节点，递归处理
           if (item.children && item.children.length > 0) {
-            itemCopy.children = item.children.filter(child => values.includes(child.value));
+            itemCopy.children = item.children.filter((child:any) => values.includes(child.value));
           }
           result.push(itemCopy);
         }
