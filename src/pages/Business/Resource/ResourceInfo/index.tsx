@@ -452,7 +452,7 @@ export default (props: any) => {
           }}
           toolBarRender={[
             <a
-              hidden={TabListNuber == '1' || hidden}
+              hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
               download="新学员导入模板"
               href="./template/新学员导入模板.xlsx"
             >
@@ -464,6 +464,7 @@ export default (props: any) => {
               icon={<PlusOutlined />}
               type="primary"
               // hidden={order == 'order' || isFormal || recommend}
+              hidden={ TabListNuber == '9' || hidden}
               onClick={() => {
                 if (parentId) {
                   setRenderData({ typee: 'add', parentId, newMedia: false, teacher: true });
@@ -479,7 +480,7 @@ export default (props: any) => {
 
             <Button
               key="button"
-              hidden={TabListNuber == '2' || hidden}
+              hidden={TabListNuber == '2'|| TabListNuber == '9' || hidden}
               icon={<DownloadOutlined />}
               type="primary"
               onClick={() => {
@@ -491,7 +492,7 @@ export default (props: any) => {
             </Button>,
             <Button
               key="button"
-              hidden={TabListNuber == '1' || hidden}
+              hidden={TabListNuber == '1'|| TabListNuber == '9' || hidden}
               icon={<DownloadOutlined />}
               type="primary"
               onClick={() => {

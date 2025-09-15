@@ -146,7 +146,7 @@ class dictionaries {
         }
       }
     }
-    list.forEach(async (item: any) => {
+    list?.forEach(async (item: any) => {
       if (item.departmentName == '汇德教育') {
         departments = item.children
       }
