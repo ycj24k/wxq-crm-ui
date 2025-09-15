@@ -2,11 +2,45 @@
 /* eslint-disable */
 import { request } from 'umi';
 import request1 from './apiRequest';
-import component from '@/locales/bn-BD/component';
+// import component from '@/locales/bn-BD/component';
+
+/** 获取待办事项列表 GET /sms/business/bizTodo */
+export async function getTodoList(params?: any, options?: { [key: string]: any }) {
+  return request1.get('/sms/business/bizTodo', {
+    method: 'GET',
+    params,
+    ...(options || {}),
+  });
+}
+
+/** 创建/更新待办事项 POST /sms/business/bizTodo */
+export async function saveTodo(data: any, options?: { [key: string]: any }) {
+  return request1.post('/sms/business/bizTodo', {
+    method: 'POST',
+    data,
+    ...(options || {}),
+  });
+}
+
+/** 删除待办事项 DELETE /sms/business/bizTodo */
+export async function deleteTodo(params: any, options?: { [key: string]: any }) {
+  return request1.delete('/sms/business/bizTodo', {
+    method: 'DELETE',
+    params,
+    ...(options || {}),
+  });
+}
+
+/** 完成待办事项 POST /sms/business/bizTodo/complete/{id} */
+export async function completeTodo(id: number, options?: { [key: string]: any }) {
+  return request1.post(`/sms/business/bizTodo/complete/${id}`, {
+    method: 'POST',
+    ...(options || {}),
+  });
+}
 
 /** 获取当前的用户 GET /api/currentUser */
 export async function currentUser(options?: { [key: string]: any }) {
-
   // const convertToRoutes = (menuData: any[], level = 1) => {
   //   return menuData.map(item => {
   //     const route: any = {
@@ -40,12 +74,9 @@ export async function currentUser(options?: { [key: string]: any }) {
   //   });
   // }
 
-
   // const loginRouter = await request1.get('/sms/user/getMenus');
   // // 添加对loginRouter.data为null的检查
   // let newRouter = loginRouter.data ? convertToRoutes(loginRouter.data) : [];
-
-
 
   // const user: any = await request1.get('/sms/user');
   let user: any = JSON.parse(sessionStorage.getItem('userInfo') as string);
@@ -263,7 +294,7 @@ export async function currentUser(options?: { [key: string]: any }) {
                 name: '专属码未支付申请退款',
                 path: '/business/exclusiveqrcoderefund',
                 component: './Business/ExclusiveQRCodeRefund',
-              }
+              },
             ],
           },
           {
@@ -306,7 +337,7 @@ export async function currentUser(options?: { [key: string]: any }) {
               {
                 name: '报名团组',
                 path: '/business/teamstudent',
-                component: './Business/TeamStudent'
+                component: './Business/TeamStudent',
               },
               {
                 name: '题库设置',
@@ -370,12 +401,12 @@ export async function currentUser(options?: { [key: string]: any }) {
               {
                 name: '退款',
                 path: '/business/refund',
-                component: './Business/Refund'
+                component: './Business/Refund',
               },
               {
                 name: '补缴下单',
                 path: '/business/supplementaryorder',
-                component: './Business/SuppleMentaryOrder'
+                component: './Business/SuppleMentaryOrder',
               },
               {
                 name: '开具发票',
@@ -498,8 +529,7 @@ export async function currentUser(options?: { [key: string]: any }) {
           {
             name: '数据统计',
             icon: 'AreaChartOutlined',
-            // path: '/admins/contract',
-            // component: './Admins/Contract',
+            path: '/business/data-statistics',
             routes: [
               // {
               //   name: '部门看板',
@@ -508,22 +538,22 @@ export async function currentUser(options?: { [key: string]: any }) {
               // },
               {
                 name: '学生来源',
-                path: '/business/statistics/source',
+                path: '/business/data-statistics/source',
                 component: './Business/Statistics/Source',
               },
               // {
               //   name: '招生老师业绩统计',
-              //   path: '/business/statistics/performance',
+              //   path: '/business/data-statistics/performance',
               //   component: './Business/Statistics/Performance',
               // },
               {
                 name: '业绩统计',
-                path: '/business/statistics/performances',
+                path: '/business/data-statistics/performances',
                 component: './Business/Statistics/Performances',
               },
               {
                 name: '新媒体运营统计',
-                path: '/business/statistics/operations',
+                path: '/business/data-statistics/operations',
                 component: './Business/Statistics/Operations',
               },
             ],
@@ -574,9 +604,9 @@ export async function currentUser(options?: { [key: string]: any }) {
               {
                 name: '资源小组',
                 path: '/business/cluemanagement',
-                component: './Business/Cluemanagement'
+                component: './Business/Cluemanagement',
               },
-            ]
+            ],
           },
           {
             name: '新媒体资源',
@@ -591,7 +621,7 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/newmedia',
                 redirect: '/business/newmedia/view',
               },
-            ]
+            ],
           },
           // {
           //   name: '销售管理',
@@ -618,30 +648,52 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/sop/template',
                 component: './Business/SOP/Template',
               },
-            ]
+            ],
           },
           {
-            name: '线索列表',
-            icon: 'table',
+            name: '统计报表',
+            icon: 'AreaChartOutlined',
+            path: '/business/statistics',
             routes: [
+              // {
+              //   name: '销售市场业绩报表',
+              //   path: '/business/statistics/sales-report',
+              //   component: './Business/Statistics/SalesReport',
+              // },
               {
-                name: '新媒体线索视图',
-                path: '/business/cluelist/personview',
-                component: './Business/Cluelist/PersonView'
+                name: '新媒体运营报表',
+                path: '/business/statistics/new-media-report',
+                component: './Business/Statistics/NewMediaReport',
               },
               {
-                name: '线索池',
-                path: '/business/cluelist/managerview',
-                component: './Business/Cluelist/Managerview'
-              }
-            ]
+                name: '销售业绩报表',
+                path: '/business/statistics/sales-performance-report',
+                component: './Business/Statistics/SalesPerformanceReport',
+              },
+            ],
           },
-          {
-            name: '销售线索视图',
-            icon: 'ClusterOutlined',
-            path: '/business/saleslead',
-            component: './Business/SalesLead',
-          },
+          // {
+          //   name: '线索列表',
+          //   icon: 'table',
+          //   routes: [
+          //     {
+          //       name: '新媒体线索视图',
+          //       path: '/business/cluelist/personview',
+          //       component: './Business/Cluelist/PersonView',
+          //     },
+          //     {
+          //       name: '线索池',
+          //       path: '/business/cluelist/managerview',
+          //       component: './Business/Cluelist/Managerview',
+          //     },
+          //   ],
+          // },
+          // {
+          //   name: '销售线索视图',
+          //   icon: 'ClusterOutlined',
+          //   path: '/business/saleslead',
+          //   component: './Business/SalesLead',
+          // },
           // {
           //   name:'销售线索管理',
           //   icon: 'table',
@@ -699,8 +751,8 @@ export async function currentUser(options?: { [key: string]: any }) {
             name: '待办计划',
             icon: 'ReadOutlined',
             path: '/users/todolist',
-            component: './UserCenter/TodoList'
-          }
+            component: './UserCenter/TodoList',
+          },
         ],
       },
       {
@@ -758,22 +810,22 @@ export async function currentUser(options?: { [key: string]: any }) {
             name: '用户相关',
             icon: 'TeamOutlined',
             routes: [
-                  {
-                    name: '用户管理',
-                    path: '/admins/usermanage',
-                    component: './Admins/UserManage',
-                  },
-                  {
-                    name: '销售等级',
-                    path: '/admins/saleslevel',
-                    component: './Admins/SalesLevel',
-                  },
-                  // {
-                  //   name: '用户等级',
-                  //   path: '/business/sales/level',
-                  //   component: './Business/Sales/Level',
-                  // },
-                ]
+              {
+                name: '用户管理',
+                path: '/admins/usermanage',
+                component: './Admins/UserManage',
+              },
+              {
+                name: '销售等级',
+                path: '/admins/saleslevel',
+                component: './Admins/SalesLevel',
+              },
+              // {
+              //   name: '用户等级',
+              //   path: '/business/sales/level',
+              //   component: './Business/Sales/Level',
+              // },
+            ],
           },
           // {
           //   name: '用户相关',
@@ -876,10 +928,22 @@ export async function currentUser(options?: { [key: string]: any }) {
             component: './Admins/Scheduling',
           },
           {
-            name: '有效期配置',
-            path: '/admins/expirationdate',
-            icon: 'FieldTimeOutlined',
-            component: './Admins/ExpirationDate'
+            name: '系统配置',
+            icon: 'SettingOutlined',
+            routes: [
+              {
+                name: '项目有效期配置',
+                path: '/admins/expirationdate',
+                icon: 'FieldTimeOutlined',
+                component: './Admins/ExpirationDate',
+              },
+              {
+                name: '共享学员设置',
+                path: '/admins/shared-student',
+                icon: 'ShareAltOutlined',
+                component: './Admins/SharedStudent',
+              },
+            ],
           },
           // {
           //   name: '有效期配置',
@@ -891,7 +955,7 @@ export async function currentUser(options?: { [key: string]: any }) {
             path: '/admins/recommends',
             icon: 'ReadOutlined',
             component: './Admins/Recommend',
-          }
+          },
         ],
       },
 
@@ -947,7 +1011,7 @@ export async function rule(
     /** 页面的容量 */
     pageSize?: number;
   },
-  options?: { [key: string]: any },
+  options?: { [key: string]: any }
 ) {
   return request<API.RuleList>('/api/rule', {
     method: 'GET',
@@ -998,4 +1062,36 @@ export async function updateStudentLevel(data: any) {
 /** 删除 DELETE /sms/student/level */
 export async function deleteStudentLevel(id: number | string) {
   return request1.delete('/sms/student/level', { id });
+}
+
+/** ================= 项目有效期配置 API ================= */
+/** 列表 GET /sms/business/bizEffectiveConfig */
+export async function getProjectValidityConfig(params?: any) {
+  return request1.get('/sms/business/bizEffectiveConfig', params);
+}
+/** 新增 POST /sms/business/bizEffectiveConfig */
+export async function createProjectValidityConfig(data: any) {
+  return request1.post('/sms/business/bizEffectiveConfig', data);
+}
+/** 更新 POST /sms/business/bizEffectiveConfig */
+export async function updateProjectValidityConfig(data: any) {
+  return request1.post('/sms/business/bizEffectiveConfig', data);
+}
+/** 删除 DELETE /sms/business/bizEffectiveConfig */
+export async function deleteProjectValidityConfig(id: number | string) {
+  return request1.delete('/sms/business/bizEffectiveConfig', { id });
+}
+
+/** ================= 共享学员设置 API ================= */
+/** 列表 GET /sms/business/bizCompanyShare */
+export async function getSharedStudentConfig(params?: any) {
+  return request1.get('/sms/business/bizCompanyShare', params);
+}
+/** 新增 POST /sms/business/bizCompanyShare */
+export async function createSharedStudentConfig(data: any) {
+  return request1.post('/sms/business/bizCompanyShare', data);
+}
+/** 删除 DELETE /sms/business/bizCompanyShare */
+export async function deleteSharedStudentConfig(id: number | string) {
+  return request1.delete('/sms/business/bizCompanyShare', { id });
 }

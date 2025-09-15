@@ -111,6 +111,7 @@ class httpRequest {
       'date',
       'startDate',
       'endDate',
+      'remindTime',
     ];
 
     //时间查询通用
@@ -122,10 +123,8 @@ class httpRequest {
           data[`${key}-end`] = moment(data[key][1]).format('YYYY-MM-DD') + ' 23:59:59';
           delete data[key];
         } else {
-          data[`${key}-start`] =
-            data[key][0]?.length == 10 ? data[key][0] + ' 00:00:00' : data[key][0];
-          data[`${key}-end`] =
-            data[key][1]?.length == 10 ? data[key][1] + ' 23:59:59' : data[key][1];
+          data[`${key}-start`] = data[key][0]?.length == 10 ? data[key][0] + ' 00:00:00' : data[key][0];
+          data[`${key}-end`] = data[key][1]?.length == 10 ? data[key][1] + ' 23:59:59' : data[key][1];
           delete data[key];
         }
       }

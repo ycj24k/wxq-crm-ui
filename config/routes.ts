@@ -91,47 +91,47 @@
   {
     name: '补缴下单',
     path: '/business/supplementaryorder',
-    component: './Business/SuppleMentaryOrder'
+    component: './Business/SuppleMentaryOrder',
   },
   {
     name: '退款',
     path: '/business/refund',
-    component: './Business/Refund'
+    component: './Business/Refund',
   },
-  {
-    name: '线索列表',
-    path: '/business/cluelist',
-    component: './Business/ClueList',
-  },
-  {
-    name: '新媒体线索视图',
-    path: '/business/cluelist/personview',
-    component: './Business/ClueList/PersonView'
-  },
-  {
-    name: '线索池',
-    path: '/business/cluelist/managerview',
-    component: './Business/ClueList/ManagerView'
-  },
-  {
-    name: '销售线索视图',
-    path: '/business/saleslead',
-    component: './Business/SalesLead',
-  },
+  // {
+  //   name: '线索列表',
+  //   path: '/business/cluelist',
+  //   component: './Business/ClueList',
+  // },
+  // {
+  //   name: '新媒体线索视图',
+  //   path: '/business/cluelist/personview',
+  //   component: './Business/ClueList/PersonView',
+  // },
+  // {
+  //   name: '线索池',
+  //   path: '/business/cluelist/managerview',
+  //   component: './Business/ClueList/ManagerView',
+  // },
+  // {
+  //   name: '销售线索视图',
+  //   path: '/business/saleslead',
+  //   component: './Business/SalesLead',
+  // },
   {
     name: '个人视图',
     path: '/business/salelead/salepersonlead',
-    component: './Business/SaleLead/SaleGroupLead'
+    component: './Business/SaleLead/SaleGroupLead',
   },
   {
     name: '管理视图',
     path: '/business/salelead/salegrouplead',
-    component: './Business/SaleLead/SalePersonLead'
+    component: './Business/SaleLead/SalePersonLead',
   },
   {
     name: '资源小组',
     path: '/business/cluemanagement',
-    component: './Business/Cluemanagement'
+    component: './Business/Cluemanagement',
   },
   {
     name: '新媒体资源',
@@ -213,6 +213,50 @@
         name: 'SOP模板管理',
         path: '/business/sop/template',
         component: './Business/SOP/Template',
+      },
+    ],
+  },
+  {
+    name: '数据统计',
+    icon: 'BarChartOutlined',
+    path: '/business/data-statistics',
+    routes: [
+      {
+        name: '学生来源',
+        path: '/business/data-statistics/source',
+        component: './Business/Statistics/Source',
+      },
+      {
+        name: '业绩统计',
+        path: '/business/data-statistics/performances',
+        component: './Business/Statistics/Performances',
+      },
+      {
+        name: '新媒体运营统计',
+        path: '/business/data-statistics/operations',
+        component: './Business/Statistics/Operations',
+      },
+    ],
+  },
+  {
+    name: '统计报表',
+    icon: 'AreaChartOutlined',
+    path: '/business/statistics',
+    routes: [
+      // {
+      //   name: '销售市场业绩报表',
+      //   path: '/business/statistics/sales-report',
+      //   component: './Business/Statistics/SalesReport',
+      // },
+      {
+        name: '新媒体运营报表',
+        path: '/business/statistics/new-media-report',
+        component: './Business/Statistics/NewMediaReport',
+      },
+      {
+        name: '销售业绩报表',
+        path: '/business/statistics/sales-performance-report',
+        component: './Business/Statistics/SalesPerformanceReport',
       },
     ],
   },
@@ -363,31 +407,6 @@
     component: './Business/PaymentApply/Audit',
   },
   {
-    name: '来源统计',
-    path: '/business/statistics/source',
-    component: './Business/Statistics/Source',
-  },
-  {
-    name: '部门看板',
-    path: '/business/statistics/departmentkanban',
-    component: './Business/Statistics/DepartmentKanban',
-  },
-  {
-    name: '招生老师业绩统计',
-    path: '/business/statistics/performance',
-    component: './Business/Statistics/Performance',
-  },
-  {
-    name: '新媒体运营统计',
-    path: '/business/statistics/operations',
-    component: './Business/Statistics/Operations',
-  },
-  {
-    name: '业绩统计',
-    path: '/business/statistics/performances',
-    component: './Business/Statistics/Performances',
-  },
-  {
     name: '退费列表',
     path: '/business/refundCharge/list',
     component: './Business/RefundCharge/List',
@@ -445,7 +464,7 @@
   {
     name: '待办计划',
     path: '/users/todolist',
-    component: './TodoList',
+    component: './UserCenter/TodoList',
   },
   {
     name: '部门看板',
@@ -636,7 +655,7 @@
   {
     name: '有效期配置',
     path: '/admins/expirationdate',
-    component: './Admins/ExpirationDate'
+    component: './Admins/ExpirationDate',
   },
   // {
   //   name: '有效期配置',
@@ -709,6 +728,10 @@
   //   path: '/business',
   //   redirect: '/business/studentmanage',
   // },
+  {
+    path: '/admins/shared-student',
+    component: './Admins/SharedStudent',
+  },
   {
     path: '/',
     redirect: '/welcome',

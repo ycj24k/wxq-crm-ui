@@ -88,8 +88,9 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 11, name: '时间大于', valueType: 'time' },
     { value: 12, name: '时间小于', valueType: 'time' },
     { value: 13, name: '在列表', valueType: 'string' },
-    { value: 14, name: '是', valueType: 'boolean' },
-    { value: 15, name: '否', valueType: 'boolean' },
+    // 按要求：14/15 也为“空”，不需要输入值
+    { value: 14, name: '是', valueType: 'empty' },
+    { value: 15, name: '否', valueType: 'empty' },
   ];
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
@@ -289,10 +290,22 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   };
 
   // 获取运算类型的值类型
-  const getOperatorValueType = (operator?: number): string => {
-    if (operator == null) return 'empty';
-    const config = operatorConfigs.find(op => op.value === operator);
-    return config?.valueType || 'string';
+  // 已被 mapOperatorToValueType 取代
+
+  // 根据你的要求，严格控制“计算值/可用值”输入格式
+  // 0 1 2 3 8 13 -> 字符串
+  // 4 5 14 15 -> 空
+  // 6 7 -> 数字
+  // 9 10 -> 日期时间 yyyy-MM-dd HH:mm:ss
+  // 11 12 -> 时间 HH:mm:ss
+  const mapOperatorToValueType = (op?: number): 'string' | 'number' | 'datetime' | 'time' | 'empty' => {
+    if (op == null) return 'empty';
+    if ([0, 1, 2, 3, 8, 13].includes(op)) return 'string';
+    if ([4, 5, 14, 15].includes(op)) return 'empty';
+    if ([6, 7].includes(op)) return 'number';
+    if ([9, 10].includes(op)) return 'datetime';
+    if ([11, 12].includes(op)) return 'time';
+    return 'string';
   };
 
   // 添加规则行
@@ -463,7 +476,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     const convertToTreeData = (nodes: any[]): any[] => {
       const result: any[] = [];
       
-      nodes.forEach((node, index) => {
+      nodes.forEach((node) => {
         // 如果是部门节点
         if (node.departmentName) {
           const deptNode: any = {
@@ -529,7 +542,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
 
   // 渲染计算值输入组件
   const renderValueInput = (rule: RuleLine) => {
-    const valueType = getOperatorValueType(rule.type);
+    // 强制使用新映射
+    const valueType = mapOperatorToValueType(rule.type);
     const fieldKey = rule.field;
 
     switch (valueType) {
@@ -544,17 +558,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             style={{ width: '100%' }}
           />
         );
-      case 'date':
-        // 规范：日期型统一使用 yyyy-MM-dd HH:mm:ss（按你要求，9/10 用日期时间，11/12 用时间）
-        return (
-          <DatePicker
-            showTime
-            value={rule.value ? moment(rule.value, 'YYYY-MM-DD HH:mm:ss') : null}
-            onChange={(date) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', date?.format('YYYY-MM-DD HH:mm:ss') || '')}
-            placeholder="请选择日期时间"
-            style={{ width: '100%' }}
-          />
-        );
+      // 不使用纯 date；9/10 已归入 datetime
       case 'datetime':
         return (
           <DatePicker
@@ -575,18 +579,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
             style={{ width: '100%' }}
           />
         );
-      case 'boolean':
-        return (
-          <Select
-            value={rule.value}
-            onChange={(value) => updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', value)}
-            placeholder="请选择"
-            style={{ width: '100%' }}
-          >
-            <Option value="14">是</Option>
-            <Option value="15">否</Option>
-          </Select>
-        );
+      // 不再提供 boolean 值输入；14/15 属于 empty
       // 列表选择（在列表 13）
       case 'string':
         if (rule.type === 13) {
@@ -621,7 +614,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                 treeCheckStrictly={false}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
                 tagRender={(props) => {
-                  const { label, closable, onClose } = props;
+                  const { label, closable, onClose: _onClose } = props;
                   return (
                     <span style={{ 
                       display: 'inline-block',
@@ -640,7 +633,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                       {label}
                       {closable && (
                         <span 
-                          onClick={onClose}
+                          onClick={_onClose}
                           style={{ 
                             marginLeft: '4px', 
                             cursor: 'pointer',
@@ -704,12 +697,12 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     >
       <Spin spinning={loading}>
         <div style={{ padding: '20px 0' }}>
-          {ruleGroups.map((group, _groupIndex) => (
+          {ruleGroups.map((group, idx) => (
           <Card
             key={group.id}
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>{`规则组${_groupIndex + 1}`}</span>
+                <span style={{ fontSize: '16px', fontWeight: 'bold' }}>{`规则组${idx + 1}`}</span>
                 <span style={{ fontSize: '13px', color: '#333' }}>组内关系：</span>
                 <Select
                   value={group.relation}
