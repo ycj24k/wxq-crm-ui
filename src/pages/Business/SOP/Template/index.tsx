@@ -48,7 +48,12 @@ export default () => {
       hideInSearch: true
     },
     { title: '项目名称', dataIndex: 'project', width: 160 },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    { title: '描述', dataIndex: 'description', ellipsis: true,
+      render: (_, record) => (
+            <span>
+              {record.description!="undefined"?record.description: '无'}
+            </span>
+          ) },
     {
       title: '操作', valueType: 'option', width: 200, render: (_, record) => [
         <a key="view" onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>查看</a>,

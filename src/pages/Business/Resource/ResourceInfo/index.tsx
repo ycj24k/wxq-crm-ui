@@ -64,7 +64,7 @@ export default (props: any) => {
     actionRef.current.reload();
   };
   useEffect(() => {
-    if (TabListNuber == '7' || TabListNuber == '0') {
+    if (TabListNuber == '7' || TabListNuber == '9') {
       setParams({})
     }
   }, [TabListNuber])
@@ -275,7 +275,7 @@ export default (props: any) => {
         <>
         <Space>
         <a
-            key="edit"
+            key={`edit-${record.id || Math.random()}`}
             // size="small"
             type="primary"
             // icon={<FormOutlined />}
@@ -320,7 +320,7 @@ export default (props: any) => {
           >
             分配
           </a> */}
-           {TabListNuber == '0' &&<Popconfirm
+           {TabListNuber == '9' &&<Popconfirm
             key="deletePop"
             title="是否确定删除？"
             style={{ marginRight: '15px', marginBottom: '8px' }}
@@ -421,7 +421,7 @@ export default (props: any) => {
           },
           {
             tab: '新媒体资源',
-            key: '0'
+            key: '9'
           },
           {
             tab: '无效数据库',
@@ -432,11 +432,11 @@ export default (props: any) => {
         <Tables
           columns={columns}
           actionRef={actionRef}
-          toolbar={TabListNuber == '7' || TabListNuber == '0' ? undefined : toolbar}
+          toolbar={TabListNuber == '7' || TabListNuber == '9' ? undefined : toolbar}
           request={{
-            url: TabListNuber == '0'?'/sms/business/bizStudentUser/leadStudent':'/sms/business/bizStudentUser/circulationLibrary',
+            url: TabListNuber == '9'?'/sms/business/bizStudentUser/leadStudent':'/sms/business/bizStudentUser/circulationLibrary',
             params: { ...({ source: TabListNuber }), 'userId-isNull': true, ...params },
-            sortList:TabListNuber == '0'?{
+            sortList:TabListNuber == '9'?{
               ['circulationTime']: 'asc,desc',
             }:sortList,
           }}
@@ -504,7 +504,7 @@ export default (props: any) => {
             <Button
             key="ordere"
             type="primary"
-            hidden={TabListNuber != '1' && TabListNuber != '0'|| hidden}
+            hidden={TabListNuber != '1' && TabListNuber != '9'|| hidden}
             icon={<PlusOutlined />}
             onClick={async () => {
               if (StudentIds.length == 0) {
@@ -546,7 +546,7 @@ export default (props: any) => {
               key="button"
               icon={<PlusOutlined />}
               type="primary"
-              hidden={TabListNuber == '0' || hidden}
+              hidden={TabListNuber == '9' || hidden}
               onClick={() => {
                 if (StudentIds.length == 0) {
                   message.error('请选择需要领取的学员!');
@@ -574,7 +574,7 @@ export default (props: any) => {
               icon={<DeleteOutlined />}
               type="primary"
               danger
-              hidden={TabListNuber != '0' || hidden}
+              hidden={TabListNuber != '9' || hidden}
               onClick={() => {
                 if (StudentIds.length == 0) {
                   message.error('请选择需要删除的学员!');

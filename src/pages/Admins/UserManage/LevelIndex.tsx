@@ -8,7 +8,7 @@ import UserManageCard from '../Department/UserManageCard';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 
 import Dictionaries from '@/services/util/dictionaries';
-
+//销售等级页面
 type SalesLevel = {
   studentLevelNameList: any;
   id?: number;
@@ -121,7 +121,13 @@ export default () => {
     },
     { title: '客户容量', dataIndex: 'customerCapacity', sorter: true },
     { title: '锁定数量容量', dataIndex: 'lockedCustomerLimit', sorter: true },
-    { title: '描述', dataIndex: 'description', sorter: true },
+    { title: '描述', dataIndex: 'description', sorter: true,
+      render: (_, record) => (
+            <span>
+              {record.description!="undefined"?record.description: '无'}
+            </span>
+          )
+     },
     // { 
     //   title: '可见等级', 
     //   colSpan: 2,
@@ -206,7 +212,7 @@ export default () => {
       title: '操作', 
       valueType: 'option', 
       render: (_, record) => [
-        <a key="edit" onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
+        <a key={`edit-${record.id || Math.random()}`} onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
         <Popconfirm key="del" title="确认删除该等级？" onConfirm={async () => {
           await apiRequest.delete('/sms/system/sysUserLevel', { id: record.id });
           message.success('删除成功');

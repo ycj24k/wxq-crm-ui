@@ -28,7 +28,7 @@ export default () => {
     { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
     {
       title: '操作', valueType: 'option', render: (_, record) => [
-        <a key="edit" onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
+        <a key={`edit-${record.id || Math.random()}`} onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
         <Popconfirm key="del" title="确认删除该销售？" onConfirm={async () => {
           await apiRequest.delete('/sms/sales', { id: record.id });
           message.success('删除成功');

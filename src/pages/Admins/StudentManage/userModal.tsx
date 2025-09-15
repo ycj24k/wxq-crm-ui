@@ -92,6 +92,8 @@ export default (props: any) => {
   // formRef?.current?.resetFields();
   useEffect(() => {
     if (renderData.typee == 'eidt') {
+      console.log(renderData, 'renderData')
+
       delete renderData.codeFile;
       delete renderData.powerAttorneyFile;
       setTimeout(() => {

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import type { ActionType, ProColumns } from '@ant-design/pro-table';
-import ProTable from '@ant-design/pro-table';
+import ProTable, { ActionType, ProColumns } from '@ant-design/pro-table';
 import { Button, Modal, Form, Select, Input, InputNumber, Space, message, Popconfirm, Tag } from 'antd';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import { getCompanyRequest } from '@/services/util/util';
@@ -25,40 +24,8 @@ export default () => {
   const [departmentList, setDepartmentList] = useState<any>([]);
   // 获取分公司名称
   useEffect(() => {
-    let isMounted = true;
-    
-    const loadCompanyName = async () => {
-      try {
-        const contentList: any = await apiRequest.get('/sms/share/getDepartment', {
-          _isGetAll: true,
-        });
-        
-        if (!isMounted) return; // 组件已卸载，不更新状态
-        
-        const targetID = contentList.data[0].id;
-        const targetData = contentList.data.find((item: any) => item.parentId === targetID);
-        const result = targetData ? contentList.data.filter((item: any) => item.parentId === targetID && item.parentId != -1) : [];
-        const data = result.map((item: any) => {
-          return {
-            ...item,
-            label: item.name,
-            value: item.id,
-          }
-        });
-        setDepartmentList(data);
-      } catch (error) {
-        if (isMounted) {
-          console.error('加载部门列表失败:', error);
-        }
-      }
-    };
-    
-    loadCompanyName();
+    getCompanyName();
     // getStudentLevelOptions();
-    
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   // 获取分公司名称
@@ -99,7 +66,14 @@ export default () => {
     // { title: '等级编码', dataIndex: 'code' },
     { title: '优先级', dataIndex: 'weight', sorter: true },
     // { title: '状态', dataIndex: 'enable', valueType: 'select', valueEnum: { true: { text: '启用', status: 'Success' }, false: { text: '停用', status: 'Default' } }, render: (_, r) => <Tag color={r.enable ? 'green' : 'default'}>{r.enable ? '启用' : '停用'}</Tag> },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    { title: '描述', dataIndex: 'description', ellipsis: true,
+      render: (_, record) => (
+            <span>
+              {record.description!="undefined"?record.description: '无'}
+            </span>
+          )
+
+     },
     // { title: '创建时间', dataIndex: 'createdAt', valueType: 'dateTime' },
     {
       title: '操作',

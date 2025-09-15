@@ -741,7 +741,7 @@ export default (props: any) => {
                     编辑
                   </a>
                   <a
-                    key="edit"
+                    key={`edit-${record.id || Math.random()}`}
                     hidden={parentId}
                     // size="small"
                     type="primary"

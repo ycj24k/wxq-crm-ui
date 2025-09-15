@@ -23,10 +23,18 @@ export default () => {
     { title: '等级名称', dataIndex: 'name' },
     { title: '等级编码', dataIndex: 'code' },
     { title: '优先级', dataIndex: 'priority', sorter: true },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    { title: '描述', dataIndex: 'description', ellipsis: true,
+      render: (_, record) => (
+            <span>
+              {record.description!="undefined"?record.description: '无'}
+            </span>
+          )
+
+
+     },
     {
       title: '操作', valueType: 'option', render: (_, record) => [
-        <a key="edit" onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
+        <a key={`edit-${record.id || Math.random()}`} onClick={() => { setEditing(record); form.setFieldsValue(record); setVisible(true); }}>编辑</a>,
         <Popconfirm key="del" title="确认删除该等级？" onConfirm={async () => {
           await apiRequest.delete('/sms/sales/level', { id: record.id });
           message.success('删除成功');
