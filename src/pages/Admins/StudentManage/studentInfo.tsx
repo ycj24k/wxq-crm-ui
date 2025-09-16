@@ -148,7 +148,7 @@ console.log(renderData)
             </Descriptions.Item>
 
             <Descriptions.Item label="客户来源">
-              {Dictionaries.getName('dict_source', renderData.source)}
+              {Dictionaries.getName('dict_source', renderData.studentSource)}
             </Descriptions.Item>
             <Descriptions.Item label="流转次数">{renderData.receiveNum}</Descriptions.Item>
             <Descriptions.Item label="资源类型">

@@ -13,11 +13,11 @@ import {
   message,
   Space,
 } from 'antd';
-import Modals from './userModal';
+import Modals from './newUserModal';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
-import StudentInfo from './studentInfo';
+import StudentInfo from './newstudentInfo';
 import StepsOrder from '../AdminOrder/StepsOrder';
 import AddModals from '../AdminReturnVisit/addModals';
 import ContractS from './ContractS';
@@ -542,7 +542,7 @@ export default () => {
                   </Space>
                 </div>
 
-                <Popconfirm
+                {/* <Popconfirm
                   key="deletePop"
                   title="是否确定删除？"
                   style={{ marginRight: '15px', marginBottom: '8px' }}
@@ -560,7 +560,7 @@ export default () => {
                   <a key="deletes" style={{ color: 'red' }}>
                     删除
                   </a>
-                </Popconfirm>
+                </Popconfirm> */}
                 <div hidden={record.isLocked}>
                   <Popconfirm
                     key="deletePop"

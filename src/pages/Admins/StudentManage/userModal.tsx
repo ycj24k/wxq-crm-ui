@@ -98,7 +98,7 @@ export default (props: any) => {
   // formRef?.current?.resetFields();
   useEffect(() => {
     if (renderData.typee == 'eidt') {
-      // console.log(renderData, 'renderData')
+      console.log(renderData, 'renderData')
 
       delete renderData.codeFile;
       delete renderData.powerAttorneyFile;
@@ -249,7 +249,7 @@ export default (props: any) => {
     if (value.type == '1') {
       value.isPeer ? '' : (value.isPeer = false);
     }
-    // if (renderData.typee == 'eidt') value.id = renderData.studentId;
+    if (renderData.typee == 'eidt') value.id = renderData.studentId;
     if (Student) value.id = Student.id;
     if (renderData.parentId) value.parentId = renderData.parentId;
     if (JSON.stringify(department) != '{}') {
