@@ -14,7 +14,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '文星棋管理系统',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: '/biglogo.png',
   iconfontUrl: '',
   headerHeight: 48,
   splitMenus: true,

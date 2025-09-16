@@ -78,6 +78,11 @@
     path: '/business/resource/info',
     component: './Business/Resource/ResourceInfo',
   },
+  // {
+  //   name: '资源库',
+  //   path: '/business/resource/newinfo',
+  //   component: './Business/Resource/ResourceInfo/newIndex.tsx',
+  // },
   {
     name: '资源库',
     path: '/business/resource/statistics',
@@ -265,10 +270,15 @@
     path: '/business/studentmanage2',
     component: './Business/StudentManage2',
   },
+  // {
+  //   name: '正式学员1',
+  //   path: '/business/studentmanagetrue',
+  //   component: './Business/StudentManageTrue',
+  // },
   {
     name: '正式学员',
-    path: '/business/studentmanagetrue',
-    component: './Business/StudentManageTrue',
+    path: '/business/NewStudentmanagetrue',
+    component: './Business/NewStudentmanagetrue',
   },
   {
     name: '信息提供人',

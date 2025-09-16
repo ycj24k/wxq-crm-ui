@@ -301,11 +301,17 @@ export async function currentUser(options?: { [key: string]: any }) {
             name: '学员管理',
             icon: 'TeamOutlined',
             routes: [
+              // {
+              //   name: '正式学员1',
+              //   icon: 'SolutionOutlined',
+              //   path: '/business/studentmanagetrue',
+              //   component: './Business/StudentManageTrue',
+              // },
               {
                 name: '正式学员',
                 icon: 'SolutionOutlined',
-                path: '/business/studentmanagetrue',
-                component: './Business/StudentManageTrue',
+                path: '/business/NewStudentmanagetrue',
+                component: './Business/NewStudentManageTrue',
               },
               {
                 name: '学员等级',
@@ -471,6 +477,12 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/resource/info',
                 component: './Business/Resource/ResourceInfo',
               },
+              // {
+              //   name: '资源库',
+              //   icon: 'table',
+              //   path: '/business/resource/newinfo',
+              //   component: './Business/Resource/ResourceInfo/newIndex.tsx',
+              // },
               {
                 name: '流转资源看板',
                 icon: 'table',

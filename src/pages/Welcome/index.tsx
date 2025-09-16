@@ -51,8 +51,13 @@ const Welcome: React.FC = () => {
       name: '潜在团组',
       icon: <UsergroupDeleteOutlined style={{ fontSize: '32px' }} />,
     },
+    // {
+    //   url: '/business/studentmanagetrue',
+    //   name: '正式学员1',
+    //   icon: <UserAddOutlined style={{ fontSize: '32px' }} />,
+    // },
     {
-      url: '/business/studentmanagetrue',
+      url: '/business/NewStudentmanagetrue',
       name: '正式学员',
       icon: <UserAddOutlined style={{ fontSize: '32px' }} />,
     },

@@ -173,7 +173,7 @@ const Login: React.FC = () => {
       </div> */}
       <div className={styles.content}>
         <LoginForm
-          logo={<img alt="logo" src="./logo.svg" />}
+          logo={<img alt="logo" src="./biglogo.png" />}
           title="文星棋管理系统"
           subTitle="用心服务学员"
           initialValues={{
