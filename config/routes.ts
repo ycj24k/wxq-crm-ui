@@ -89,6 +89,11 @@
     component: './Business/Resource/Statistics',
   },
   {
+    name: '新媒体资源视图',
+    path: '/business/newmedia/view',
+    component: './Business/NewMediaResource/View',
+  },
+  {
     name: '题库设置',
     path: '/business/question',
     component: './Business/Question',
@@ -137,21 +142,6 @@
     name: '资源小组',
     path: '/business/cluemanagement',
     component: './Business/Cluemanagement',
-  },
-  {
-    name: '新媒体资源',
-    path: '/business/newmedia',
-    routes: [
-      {
-        name: '新媒体资源视图',
-        path: '/business/newmedia/view',
-        component: './Business/NewMediaResource/View',
-      },
-      {
-        path: '/business/newmedia',
-        redirect: '/business/newmedia/view',
-      },
-    ],
   },
   {
     name: '下单专页',
