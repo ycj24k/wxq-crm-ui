@@ -52,6 +52,11 @@ interface ApiFieldType {
   field: string;
   name: string;
   type: string;
+  // 可能由后端返回的可选值来源标识（尽量兼容多种字段名）
+  dictKey?: string; // 字典键，如 clue_intention_level
+  dict?: string;    // 兼容命名
+  options?: { label: string; value: string | number }[]; // 直接可用的可选项
+  optionList?: { label: string; value: string | number }[]; // 兼容命名
 }
 
 interface RuleConfigDrawerProps {
@@ -78,8 +83,6 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 1, name: '不等于', valueType: 'string' },
     { value: 2, name: '包含', valueType: 'string' },
     { value: 3, name: '不包含', valueType: 'string' },
-    { value: 4, name: '为空', valueType: 'empty' },
-    { value: 5, name: '不为空', valueType: 'empty' },
     { value: 6, name: '数字大于', valueType: 'number' },
     { value: 7, name: '数字小于', valueType: 'number' },
     { value: 8, name: '正则表达式', valueType: 'string' },
@@ -88,7 +91,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 11, name: '时间大于', valueType: 'time' },
     { value: 12, name: '时间小于', valueType: 'time' },
     { value: 13, name: '在列表', valueType: 'string' },
-    // 按要求：14/15 也为“空”，不需要输入值
+    // 空值类由 14/15 表示（是/否）
     { value: 14, name: '是', valueType: 'empty' },
     { value: 15, name: '否', valueType: 'empty' },
   ];
@@ -259,13 +262,13 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   const getAvailableOperators = (fieldKey: string): OperatorConfig[] => {
     // 已知映射（严格按后端/图片提供）
     const strictMap: Record<string, number[]> = {
-      consultationTime: [4, 5, 9, 10, 11, 12],
-      project: [4, 5, 13],
-      studentSource: [4, 5, 13],
-      provider: [4, 5, 13],
-      isLive: [4, 5, 14, 15],
-      owner: [4, 5, 13],
-      intentionLevel: [4, 5, 13],
+      consultationTime: [9, 10, 11, 12],
+      project: [13],
+      studentSource: [13],
+      provider: [13],
+      isLive: [14, 15],
+      owner: [13],
+      intentionLevel: [13],
     };
     const matched = strictMap[fieldKey];
     if (matched) return operatorConfigs.filter(op => matched.includes(op.value));
@@ -274,16 +277,16 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     const fieldType = getFieldType(fieldKey);
     switch (fieldType) {
       case 'string':
-        return operatorConfigs.filter(op => [0, 1, 2, 3, 4, 5, 8, 13].includes(op.value));
+        return operatorConfigs.filter(op => [0, 1, 2, 3, 8, 13].includes(op.value));
       case 'number':
-        return operatorConfigs.filter(op => [0, 1, 4, 5, 6, 7].includes(op.value));
+        return operatorConfigs.filter(op => [0, 1, 6, 7].includes(op.value));
       case 'date':
       case 'datetime':
-        return operatorConfigs.filter(op => [0, 1, 4, 5, 9, 10].includes(op.value));
+        return operatorConfigs.filter(op => [0, 1, 9, 10].includes(op.value));
       case 'time':
-        return operatorConfigs.filter(op => [0, 1, 4, 5, 11, 12].includes(op.value));
+        return operatorConfigs.filter(op => [0, 1, 11, 12].includes(op.value));
       case 'boolean':
-        return operatorConfigs.filter(op => [0, 1, 4, 5, 14, 15].includes(op.value));
+        return operatorConfigs.filter(op => [0, 1, 14, 15].includes(op.value));
       default:
         return operatorConfigs;
     }
@@ -301,7 +304,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   const mapOperatorToValueType = (op?: number): 'string' | 'number' | 'datetime' | 'time' | 'empty' => {
     if (op == null) return 'empty';
     if ([0, 1, 2, 3, 8, 13].includes(op)) return 'string';
-    if ([4, 5, 14, 15].includes(op)) return 'empty';
+    if ([14, 15].includes(op)) return 'empty';
     if ([6, 7].includes(op)) return 'number';
     if ([9, 10].includes(op)) return 'datetime';
     if ([11, 12].includes(op)) return 'time';
@@ -405,6 +408,31 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     if (!userGroupId) {
       message.error('用户组ID不能为空');
       return;
+    }
+
+    // 校验：根据 operationType 决定是否必填
+    for (const group of ruleGroups) {
+      for (const rule of group.rules) {
+        if (!rule.field) {
+          message.error('存在未选择字段的规则');
+          return;
+        }
+        if (rule.type == null) {
+          message.error('存在未选择运算类型的规则');
+          return;
+        }
+        const vt = mapOperatorToValueType(rule.type);
+        if (vt === 'empty') {
+          // 空/是/否/为空/不为空：不需要值，强制置空
+          rule.value = '' as any;
+        } else {
+          // 在列表(13)或其他需要值的类型必须提供值
+          if (!rule.value || String(rule.value).trim() === '') {
+            message.error('存在需要填写“计算值/可用值”的规则');
+            return;
+          }
+        }
+      }
     }
 
     setLoading(true);
@@ -533,10 +561,26 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
 
   // 获取列表型选项（运算类型13用）
   const getListOptionsByField = (fieldKey: string): { label: string; value: string | number }[] => {
+    // 1) 优先使用后端 getRuleFields 返回的信息
+    const meta = _apiFields.find((f) => f.field === fieldKey) as ApiFieldType | undefined;
+    if (meta) {
+      // 1.1 直接给了 options/optionList
+      const apiOptions = (meta.options || meta.optionList) as any[] | undefined;
+      if (Array.isArray(apiOptions) && apiOptions.length > 0) {
+        return apiOptions.map((o: any) => ({ label: o.label ?? o.name ?? String(o.value), value: o.value ?? o.id }));
+      }
+      // 1.2 给了 dictKey/dict → 从字典取
+      const dictKey = (meta.dictKey || (meta as any).dict) as string | undefined;
+      if (dictKey) {
+        return ((Dictionaries.getList(dictKey) as any) || []).map((o: any) => ({ label: o.label, value: o.value }));
+      }
+    }
+
+    // 2) 特例字段（兜底）
     if (fieldKey === 'project') return getProjectLeafOptions();
-    if (fieldKey === 'studentSource') return (Dictionaries.getList('dict_source') || []) as any;
-    if (fieldKey === 'intentionLevel') return (Dictionaries.getList('dict_intention_level') || []) as any;
     if (fieldKey === 'provider' || fieldKey === 'owner') return getUserOptions();
+    if (fieldKey === 'studentSource') return (Dictionaries.getList('dict_source') as any) || [];
+    if (fieldKey === 'intentionLevel') return (Dictionaries.getList('clue_intention_level') as any) || [];
     return [];
   };
 

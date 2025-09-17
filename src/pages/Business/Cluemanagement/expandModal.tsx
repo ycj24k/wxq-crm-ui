@@ -13,27 +13,32 @@ import { CloseCircleOutlined, SmileOutlined } from '@ant-design/icons';
 import { message } from 'antd';
 export default (props: any) => {
   const { visible, setVisible } = props;
-  const [ expandData, setExpandData ] = useState<any>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const actionRef = useRef<any>();
   const formRef = useRef<ProFormInstance>();
 
-  const getRule = () => {
-    request.post('/sms/lead/ladRule/getExpandField').then((res: any) => {
-      console.log(res.data,'res------>')
-      const result = res.data.map((item: any) => {
-        return {
-          ...item,
-          operationType: item.operationType.split(',')
-        }
-      })
-      console.log(result,'result------>')
-      setExpandData(result)
-    })
-  }
+  const loadExpandFields = async () => {
+    try {
+      setLoading(true);
+      const res: any = await request.post('/sms/lead/ladRule/getExpandField');
+      const result = (res?.data || []).map((item: any) => ({
+        ...item,
+        operationType: String(item.operationType || '')?.split(',').filter((v: string) => v !== ''),
+      }));
+      // 将拉取的数据写入表单
+      formRef.current?.setFieldsValue({ labels: result });
+    } catch (e) {
+      message.error('获取拓展信息失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getRule()
-  },[])
+    if (visible) {
+      loadExpandFields();
+    }
+  }, [visible])
 //   const submitok = (values: any) => {
 //     return new Promise((resolve) => {
 //       request
@@ -53,24 +58,26 @@ export default (props: any) => {
     <ModalForm
       width={800}
       formRef={formRef}
+      submitter={{
+        searchConfig: { submitText: '保存', resetText: '重置' },
+      }}
       onFinish={async (values) => {
-        const changeValues = values.labels.map((item: any) => {
-            return {
-                ...item,
-                name:item.field,
-                operationType: item.operationType.join(','),
-            }
-        })
-        request
-        .postAll('/sms/lead/ladRule/expandField',changeValues)
-        .then((res: any) => {
-          if (res.status == 'success') {
-            message.success('操作成功!');
+        try {
+          const changeValues = (values.labels || []).map((item: any) => ({
+            field: item.field,
+            name: item.field, // 与接口示例一致
+            operationType: Array.isArray(item.operationType) ? item.operationType.join(',') : String(item.operationType || ''),
+          }));
+          const res: any = await request.postAll('/sms/lead/ladRule/expandField', changeValues);
+          if (res.status === 'success') {
+            message.success('保存成功');
+            setVisible(false);
+          } else {
+            message.error(res.msg || '保存失败');
           }
-        })
-        .catch((err: any) => {
-          
-        });
+        } catch (e) {
+          message.error('保存失败');
+        }
       }}
       modalProps={{
         destroyOnClose: true,
@@ -80,6 +87,7 @@ export default (props: any) => {
         maskClosable: false,
       }}
       visible={visible}
+      loading={loading}
     >
       <ProFormList
         actionRef={actionRef}
@@ -102,7 +110,7 @@ export default (props: any) => {
         //     });
         //   },
         }}
-        initialValue={expandData}
+        initialValue={[]}
         copyIconProps={{ Icon: SmileOutlined, tooltipText: '复制此行到末尾' }}
         deleteIconProps={{
           Icon: CloseCircleOutlined,
@@ -110,13 +118,9 @@ export default (props: any) => {
         }}
       >
         <ProForm.Group key="group">
-          <ProFormText 
-            name="field" 
-            label="线索信息"  
-            rules={[{ required: true, message: '请输入线索信息' }]}
-          />
+          <ProFormText name="field" label="字段标识" rules={[{ required: true, message: '请输入字段标识' }]} />
           <ProFormSelect
-            label="运算类型"
+            label="运算类型（可多选）"
             width="md"
             name="operationType"
             options={[
@@ -124,8 +128,6 @@ export default (props: any) => {
                 { label: '不等于', value: '1' },
                 { label: '包含', value: '2' },
                 { label: '不包含', value: '3' },
-                { label: '为空', value: '4' },
-                { label: '不为空', value: '5' },
                 { label: '数字大于', value: '6' },
                 { label: '数字小于', value: '7' },
                 { label: '正则表达式', value: '8' },

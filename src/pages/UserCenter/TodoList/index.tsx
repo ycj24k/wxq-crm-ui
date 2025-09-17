@@ -8,14 +8,15 @@ import {
   Card,
   Tag,
   message,
-  Badge,
+  // Badge,
   Modal,
   Form,
   Input,
   Select,
   DatePicker,
-  Space,
-  Popconfirm,
+  // Space,
+  // Popconfirm,
+  TreeSelect,
 } from 'antd';
 import { LeftOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
@@ -24,7 +25,7 @@ import apiRequest from '@/services/ant-design-pro/apiRequest';
 import 'moment/locale/zh-cn';
 import './index.less';
 
-const { Option } = Select;
+// const { Option } = Select;
 const { TextArea } = Input;
 
 type TodoItem = {
@@ -50,8 +51,15 @@ export default () => {
   const [editingItem, setEditingItem] = useState<TodoItem | null>(null);
   const [form] = Form.useForm();
   // const actionRef = useRef<any>();
+  const [userTreeData, setUserTreeData] = useState<any[]>([]);
+  const [userIdToName, setUserIdToName] = useState<Record<string, string>>({});
 
   moment.locale('zh-cn');
+  // 日历从周日开始
+  moment.updateLocale('zh-cn', {
+    week: { dow: 0 },
+    weekdaysMin: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+  });
 
   // 获取待办事项列表
   const fetchTodoList = async (date?: moment.Moment) => {
@@ -144,17 +152,8 @@ export default () => {
   };
 
   // 删除待办事项
-  const handleDelete = async (item: TodoItem) => {
-    try {
-      await apiRequest.delete('/sms/business/bizTodo', { id: item.id });
-      message.success('删除成功');
-      fetchTodoList(selectedDate);
-      fetchMonthStats(selectedDate);
-    } catch (error) {
-      console.error('删除待办事项失败:', error);
-      message.error('删除待办事项失败');
-    }
-  };
+  // 删除逻辑保留（未启用）
+  void 0;
 
   // 打开添加/编辑弹窗
   const openModal = (item?: TodoItem) => {
@@ -164,10 +163,15 @@ export default () => {
       form.setFieldsValue({
         ...item,
         remindTime: item.remindTime ? moment(item.remindTime) : moment(),
+        // 将后端格式 ",1,2,3," 解析为 ["1","2","3"]
+        joinUser: item.joinUser
+          ? item.joinUser.split(',').filter((v: string) => v && v.trim())
+          : [],
       });
     } else {
       form.setFieldsValue({
         remindTime: selectedDate,
+        joinUser: [],
       });
     }
   };
@@ -178,7 +182,14 @@ export default () => {
       const values = await form.validateFields();
       const data = {
         content: values.content,
-        joinUser: values.joinUser || '1', // 默认值
+        // joinUser 需为后端要求格式：",1,2,3,"
+        joinUser: (function () {
+          const ids = Array.isArray(values.joinUser)
+            ? values.joinUser.filter((v: any) => v !== undefined && v !== null && String(v).trim())
+            : (values.joinUser ? String(values.joinUser).split(',').filter((v: string) => v && v.trim()) : []);
+          if (ids.length === 0) return '';
+          return `,${ids.join(',')},`;
+        })(),
         remindTime: values.remindTime.format('YYYY-MM-DD HH:mm:ss'),
         completeStatus: false,
         remindStatus: false,
@@ -213,6 +224,61 @@ export default () => {
     fetchMonthStats(selectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空依赖数组，只在组件挂载时执行一次
+
+  // 加载人员树用于“参与人”多选
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const res = await apiRequest.get('/sms/share/getDepartmentAndUser');
+        const idNameMap: Record<string, string> = {};
+        const buildTree = (nodes: any[]): any[] => {
+          if (!Array.isArray(nodes)) return [];
+          return nodes
+            .map((node: any, idx: number) => {
+              // const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+              const isDept = !!node.departmentName;
+              const title = isDept ? node.departmentName : node.name;
+              const key = `${node.id || node.userId || 'k'}-${idx}`;
+              // 仅保留在职用户：用户节点需要 enable === true
+              if (!isDept) {
+                if (!node.enable) {
+                  return null; // 过滤离职员工
+                }
+                const userKey = String(node.userId);
+                const item: any = {
+                  title,
+                  key: userKey,
+                  value: userKey,
+                  selectable: true,
+                };
+                if (node.userId) {
+                  idNameMap[String(node.userId)] = node.name;
+                }
+                return item;
+              }
+              // 部门节点：仅在有有效子节点时保留
+              const children = buildTree(node.children || []);
+              if (!children || children.length === 0) return null;
+              return {
+                title,
+                key,
+                value: key,
+                selectable: false,
+                disabled: true,
+                children,
+              };
+            })
+            .filter(Boolean);
+        };
+        const tree = buildTree(res?.data || []);
+        setUserTreeData(tree);
+        setUserIdToName(idNameMap);
+      } catch (e) {
+        // 忽略加载失败，仅不提供多选名单
+      }
+    };
+    loadUsers();
+  }, []);
 
   return (
     <PageContainer title="待办事项">
@@ -250,17 +316,19 @@ export default () => {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Button
+                      type="primary"
+                      shape="circle"
                       size="large"
                       icon={<LeftOutlined />}
                       onClick={() => onChange(value.clone().subtract(1, 'month'))}
-                      style={{ width: '40px', height: '40px' }}
                     />
                     <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 16px' }}>{value.format('YYYY年MM月')}</div>
                     <Button
+                      type="primary"
+                      shape="circle"
                       size="large"
                       icon={<RightOutlined />}
                       onClick={() => onChange(value.clone().add(1, 'month'))}
-                      style={{ width: '40px', height: '40px' }}
                     />
                   </div>
 
@@ -288,15 +356,25 @@ export default () => {
               const count = monthMap[key] || 0;
               if (!count) return null;
               return (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '4px',
-                  color: '#1890ff',
-                  fontSize: '12px',
-                  marginTop: '2px'
-                }}>
-                  <span style={{ fontSize: '14px' }}>i</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    color: '#1890ff',
+                    fontSize: 12,
+                    marginTop: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: 3,
+                      height: 12,
+                      background: '#1890ff',
+                      borderRadius: 2,
+                    }}
+                  />
                   <span>有{count}项待办</span>
                 </div>
               );
@@ -346,10 +424,13 @@ export default () => {
                   </div>
                   <div style={{ marginBottom: '4px', fontSize: '12px', color: '#666' }}>
                     参与人：{(() => {
-                      if (item.joinUser === '1') return '我';
-                      if (item.joinUser === '2') return '团队';
-                      if (item.joinUser === '3') return '全部';
-                      return item.joinUser || '-';
+                      if (!item.joinUser) return '-';
+                      const ids = String(item.joinUser).split(',').filter(Boolean);
+                      const names = ids
+                        .map((id) => userIdToName[id] || id)
+                        .filter(Boolean)
+                        .join('、');
+                      return names || item.joinUser;
                     })()}
                   </div>
                   <div style={{ fontSize: '12px', color: '#666' }}>
@@ -378,12 +459,20 @@ export default () => {
             <TextArea rows={3} placeholder="请输入待办内容" />
           </Form.Item>
 
-          <Form.Item name="joinUser" label="参与人" rules={[{ required: true, message: '请选择参与人' }]}>
-            <Select placeholder="请选择参与人">
-              <Option value="1">我</Option>
-              <Option value="2">团队</Option>
-              <Option value="3">全部</Option>
-            </Select>
+          <Form.Item name="joinUser" label="参与人" rules={[{ required: true, message: '请选择参与人' }]}> 
+            <TreeSelect
+              treeData={userTreeData}
+              placeholder="请选择参与人（可多选）"
+              allowClear
+              multiple
+              showSearch
+              treeNodeFilterProp="title"
+              filterTreeNode
+              treeDefaultExpandAll
+              treeCheckable
+              showCheckedStrategy={TreeSelect.SHOW_CHILD}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item name="remindTime" label="提醒时间" rules={[{ required: true, message: '请选择提醒时间' }]}>

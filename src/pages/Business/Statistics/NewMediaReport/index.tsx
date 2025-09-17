@@ -50,7 +50,7 @@ const NewMediaReport: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<ProviderReportData[]>([]);
-  const [activeTab, setActiveTab] = useState('1'); // 默认选中资源量统计
+  const [activeTab, setActiveTab] = useState('1'); // 1:资源量统计 2:成交量统计
   const [viewResigned, setViewResigned] = useState(true); // 是否查看离职人员
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
@@ -179,13 +179,14 @@ const NewMediaReport: React.FC = () => {
         .filter((key) => key.startsWith('user_'))
         .map((key) => key.replace('user_', ''));
 
-      // 根据tab选择不同的接口
       const apiUrl = '/sms/business/bizCharge/providerReport';
 
       // 构建请求参数，只传递有值的参数
       const requestParams: any = {
         startTime: params.startTime || moment().startOf('week').format('YYYY-MM-DD HH:mm:ss'),
         endTime: params.endTime || moment().endOf('week').format('YYYY-MM-DD HH:mm:ss'),
+        // type: 资源量统计 1，成交量统计 0
+        type: activeTab === '1' ? 1 : 0,
       };
 
       // 只有当参数有值时才添加到请求中

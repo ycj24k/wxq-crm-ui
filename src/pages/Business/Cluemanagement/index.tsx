@@ -230,7 +230,9 @@ export default () => {
                     _sort,
                     _filter,
                 ) => {
-                    roleContent = await apiRequest.get(url, params);
+                    // 默认创建时间倒序排序
+                    const queryParams: any = { ...params, _orderBy: 'createTime', _direction: 'desc' };
+                    roleContent = await apiRequest.get(url, queryParams);
                     return {
                         data: roleContent.data.content,
                         success: roleContent.success,

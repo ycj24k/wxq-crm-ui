@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
@@ -68,6 +69,15 @@
 .ant-picker-calendar {
   .ant-picker-calendar-date {
     position: relative;
+  }
+}
+
+// 自定义日历单元格样式（符合视觉稿）
+// 恢复默认日历样式，仅保留头部横线与列表样式
+.ant-picker-calendar {
+  .ant-picker-content thead {
+    // border-top: 1px dashed #e5e5e5;
+    // padding: 20px 0;
   }
 }
 

@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { type ActionType, type ProColumns } from '@ant-design/pro-table';
-import { Button, Space, Tag, Modal, Form, Input, Select, DatePicker, message, Radio, Cascader, TreeSelect } from 'antd';
+import { Button, Space, Tag, Modal, Form, Input, Select, DatePicker, message, Radio, Cascader, TreeSelect, Tooltip } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import moment from 'moment';
 // 参考资源小组使用方式，统一使用 apiRequest
 import apiRequest from '@/services/ant-design-pro/apiRequest';
+import { useModel } from 'umi';
 
 type StudentItem = {
   id: number;
@@ -57,6 +58,16 @@ export default () => {
   const [expandFields, setExpandFields] = useState<ExpandField[]>([]);
   const [batchVisible, setBatchVisible] = useState(false);
   const [batchForm] = Form.useForm();
+  const { initialState } = useModel('@@initialState');
+  const safeGetPopupContainer = (trigger: any) => (trigger && (trigger.parentNode as HTMLElement)) || document.body;
+  const typeWatch = Form.useWatch('type', form);
+
+  // 学员类型切换时，清理不需要的企业字段
+  useEffect(() => {
+    if (typeWatch !== 1) {
+      form.setFieldsValue({ chargePersonName: undefined, code: undefined, codeFile: undefined });
+    }
+  }, [typeWatch]);
 
   // 统一安全获取字典 options，过滤掉无效值，防止 Select 内部 children 生成 undefined key
   const getDictOptions = (dictKey: string) => {
@@ -294,7 +305,7 @@ export default () => {
       dataIndex: 'intentionLevel',
       hideInTable: true,
       renderFormItem: () => (
-        <Select allowClear options={getDictOptions('dict_intention_level')} placeholder="请选择意向等级" />
+        <Select allowClear options={getDictOptions('clue_intention_level')} placeholder="请选择意向等级" />
       ),
     },
     { title: '创建时间', dataIndex: 'createTimeRange', valueType: 'dateTimeRange', hideInTable: true },
@@ -328,7 +339,12 @@ export default () => {
       ellipsis: true,
       render: (_, r) => {
         const name = (Dictionaries.getCascaderAllName('dict_reg_job', r.project) as any) || '';
-        return <span>{name || r.project}</span>;
+        const text = name || r.project || '';
+        return (
+          <Tooltip title={text} placement="topLeft">
+            <span>{text}</span>
+          </Tooltip>
+        );
       },
     },
     {
@@ -432,6 +448,10 @@ export default () => {
               owner: record.owner !== undefined && record.owner !== null ? `user_${record.owner}` : undefined,
               address: record.address,
               description: record.description,
+              // 企业/代理人相关
+              chargePersonName: (record as any).chargePersonName,
+              code: (record as any).code,
+              codeFile: (record as any).codeFile,
               // 设置拓展字段数据
               leadExpandField: leadExpandFieldData,
             });
@@ -462,7 +482,7 @@ export default () => {
         }}
         toolBarRender={() => [
           <Space key="toolbar">
-            <Button
+          <Button
               key="create"
               type="primary"
               onClick={() => {
@@ -542,10 +562,14 @@ export default () => {
               isPeer: false,
               intentionLevel: values.intentionLevel,
               project: Array.isArray(values.project) ? values.project[values.project.length - 1] : values.project,
+              studentSource: values.studentSource,
               source: 9,
               leadExpandField: Object.keys(leadExpandFieldData).length > 0 
                 ? JSON.stringify(leadExpandFieldData) 
                 : undefined,
+              // 企业字段透传
+              chargePersonName: values.chargePersonName,
+              code: values.code,
               provider:
                 typeof values.provider === 'string' && values.provider.startsWith('user_')
                   ? Number(values.provider.replace('user_', ''))
@@ -579,7 +603,12 @@ export default () => {
           }
         }}
       >
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" initialValues={{
+          provider: (() => {
+            const uid = (initialState as any)?.currentUser?.userid;
+            return uid ? `user_${uid}` : undefined;
+          })()
+        }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
             <Form.Item
               label="学员类型"
@@ -622,6 +651,22 @@ export default () => {
             </Form.Item>
             <div />
 
+            {/* 企业类字段（type===1） */}
+            {typeWatch === 1 && (
+              <>
+                <Form.Item label="企业负责人姓名" name="chargePersonName" style={{ marginBottom: 10 }}>
+                  <Input placeholder="请输入企业负责人姓名" />
+                </Form.Item>
+                <Form.Item label="统一社会信用码" name="code" style={{ marginBottom: 10 }}>
+                  <Input placeholder="请输入统一社会信用码" />
+                </Form.Item>
+                <Form.Item label="社会信用码电子版" name="codeFile" style={{ marginBottom: 10 }}>
+                  <Input placeholder="请输入电子版文件地址或编号" />
+                </Form.Item>
+                <div />
+              </>
+            )}
+
             <Form.Item 
               label="微信" 
               name="weChat" 
@@ -655,6 +700,14 @@ export default () => {
 
             <Form.Item label="学历" name="education" style={{ marginBottom: 10 }}>
               <Select placeholder="请选择" options={getDictOptions('dict_education') as any} />
+            </Form.Item>
+            <Form.Item
+              label="客户来源"
+              name="studentSource"
+              style={{ marginBottom: 10 }}
+              rules={[{ required: true, message: '请选择客户来源' }]}
+            >
+              <Select placeholder="请选择客户来源" options={getDictOptions('dict_source') as any} />
             </Form.Item>
             {/* 客户来源固定为9，移除此输入项 */}
             <Form.Item
@@ -731,9 +784,10 @@ export default () => {
                 placeholder="请选择信息提供人"
                 treeNodeFilterProp="title"
                 filterTreeNode={(input, treeNode) => String(treeNode.title).toLowerCase().includes(input.toLowerCase())}
-                getPopupContainer={(trigger) => trigger.parentNode as HTMLElement}
+                getPopupContainer={safeGetPopupContainer}
                 fieldNames={{ label: 'title', value: 'value', children: 'children' }}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
+                disabled={true}
               />
             </Form.Item>
             <Form.Item
@@ -750,7 +804,7 @@ export default () => {
                 placeholder="请选择信息所有人"
                 treeNodeFilterProp="title"
                 filterTreeNode={(input, treeNode) => String(treeNode.title).toLowerCase().includes(input.toLowerCase())}
-                getPopupContainer={(trigger) => trigger.parentNode as HTMLElement}
+                getPopupContainer={safeGetPopupContainer}
                 fieldNames={{ label: 'title', value: 'value', children: 'children' }}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
               />

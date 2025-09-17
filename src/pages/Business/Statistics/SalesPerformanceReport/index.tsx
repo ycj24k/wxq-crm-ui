@@ -1,23 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { type ActionType, type ProColumns } from '@ant-design/pro-table';
-import {
-  Card,
-  Form,
-  Row,
-  Col,
-  DatePicker,
-  Select,
-  Button,
-  Space,
-  message,
-  Tabs,
-  Tree,
-  Input,
-  Radio,
-  Tooltip,
-  Typography,
-} from 'antd';
+import { Card, Form, Row, Col, DatePicker, Select, Button, Space, message, Tabs, Tree, Input, Radio, Typography } from 'antd';
 import { SearchOutlined, ReloadOutlined, FileExcelOutlined, FilePdfOutlined } from '@ant-design/icons';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
@@ -48,7 +32,7 @@ const SalesPerformanceReport: React.FC = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [dataSource, setDataSource] = useState<SalesReportData[]>([]);
-  const [activeTab, setActiveTab] = useState('1'); // 默认选中资源量统计
+  const [activeTab, setActiveTab] = useState('1'); // 1:资源量统计 2:成交量统计
   const [viewResigned, setViewResigned] = useState(true); // 是否查看离职人员
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
@@ -160,13 +144,14 @@ const SalesPerformanceReport: React.FC = () => {
         .filter((key) => key.startsWith('user_'))
         .map((key) => key.replace('user_', ''));
 
-      // 根据tab选择不同的接口
       const apiUrl = '/sms/business/bizCharge/salesReport';
 
       // 构建请求参数，只传递有值的参数
       const requestParams: any = {
         startTime: params.startTime || moment().startOf('week').format('YYYY-MM-DD HH:mm:ss'),
         endTime: params.endTime || moment().endOf('week').format('YYYY-MM-DD HH:mm:ss'),
+        // type: 资源量统计 1，成交量统计 0
+        type: activeTab === '1' ? 1 : 0,
       };
 
       // 只有当参数有值时才添加到请求中
@@ -182,13 +167,11 @@ const SalesPerformanceReport: React.FC = () => {
 
       const response = await apiRequest.get(apiUrl, requestParams);
 
-      if (response && Array.isArray(response)) {
-        setDataSource(response);
-
-        // 数据设置完成
-      } else {
-        setDataSource([]);
-      }
+      // 兼容两种返回：直接数组 或 { status, data }
+      const list = Array.isArray(response)
+        ? response
+        : (response && Array.isArray(response.data) ? response.data : []);
+      setDataSource(list || []);
     } catch (error) {
       console.error('获取销售业绩报表数据失败:', error);
       message.error('获取数据失败，请稍后重试');
@@ -381,36 +364,12 @@ const SalesPerformanceReport: React.FC = () => {
       width: 120,
       render: (_, record) => record.newNum || 0,
     },
-    {
-      title: '成交量',
-      dataIndex: 'dealNum',
-      key: 'dealNum',
-      width: 120,
-      render: (_, record) => (
-        <Tooltip title="当前查询时间段内产生资源数量中销售订单下单成功的数量">{record.dealNum || 0}</Tooltip>
-      ),
-    },
-    {
-      title: '成交金额',
-      dataIndex: 'dealAmount',
-      key: 'dealAmount',
-      width: 150,
-      render: (_, record) => (
-        <Tooltip title="当前查询时间段内产生资源量中销售订单下单成功的金额">
-          ¥{(record.dealAmount || 0).toLocaleString()}
-        </Tooltip>
-      ),
-    },
-    {
-      title: '成交率',
-      dataIndex: 'dealPercent',
-      key: 'dealPercent',
-      width: 120,
-      render: (_, record) => {
-        const percent = record.newNum > 0 ? (((record.dealNum || 0) / record.newNum) * 100).toFixed(2) : '0.00';
-        return <Tooltip title="当前查询时间段内产生资源数量中销售订单下单成功的比例">{percent}%</Tooltip>;
-      },
-    },
+    { title: '成交量', dataIndex: 'dealNum', key: 'dealNum', width: 120, render: (_, r) => r.dealNum || 0 },
+    { title: '成交金额', dataIndex: 'dealAmount', key: 'dealAmount', width: 150, render: (_, r) => `¥${(r.dealAmount || 0).toLocaleString()}` },
+    { title: '成交率', dataIndex: 'dealPercent', key: 'dealPercent', width: 120, render: (_, r) => {
+      const percent = r.newNum > 0 ? (((r.dealNum || 0) / r.newNum) * 100).toFixed(2) : '0.00';
+      return `${percent}%`;
+    } },
     {
       title: '所属组名',
       dataIndex: 'groupName',
