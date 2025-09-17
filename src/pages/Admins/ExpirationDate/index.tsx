@@ -122,7 +122,7 @@ export default (props: any) => {
       title: '操作',
       valueType: 'option',
       key: 'option',
-      width: 120,
+      width: 160,
       fixed: 'right',
       render: (text, record, _, action) => (
         <Space size="small">

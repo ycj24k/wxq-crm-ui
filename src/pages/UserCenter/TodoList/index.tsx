@@ -17,7 +17,7 @@ import {
   Space,
   Popconfirm,
 } from 'antd';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 // import Dictionaries from '@/services/util/dictionaries';
@@ -105,8 +105,11 @@ export default () => {
       if (response.status === 'success' && response.data) {
         const map: Record<string, number> = {};
         response.data.content?.forEach((item: TodoItem) => {
-          const dateKey = moment(item.remindTime).format('YYYY-MM-DD');
-          map[dateKey] = (map[dateKey] || 0) + 1;
+          // 只统计未完成的待办事项
+          if (!item.completeStatus) {
+            const dateKey = moment(item.remindTime).format('YYYY-MM-DD');
+            map[dateKey] = (map[dateKey] || 0) + 1;
+          }
         });
         setMonthMap(map);
       }
@@ -238,13 +241,28 @@ export default () => {
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}
                 >
                   <Button
-                    size="large"
-                    icon={<LeftOutlined />}
-                    onClick={() => onChange(value.clone().subtract(1, 'month'))}
-                    style={{ width: '40px', height: '40px' }}
-                  />
+                    type="primary"
+                    onClick={() => onChange(moment())}
+                    style={{ marginRight: '8px' }}
+                  >
+                    今天
+                  </Button>
 
-                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>{value.format('YYYY年MM月')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Button
+                      size="large"
+                      icon={<LeftOutlined />}
+                      onClick={() => onChange(value.clone().subtract(1, 'month'))}
+                      style={{ width: '40px', height: '40px' }}
+                    />
+                    <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 16px' }}>{value.format('YYYY年MM月')}</div>
+                    <Button
+                      size="large"
+                      icon={<RightOutlined />}
+                      onClick={() => onChange(value.clone().add(1, 'month'))}
+                      style={{ width: '40px', height: '40px' }}
+                    />
+                  </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Select
@@ -261,12 +279,6 @@ export default () => {
                       style={{ width: '80px', height: '32px' }}
                       size="middle"
                     />
-                    <Button
-                      size="large"
-                      icon={<RightOutlined />}
-                      onClick={() => onChange(value.clone().add(1, 'month'))}
-                      style={{ width: '40px', height: '40px', marginLeft: '4px' }}
-                    />
                   </div>
                 </div>
               );
@@ -276,8 +288,16 @@ export default () => {
               const count = monthMap[key] || 0;
               if (!count) return null;
               return (
-                <div className="todo_cell">
-                  <Badge count={count} style={{ backgroundColor: '#52c41a' }} />
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '4px',
+                  color: '#1890ff',
+                  fontSize: '12px',
+                  marginTop: '2px'
+                }}>
+                  <span style={{ fontSize: '14px' }}>i</span>
+                  <span>有{count}项待办</span>
                 </div>
               );
             }}
@@ -286,10 +306,14 @@ export default () => {
 
         <ProCard headerBordered>
           <div className="todo_right_header">
-            <div className="date_title">待办事项 {selectedDate.format('YYYY年M月D日 dddd')}</div>
-            <Button type="primary" onClick={() => openModal()}>
-              添加事项
-            </Button>
+            <div className="date_title">待办事项 {selectedDate.format('YYYY-MM-DD')}</div>
+            <Button 
+              type="primary" 
+              shape="circle" 
+              icon={<PlusOutlined />}
+              onClick={() => openModal()}
+              style={{ width: '32px', height: '32px' }}
+            />
           </div>
 
           <div className="todo_list">
@@ -305,51 +329,32 @@ export default () => {
                   className="todo_card"
                   key={item.id}
                   size="small"
+                  style={{ marginBottom: '8px' }}
+                  bodyStyle={{ padding: '12px' }}
                   extra={
-                    <Space>
-                      {item.completeStatus ? (
-                        <Tag color="default">已完成</Tag>
-                      ) : (
-                        <>
-                          <Button size="small" type="primary" onClick={() => handleComplete(item)}>
-                            完成
-                          </Button>
-                          <Button size="small" onClick={() => openModal(item)}>
-                            编辑
-                          </Button>
-                          <Popconfirm
-                            title="确定要删除这个待办事项吗？"
-                            onConfirm={() => handleDelete(item)}
-                            okText="确定"
-                            cancelText="取消"
-                          >
-                            <Button size="small" danger>
-                              删除
-                            </Button>
-                          </Popconfirm>
-                        </>
-                      )}
-                    </Space>
+                    item.completeStatus ? (
+                      <Tag color="green">已完成</Tag>
+                    ) : (
+                      <Button size="small" type="primary" onClick={() => handleComplete(item)}>
+                        完成
+                      </Button>
+                    )
                   }
                 >
-                  <div className="todo_title">{item.content}</div>
-                  <div className="todo_meta">
-                    参与人：
-                    {(() => {
+                  <div style={{ marginBottom: '8px', fontSize: '14px', lineHeight: '1.4' }}>
+                    {item.content}
+                  </div>
+                  <div style={{ marginBottom: '4px', fontSize: '12px', color: '#666' }}>
+                    参与人：{(() => {
                       if (item.joinUser === '1') return '我';
                       if (item.joinUser === '2') return '团队';
                       if (item.joinUser === '3') return '全部';
                       return item.joinUser || '-';
                     })()}
                   </div>
-                  <div className="todo_time">
-                    提醒时间：{item.remindTime ? moment(item.remindTime).format('YYYY-MM-DD HH:mm') : '-'}
+                  <div style={{ fontSize: '12px', color: '#666' }}>
+                    待办日期：{item.remindTime ? moment(item.remindTime).format('YYYY-MM-DD HH:mm:ss') : '-'}
                   </div>
-                  {item.completeTime && (
-                    <div className="todo_complete_time">
-                      完成时间：{moment(item.completeTime).format('YYYY-MM-DD HH:mm')}
-                    </div>
-                  )}
                 </Card>
               ));
             })()}

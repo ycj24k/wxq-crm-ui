@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { type ActionType, type ProColumns } from '@ant-design/pro-table';
 import { Button, Space, Tag, Modal, Form, Input, Select, DatePicker, message, Radio, Cascader, TreeSelect } from 'antd';
@@ -7,8 +7,6 @@ import type { ProFormInstance } from '@ant-design/pro-form';
 import moment from 'moment';
 // 参考资源小组使用方式，统一使用 apiRequest
 import apiRequest from '@/services/ant-design-pro/apiRequest';
-
-const { Option } = Select;
 
 type StudentItem = {
   id: number;
@@ -43,6 +41,12 @@ type StudentItem = {
   codeFile?: string; // 统一社会信用码电子版
 };
 
+type ExpandField = {
+  field: string;
+  name: string;
+  operationType: string;
+};
+
 export default () => {
   const actionRef = useRef<ActionType>();
   const [loading, setLoading] = useState(false);
@@ -50,6 +54,7 @@ export default () => {
   const [visible, setVisible] = useState(false);
   const [editing, setEditing] = useState<StudentItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [expandFields, setExpandFields] = useState<ExpandField[]>([]);
   const [batchVisible, setBatchVisible] = useState(false);
   const [batchForm] = Form.useForm();
 
@@ -69,6 +74,23 @@ export default () => {
         seen[k] = true;
         return true;
       });
+  };
+
+  // 安全获取级联选择器数据，过滤掉 null 值
+  const getSafeCascaderOptions = (dictKey: string) => {
+    const options = (Dictionaries.getCascader(dictKey) as any) || [];
+    
+    const cleanOptions = (nodes: any[]): any[] => {
+      return nodes
+        .filter((node: any) => node && node.value !== null && node.value !== undefined && node.label !== undefined)
+        .map((node: any) => ({
+          ...node,
+          children: node.children ? cleanOptions(node.children) : undefined,
+        }))
+        .filter((node: any) => node.children === undefined || node.children.length > 0);
+    };
+    
+    return cleanOptions(options);
   };
 
   // 人员树（部门/用户），与潜在学员一致数据源：localStorage Department 或后续统一 API
@@ -108,6 +130,23 @@ export default () => {
     return convert(dep);
   };
 
+  // 获取拓展字段配置
+  const fetchExpandFields = async () => {
+    try {
+      const response = await apiRequest.post('/sms/lead/ladRule/getExpandField');
+      if (response.status === 'success' && response.data) {
+        setExpandFields(response.data);
+      }
+    } catch (error) {
+      console.error('获取拓展字段失败:', error);
+    }
+  };
+
+  // 组件加载时获取拓展字段
+  useEffect(() => {
+    fetchExpandFields();
+  }, []);
+
   // 根据 userId 获取姓名（从 Department 树中解析），做简单缓存
   const userNameCache: Record<string, string> = {};
   const getUserNameById = (id?: number) => {
@@ -143,7 +182,7 @@ export default () => {
     const normalize = (s: string) => String(s || '').replace(/\s+/g, '').trim();
     const inputRaw = String(labelOrPathOrValue);
     const input = normalize(inputRaw);
-    const tree = (Dictionaries.getCascader('dict_reg_job') as any[]) || [];
+    const tree = getSafeCascaderOptions('dict_reg_job');
 
     // 工具：取某节点的第一个叶子 value
     const firstLeafValue = (node: any): any => {
@@ -320,6 +359,17 @@ export default () => {
       ),
     },
     {
+      key: 'col-isLive',
+      title: '出镜人专属',
+      dataIndex: 'isLive',
+      width: 80,
+      render: (_, r) => (
+        <Tag key={`isLive-${r.id}`} color={r.isLive ? 'blue' : 'default'}>
+          {r.isLive ? '是' : '否'}
+        </Tag>
+      ),
+    },
+    {
       key: 'col-provider',
       title: '信息提供人',
       dataIndex: 'provider',
@@ -346,6 +396,16 @@ export default () => {
           key="edit"
           onClick={() => {
             setEditing(record);
+            // 解析拓展字段数据
+            let leadExpandFieldData = {};
+            if ((record as any).leadExpandField) {
+              try {
+                leadExpandFieldData = JSON.parse((record as any).leadExpandField);
+              } catch (error) {
+                console.error('解析拓展字段数据失败:', error);
+              }
+            }
+
             form.setFieldsValue({
               name: record.name,
               type: record.type,
@@ -365,12 +425,15 @@ export default () => {
                   : undefined,
               consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
+              isLive: record.isLive ?? false,
               // 人员树使用 user_ 前缀
               provider:
                 record.provider !== undefined && record.provider !== null ? `user_${record.provider}` : undefined,
               owner: record.owner !== undefined && record.owner !== null ? `user_${record.owner}` : undefined,
               address: record.address,
               description: record.description,
+              // 设置拓展字段数据
+              leadExpandField: leadExpandFieldData,
             });
             setVisible(true);
           }}
@@ -451,6 +514,22 @@ export default () => {
           try {
             setSubmitting(true);
             const values = await form.validateFields();
+            // 处理拓展字段数据
+            const leadExpandFieldData: Record<string, any> = {};
+            if (values.leadExpandField) {
+              Object.keys(values.leadExpandField).forEach(fieldKey => {
+                const fieldValue = values.leadExpandField[fieldKey];
+                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                  // 处理日期时间字段
+                  if (moment.isMoment(fieldValue)) {
+                    leadExpandFieldData[fieldKey] = fieldValue.format('YYYY-MM-DD HH:mm:ss');
+                  } else {
+                    leadExpandFieldData[fieldKey] = fieldValue;
+                  }
+                }
+              });
+            }
+
             // 处理 project 为级联，取最后一级 value；提取人员ID
             const payload: any = {
               ...values,
@@ -458,12 +537,15 @@ export default () => {
               isFormal: false,
               isInBlacklist: false,
               isInWhitelist: false,
-              isLive: false,
+              isLive: values.isLive ?? false,
               isLocked: false,
               isPeer: false,
               intentionLevel: values.intentionLevel,
               project: Array.isArray(values.project) ? values.project[values.project.length - 1] : values.project,
               source: 9,
+              leadExpandField: Object.keys(leadExpandFieldData).length > 0 
+                ? JSON.stringify(leadExpandFieldData) 
+                : undefined,
               provider:
                 typeof values.provider === 'string' && values.provider.startsWith('user_')
                   ? Number(values.provider.replace('user_', ''))
@@ -475,8 +557,17 @@ export default () => {
               levelWeight: values.intentionLevel === 1 ? 5 : 3,
             };
 
-            // 新增/编辑统一接口：数组提交
-            await apiRequest.addStudentsToGroup([editing ? { ...payload, id: editing.id } : payload]);
+            // 新增/编辑分别处理
+            if (editing) {
+              // 编辑使用新接口，直接传bizStudent对象
+              await apiRequest.post('/sms/business/bizStudent/editOfProvider', { 
+                ...payload, 
+                id: editing.id 
+              });
+            } else {
+              // 新增使用原接口
+              await apiRequest.addStudentsToGroup([payload]);
+            }
             message.success(editing ? '编辑成功' : '新增成功');
             setVisible(false);
             actionRef.current?.reload();
@@ -496,10 +587,7 @@ export default () => {
               style={{ marginBottom: 10 }}
               rules={[{ required: true, message: '请选择学员类型' }]}
             >
-              <Select placeholder="请选择">
-                <Option value={0}>个人</Option>
-                <Option value={1}>企业</Option>
-              </Select>
+              <Select placeholder="请选择" options={getDictOptions('studentType') as any} />
             </Form.Item>
             <Form.Item
               label="学员姓名"
@@ -515,7 +603,17 @@ export default () => {
               label="联系电话"
               name="mobile"
               style={{ marginBottom: 10 }}
-              rules={[{ required: true, message: '请输入联系电话' }]}
+              rules={[
+                {
+                  validator: (_, value) => {
+                    const weChat = form.getFieldValue('weChat');
+                    if (!value && !weChat) {
+                      return Promise.reject(new Error('联系电话或微信至少填写一个'));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
             >
               <Input placeholder="请输入联系电话" />
             </Form.Item>
@@ -524,7 +622,22 @@ export default () => {
             </Form.Item>
             <div />
 
-            <Form.Item label="微信" name="weChat" style={{ marginBottom: 10 }}>
+            <Form.Item 
+              label="微信" 
+              name="weChat" 
+              style={{ marginBottom: 10 }}
+              rules={[
+                {
+                  validator: (_, value) => {
+                    const mobile = form.getFieldValue('mobile');
+                    if (!value && !mobile) {
+                      return Promise.reject(new Error('联系电话或微信至少填写一个'));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
               <Input placeholder="请输入微信" />
             </Form.Item>
             <Form.Item label="QQ" name="qq" style={{ marginBottom: 10 }}>
@@ -595,7 +708,7 @@ export default () => {
             >
               <Cascader
                 placeholder="选择报考岗位"
-                options={Dictionaries.getCascader('dict_reg_job') as any}
+                options={getSafeCascaderOptions('dict_reg_job')}
                 showSearch={{
                   filter: (inputValue: string, path: any[]) =>
                     path.some((o) => String(o.label).toLowerCase().includes(inputValue.toLowerCase())),
@@ -642,11 +755,81 @@ export default () => {
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
               />
             </Form.Item>
-            <div />
+            <Form.Item
+              label="是否为出镜人专属资源"
+              name="isLive"
+              style={{ marginBottom: 10, textAlign: 'left' }}
+            >
+              <Radio.Group>
+                <Radio value={false}>否</Radio>
+                <Radio value={true}>是</Radio>
+              </Radio.Group>
+            </Form.Item>
 
+            {/* 拓展字段 */}
+            {expandFields.map((field, index) => (
+              <Form.Item
+                key={field.field}
+                label={field.name}
+                name={['leadExpandField', field.field]}
+                style={{ 
+                  gridColumn: index % 2 === 0 ? '1 / span 1' : '2 / span 1', 
+                  marginBottom: 10 
+                }}
+              >
+                {(() => {
+                  // 根据运算类型判断字段类型
+                  const opType = field.operationType;
+                  
+                  // 字符串类型：0,1,2,3,8,13
+                  if (['0', '1', '2', '3', '8', '13'].includes(opType)) {
+                    return <Input placeholder={`请输入${field.name}`} />;
+                  }
+                  
+                  // 空值类型：4,5,14,15
+                  if (['4', '5', '14', '15'].includes(opType)) {
+                    return <Input placeholder={`请输入${field.name}`} disabled />;
+                  }
+                  
+                  // 数字类型：6,7
+                  if (['6', '7'].includes(opType)) {
+                    return <Input type="number" placeholder={`请输入${field.name}`} />;
+                  }
+                  
+                  // 日期时间类型：9,10 (yyyy-MM-dd HH:mm:ss)
+                  if (['9', '10'].includes(opType)) {
+                    return (
+                      <DatePicker
+                        showTime
+                        style={{ width: '100%' }}
+                        placeholder={`请选择${field.name}`}
+                        format="YYYY-MM-DD HH:mm:ss"
+                      />
+                    );
+                  }
+                  
+                  // 时间类型：11,12 (HH:mm:ss)
+                  if (['11', '12'].includes(opType)) {
+                    return (
+                      <DatePicker
+                        showTime={{ format: 'HH:mm:ss' }}
+                        style={{ width: '100%' }}
+                        placeholder={`请选择${field.name}`}
+                        format="HH:mm:ss"
+                      />
+                    );
+                  }
+                  
+                  // 默认字符串输入
+                  return <Input placeholder={`请输入${field.name}`} />;
+                })()}
+              </Form.Item>
+            ))}
+            
             <Form.Item label="地址" name="address" style={{ gridColumn: '1 / span 3', marginBottom: 10 }}>
               <Input.TextArea placeholder="请输入地址..." rows={2} />
             </Form.Item>
+            
             <Form.Item label="备注" name="description" style={{ gridColumn: '1 / span 3', marginBottom: 0 }}>
               <Input.TextArea placeholder="请输入备注..." rows={3} />
             </Form.Item>
@@ -669,7 +852,7 @@ export default () => {
             const { text } = values as any;
 
             // 固定顺序（中文名可填）：
-            // 姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(个人/企业或0/1),咨询时间(yyyy-MM-dd HH:mm:ss)
+            // 姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(字典名称或值),咨询时间(yyyy-MM-dd HH:mm:ss)
             const lines: string[] = (text || '').split(/\r?\n/).filter((l: string) => l.trim());
             const students = lines.map((line: string, idx: number) => {
               const parts = line.split(',').map((s) => (s || '').trim());
@@ -679,13 +862,16 @@ export default () => {
               const [name, mobile, intentionText, projectText, typeText, consultationTime] = parts;
               const il = parseIntentionLevel(intentionText);
 
-              // 学员类型：个人/企业 → 0/1
+              // 学员类型：通过字典匹配
               const typeNum = (() => {
                 const t = String(typeText).trim();
                 if (/^-?\d+$/.test(t)) return Number(t);
-                if (t === '个人') return 0;
-                if (t === '企业') return 1;
-                return 0;
+                // 通过字典匹配学员类型
+                const studentTypeOptions = getDictOptions('studentType');
+                const matchedOption = studentTypeOptions?.find((option: any) => 
+                  option.label === t || option.label.includes(t) || t.includes(option.label)
+                );
+                return matchedOption ? matchedOption.value : 0;
               })();
 
               // 报考岗位：名称/路径 → 叶子值
@@ -743,7 +929,7 @@ export default () => {
             </Button>
           </Space>
           <Form.Item
-            label="粘贴数据（每行6列，逗号分隔：姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(个人/企业或0/1),咨询时间(yyyy-MM-dd HH:mm:ss)）"
+            label="粘贴数据（每行6列，逗号分隔：姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(字典名称或值),咨询时间(yyyy-MM-dd HH:mm:ss)）"
             name="text"
             rules={[{ required: true, message: '请输入内容' }]}
           >
