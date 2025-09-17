@@ -19,7 +19,7 @@ import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import StudentInfo from './newstudentInfo';
 import StepsOrder from '../AdminOrder/StepsOrder';
-import AddModals from '../AdminReturnVisit/addModals';
+import AddModals from '../AdminReturnVisit/addModalsNew';
 import ContractS from './ContractS';
 import StudentOrders from './StudentOrder';
 import CompanyContract from '../Contract/CompanyContract';

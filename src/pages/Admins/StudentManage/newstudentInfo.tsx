@@ -4,7 +4,8 @@ import Dictionaries from '@/services/util/dictionaries';
 // import request from '@/services/ant-design-pro/apiRequest';
 // import moment from 'moment';
 import getWindowSize from '@/services/util/windowSize';
-import Order from '../AdminOrder/OrderNew';
+import Order from '../AdminOrder/Order';
+import Ordernew from '../AdminOrder/OrderNew';
 import Return from '../AdminReturnVisit/Return';
 import Student from './student';
 import Contract from '../ContractList/Contract';
@@ -78,7 +79,7 @@ export default (props: any) => {
       setTabInvoice(a);
     }
     if (tabsKey == '10' && !tabsOrder && renderData.id) {
-      const a = <Order studentUserId={renderData.id} type={renderData.type} />;
+      const a = <Ordernew studentUserId={renderData.id} type={renderData.type} />;
       setTabsOrder(a);
     }
   }, [tabsKey, renderData]);

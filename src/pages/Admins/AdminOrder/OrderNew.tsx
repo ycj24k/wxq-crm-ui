@@ -154,7 +154,7 @@ export default (props: any) => {
       arr2.forEach((item: any) => {
         // arr.push({ ...params, studentUserId: item.id });
         array.push({
-          studentUserId: item.id,
+          studentId: item.id,
           classType: renderData.order.classType,
           examType: renderData.order.examType,
           classYear: renderData.order.classYear,
