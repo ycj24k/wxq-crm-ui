@@ -128,6 +128,7 @@ export default (props: any) => {
       dataIndex: 'parentProjects',
       key: 'parentProjects',
       sorter: true,
+      ellipsis: true,
       valueType: 'cascader',
       fieldProps: {
         options: Dictionaries.getList('dict_reg_job'),

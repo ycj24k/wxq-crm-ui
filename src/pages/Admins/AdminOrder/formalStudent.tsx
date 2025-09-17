@@ -76,6 +76,7 @@ export default (props: any) => {
             sorter: true,
             key: 'project-in',
             valueType: 'select',
+            ellipsis: true,
             fieldProps: {
                 options: Dictionaries.getCascader('dict_reg_job'),
                 showSearch: { filter },

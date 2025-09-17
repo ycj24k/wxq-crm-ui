@@ -270,7 +270,7 @@ export default (props: any) => {
       callbackRef();
       return
     } else {
-      const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : '/sms/business/bizStudent'
+      const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' :renderData.typee== 'eidt' ?'/sms/business/bizStudent/editOfUser': '/sms/business/bizStudent'
       const data = renderData.newMedia ? [value] : value
       const callBackFn = (res: any) => {
         if (res.status == 'success') {

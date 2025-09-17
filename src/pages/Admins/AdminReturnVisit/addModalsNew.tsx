@@ -199,7 +199,7 @@ export default (props: any) => {
             label="项目"
             rules={[{ required: true, message: '请选择所属跟进项目' }]}
           >
-            <Card size="small" title="请选择所属跟进项目" style={{ marginBottom: 16, width: '100%' }}>
+            {/* <Card size="small" title="请选择所属跟进项目" style={{ marginBottom: 16, width: '100%' }}> */}
               <Radio.Group style={{ width: '100%' }}>
                 <Row gutter={[16, 16]}>
                   {consultationOptions.map(option => (
@@ -214,7 +214,7 @@ export default (props: any) => {
                   ))}
                 </Row>
               </Radio.Group>
-            </Card>
+            {/* </Card> */}
           </ProForm.Item>
         </ProForm.Group>
       )}

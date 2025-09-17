@@ -47,22 +47,35 @@ type GithubIssueItem = {
 
 export default (props: any) => {
     const formRefs = useRef<ProFormInstance>();
-    const { initialState } = useModel('@@initialState');//获取公司下拉列表
-    const [userNameId1, setUserNameId1] = useState<any>();//选择老师弹窗
-    const [renderData, setRenderData] = useState<any>(null);//存行详情
-    const [userFromTeacher, setuserFromTeacher] = useState<boolean>(false);//分配老师弹窗
-    const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);//查看学生信息弹窗
-    const [TabListNuber, setTabListNuber] = useState<any>('9');//控制tab切换
-    const [StudentIds, setStudentIds] = useState<any>([]);//选中的学员列表
-    const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid as number)?.id//获取公司下拉列表
-    const [params, setParams] = useState<any>({ departmentId: departmentId })
+    const { initialState } = useModel('@@initialState');
+    const [userNameId1, setUserNameId1] = useState<any>();
+    const [renderData, setRenderData] = useState<any>(null);
+    const [userFromTeacher, setuserFromTeacher] = useState<boolean>(false);
+    const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
+    const [TabListNuber, setTabListNuber] = useState<any>('9');
+    const [StudentIds, setStudentIds] = useState<any>([]);
+    const [params, setParams] = useState<any>({});
+    const [departmentId, setDepartmentId] = useState<number>();
     const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
-    const url ='/sms/business/bizStudentUser';
+    const url = '/sms/business/bizStudentUser';
 
     const actionRef = useRef<ActionType>();
-    const callbackRef = () => {//刷新页面
-        // @ts-ignore
-        actionRef.current.reload();
+    
+    // 监听 initialState 变化
+    useEffect(() => {
+        if (initialState?.currentUser?.userid) {
+            const deptId = Dictionaries.getDepartmentList(initialState.currentUser.userid)?.id;
+            console.log('deptId', deptId);
+            setDepartmentId(deptId);
+            // 只有在非特定标签页时才设置 departmentId
+            if (TabListNuber !== '7' && TabListNuber !== '9') {
+                setParams({ departmentId: deptId });
+            }
+        }
+    }, [initialState?.currentUser?.userid, TabListNuber]);
+
+    const callbackRef = () => {
+        actionRef.current?.reload();
     };
     useEffect(() => {
         if (TabListNuber == '7' || TabListNuber == '9') {

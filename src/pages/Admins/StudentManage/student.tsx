@@ -375,6 +375,7 @@ export default (props: any) => {
       title: '咨询岗位',
       dataIndex: 'project-in',
       // search: false,
+      ellipsis: true,
       sorter: true,
       key: 'project-in',
       valueType: 'select',
@@ -432,6 +433,7 @@ export default (props: any) => {
       key: 'parentProjects',
       sorter: true,
       valueType: 'select',
+    
       fieldProps: {
         options: Dictionaries.getList('dict_reg_job'),
         mode: 'tags',
@@ -553,6 +555,7 @@ export default (props: any) => {
       dataIndex: 'circulationTime',
       valueType: 'dateRange',
       sorter: true,
+      ellipsis: true,
       hideInTable: recommend,
       render: (text, record) => (
         <span>{record.circulationTime}</span>
@@ -565,6 +568,7 @@ export default (props: any) => {
       dataIndex: 'createTimes',
       valueType: 'dateRange',
       hideInTable: !recommend,
+      ellipsis: true,
       sorter: true,
       render: (text, record) => (
         <span>{record.createTime}</span>
@@ -575,6 +579,7 @@ export default (props: any) => {
       title: '下单时间',
       key: 'lastDealTime',
       dataIndex: 'lastDealTime',
+      ellipsis: true,
       valueType: 'dateRange',
       hideInTable: !recommend,
       sorter: true,
@@ -593,6 +598,7 @@ export default (props: any) => {
       title: '创建时间',
       key: 'createTime',
       dataIndex: 'createTime',
+      ellipsis: true,
       valueType: 'dateRange',
       hideInTable: recommend,
       sorter: true,
@@ -605,6 +611,7 @@ export default (props: any) => {
       title: '咨询时间',
       key: 'consultationTime',
       dataIndex: 'consultationTime',
+      ellipsis: true,
       valueType: 'dateRange',
       hideInTable: recommend,
       sorter: true,
