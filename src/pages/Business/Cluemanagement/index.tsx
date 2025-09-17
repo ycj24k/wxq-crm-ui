@@ -147,7 +147,10 @@ export default () => {
 
         {
             title: '描述',
-            dataIndex: 'description'
+            dataIndex: 'description',
+            ellipsis: true,
+            search: false,
+            tip: '过长会自动收缩'
         },
 
         {

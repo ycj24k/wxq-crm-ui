@@ -5,7 +5,7 @@ import { message } from 'antd';
 import Socket from '../util/websocket';
 import Dictionaries from '@/services/util/dictionaries';
 import moment, { isMoment } from 'moment';
-const num = 0;
+let msgList = []
 class httpRequest {
   request = request;
 
@@ -60,13 +60,20 @@ class httpRequest {
               if (res.status == 'loginError') {
                 history.push(loginPath);
               }
-              if (res.status == 'seriousError') {
-                reject(res);
-                message.error(res.msg + '，已发送错误信息给管理员..');
+              reject(res);
+              if (msgList.indexOf(res.msg) == -1) {
+                msgList.push(res.msg)
+              } else {
                 return;
               }
-              reject(res);
-              message.error(res.msg, 5);
+              setTimeout(() => {
+                msgList.splice(msgList.indexOf(res.msg), 1)
+              }, 5000)
+              if (res.status == 'seriousError') {
+                message.error(res.msg + '，已发送错误信息给管理员..');
+              } else {
+                message.error(res.msg, 5);
+              }
             }
           } else {
             resolve(res);

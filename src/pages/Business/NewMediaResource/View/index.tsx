@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { type ActionType, type ProColumns } from '@ant-design/pro-table';
 import { Button, Space, Tag, Modal, Form, Input, Select, DatePicker, message, Radio, Cascader, TreeSelect } from 'antd';
@@ -21,7 +21,7 @@ type StudentItem = {
   qq: string; // QQ
   sex: boolean; // 性别 0男 1女
   project: string; // 报考岗位
-  source: number; // 客户来源
+  studentSource: number; // 客户来源
   consultationTime: string; // 咨询时间
   intentionLevel?: number; // 意向等级 0普通 1高意向
   provider: number; // 信息提供人
@@ -129,72 +129,92 @@ export default () => {
     userNameCache[key] = name;
     return name;
   };
-  const searchFormRef = useRef<ProFormInstance>();
+  // （批量导入已不再需要按用户名匹配ID，保留名称解析在其他处使用时再补充）
 
-  // 假数据
-  const mockList: StudentItem[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: '张三',
-        type: 0,
-        education: 1,
-        mobile: '13800001111',
-        idCard: '110101199001011234',
-        weChat: 'wx_zhangsan',
-        qq: '123456789',
-        sex: false,
-        project: '机电类工种',
-        source: 1,
-        consultationTime: '2025-08-27 10:33:48',
-        level: 1,
-        provider: 1,
-        owner: 1,
-        address: '北京市朝阳区',
-        description: '高意向客户',
-        userId: 1,
-        createTime: '2025-08-27 10:33:48',
-        isDel: 0,
-        isFormal: false,
-        isInBlacklist: false,
-        isInWhitelist: false,
-        isLive: false,
-        isLocked: false,
-        isPeer: false,
-        levelWeight: 5,
-      },
-      {
-        id: 2,
-        name: '李四',
-        type: 0,
-        education: 2,
-        mobile: '13900002222',
-        idCard: '110101199002021234',
-        weChat: 'wx_lisi',
-        qq: '987654321',
-        sex: true,
-        project: '应急特种作业',
-        source: 2,
-        consultationTime: '2025-08-26 11:34:14',
-        level: 0,
-        provider: 2,
-        owner: 2,
-        address: '上海市浦东新区',
-        description: '普通客户',
-        userId: 2,
-        createTime: '2025-08-26 11:34:14',
-        isDel: 0,
-        isFormal: false,
-        isInBlacklist: false,
-        isInWhitelist: false,
-        isLive: false,
-        isLocked: false,
-        isPeer: false,
-        levelWeight: 3,
-      },
-    ],
-    []
-  );
+  // （批量导入已不再需要客户来源匹配，保留字典解析在其他处使用时再补充）
+
+  // 通过级联（dict_reg_job）获取叶子值；
+  // 支持：
+  // 1) 直接传 value（若能命中任一节点 value，返回该值；如是父级则取其第一个叶子）
+  // 2) 传“父/子/叶”路径（逐级按 label 精确/包含匹配，末级若为父级则取其第一个叶子）
+  // 3) 仅传某一级 label（优先匹配叶子；若命中父级则取其第一个叶子）
+  const getRegJobLeafValueByLabelPath = (labelOrPathOrValue: string) => {
+    if (!labelOrPathOrValue) return undefined;
+    const normalize = (s: string) => String(s || '').replace(/\s+/g, '').trim();
+    const inputRaw = String(labelOrPathOrValue);
+    const input = normalize(inputRaw);
+    const tree = (Dictionaries.getCascader('dict_reg_job') as any[]) || [];
+
+    // 工具：取某节点的第一个叶子 value
+    const firstLeafValue = (node: any): any => {
+      if (!node) return undefined;
+      if (!node.children || node.children.length === 0) return node.value;
+      for (const c of node.children) {
+        const leaf = firstLeafValue(c);
+        if (leaf !== undefined) return leaf;
+      }
+      return undefined;
+    };
+
+    // 遍历任意节点 by predicate
+    const findNode = (nodes: any[], pred: (n: any) => boolean): any => {
+      for (const n of nodes) {
+        if (pred(n)) return n;
+        if (n.children && n.children.length) {
+          const r = findNode(n.children, pred);
+          if (r) return r;
+        }
+      }
+      return undefined;
+    };
+
+    // 0) 若传入的是存在的 value，直接定位该节点；若为父级则取其第一个叶子
+    const byValue = findNode(tree, (n) => String(n.value) === inputRaw);
+    if (byValue) return firstLeafValue(byValue);
+
+    // 1) 路径匹配：逐级按 label 精确→包含 匹配
+    const parts = inputRaw.split('/').map((p) => normalize(p)).filter(Boolean);
+    if (parts.length > 1) {
+      const walkPath = (nodes: any[], idx: number): any => {
+        if (idx >= parts.length) return undefined;
+        const part = parts[idx];
+        // 先精确，再包含
+        const pick = (arr: any[]) =>
+          findNode(arr, (n) => normalize(n.label) === part) || findNode(arr, (n) => normalize(n.label).includes(part));
+        const node = pick(nodes);
+        if (!node) return undefined;
+        if (idx === parts.length - 1) return firstLeafValue(node);
+        return walkPath(node.children || [], idx + 1);
+      };
+      const val = walkPath(tree, 0);
+      if (val !== undefined) return val;
+    }
+
+    // 2) 单 label：优先精确命中叶子；否则命中父级则取第一个叶子；再尝试包含匹配
+    const exactLeaf = findNode(tree, (n) => normalize(n.label) === input && (!n.children || n.children.length === 0));
+    if (exactLeaf) return exactLeaf.value;
+    const exactAny = findNode(tree, (n) => normalize(n.label) === input);
+    if (exactAny) return firstLeafValue(exactAny);
+    const incLeaf = findNode(
+      tree,
+      (n) => normalize(n.label).includes(input) && (!n.children || n.children.length === 0)
+    );
+    if (incLeaf) return incLeaf.value;
+    const incAny = findNode(tree, (n) => normalize(n.label).includes(input));
+    if (incAny) return firstLeafValue(incAny);
+
+    return undefined;
+  };
+
+  // 意向等级名称转数值
+  const parseIntentionLevel = (text: string) => {
+    const s = String(text).trim();
+    if (/^-?\d+$/.test(s)) return Number(s);
+    if (s === '高意向') return 1;
+    if (s === '普通' || s === '一般') return 0;
+    return 0;
+  };
+  const searchFormRef = useRef<ProFormInstance>();
 
   const columns: ProColumns<StudentItem>[] = [
     // 顶部查询表单
@@ -225,7 +245,7 @@ export default () => {
     {
       key: 'search-source',
       title: '客户来源',
-      dataIndex: 'source',
+      dataIndex: 'studentSource',
       hideInTable: true,
       renderFormItem: () => <Select allowClear options={getDictOptions('dict_source')} placeholder="请选择客户来源" />,
     },
@@ -275,9 +295,11 @@ export default () => {
     {
       key: 'col-source',
       title: '客户来源',
-      dataIndex: 'source',
+      dataIndex: 'studentSource',
       width: 100,
-      render: (_, r) => <span key={`source-${r.id}`}>{Dictionaries.getName('dict_source', r.source)}</span>,
+      render: (_, r) => (
+        <span key={`source-${r.id}`}>{Dictionaries.getName('dict_source', Number((r as any).studentSource))}</span>
+      ),
     },
     {
       key: 'col-consultationTime',
@@ -337,7 +359,10 @@ export default () => {
               project: record.project
                 ? (Dictionaries.getCascaderValue('dict_reg_job', record.project) as any)
                 : undefined,
-              source: record.source !== undefined && record.source !== null ? String(record.source) : undefined,
+              studentSource:
+                (record as any).studentSource !== undefined && (record as any).studentSource !== null
+                  ? Number((record as any).studentSource)
+                  : undefined,
               consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
               // 人员树使用 user_ 前缀
@@ -394,8 +419,7 @@ export default () => {
             >
               批量导入
             </Button>
-            <Button key="export">导出</Button>
-          </Space>,
+          </Space>
         ]}
         request={async (params) => {
           setLoading(true);
@@ -408,22 +432,7 @@ export default () => {
               total: res.data?.totalElements || res.data?.length || 0,
             };
           } catch (error) {
-            console.error('获取学员列表失败:', error);
-            const { createTimeRange, ...rest } = params as any;
-            let list = [...mockList];
-            Object.keys(rest).forEach((k) => {
-              if (rest[k]) list = list.filter((it: any) => String(it[k] ?? '').includes(String(rest[k])));
-            });
-            if (createTimeRange && createTimeRange.length === 2) {
-              const [start, end] = createTimeRange;
-              const s = moment(start);
-              const e = moment(end);
-              list = list.filter((it) => {
-                const t = moment(it.createTime);
-                return t.isBetween(s, e, undefined, '[]');
-              });
-            }
-            return { data: list, success: true, total: list.length };
+            return { data: [], success: false, total: 0 };
           } finally {
             setLoading(false);
           }
@@ -454,6 +463,7 @@ export default () => {
               isPeer: false,
               intentionLevel: values.intentionLevel,
               project: Array.isArray(values.project) ? values.project[values.project.length - 1] : values.project,
+              source: 9,
               provider:
                 typeof values.provider === 'string' && values.provider.startsWith('user_')
                   ? Number(values.provider.replace('user_', ''))
@@ -533,14 +543,7 @@ export default () => {
             <Form.Item label="学历" name="education" style={{ marginBottom: 10 }}>
               <Select placeholder="请选择" options={getDictOptions('dict_education') as any} />
             </Form.Item>
-            <Form.Item
-              label="客户来源"
-              name="source"
-              style={{ marginBottom: 10 }}
-              rules={[{ required: true, message: '请选择客户来源' }]}
-            >
-              <Select placeholder="请选择" options={getDictOptions('dict_source') as any} />
-            </Form.Item>
+            {/* 客户来源固定为9，移除此输入项 */}
             <Form.Item
               label="咨询日期"
               name="consultationTime"
@@ -663,16 +666,42 @@ export default () => {
           try {
             setSubmitting(true);
             const values = await batchForm.validateFields();
-            // 约定使用换行分隔的文本区域：每行为一个学员“姓名,电话,意向等级(0/1),项目”
-            const lines: string[] = (values.text || '').split(/\r?\n/).filter((l: string) => l.trim());
-            const students = lines.map((line: string) => {
-              const [name, mobile, intentionLevel, project] = line.split(',').map((s) => (s || '').trim());
-              const il = Number(intentionLevel);
+            const { text } = values as any;
+
+            // 固定顺序（中文名可填）：
+            // 姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(个人/企业或0/1),咨询时间(yyyy-MM-dd HH:mm:ss)
+            const lines: string[] = (text || '').split(/\r?\n/).filter((l: string) => l.trim());
+            const students = lines.map((line: string, idx: number) => {
+              const parts = line.split(',').map((s) => (s || '').trim());
+              if (parts.length < 6) {
+                throw new Error(`第 ${idx + 1} 行字段数量不足，应为6个`);
+              }
+              const [name, mobile, intentionText, projectText, typeText, consultationTime] = parts;
+              const il = parseIntentionLevel(intentionText);
+
+              // 学员类型：个人/企业 → 0/1
+              const typeNum = (() => {
+                const t = String(typeText).trim();
+                if (/^-?\d+$/.test(t)) return Number(t);
+                if (t === '个人') return 0;
+                if (t === '企业') return 1;
+                return 0;
+              })();
+
+              // 报考岗位：名称/路径 → 叶子值
+              const projectVal = getRegJobLeafValueByLabelPath(projectText);
+              if (projectVal === undefined) {
+                throw new Error(`第 ${idx + 1} 行报考岗位无法匹配：${projectText}`);
+              }
+
               return {
                 name,
                 mobile,
                 intentionLevel: isNaN(il) ? 0 : il,
-                project,
+                project: projectVal,
+                type: typeNum,
+                source: 9,
+                consultationTime,
                 isFormal: false,
                 isInBlacklist: false,
                 isInWhitelist: false,
@@ -691,22 +720,36 @@ export default () => {
             message.success(`成功提交 ${students.length} 条`);
             setBatchVisible(false);
             actionRef.current?.reload();
-          } catch (e) {
-            message.error('导入失败，请检查数据格式');
+          } catch (e: any) {
+            message.error(e?.message || '导入失败，请检查数据格式');
           } finally {
             setSubmitting(false);
           }
         }}
       >
         <Form form={batchForm} layout="vertical">
+          <Space style={{ marginBottom: 8 }}>
+            <Button
+              onClick={() => {
+                const sample = '张三,13800001111,高意向,应急特种作业,个人,2025-08-27 10:33:48';
+                if (navigator && (navigator as any).clipboard && (navigator as any).clipboard.writeText) {
+                  (navigator as any).clipboard.writeText(sample).then(() => message.success('示例已复制到剪贴板'));
+                } else {
+                  message.info('当前环境不支持一键复制，请手动复制示例');
+                }
+              }}
+            >
+              复制示例
+            </Button>
+          </Space>
           <Form.Item
-            label="粘贴数据（每行：姓名,电话,意向等级(0/1),项目）"
+            label="粘贴数据（每行6列，逗号分隔：姓名,电话,意向等级(普通/高意向或0/1),报考岗位名称,学员类型(个人/企业或0/1),咨询时间(yyyy-MM-dd HH:mm:ss)）"
             name="text"
             rules={[{ required: true, message: '请输入内容' }]}
           >
             <Input.TextArea
-              rows={8}
-              placeholder="示例：\n张三,13800001111,1,机电类工种\n李四,13900002222,0,应急特种作业"
+              rows={10}
+              placeholder={"示例：\n张三,13800001111,高意向,应急特种作业,个人,2025-08-27 10:33:48\n李四,13900002222,普通,机电类工种,个人,2025-08-26 11:34:14"}
             />
           </Form.Item>
         </Form>
