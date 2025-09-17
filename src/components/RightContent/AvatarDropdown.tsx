@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { BellOutlined, LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
-import { Avatar, Menu, Spin } from 'antd';
+import { BellOutlined, LogoutOutlined, SettingOutlined, UserOutlined, ScheduleOutlined } from '@ant-design/icons';
+import { Avatar, Menu, Spin, Badge } from 'antd';
 import { history, useModel } from 'umi';
 import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
@@ -9,6 +9,7 @@ import { outLogin } from '@/services/ant-design-pro/api';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import request from '@/services/ant-design-pro/apiRequest';
 import Sockect from '@/pages/Sockect';
+
 export type GlobalHeaderRightProps = {
   menu?: boolean;
 };
@@ -50,6 +51,10 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         history.push('/users/usercenter?key=1');
         return;
       }
+      if (key === 'todolist') {
+        history.push('/todolist'); // 跳转到待办计划页面
+        return;
+      }
       history.push(`/account/${key}`);
     },
     [setInitialState],
@@ -77,12 +82,23 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     return loading;
   }
 
+  // 模拟待办事项数量，这个接口麻烦纯金负责下
+  const todoCount = 5; // 可以从API获取实际数量
+
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
       {menu && (
         <Menu.Item key="center">
           <UserOutlined />
           个人中心
+        </Menu.Item>
+      )}
+      {menu && (
+        <Menu.Item key="todolist">
+          <Badge count={todoCount} size="small" offset={[10, 0]}>
+            <ScheduleOutlined />
+            <span>待办计划</span>
+          </Badge>
         </Menu.Item>
       )}
       {menu && (
@@ -96,16 +112,23 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         <UserOutlined />
         个人中心
       </Menu.Item>
+      <Menu.Item key="todolist">
+          <Badge count={todoCount} size="small" offset={[10, 0]}>
+            <ScheduleOutlined />
+            <span>待办计划</span>
+          </Badge>
+        </Menu.Item>
       <Menu.Item key="logout">
         <LogoutOutlined />
         退出登录
       </Menu.Item>
     </Menu>
   );
+  
   return (
     <div>
       {/* <Sockect /> */}
-      <HeaderDropdown menu={{ items: menuHeaderDropdown }}>
+      <HeaderDropdown overlay={menuHeaderDropdown}>
         <span className={`${styles.action} ${styles.account}`}>
           <Avatar size="small" className={styles.avatar} src={currentUser.avatar} alt="avatar" />
           <span className={`${styles.name} anticon`}>

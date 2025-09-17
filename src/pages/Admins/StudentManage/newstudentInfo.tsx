@@ -1,10 +1,10 @@
-import  { useEffect, useState } from 'react';
-import {  Divider, Descriptions, Tabs, Drawer, Tag } from 'antd';
+import { useEffect, useState } from 'react';
+import { Divider, Descriptions, Tabs, Drawer, Tag } from 'antd';
 import Dictionaries from '@/services/util/dictionaries';
 // import request from '@/services/ant-design-pro/apiRequest';
 // import moment from 'moment';
 import getWindowSize from '@/services/util/windowSize';
-import Order from '../AdminOrder/Order';
+import Order from '../AdminOrder/OrderNew';
 import Return from '../AdminReturnVisit/Return';
 import Student from './student';
 import Contract from '../ContractList/Contract';
@@ -94,7 +94,7 @@ export default (props: any) => {
       nameInfo = '介绍人';
       break;
   }
-console.log(renderData)
+  console.log(renderData)
   return (
     <Drawer
       onClose={() => {
@@ -184,7 +184,7 @@ console.log(renderData)
                 setTabsKey(e);
               }}
             >
-              
+
               <TabPane tab="跟进/回访进度" key="1">
                 {tabsReturnVisit}
               </TabPane>
@@ -192,12 +192,12 @@ console.log(renderData)
                 {tabsOrder}
               </TabPane>
               <TabPane tab="资源列表" key="10">
-                    {tabsOrder}
-                  </TabPane>
+                {tabsOrder}
+              </TabPane>
               {renderData.isFormal ? (
                 <>
-                
-                
+
+
                   <TabPane tab="订单记录" key="2">
                     {tabsOrder}
                   </TabPane>
