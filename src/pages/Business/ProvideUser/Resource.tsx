@@ -140,7 +140,7 @@ export default (props: any) => {
             title: '项目总称',
             dataIndex: 'parentProjects',
             key: 'parentProjects',
-            sorter: true,
+            // sorter: true,
             valueType: 'select',
 
             fieldProps: {

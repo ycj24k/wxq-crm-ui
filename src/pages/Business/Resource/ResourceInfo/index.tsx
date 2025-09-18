@@ -51,7 +51,7 @@ export default (props: any) => {
   const [userFromTeacher, setuserFromTeacher] = useState<boolean>(false);
   const [UploadUrl, setUploadUrl] = useState<string>('/sms/business/bizStudent/addSystemRepository');
   const [InfoVisibleFalg, setInfoVisible] = useState<boolean>(false);
-  const [TabListNuber, setTabListNuber] = useState<any>('1');
+  const [TabListNuber, setTabListNuber] = useState<any>('9');
   const [StudentIds, setStudentIds] = useState<any>([]);
   const [selectedRowsId, setselectedRowsId] = useState<any>([]);
   const departmentId = Dictionaries.getDepartmentList(initialState?.currentUser?.userid as number)?.id
@@ -164,7 +164,7 @@ export default (props: any) => {
       title: '项目总称',
       dataIndex: 'parentProjects',
       key: 'parentProjects',
-      sorter: true,
+      // sorter: true,
       valueType: 'cascader',
       fieldProps: {
         options: Dictionaries.getList('dict_reg_job'),
@@ -181,7 +181,8 @@ export default (props: any) => {
       title: '咨询岗位',
       dataIndex: 'project',
       // search: false,
-      sorter: true,
+      // sorter: true,
+      ellipsis: true,
       key: 'project',
       valueType: 'cascader',
       fieldProps: {
@@ -195,6 +196,7 @@ export default (props: any) => {
     {
       title: '咨询时间',
       key: 'createTime',
+      ellipsis: true,
       sorter: true,
       dataIndex: 'createTime',
       valueType: 'dateRange',
@@ -207,6 +209,7 @@ export default (props: any) => {
       dataIndex: 'studentSource',
       valueType: 'select',
       sorter: true,
+      ellipsis: true,
       valueEnum: Dictionaries.getSearch('dict_source'),
       render: (text, record) => (
         <span>{Dictionaries.getName('dict_source', record.studentSource)}</span>
@@ -219,12 +222,12 @@ export default (props: any) => {
     //   sorter: true,
     //   render: (text, record) => <span>{record.receiveDate}天</span>,
     // },
-    {
-      title: '领取次数',
-      sorter: true,
-      dataIndex: 'receiveNum',
-      key: 'receiveNum',
-    },
+    // {
+    //   title: '领取次数',
+    //   sorter: true,
+    //   dataIndex: 'receiveNum',
+    //   key: 'receiveNum',
+    // },
     {
       title: '当前所在部门',
       width: 120,
@@ -249,6 +252,7 @@ export default (props: any) => {
       sorter: true,
       key: 'circulationTime',
       dataIndex: 'circulationTime',
+      ellipsis: true,
       valueType: 'dateRange',
       render: (text, record) => (
         <span>{record.circulationTime}</span>
@@ -416,6 +420,10 @@ export default (props: any) => {
         }}
         tabList={[
           {
+            tab: '新媒体资源',
+            key: '9'
+          },
+          {
             tab: '潜在学员公海',
             key: '1',
           },
@@ -423,10 +431,7 @@ export default (props: any) => {
             tab: '正式学员公海',
             key: '4',
           },
-          {
-            tab: '新媒体资源',
-            key: '9'
-          },
+          
           {
             tab: '无效数据库',
             key: '7',
@@ -438,7 +443,7 @@ export default (props: any) => {
           actionRef={actionRef}
           toolbar={TabListNuber == '7' || TabListNuber == '9' ? undefined : toolbar}
           request={{
-            url: TabListNuber == '9'?'/sms/business/bizStudentUser/leadStudent':'/sms/business/bizStudentUser/circulationLibrary',
+            url: TabListNuber == '9'?'/sms/business/bizStudentUser/leadStudent':TabListNuber == '7'?'/sms/business/bizStudentUser/invalidLibrary':'/sms/business/bizStudentUser/circulationLibrary',
             params: { ...({ source: TabListNuber }), 'userId-isNull': true, ...params },
             sortList:TabListNuber == '9'?{
               ['circulationTime']: 'asc,desc',

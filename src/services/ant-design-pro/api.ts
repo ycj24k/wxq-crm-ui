@@ -495,11 +495,6 @@ export async function currentUser(options?: { [key: string]: any }) {
                 path: '/business/receive',
                 component: './Business/Receive',
               },
-              {
-                name: '新媒体资源视图',
-                path: '/business/newmedia/view',
-                component: './Business/NewMediaResource/View',
-              },
             ],
           },
           {
@@ -622,6 +617,21 @@ export async function currentUser(options?: { [key: string]: any }) {
                 name: '资源小组',
                 path: '/business/cluemanagement',
                 component: './Business/Cluemanagement',
+              },
+            ],
+          },
+          {
+            name: '新媒体资源',
+            icon: 'table',
+            routes: [
+              {
+                name: '新媒体资源视图',
+                path: '/business/newmedia/view',
+                component: './Business/NewMediaResource/View',
+              },
+              {
+                path: '/business/newmedia',
+                redirect: '/business/newmedia/view',
               },
             ],
           },
@@ -753,7 +763,7 @@ export async function currentUser(options?: { [key: string]: any }) {
             name: '待办计划',
             icon: 'ReadOutlined',
             path: '/users/todolist',
-            component: './UserCenter/TodoList',
+            component: './UserCenter',
           },
         ],
       },

@@ -23,19 +23,37 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
   const [isModalVisible, setisModalVisible] = useState<boolean>(false);
   const [dropdownFalg, setDropdownFalg] = useState<any>(false);
   const [newsList, setNewsList] = useState(false);
-  const [contentNews, setContentNews] = useState(
-    // @ts-ignore
-    JSON.parse(localStorage.getItem('contentNews')),
-  );
-  const menuHeaderDropdown = (
+  
+  // 安全地获取 localStorage 数据
+  const getContentNews = () => {
+    try {
+      const contentNews = localStorage.getItem('contentNews');
+      return contentNews ? JSON.parse(contentNews) : null;
+    } catch (e) {
+      console.error('Error parsing contentNews from localStorage', e);
+      return null;
+    }
+  };
+  
+  const [contentNews, setContentNews] = useState(getContentNews());
+
+  const dropdownContent = (
     <div style={{ width: '300px', height: '366px', position: 'relative' }}>
       <Tabs
         defaultActiveKey="1"
         centered
         style={{ marginBottom: '0px' }}
         items={[
-          { key: '1', label: '通知', children: notice ? notice : <Empty style={{ marginTop: '45px' }} /> },
-          { key: '2', label: '消息', children: menus ? menus : <Empty style={{ marginTop: '45px' }} /> },
+          { 
+            key: '1', 
+            label: '通知', 
+            children: notice ? notice : <Empty style={{ marginTop: '45px' }} /> 
+          },
+          { 
+            key: '2', 
+            label: '消息', 
+            children: menus ? menus : <Empty style={{ marginTop: '45px' }} /> 
+          },
         ]}
       />
       <div className="menuBot">
@@ -60,33 +78,49 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
     </div>
   );
   useEffect(() => {
-    const bizNotice: any = JSON.parse(sessionStorage.getItem('bizNotice') as string);
-    if (bizNotice) {
-      setNotice(contentList(bizNotice?.data?.content));
-      badgeFalg(bizNotice?.data?.content);
+    // 安全地从 sessionStorage 获取数据
+    let bizNotice = null;
+    try {
+      const bizNoticeStr = sessionStorage.getItem('bizNotice');
+      bizNotice = bizNoticeStr ? JSON.parse(bizNoticeStr) : null;
+    } catch (e) {
+      console.error('Error parsing bizNotice from sessionStorage', e);
+    }
+    
+    if (bizNotice && bizNotice.data && bizNotice.data.content) {
+      setNotice(contentList(bizNotice.data.content));
+      badgeFalg(bizNotice.data.content);
     } else {
+      // 如果没有数据，显示空状态
+      setNotice(<Empty style={{ marginTop: '45px' }} />);
+      setFalg('none');
+      
+      // 注释掉的 API 调用
       // request.get('/sms/business/bizNotice').then((res: any) => {
-      //   if (res.data.content.length > 0) {
+      //   if (res.data && res.data.content && res.data.content.length > 0) {
       //     setNotice(contentList(res.data.content));
       //     badgeFalg(res.data.content);
       //   }
       // });
     }
-
-    // contentNews && badgeFalg(contentNews);
-  }, [dropdownFalg || isModalVisible]);
+  }, [dropdownFalg, isModalVisible]);
+  
   const badgeFalg = (data: any = []) => {
-    if (
-      data.slice(0, 4).some((item: any) => {
-        return item.isConfirm == false;
-      })
-    ) {
+    if (Array.isArray(data) && 
+        data.slice(0, 4).some((item: any) => {
+          return item.isConfirm == false;
+        })) {
       setFalg('block');
     } else {
       setFalg('none');
     }
   };
-  const contentList = (data: []) => {
+  
+  const contentList = (data: any[]) => {
+    if (!Array.isArray(data) || data.length === 0) {
+      return <Empty style={{ marginTop: '45px' }} />;
+    }
+    
     return data.slice(0, 4).map((item: any, index: number) => {
       return (
         <div
@@ -98,28 +132,34 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
                 setisModalVisible(true);
                 setmodalContent(item);
               } else {
-                request.get('/sms/business/bizNotice/confirm', { id: item.id }).then((res: any) => {
-                  if (res.status == 'success') {
-                    Dictionaries.getBizNotice();
-                    setisModalVisible(true);
-                    setmodalContent(item);
-                  }
-                });
+                // 注释掉的 API 调用
+                // request.get('/sms/business/bizNotice/confirm', { id: item.id }).then((res: any) => {
+                //   if (res.status == 'success') {
+                //     Dictionaries.getBizNotice();
+                //     setisModalVisible(true);
+                //     setmodalContent(item);
+                //   }
+                // });
+                setisModalVisible(true);
+                setmodalContent(item);
               }
             } else {
-              const contentNewss = contentNews
-                ? // @ts-ignore
-                JSON.parse(localStorage.getItem('contentNews')).reverse()
-                : '';
-              contentNewss[index].isConfirm = false;
-
-              localStorage.setItem('contentNews', JSON.stringify(contentNewss));
-              // @ts-ignore
-              badgeFalg(JSON.parse(localStorage.getItem('contentNews')));
+              try {
+                const contentNewss = contentNews
+                  ? [...contentNews].reverse()
+                  : [];
+                  
+                if (contentNewss[index]) {
+                  contentNewss[index].isConfirm = false;
+                  localStorage.setItem('contentNews', JSON.stringify(contentNewss));
+                  badgeFalg(contentNewss);
+                }
+              } catch (e) {
+                console.error('Error updating content news', e);
+              }
             }
           }}
           style={{
-            // backgroundColor: item.falg ? '' : 'rgb(247, 245, 245)',
             position: 'relative',
           }}
         >
@@ -138,11 +178,11 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
               <MailOutlined className="icons" />
             </div>
             <div className="left">
-              {item.data || item.content}
+              {item.data || item.content || '无内容'}
               <div className="leftDiv">
-                <p>{item.from || item.userName}</p>
+                <p>{item.from || item.userName || '未知'}</p>
                 <p style={{ color: '#ccc' }}>
-                  {moment(item.createTime).format('GGGG-MM-DD') || '刚刚'}
+                  {item.createTime ? moment(item.createTime).format('GGGG-MM-DD') : '刚刚'}
                 </p>
               </div>
             </div>
@@ -151,34 +191,34 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
       );
     });
   };
+  
   return (
-    <div>
-      <HeaderDropdown
+    <div
+    onClick={() => {
+      history.push('/users/usercenter');
+    }}
+    >
+     <HeaderDropdown
         overlayClassName="newss"
         trigger={['click']}
-        menu={{ items: menuHeaderDropdown }}
+        // 移除 menu 属性，直接使用 dropdownContent 作为 children
+        dropdownRender={() => dropdownContent}
+        // 或者如果你的 HeaderDropdown 支持直接传递 children：
+        // children={dropdownContent}
         // @ts-ignore
         placement="bottom"
         onVisibleChange={(e) => {
-          const arr: any = [];
           if (e) {
-            // if (localStorage.getItem('contentNews')) {
-            //   // @ts-ignore
-            //   arr = JSON.parse(localStorage.getItem('contentNews')).reverse();
-            //   badgeFalg(arr);
-            //   // @ts-ignore
-            //   setMenus(contentList(arr));
-            //   setContentNews(arr);
-            // }
             setDropdownFalg(!dropdownFalg);
           }
         }}
       >
-        {/* @ts-ignore */}
-        <Badge dot id="bage" style={{ display: falg }}>
+        <Badge dot>
+        {/* <Badge count={0} dot> */}
           <BellOutlined id="bell" style={{ cursor: 'pointer' }} />
         </Badge>
       </HeaderDropdown>
+      
       {isModalVisible && (
         <NewsModal
           isModalVisible={isModalVisible}
@@ -188,6 +228,7 @@ const NewsDropdown: React.FC<GlobalHeaderRightProps> = () => {
           modalContent={modalContent}
         />
       )}
+      
       {newsList && (
         <Modal
           title="通知列表"

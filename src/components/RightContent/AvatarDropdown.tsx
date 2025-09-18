@@ -43,6 +43,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
     (event: MenuInfo) => {
       const { key } = event;
       if (key === 'logout') {
+        console.log('logout')
         setInitialState((s) => ({ ...s, currentUser: undefined }));
         loginOut();
         return;
@@ -52,7 +53,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
         return;
       }
       if (key === 'todolist') {
-        history.push('/todolist'); // 跳转到待办计划页面
+        history.push('/users/todolist?key=1'); // 跳转到待办计划页面
         return;
       }
       history.push(`/account/${key}`);
@@ -83,7 +84,7 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu }) => {
   }
 
   // 模拟待办事项数量，这个接口麻烦纯金负责下
-  const todoCount = 5; // 可以从API获取实际数量
+  const todoCount = 0; // 可以从API获取实际数量
 
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>

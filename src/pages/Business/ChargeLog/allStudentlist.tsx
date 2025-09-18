@@ -73,7 +73,7 @@ export default (props: any) => {
         {
             title: '咨询岗位',
             dataIndex: 'project-in',
-            sorter: true,
+            // sorter: true,
             key: 'project-in',
             valueType: 'select',
             fieldProps: {

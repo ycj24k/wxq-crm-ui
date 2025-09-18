@@ -1,7 +1,8 @@
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
 import type {
-    ProFormInstance} from '@ant-design/pro-form';
+    ProFormInstance
+} from '@ant-design/pro-form';
 import ProForm, {
     ProFormList,
     ProFormText,
@@ -12,7 +13,7 @@ import ProForm, {
     ProFormTextArea
 } from '@ant-design/pro-form';
 import ProTable from '@ant-design/pro-table';
-import type { RadioChangeEvent} from 'antd';
+import type { RadioChangeEvent } from 'antd';
 import { Button, message, Modal, Radio, Switch } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import Dictionaries from '@/services/util/dictionaries';
@@ -31,8 +32,9 @@ import {
     DownloadOutlined,
 } from '@ant-design/icons';
 import student from '@/pages/Admins/StudentManage/student';
+import { clearConfigCache } from 'prettier';
 
-
+//下单专页
 
 export default () => {
     const formRef = useRef<ProFormInstance>();
@@ -188,7 +190,7 @@ export default () => {
         setOrderPay(true)
         handleOpenProject()
         setStudentId(record)
-        console.log(record,'下单')
+        console.log(record, '下单')
         setTypeStatus(record.type)
         //setOptionEnable(false)
         setRenderData(record)
@@ -313,7 +315,7 @@ export default () => {
         setModalStudentInfo(true);
         setEditID(record.studentId)
         setTypeStatus(record.type)
-        console.log(record,'record--------->')
+        console.log(record, 'record--------->')
         setTimeout(() => {
             formRefStudentInfo?.current?.setFieldsValue({
                 name: record.name,
@@ -508,7 +510,7 @@ export default () => {
             title: '咨询岗位',
             dataIndex: 'project-in',
             search: false,
-            sorter: true,
+            // sorter: true,
             key: 'project-in',
             valueType: 'select',
             fieldProps: {
@@ -540,7 +542,7 @@ export default () => {
             dataIndex: 'parentProjects',
             search: false,
             key: 'parentProjects',
-            sorter: true,
+            // sorter: true,
             valueType: 'select',
             fieldProps: {
                 options: Dictionaries.getList('dict_reg_job'),
@@ -1157,47 +1159,55 @@ export default () => {
                             }
                         }
                     })
-                    request
-                        .postAll('/sms/business/bizOrder/intelligence', newSubmitValue)
-                        .then((res: any) => {
-                            if (res.status == 'success') {
-                                message.success('操作成功');
-                                if (renderData.type == '1') {
-                                    setTeamStudents(true)
-                                }
-                                if (renderData.type == '0' || renderData.type == '2') {
-                                    setRegistration(true)
-                                }
-                                setID(res.data[0])
-                                
-                                setTotalReceivable(0)
-                                callbackRef()
-                                // 重置所有表单数据
-                                // 1. 重置学生表单
-                                formRef.current?.resetFields();
-                                userRef?.current?.setDepartment({});
-                                userRefs?.current?.setDepartment({});
-                                userRef2?.current?.setDepartment({});
-                                setModalOrderVisible(false)
-                                setModalStudentInfo(false)
-                                // 2. 重置班级列表表单
-                                if (classListRef.current) {
-                                    classListRef.current.resetForm();
-                                }
+                    request.get('/sms/business/bizOrder/queryCustomerCapacity',).then((res: any) => {
+                        console.log(res)
+                        if (res.data.customerCapacity > res.data.usedCapacity) {
 
-                                // 3. 重置支付方式组件
-                                if (payWayRef.current) {
-                                    payWayRef.current.resetPayWay();
-                                }
-                            } else {
-                                setLoading(false);
-                                message.error(res.msg)
-                            }
-                        }).catch((err) => {
-                            console.log(err, 'err')
-                            setLoading(false);
-                        })
-                    console.log(newSubmitValue, 'newSubmitValue------>')
+                            request
+                                .postAll('/sms/business/bizOrder/intelligence', newSubmitValue)
+                                .then((res: any) => {
+                                    if (res.status == 'success') {
+                                        message.success('操作成功');
+                                        if (renderData.type == '1') {
+                                            setTeamStudents(true)
+                                        }
+                                        if (renderData.type == '0' || renderData.type == '2') {
+                                            setRegistration(true)
+                                        }
+                                        setID(res.data[0])
+
+                                        setTotalReceivable(0)
+                                        callbackRef()
+                                        // 重置所有表单数据
+                                        // 1. 重置学生表单
+                                        formRef.current?.resetFields();
+                                        userRef?.current?.setDepartment({});
+                                        userRefs?.current?.setDepartment({});
+                                        userRef2?.current?.setDepartment({});
+                                        setModalOrderVisible(false)
+                                        setModalStudentInfo(false)
+                                        // 2. 重置班级列表表单
+                                        if (classListRef.current) {
+                                            classListRef.current.resetForm();
+                                        }
+
+                                        // 3. 重置支付方式组件
+                                        if (payWayRef.current) {
+                                            payWayRef.current.resetPayWay();
+                                        }
+                                    } else {
+                                        setLoading(false);
+                                        message.error(res.msg)
+                                    }
+                                }).catch((err) => {
+                                    console.log(err, 'err')
+                                    setLoading(false);
+                                })
+                        }else{
+                            message.error('客户容量已满')
+                        }
+                    })
+                    // console.log(newSubmitValue, 'newSubmitValue------>')
                     // try {
                     //     classListValues = await classListRef.current?.getFormValues();
                     //     if (!classListValues || !classListValues.users || classListValues.users.length === 0) {
@@ -1685,14 +1695,14 @@ export default () => {
                         const dataList: any = await request.get('/sms/business/bizOrder', {
                             ...params,
                         });
-                        console.log(dataList,'-======-')
+                        console.log(dataList, '-======-')
                         return {
                             data: dataList.data.content,
                             success: dataList.success,
                             total: dataList.data.totalElements,
                         };
                     }}
-                 />
+                />
             </Modal>
 
 

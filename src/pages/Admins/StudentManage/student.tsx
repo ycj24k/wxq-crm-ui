@@ -39,7 +39,7 @@ import IsVerifyModel from './isVerifyModel';
 import ContractModel from './ContractModel';
 import { useModel, history } from 'umi';
 import filter from '@/services/util/filter';
-import { ModalForm, ProFormCascader, ProFormInstance } from '@ant-design/pro-form';
+import { ModalForm, ProFormCascader, ProFormInstance, ProFormDigit } from '@ant-design/pro-form';
 // import { getNextDay } from '@/pages/Department/AchievementUser/getTime';
 import './index.less'
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
@@ -376,7 +376,7 @@ export default (props: any) => {
       dataIndex: 'project-in',
       // search: false,
       ellipsis: true,
-      sorter: true,
+      // sorter: true,
       key: 'project-in',
       valueType: 'select',
       fieldProps: {
@@ -431,9 +431,9 @@ export default (props: any) => {
       title: '项目总称',
       dataIndex: 'parentProjects',
       key: 'parentProjects',
-      sorter: true,
+      // sorter: true,
       valueType: 'select',
-    
+
       fieldProps: {
         options: Dictionaries.getList('dict_reg_job'),
         mode: 'tags',
@@ -662,7 +662,7 @@ export default (props: any) => {
                     title="是否确定领取？"
                     style={{ marginRight: '15px', marginBottom: '8px' }}
                     onConfirm={() => {
-                      request.postAll('/sms/business/bizStudent/receiveCompanyShare',[record.id]).then((res: any) => {
+                      request.postAll('/sms/business/bizStudent/receiveCompanyShare', [record.id]).then((res: any) => {
                         if (res.status == 'success') {
                           message.success('领取成功');
                           callbackRef();
@@ -1706,6 +1706,7 @@ export default (props: any) => {
               request
                 .post('/sms/business/bizStudentUser/diyPresentation', {
                   studentUserIdList: selectedRowsId.join(','),
+                  percent: value.percent, // 添加 percent 字段
                   userId: userNameId.id,
                 })
                 .then((res) => {
@@ -1719,6 +1720,14 @@ export default (props: any) => {
             });
           }}
         >
+          <ProFormDigit
+            name="percent"
+            label="业绩分成比例（%）"
+            width="sm"
+            min={0}
+            max={100}
+            rules={[{ required: true, message: '请输入业绩分成比例' }]} // 建议添加必填规则
+          />
           <UserTreeSelect
             ref={null}
             userLabel={'推荐给'}

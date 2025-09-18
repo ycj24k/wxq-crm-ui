@@ -169,7 +169,7 @@ export default (props: any) => {
             title: '项目总称',
             dataIndex: 'parentProjects',
             key: 'parentProjects',
-            sorter: true,
+            // sorter: true,
             valueType: 'cascader',
             fieldProps: {
                 options: Dictionaries.getList('dict_reg_job'),
@@ -186,7 +186,7 @@ export default (props: any) => {
             title: '咨询岗位',
             dataIndex: 'project',
             // search: false,
-            sorter: true,
+            // sorter: true,
             key: 'project',
             valueType: 'cascader',
             fieldProps: {
@@ -379,7 +379,7 @@ export default (props: any) => {
                     },
 
                     {
-                        tab: '无效数据库',
+                        tab: '无效资源库',
                         key: '7',
                     },
                 ]}

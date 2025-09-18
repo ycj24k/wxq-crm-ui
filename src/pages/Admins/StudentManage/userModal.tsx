@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, message, Image, Upload,
+import {
+  Button, message, Image, Upload,
   //  Modal,
-    Input } from 'antd';
+  Input
+} from 'antd';
 const { TextArea } = Input;
 import type {
-  ProFormInstance} from '@ant-design/pro-form';
+  ProFormInstance
+} from '@ant-design/pro-form';
 import {
   ProFormCascader,
   ProFormDatePicker,
@@ -19,15 +22,16 @@ import ProForm, {
   // ProFormSwitch,
   ProFormCheckbox,
 } from '@ant-design/pro-form';
-import { getLevel} from '@/services/util/util';
+import { getLevel } from '@/services/util/util';
 import Dictionaries from '@/services/util/dictionaries';
 import request from '@/services/ant-design-pro/apiRequest';
 import moment from 'moment';
 import UserManageCard from '../Department/UserManageCard';
 import StudentModals from '../AdminOrder/Modals';
-import { 
+import {
   // history, 
-  useModel } from 'umi';
+  useModel
+} from 'umi';
 // import { ExclamationCircleFilled } from '@ant-design/icons';
 import UserTreeSelect from '@/components/ProFormUser/UserTreeSelect';
 import ModbileListOrder from './ModbileListOrder';
@@ -39,7 +43,7 @@ export default (props: any) => {
   const [company, setCompany] = useState('学员姓名');
   const { modalVisible, setModalVisible, callbackRef,
     //  url,
-      type, sourceType, isShowMedium } = props;
+    type, sourceType, isShowMedium } = props;
   const { renderData } = props;
   console.log(renderData.from, 'isShowMedium')
   const [StudentModalsVisible, setStudentModalsVisible] = useState(false);
@@ -69,7 +73,7 @@ export default (props: any) => {
   const [departmentList, setDepartmentList] = useState<any>([]);
   //保存部门id
   const [departmentId, setDepartmentId] = useState<any>([]);
-
+  console.log(renderData, 'renderData')
   useEffect(() => {
     if (JSON.stringify(department) != '{}') {
       console.log(department);
@@ -270,7 +274,7 @@ export default (props: any) => {
       callbackRef();
       return
     } else {
-      const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' :renderData.typee== 'eidt' ?'/sms/business/bizStudent/editOfUser': '/sms/business/bizStudent'
+      const url = renderData.newMedia ? '/sms/business/bizStudent/batch/importForOther' : renderData.typee == 'eidt' ? '/sms/business/bizStudent/editOfUser' : '/sms/business/bizStudent'
       const data = renderData.newMedia ? [value] : value
       const callBackFn = (res: any) => {
         if (res.status == 'success') {
@@ -280,7 +284,8 @@ export default (props: any) => {
               project: value.project,
               studentSource: value.source,
               consultationTime: value.consultationTime,
-              provider: userNameIds.id
+              provider: userNameIds.id,
+              owner: value.owner
             }
             request.post('/sms/business/bizStudentUser', dataValue);
           }
@@ -610,6 +615,7 @@ export default (props: any) => {
           name="mobile"
           label="联系电话"
           placeholder="请输入联系电话"
+          disabled={renderData.mobile}
           rules={[
             {
               // required: true,
@@ -632,8 +638,10 @@ export default (props: any) => {
         />
       </ProForm.Group>
       <ProForm.Group>
-        <ProFormText width="xs" name="weChat" label="微信" placeholder="请输入微信" />
-        <ProFormText width="xs" name="QQ" label="QQ" placeholder="请输入QQ" />
+        <ProFormText width="xs" name="weChat" label="微信" placeholder="请输入微信" 
+        disabled={renderData.weChat}
+        />
+        <ProFormText width="xs" name="QQ" label="QQ" placeholder="请输入QQ" disabled={renderData.QQ}/>
         <ProFormSelect
           label="性别"
           name="sex"
@@ -736,7 +744,7 @@ export default (props: any) => {
           setUserNameId={(e: any) => setUserNameId(e)}
           // setDepartId={(e: any) => setDepartId(e)}
           flag={true}
-          // setFalgUser={(e: any) => setFalgUser(e)}
+        // setFalgUser={(e: any) => setFalgUser(e)}
         />
       ) : null}
 

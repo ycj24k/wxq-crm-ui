@@ -8,6 +8,7 @@ import {
 } from '@ant-design/pro-form';
 import request from '@/services/ant-design-pro/apiRequest';
 import { message } from 'antd';
+import Dictionaries from '@/services/util/dictionaries';
 import sokect from '../../../services/util/websocket';
 import { useRef, useState } from 'react';
 import UpDownload from '@/services/util/UpDownload';
@@ -38,12 +39,14 @@ export default (props: any) => {
       width={600}
       formRef={formRef}
       onFinish={async (values) => {
+        values.type=0;
         if (values.filess) {
           const arr: any[] = [];
           values.filess.forEach((item: any) => {
             arr.push(item.response.data);
           });
           delete values.filess;
+         
           values.files = arr.join(',');
         }
         return new Promise((resolve) => {

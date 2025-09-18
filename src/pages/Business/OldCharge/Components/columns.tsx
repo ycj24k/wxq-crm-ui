@@ -54,7 +54,7 @@ export default (type: any) => {
           title: '项目总称',
           dataIndex: 'parentProjects',
           key: 'parentProjects',
-          sorter: true,
+          // sorter: true,
           valueType: 'cascader',
           fieldProps: {
             options: Dictionaries.getList('dict_reg_job'),

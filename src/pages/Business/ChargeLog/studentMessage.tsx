@@ -19,7 +19,7 @@ export default (props: any) => {
             title: '项目总称',
             dataIndex: 'parentProjects',
             key: 'parentProjects',
-            sorter: true,
+            // sorter: true,
             valueType: 'select',
             fieldProps: {
                 options: Dictionaries.getList('dict_reg_job'),
@@ -36,7 +36,7 @@ export default (props: any) => {
             title: '咨询岗位',
             dataIndex: 'project-in',
             // search: false,
-            sorter: true,
+            // sorter: true,
             key: 'project-in',
             valueType: 'select',
             fieldProps: {
