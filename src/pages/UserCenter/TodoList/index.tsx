@@ -20,6 +20,7 @@ import {
 } from 'antd';
 import { LeftOutlined, RightOutlined, PlusOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
+import { useModel } from 'umi';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 // import Dictionaries from '@/services/util/dictionaries';
 import 'moment/locale/zh-cn';
@@ -43,6 +44,10 @@ type TodoItem = {
 };
 
 export default () => {
+  const { initialState } = useModel('@@initialState');
+  const currentUserId: string | undefined = initialState?.currentUser?.userid
+    ? String(initialState.currentUser.userid)
+    : undefined;
   const [selectedDate, setSelectedDate] = useState<moment.Moment>(moment());
   const [list, setList] = useState<TodoItem[]>([]);
   const [monthMap, setMonthMap] = useState<Record<string, number>>({});
@@ -171,7 +176,7 @@ export default () => {
     } else {
       form.setFieldsValue({
         remindTime: selectedDate,
-        joinUser: [],
+        joinUser: currentUserId ? [currentUserId] : [],
       });
     }
   };

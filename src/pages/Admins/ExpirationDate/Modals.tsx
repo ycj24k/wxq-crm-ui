@@ -1,16 +1,15 @@
 import { useEffect, useRef } from 'react';
-import ProForm, { ModalForm, ProFormSelect, ProFormDigit } from '@ant-design/pro-form';
+import { ModalForm, ProFormSelect, ProFormDigit } from '@ant-design/pro-form';
 import Dictionaries from '@/services/util/dictionaries';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import request from '@/services/ant-design-pro/apiRequest';
 import { message } from 'antd';
 export default (props: any) => {
   const { modalVisible, setModalVisible, callbackRef, renderData, url } = props;
-  console.log(renderData, 'renderData');
   const formRef = useRef<ProFormInstance>();
 
   useEffect(() => {
-    if (renderData.types == 'edit') {
+    if (renderData?.types == 'edit') {
       setTimeout(() => {
         formRef?.current?.setFieldsValue({
           project: renderData.project,
@@ -20,16 +19,14 @@ export default (props: any) => {
           unclaimedDegradationTime: renderData.unclaimedDegradationTime,
           unfollowedTransferTime: renderData.unfollowedTransferTime,
           customerProtectionPeriod: renderData.customerProtectionPeriod,
-          activePercent: renderData.activePercent,
-          passivePercent: renderData.passivePercent,
+          // 回显按后端小数（0-1）原样展示
+          activePercent: typeof renderData.activePercent === 'number' ? renderData.activePercent : undefined,
+          passivePercent: typeof renderData.passivePercent === 'number' ? renderData.passivePercent : undefined,
         });
       }, 100);
     }
-  }, []);
+  }, [renderData]);
 
-  const filter = (inputValue: string, path: any[]) => {
-    return path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
-  };
   return (
     <ModalForm<{
       name: string;
@@ -51,22 +48,32 @@ export default (props: any) => {
         },
       }}
       onFinish={async (values: any) => {
-        console.log(values, 'values');
+        // 校验：两个比例均不得超过100
+        const ap = Number(values.activePercent);
+        const pp = Number(values.passivePercent);
+        // 新规则：范围在 0.01 - 1（含）
+        const inRange = (v: number) => Number.isFinite(v) && v >= 0.01 && v <= 1;
+        if (!inRange(ap) || !inRange(pp)) {
+          message.error('主动/被动共享分配比例必须在 0.01 至 1 之间');
+          return false;
+        }
 
-        if (renderData.types == 'edit') values.id = renderData.id;
-        request
-          .post(url, values)
-          .then((res: any) => {
-            if (res.status == 'success') {
-              message.success('操作成功');
-              setModalVisible();
-              callbackRef();
-            }
+        // 直接按小数（0-1）提交
+        const submitValues = { ...values, activePercent: ap, passivePercent: pp };
+
+        if (renderData?.types == 'edit') submitValues.id = renderData.id;
+        try {
+          const res: any = await request.post(url, submitValues);
+          if (res.status == 'success') {
+            message.success('操作成功');
+            setModalVisible();
+            callbackRef();
             return true;
-          })
-          .catch((err: any) => {
-            return true;
-          });
+          }
+          return false;
+        } catch (_err) {
+          return false;
+        }
       }}
     >
       <ProFormSelect
@@ -136,9 +143,9 @@ export default (props: any) => {
 
       <ProFormDigit
         width="md"
-        label="未跟进流转时间"
+        label="公海未领取降级时间"
         name="unfollowedTransferTime"
-        rules={[{ required: true, message: '请输入未跟进流转时间' }]}
+        rules={[{ required: true, message: '请输入公海未领取降级时间' }]}
         min={0}
         fieldProps={{
           placeholder: '请输入天数',
@@ -148,9 +155,9 @@ export default (props: any) => {
 
       <ProFormDigit
         width="md"
-        label="成交客户保护期"
+        label="成交正式学员保护期"
         name="customerProtectionPeriod"
-        rules={[{ required: true, message: '请输入成交客户保护期' }]}
+        rules={[{ required: true, message: '请输入成交正式学员保护期' }]}
         min={0}
         fieldProps={{
           placeholder: '请输入天数',
@@ -163,11 +170,10 @@ export default (props: any) => {
         label="主动共享分配比例"
         name="activePercent"
         rules={[{ required: true, message: '请输入主动共享分配比例' }]}
-        min={0}
-        max={100}
+        min={0.01}
+        max={1}
         fieldProps={{
-          placeholder: '请输入百分比',
-          addonAfter: '%',
+          placeholder: '请输入（0.01 - 1）',
         }}
       />
 
@@ -176,11 +182,10 @@ export default (props: any) => {
         label="被动共享分配比例"
         name="passivePercent"
         rules={[{ required: true, message: '请输入被动共享分配比例' }]}
-        min={0}
-        max={100}
+        min={0.01}
+        max={1}
         fieldProps={{
-          placeholder: '请输入百分比',
-          addonAfter: '%',
+          placeholder: '请输入（0.01 - 1）',
         }}
       />
     </ModalForm>

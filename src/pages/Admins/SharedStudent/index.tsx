@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import ProTable, { type ActionType, type ProColumns } from '@ant-design/pro-table';
-import { Card, Form, Row, Col, Input, Button, Space, message, Modal, Select, DatePicker } from 'antd';
+import { Card, Form, Row, Col, Button, Space, message, Modal, Select } from 'antd';
 import { PlusOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import moment from 'moment';
 
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 interface SharedStudentData {
   id?: number;
@@ -28,29 +28,61 @@ const SharedStudent: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [companyOptions, setCompanyOptions] = useState<any[]>([]);
+  const [huideDeptOptions, setHuideDeptOptions] = useState<any[]>([]);
   const actionRef = useRef<ActionType>();
 
-  // 获取公司列表
+  // 获取公司列表（保留）
   const fetchCompanyOptions = async () => {
     try {
       const response = await apiRequest.get('/sms/share/getCompany');
-      console.log('公司数据响应:', response);
       if (response.status === 'success' && response.data) {
         // 处理公司数据
         const companies = response.data.map((item: any) => ({
           label: item.name,
           value: item.id,
         }));
-        console.log('处理后的公司数据:', companies);
         setCompanyOptions(companies);
       }
     } catch (error) {
-      console.error('获取公司列表失败:', error);
+      // console suppressed
+    }
+  };
+
+  // 获取“汇德教育”下的下级部门列表作为共享发起/接收方可选项
+  const fetchHuideDeptOptions = async () => {
+    try {
+      const res = await apiRequest.get('/sms/share/getDepartmentAndUser');
+      const data = res?.data || [];
+      // 查找包含“汇德教育”的部门节点
+      const findHuide = (nodes: any[]): any | null => {
+        for (const n of nodes) {
+          if (n.departmentName && String(n.departmentName).includes('汇德教育')) return n;
+          if (n.children && n.children.length) {
+            const found = findHuide(n.children);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+      const huide = findHuide(Array.isArray(data) ? data : []);
+      const options: any[] = [];
+      if (huide && Array.isArray(huide.children)) {
+        // 仅取“汇德教育”节点的直接下级部门
+        huide.children.forEach((child: any) => {
+          if (child?.departmentName) {
+            options.push({ label: child.departmentName, value: child.id });
+          }
+        });
+      }
+      setHuideDeptOptions(options);
+    } catch (e) {
+      setHuideDeptOptions([]);
     }
   };
 
   useEffect(() => {
     fetchCompanyOptions();
+    fetchHuideDeptOptions();
   }, []);
 
   // 获取列表数据
@@ -165,9 +197,9 @@ const SharedStudent: React.FC = () => {
       width: 120,
       ellipsis: true,
       render: (text, record) => {
-        console.log('共享发起方数据:', { record, companyOptions, shareCompanyId: record.shareCompanyId });
-        const company = companyOptions.find((item) => item.value === record.shareCompanyId);
-        return <span>{company?.label || `ID:${record.shareCompanyId}`}</span>;
+        // console.log('共享发起方数据:', { record, huideDeptOptions, shareCompanyId: record.shareCompanyId });
+        const dept = huideDeptOptions.find((item) => item.value === record.shareCompanyId);
+        return <span>{dept?.label || `ID:${record.shareCompanyId}`}</span>;
       },
     },
     {
@@ -177,9 +209,9 @@ const SharedStudent: React.FC = () => {
       width: 120,
       ellipsis: true,
       render: (text, record) => {
-        console.log('共享接收方数据:', { record, companyOptions, companyId: record.companyId });
-        const company = companyOptions.find((item) => item.value === record.companyId);
-        return <span>{company?.label || `ID:${record.companyId}`}</span>;
+        // console.log('共享接收方数据:', { record, huideDeptOptions, companyId: record.companyId });
+        const dept = huideDeptOptions.find((item) => item.value === record.companyId);
+        return <span>{dept?.label || `ID:${record.companyId}`}</span>;
       },
     },
     {
@@ -187,7 +219,7 @@ const SharedStudent: React.FC = () => {
       dataIndex: 'createTime',
       key: 'createTime',
       width: 160,
-      render: (text) => (text ? moment(text).format('YYYY-MM-DD HH:mm') : '-'),
+      render: (text: any) => (text ? moment(String(text)).format('YYYY-MM-DD HH:mm') : '-'),
     },
     {
       title: '操作',
@@ -278,6 +310,7 @@ const SharedStudent: React.FC = () => {
             actionRef={actionRef}
             columns={columns}
             request={fetchData}
+            loading={loading}
             rowKey="id"
             search={false}
             pagination={{
@@ -346,7 +379,7 @@ const SharedStudent: React.FC = () => {
               placeholder="请选择共享发起方"
               showSearch
               filterOption={(input, option) => option?.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              options={companyOptions}
+              options={huideDeptOptions}
             />
           </Form.Item>
 
@@ -355,7 +388,7 @@ const SharedStudent: React.FC = () => {
               placeholder="请选择共享接收方"
               showSearch
               filterOption={(input, option) => option?.label?.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-              options={companyOptions}
+              options={huideDeptOptions}
             />
           </Form.Item>
         </Form>

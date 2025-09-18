@@ -201,14 +201,14 @@ const NewMediaReport: React.FC = () => {
       }
 
       const response = await apiRequest.get(apiUrl, requestParams);
-
-      if (response && Array.isArray(response)) {
-        setDataSource(response);
-
-        // 数据设置完成
-      } else {
-        setDataSource([]);
-      }
+      const list: any[] = Array.isArray(response)
+        ? (response as any[])
+        : (Array.isArray((response as any)?.data)
+            ? (response as any).data
+            : (Array.isArray((response as any)?.data?.content)
+                ? (response as any).data.content
+                : []));
+      setDataSource(list as any);
     } catch (error) {
       console.error('获取新媒体运营报表数据失败:', error);
       message.error('获取数据失败，请稍后重试');

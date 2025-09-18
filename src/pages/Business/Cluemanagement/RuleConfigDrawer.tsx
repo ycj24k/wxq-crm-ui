@@ -57,6 +57,8 @@ interface ApiFieldType {
   dict?: string;    // 兼容命名
   options?: { label: string; value: string | number }[]; // 直接可用的可选项
   optionList?: { label: string; value: string | number }[]; // 兼容命名
+  // 后端下发的可用运算类型，可能是逗号分隔字符串或数组
+  operationType?: string | number[];
 }
 
 interface RuleConfigDrawerProps {
@@ -83,6 +85,8 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 1, name: '不等于', valueType: 'string' },
     { value: 2, name: '包含', valueType: 'string' },
     { value: 3, name: '不包含', valueType: 'string' },
+    { value: 4, name: '为空', valueType: 'empty' },
+    { value: 5, name: '不为空', valueType: 'empty' },
     { value: 6, name: '数字大于', valueType: 'number' },
     { value: 7, name: '数字小于', valueType: 'number' },
     { value: 8, name: '正则表达式', valueType: 'string' },
@@ -91,9 +95,6 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     { value: 11, name: '时间大于', valueType: 'time' },
     { value: 12, name: '时间小于', valueType: 'time' },
     { value: 13, name: '在列表', valueType: 'string' },
-    // 空值类由 14/15 表示（是/否）
-    { value: 14, name: '是', valueType: 'empty' },
-    { value: 15, name: '否', valueType: 'empty' },
   ];
 
   const [ruleGroups, setRuleGroups] = useState<RuleGroup[]>([]);
@@ -258,35 +259,50 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     return field?.type || 'string';
   };
 
-  // 获取可用的运算类型（优先使用后端约定/图片规则）
-  const getAvailableOperators = (fieldKey: string): OperatorConfig[] => {
-    // 已知映射（严格按后端/图片提供）
-    const strictMap: Record<string, number[]> = {
-      consultationTime: [9, 10, 11, 12],
-      project: [13],
-      studentSource: [13],
-      provider: [13],
-      isLive: [14, 15],
-      owner: [13],
-      intentionLevel: [13],
-    };
-    const matched = strictMap[fieldKey];
-    if (matched) return operatorConfigs.filter(op => matched.includes(op.value));
+  // 解析后端字段的可用运算类型
+  const getAllowedOperatorValues = (fieldKey: string): number[] | undefined => {
+    const meta = _apiFields.find((f) => f.field === fieldKey);
+    if (!meta) return undefined;
+    const ot: any = (meta as any).operationType;
+    if (ot == null) return undefined;
+    let list: number[] = [];
+    if (Array.isArray(ot)) {
+      list = ot.map((v: any) => Number(v)).filter((n) => Number.isFinite(n));
+    } else if (typeof ot === 'string') {
+      list = ot
+        .split(',')
+        .map((s) => Number(String(s).trim()))
+        .filter((n) => Number.isFinite(n));
+    }
+    // 只保留本组件支持的操作码
+    const supported = new Set(operatorConfigs.map((o) => o.value));
+    const uniq: number[] = [];
+    list.forEach((n) => {
+      if (supported.has(n) && !uniq.includes(n)) uniq.push(n);
+    });
+    return uniq.length ? uniq : undefined;
+  };
 
-    // 兜底：按字段类型
+  // 获取可用的运算类型（优先使用后端 operationType 配置）
+  const getAvailableOperators = (fieldKey: string): OperatorConfig[] => {
+    const allowed = getAllowedOperatorValues(fieldKey);
+    if (allowed && allowed.length) {
+      return operatorConfigs.filter((op) => allowed.includes(op.value));
+    }
+    // 兜底：按字段类型推断
     const fieldType = getFieldType(fieldKey);
     switch (fieldType) {
       case 'string':
-        return operatorConfigs.filter(op => [0, 1, 2, 3, 8, 13].includes(op.value));
+        return operatorConfigs.filter((op) => [0, 1, 2, 3, 8, 13].includes(op.value));
       case 'number':
-        return operatorConfigs.filter(op => [0, 1, 6, 7].includes(op.value));
+        return operatorConfigs.filter((op) => [0, 1, 6, 7].includes(op.value));
       case 'date':
       case 'datetime':
-        return operatorConfigs.filter(op => [0, 1, 9, 10].includes(op.value));
+        return operatorConfigs.filter((op) => [0, 1, 9, 10].includes(op.value));
       case 'time':
-        return operatorConfigs.filter(op => [0, 1, 11, 12].includes(op.value));
+        return operatorConfigs.filter((op) => [0, 1, 11, 12].includes(op.value));
       case 'boolean':
-        return operatorConfigs.filter(op => [0, 1, 14, 15].includes(op.value));
+        return operatorConfigs.filter((op) => [14, 15].includes(op.value));
       default:
         return operatorConfigs;
     }
@@ -304,7 +320,7 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
   const mapOperatorToValueType = (op?: number): 'string' | 'number' | 'datetime' | 'time' | 'empty' => {
     if (op == null) return 'empty';
     if ([0, 1, 2, 3, 8, 13].includes(op)) return 'string';
-    if ([14, 15].includes(op)) return 'empty';
+    if ([4, 5, 14, 15].includes(op)) return 'empty';
     if ([6, 7].includes(op)) return 'number';
     if ([9, 10].includes(op)) return 'datetime';
     if ([11, 12].includes(op)) return 'time';
@@ -385,7 +401,9 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
               const updatedRule = { ...rule, [field]: value };
               // 如果修改了字段：置空运算类型与值
               if (field === 'field') {
-                (updatedRule as any).type = undefined;
+                // 字段变更时，按后端 operationType 选择首个可用运算类型
+                const ops = getAvailableOperators(value);
+                (updatedRule as any).type = ops && ops.length ? ops[0].value : undefined;
                 updatedRule.value = '';
               }
               // 如果修改了运算类型：置空值

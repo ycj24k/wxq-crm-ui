@@ -1,29 +1,37 @@
 import { useRef, useState } from 'react';
 import { DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Button, Table, Space, Popconfirm, message, Card, Form, Row, Col, Input, Select } from 'antd';
+import { Button, Space, Popconfirm, message, Card, Form, Row, Col, Input, Select } from 'antd';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import { PageContainer } from '@ant-design/pro-layout';
 import request from '@/services/ant-design-pro/apiRequest';
 import Dictionaries from '@/services/util/dictionaries';
 import Modals from './Modals';
-import filter from '@/services/util/filter';
+// import filter from '@/services/util/filter';
 
 export default (props: any) => {
   const [renderData, setRenderData] = useState<any>(null);
   const [modalVisibleFalg, setModalVisible] = useState<boolean>(false);
-  const [deletId, setDeletId] = useState('');
+  // const [deletId, setDeletId] = useState('');
   const [searchForm] = Form.useForm();
   const actionRef = useRef<ActionType>();
   const url = '/sms/business/bizEffectiveConfig';
   type GithubIssueItem = {
-    url: string;
-    uri: string;
+    url?: string;
+    uri?: string;
     id: number;
-    project: string;
-    type: string;
-    cluesValidityPeriod: string;
-    allocationValidityPeriod: string;
+    project: string | number;
+    type?: string;
+    clueValidityPeriod?: number | string;
+    cluesValidityPeriod?: number | string;
+    allocationValidityPeriod?: number | string;
+    firstOrderProtectionPeriod?: number | string;
+    unclaimedTransferTime?: number | string;
+    unclaimedDegradationTime?: number | string;
+    customerProtectionPeriod?: number | string;
+    activePercent?: number;
+    passivePercent?: number;
+    status?: boolean;
   };
   const callbackRef = () => {
     // @ts-ignore
@@ -48,7 +56,7 @@ export default (props: any) => {
       width: 120,
       ellipsis: true,
       render: (text, record) => (
-        <span key="project">{Dictionaries.getCascaderAllName('dict_reg_job', record.project)}</span>
+        <span key="project">{Dictionaries.getCascaderAllName('dict_reg_job', String(record.project))}</span>
       ),
     },
     {
@@ -98,14 +106,14 @@ export default (props: any) => {
       dataIndex: 'activePercent',
       key: 'activePercent',
       width: 160,
-      render: (text, record) => <span>{record.activePercent}%</span>,
+      render: (text, record) => <span>{record.activePercent}</span>,
     },
     {
       title: '被动共享分配比例',
       dataIndex: 'passivePercent',
       key: 'passivePercent',
       width: 160,
-      render: (text, record) => <span>{record.passivePercent}%</span>,
+      render: (text, record) => <span>{record.passivePercent}</span>,
     },
     {
       title: '状态',
@@ -215,9 +223,9 @@ export default (props: any) => {
             columns={columns}
             actionRef={actionRef}
             request={async (
-              params: { name?: string; mobile?: string; current?: any; project?: string } = {},
-              sort,
-              filter
+              params: any = {},
+              _sort?: any,
+              _filter?: any
             ) => {
               const searchValues = searchForm.getFieldsValue();
               const requestParams = {

@@ -25,6 +25,7 @@ type StudentItem = {
   intentionLevel?: number; // 意向等级 0普通 1高意向
   provider: number; // 信息提供人
   owner: number; // 信息所有人
+  ownerName?: string; // 信息所有人姓名（后端直给）
   address: string; // 地址
   description: string; // 备注
   userId: number; // 招生老师
@@ -40,6 +41,7 @@ type StudentItem = {
   chargePersonName?: string; // 企业负责人姓名
   code?: string; // 统一社会信用码
   codeFile?: string; // 统一社会信用码电子版
+  providerName?: string; // 信息提供人姓名（后端直给）
 };
 
 type ExpandField = {
@@ -85,6 +87,23 @@ export default () => {
         seen[k] = true;
         return true;
       });
+  };
+
+  // 按字典选项的值类型，将原始值规范为一致类型，避免编辑回显因类型不一致导致不显示
+  const normalizeDictValue = (dictKey: string, raw: any): any => {
+    const opts: any[] = getDictOptions(dictKey) as any[];
+    if (!opts || opts.length === 0) return raw;
+    const sample = opts[0];
+    const sampleType = typeof sample?.value;
+    if (raw === undefined || raw === null) return undefined;
+    if (sampleType === 'number') {
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : undefined;
+    }
+    if (sampleType === 'string') {
+      return String(raw);
+    }
+    return raw;
   };
 
   // 安全获取级联选择器数据，过滤掉 null 值
@@ -390,14 +409,18 @@ export default () => {
       title: '信息提供人',
       dataIndex: 'provider',
       width: 120,
-      render: (_, r) => <span key={`provider-${r.id}`}>{getUserNameById(r.provider)}</span>,
+      render: (_, r) => (
+        <span key={`provider-${r.id}`}>{(r as any).providerName}</span>
+      ),
     },
     {
       key: 'col-owner',
       title: '信息所有人',
       dataIndex: 'owner',
       width: 120,
-      render: (_, r) => <span key={`owner-${r.id}`}>{getUserNameById(r.owner)}</span>,
+      render: (_, r) => (
+        <span key={`owner-${r.id}`}>{(r as any).ownerName}</span>
+      ),
     },
     { key: 'col-address', title: '地址', dataIndex: 'address', width: 120, ellipsis: true },
     { key: 'col-createTime', title: '创建时间', dataIndex: 'createTime', valueType: 'dateTime', width: 150 },
@@ -424,7 +447,8 @@ export default () => {
 
             form.setFieldsValue({
               name: record.name,
-              type: record.type,
+              // 学员类型/客户来源根据字典选项值类型做动态规范，确保回显
+              type: normalizeDictValue('studentType', (record as any).type),
               education: record.education,
               mobile: record.mobile,
               idCard: record.idCard,
@@ -435,10 +459,8 @@ export default () => {
               project: record.project
                 ? (Dictionaries.getCascaderValue('dict_reg_job', record.project) as any)
                 : undefined,
-              studentSource:
-                (record as any).studentSource !== undefined && (record as any).studentSource !== null
-                  ? Number((record as any).studentSource)
-                  : undefined,
+              // 保持与字典 options 值类型一致，避免因类型不匹配导致回显为 id
+              studentSource: normalizeDictValue('dict_source', (record as any).studentSource),
               consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
               isLive: record.isLive ?? false,
@@ -767,6 +789,7 @@ export default () => {
                     path.some((o) => String(o.label).toLowerCase().includes(inputValue.toLowerCase())),
                 }}
                 style={{ width: '100%' }}
+                disabled={!!editing}
               />
             </Form.Item>
 
@@ -787,7 +810,7 @@ export default () => {
                 getPopupContainer={safeGetPopupContainer}
                 fieldNames={{ label: 'title', value: 'value', children: 'children' }}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
-                disabled={true}
+                disabled={!!editing}
               />
             </Form.Item>
             <Form.Item
@@ -807,6 +830,7 @@ export default () => {
                 getPopupContainer={safeGetPopupContainer}
                 fieldNames={{ label: 'title', value: 'value', children: 'children' }}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
+                disabled={!!editing}
               />
             </Form.Item>
             <Form.Item
