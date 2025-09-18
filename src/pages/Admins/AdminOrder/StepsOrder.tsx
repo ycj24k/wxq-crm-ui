@@ -1,7 +1,7 @@
 import { Button, message, Modal, Radio, Spin, Steps } from 'antd';
 import React, { forwardRef, useRef, useEffect } from 'react';
 import { useState } from 'react';
-import CompanyOrder from './companyOrder';
+import CompanyOrder from './companyOrderNew';
 import ChargeOrder from '../AdminCharge/ChargeOrder';
 import ChargeNew from '../AdminCharge/ChargeNew';
 import Order from './Order';

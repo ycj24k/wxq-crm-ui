@@ -30,7 +30,7 @@ export default (props: any) => {
       nextVisitDate: futureTime.format('YYYY-MM-DD HH:mm:ss'),
     });
   }
-  
+  console.log(renderData)
   // 获取学员信息并设置单选按钮选项
   const getStudentInfo = async () => {
     if (renderData.id) {
@@ -90,7 +90,13 @@ export default (props: any) => {
     getPersonVisitTimeout();
     getStudentInfo();
   }, []);
-
+  useEffect(() => {
+    if (renderData.types === 'add' && renderData.name) {
+      formRef?.current?.setFieldsValue({
+        studentName: renderData.name  // 设置学员姓名为默认值
+      });
+    }
+  }, [renderData]);
   useEffect(() => {
     StudentId &&
       formRef?.current?.setFieldsValue({

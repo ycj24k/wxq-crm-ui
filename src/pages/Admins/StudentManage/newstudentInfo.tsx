@@ -6,7 +6,7 @@ import Dictionaries from '@/services/util/dictionaries';
 import getWindowSize from '@/services/util/windowSize';
 import Order from '../AdminOrder/Order';
 import Ordernew from '../AdminOrder/OrderNew';
-import Return from '../AdminReturnVisit/Return';
+import Return from '../AdminReturnVisit/ReturnNew';
 import Student from './student';
 import Contract from '../ContractList/Contract';
 import Charge from '../AdminCharge/Charge';
@@ -29,7 +29,7 @@ export default (props: any) => {
   const [windowSize, setWindowSize] = useState(getWindowSize());
   useEffect(() => {
     if (tabsKey == '1' && !tabsReturnVisit && renderData.id) {
-      const a = <Return admin={renderData.admin} studentUserId={renderData.id} />;
+      const a = <Return admin={renderData.admin} studentUserId={renderData.id} IsrenderData={renderData} />;
       setTabsReturnVisit(a);
     }
     if (tabsKey == '2' && !tabsOrder && renderData.id) {
