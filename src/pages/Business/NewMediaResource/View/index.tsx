@@ -397,7 +397,7 @@ export default () => {
       key: 'col-isLive',
       title: '出镜人专属',
       dataIndex: 'isLive',
-      width: 80,
+      width: 100,
       render: (_, r) => (
         <Tag key={`isLive-${r.id}`} color={Boolean(r.isLive) ? 'blue' : 'default'}>
           {Boolean(r.isLive) ? '是' : '否'}
