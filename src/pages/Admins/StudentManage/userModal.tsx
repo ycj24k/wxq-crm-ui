@@ -673,10 +673,10 @@ export default (props: any) => {
           request={async () => Dictionaries.getList('dict_source') as any}
         />
         <ProFormSelect
-          label="会员等级"
+          label="学员等级"
           name="Level"
           width={200}
-          rules={[{ message: '会员等级' }]}
+          rules={[{ message: '学员等级' }]}
           request={getLevel}
         />
         <ProFormDatePicker
