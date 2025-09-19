@@ -2,7 +2,7 @@
  * 配置规则右侧弹窗组件
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin, TreeSelect } from 'antd';
+import { Drawer, Button, Select, Input, Space, Card, Row, Col, DatePicker, InputNumber, message, Spin, TreeSelect, Cascader } from 'antd';
 import { PlusOutlined, PlusCircleOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import apiRequest from '@/services/ant-design-pro/apiRequest';
@@ -500,6 +500,12 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
     return res;
   };
 
+  // 获取项目树数据
+  const getProjectTreeData = (): any[] => {
+    const cascade = Dictionaries.getCascader('dict_reg_job') || [];
+    return cascade;
+  };
+
   // 扁平化人员为下拉选项
   const getUserOptions = (): { label: string; value: string | number }[] => {
     const dep = JSON.parse(localStorage.getItem('Department') as any) || [];
@@ -709,6 +715,26 @@ const RuleConfigDrawer: React.FC<RuleConfigDrawerProps> = ({
                     </span>
                   );
                 }}
+              />
+            );
+          }
+          
+          // 对项目字段采用级联选择（单选）
+          if (fieldKey === 'project') {
+            return (
+              <Cascader
+                allowClear
+                showSearch
+                value={rule.value ? String(rule.value).split(',') : []}
+                onChange={(values: any[]) => {
+                  updateRuleValue(rule.ruleGroupId || 0, rule.uid, 'value', values.join(','));
+                }}
+                options={getProjectTreeData()}
+                placeholder="请选择项目"
+                style={{ width: '100%' }}
+                displayRender={(labels: string[]) => labels.join(' / ')}
+                expandTrigger="hover"
+                changeOnSelect={false}
               />
             );
           }

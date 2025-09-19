@@ -142,7 +142,7 @@ const SopRuleDrawer: React.FC<SopRuleDrawerProps> = ({ open, onClose, templateId
                       name={[field.name, 'duration']}
                       rules={[{ required: true, message: '请输入时长' }]}
                     >
-                      <InputNumber min={1} precision={0} style={{ width: '100%' }} placeholder="请输入" />
+                      <InputNumber min={0} precision={0} style={{ width: '100%' }} placeholder="请输入" />
                     </Form.Item>
                   </Col>
                   <Col span={3}>

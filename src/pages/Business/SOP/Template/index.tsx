@@ -54,7 +54,15 @@ export default () => {
       width: 160,
       render: (text, record) => <>{Dictionaries.getName('dict_reg_job', record.project)}</>,
     },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    { 
+      title: '描述', 
+      dataIndex: 'description', 
+      ellipsis: true,
+      render: (text) => {
+        if (!text || text == 'undefined' || text == 'null') return '--';
+        return text;
+      }
+    },
     {
       title: '操作',
       valueType: 'option',

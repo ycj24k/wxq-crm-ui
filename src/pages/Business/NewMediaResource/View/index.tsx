@@ -372,7 +372,7 @@ export default () => {
       dataIndex: 'studentSource',
       width: 100,
       render: (_, r) => (
-        <span key={`source-${r.id}`}>{Dictionaries.getName('dict_source', Number((r as any).studentSource))}</span>
+        <span key={`source-${r.id}`}>{Dictionaries.getName('dict_source', (r as any).studentSource)}</span>
       ),
     },
     {
@@ -399,8 +399,8 @@ export default () => {
       dataIndex: 'isLive',
       width: 80,
       render: (_, r) => (
-        <Tag key={`isLive-${r.id}`} color={r.isLive ? 'blue' : 'default'}>
-          {r.isLive ? '是' : '否'}
+        <Tag key={`isLive-${r.id}`} color={Boolean(r.isLive) ? 'blue' : 'default'}>
+          {Boolean(r.isLive) ? '是' : '否'}
         </Tag>
       ),
     },
@@ -445,7 +445,8 @@ export default () => {
               }
             }
 
-            form.setFieldsValue({
+            // 构建表单值，清理 undefined
+            const formValues: any = {
               name: record.name,
               // 学员类型/客户来源根据字典选项值类型做动态规范，确保回显
               type: normalizeDictValue('studentType', (record as any).type),
@@ -460,10 +461,10 @@ export default () => {
                 ? (Dictionaries.getCascaderValue('dict_reg_job', record.project) as any)
                 : undefined,
               // 保持与字典 options 值类型一致，避免因类型不匹配导致回显为 id
-              studentSource: normalizeDictValue('dict_source', (record as any).studentSource),
+              studentSource: Number((record as any).studentSource),
               consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
-              isLive: record.isLive ?? false,
+              isLive: Boolean(record.isLive),
               // 人员树使用 user_ 前缀
               provider:
                 record.provider !== undefined && record.provider !== null ? `user_${record.provider}` : undefined,
@@ -476,7 +477,18 @@ export default () => {
               codeFile: (record as any).codeFile,
               // 设置拓展字段数据
               leadExpandField: leadExpandFieldData,
+            };
+
+            // 清理 undefined 值
+            const cleanFormValues: any = {};
+            Object.keys(formValues).forEach(key => {
+              const value = formValues[key];
+              if (value !== undefined) {
+                cleanFormValues[key] = value;
+              }
             });
+
+            form.setFieldsValue(cleanFormValues);
             setVisible(true);
           }}
         >
@@ -573,7 +585,7 @@ export default () => {
             }
 
             // 处理 project 为级联，取最后一级 value；提取人员ID
-            const payload: any = {
+            const rawPayload: any = {
               ...values,
               consultationTime: values.consultationTime?.format('YYYY-MM-DD HH:mm:ss'),
               isFormal: false,
@@ -602,6 +614,15 @@ export default () => {
                   : values.owner,
               levelWeight: values.intentionLevel === 1 ? 5 : 3,
             };
+
+            // 清理 undefined 值，转换为 null 或删除字段
+            const payload: any = {};
+            Object.keys(rawPayload).forEach(key => {
+              const value = rawPayload[key];
+              if (value !== undefined) {
+                payload[key] = value;
+              }
+            });
 
             // 新增/编辑分别处理
             if (editing) {
@@ -720,7 +741,12 @@ export default () => {
               />
             </Form.Item>
 
-            <Form.Item label="学历" name="education" style={{ marginBottom: 10 }}>
+            <Form.Item 
+              label="学历" 
+              name="education" 
+              style={{ marginBottom: 10 }}
+              rules={[{ required: true, message: '请选择学历' }]}
+            >
               <Select placeholder="请选择" options={getDictOptions('dict_education') as any} />
             </Form.Item>
             <Form.Item
