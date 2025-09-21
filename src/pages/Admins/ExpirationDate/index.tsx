@@ -115,17 +115,17 @@ export default (props: any) => {
       width: 160,
       render: (text, record) => <span>{record.passivePercent}</span>,
     },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      width: 80,
-      render: (text, record) => {
-        // 状态由后台自动判断：有效期内就是开启，有效期外就是关闭
-        const isActive = record.status !== false;
-        return <span style={{ color: isActive ? '#52c41a' : '#ff4d4f' }}>{isActive ? '开启' : '关闭'}</span>;
-      },
-    },
+    // {
+    //   title: '状态',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   width: 80,
+    //   render: (text, record) => {
+    //     // 状态由后台自动判断：有效期内就是开启，有效期外就是关闭
+    //     const isActive = record.status !== false;
+    //     return <span style={{ color: isActive ? '#52c41a' : '#ff4d4f' }}>{isActive ? '开启' : '关闭'}</span>;
+    //   },
+    // },
     {
       title: '操作',
       valueType: 'option',

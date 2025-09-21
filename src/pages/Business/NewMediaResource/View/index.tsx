@@ -369,10 +369,10 @@ export default () => {
     {
       key: 'col-source',
       title: '客户来源',
-      dataIndex: 'source',
+      dataIndex: 'studentSource',
       width: 100,
       render: (_, r) => {
-        const sourceValue = (r as any).source;
+        const sourceValue = (r as any).studentSource;
         // 后台返回数字，字典值是字符串，需要转换为字符串
         const sourceName = Dictionaries.getName('dict_source', String(sourceValue));
         return <span key={`source-${r.id}`}>{sourceName || sourceValue || '--'}</span>;
@@ -464,7 +464,7 @@ export default () => {
                 ? (Dictionaries.getCascaderValue('dict_reg_job', record.project) as any)
                 : undefined,
               // 后台返回数字，字典值是字符串，需要转换为字符串
-              source: String((record as any).source),
+              source: String((record as any).studentSource),
           consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
               isLive: Boolean(record.isLive),
