@@ -20,7 +20,7 @@ type StudentItem = {
   qq: string; // QQ
   sex: boolean; // 性别 0男 1女
   project: string; // 报考岗位
-  studentSource: number; // 客户来源
+  source: number; // 客户来源
   consultationTime: string; // 咨询时间
   intentionLevel?: number; // 意向等级 0普通 1高意向
   provider: number; // 信息提供人
@@ -314,7 +314,7 @@ export default () => {
     {
       key: 'search-source',
       title: '客户来源',
-      dataIndex: 'studentSource',
+      dataIndex: 'source',
       hideInTable: true,
       renderFormItem: () => <Select allowClear options={getDictOptions('dict_source')} placeholder="请选择客户来源" />,
     },
@@ -369,11 +369,14 @@ export default () => {
     {
       key: 'col-source',
       title: '客户来源',
-      dataIndex: 'studentSource',
+      dataIndex: 'source',
       width: 100,
-      render: (_, r) => (
-        <span key={`source-${r.id}`}>{Dictionaries.getName('dict_source', (r as any).studentSource)}</span>
-      ),
+      render: (_, r) => {
+        const sourceValue = (r as any).source;
+        // 后台返回数字，字典值是字符串，需要转换为字符串
+        const sourceName = Dictionaries.getName('dict_source', String(sourceValue));
+        return <span key={`source-${r.id}`}>{sourceName || sourceValue || '--'}</span>;
+      },
     },
     {
       key: 'col-consultationTime',
@@ -434,7 +437,7 @@ export default () => {
         <a
           key="edit"
           onClick={() => {
-            setEditing(record);
+        setEditing(record);
             // 解析拓展字段数据
             let leadExpandFieldData = {};
             if ((record as any).leadExpandField) {
@@ -447,30 +450,30 @@ export default () => {
 
             // 构建表单值，清理 undefined
             const formValues: any = {
-              name: record.name,
+          name: record.name,
               // 学员类型/客户来源根据字典选项值类型做动态规范，确保回显
               type: normalizeDictValue('studentType', (record as any).type),
-              education: record.education,
-              mobile: record.mobile,
-              idCard: record.idCard,
-              weChat: record.weChat,
-              qq: record.qq,
+              education: normalizeDictValue('dict_education', record.education),
+          mobile: record.mobile,
+          idCard: record.idCard,
+          weChat: record.weChat,
+          qq: record.qq,
               sex: typeof record.sex === 'boolean' ? record.sex : record.sex === 1,
               // 报考岗位为级联路径
               project: record.project
                 ? (Dictionaries.getCascaderValue('dict_reg_job', record.project) as any)
                 : undefined,
-              // 保持与字典 options 值类型一致，避免因类型不匹配导致回显为 id
-              studentSource: Number((record as any).studentSource),
-              consultationTime: moment(record.consultationTime),
+              // 后台返回数字，字典值是字符串，需要转换为字符串
+              source: String((record as any).source),
+          consultationTime: moment(record.consultationTime),
               intentionLevel: (record as any).intentionLevel ?? 0,
               isLive: Boolean(record.isLive),
               // 人员树使用 user_ 前缀
               provider:
                 record.provider !== undefined && record.provider !== null ? `user_${record.provider}` : undefined,
               owner: record.owner !== undefined && record.owner !== null ? `user_${record.owner}` : undefined,
-              address: record.address,
-              description: record.description,
+          address: record.address,
+          description: record.description,
               // 企业/代理人相关
               chargePersonName: (record as any).chargePersonName,
               code: (record as any).code,
@@ -489,7 +492,7 @@ export default () => {
             });
 
             form.setFieldsValue(cleanFormValues);
-            setVisible(true);
+        setVisible(true);
           }}
         >
           编辑
@@ -516,12 +519,16 @@ export default () => {
         }}
         toolBarRender={() => [
           <Space key="toolbar">
-          <Button
+            <Button
               key="create"
               type="primary"
               onClick={() => {
                 setEditing(null);
                 form.resetFields();
+                // 新增时信息提供人默认为当前用户
+                form.setFieldsValue({
+                  provider: initialState?.currentUser?.userid
+                });
                 setVisible(true);
               }}
             >
@@ -596,8 +603,7 @@ export default () => {
               isPeer: false,
               intentionLevel: values.intentionLevel,
               project: Array.isArray(values.project) ? values.project[values.project.length - 1] : values.project,
-              studentSource: values.studentSource,
-              source: 9,
+              source: Number(values.source),
               leadExpandField: Object.keys(leadExpandFieldData).length > 0 
                 ? JSON.stringify(leadExpandFieldData) 
                 : undefined,
@@ -615,11 +621,13 @@ export default () => {
               levelWeight: values.intentionLevel === 1 ? 5 : 3,
             };
 
-            // 清理 undefined 值，转换为 null 或删除字段
+            // 清理 null 和 undefined 值，转换为空字符串
             const payload: any = {};
             Object.keys(rawPayload).forEach(key => {
               const value = rawPayload[key];
-              if (value !== undefined) {
+              if (value === null || value === undefined) {
+                payload[key] = '';
+              } else {
                 payload[key] = value;
               }
             });
@@ -689,7 +697,7 @@ export default () => {
             >
               <Input placeholder="请输入联系电话" />
             </Form.Item>
-            <Form.Item label="身份证号" name="idCard" style={{ marginBottom: 10 }}>
+            <Form.Item label="身份证号" name="idCard" style={{ marginBottom: 10 }}> 
               <Input placeholder="请输入身份证" />
             </Form.Item>
             <div />
@@ -728,10 +736,10 @@ export default () => {
             >
               <Input placeholder="请输入微信" />
             </Form.Item>
-            <Form.Item label="QQ" name="qq" style={{ marginBottom: 10 }}>
+            <Form.Item label="QQ" name="qq" style={{ marginBottom: 10 }}> 
               <Input placeholder="请输入QQ" />
             </Form.Item>
-            <Form.Item label="性别" name="sex" style={{ marginBottom: 10 }}>
+            <Form.Item label="性别" name="sex" style={{ marginBottom: 10 }}> 
               <Select
                 placeholder="请选择"
                 options={[
@@ -751,7 +759,7 @@ export default () => {
             </Form.Item>
             <Form.Item
               label="客户来源"
-              name="studentSource"
+              name="source"
               style={{ marginBottom: 10 }}
               rules={[{ required: true, message: '请选择客户来源' }]}
             >
@@ -836,7 +844,7 @@ export default () => {
                 getPopupContainer={safeGetPopupContainer}
                 fieldNames={{ label: 'title', value: 'value', children: 'children' }}
                 dropdownStyle={{ maxHeight: 300, overflow: 'auto' }}
-                disabled={!!editing}
+                disabled={true}
               />
             </Form.Item>
             <Form.Item
@@ -927,9 +935,9 @@ export default () => {
                   // 默认字符串输入
                   return <Input placeholder={`请输入${field.name}`} />;
                 })()}
-              </Form.Item>
+            </Form.Item>
             ))}
-            
+
             <Form.Item label="地址" name="address" style={{ gridColumn: '1 / span 3', marginBottom: 10 }}>
               <Input.TextArea placeholder="请输入地址..." rows={2} />
             </Form.Item>

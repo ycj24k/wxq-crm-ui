@@ -59,7 +59,10 @@ export default () => {
       dataIndex: 'description', 
       ellipsis: true,
       render: (text) => {
-        if (!text || text == 'undefined' || text == 'null') return '--';
+        // 处理各种空值情况：undefined、null、空字符串、字符串'undefined'、字符串'null'
+        if (text === undefined || text === null || text === '' || text === 'undefined' || text === 'null') {
+          return '--';
+        }
         return text;
       }
     },
@@ -230,6 +233,14 @@ export default () => {
         onOk={async () => {
           const values = await form.validateFields();
           const payload: any = { ...values };
+          
+          // 清理undefined值，但保留空字符串（用于编辑时清空字段）
+          Object.keys(payload).forEach((key) => {
+            if (payload[key] === undefined) {
+              delete payload[key];
+            }
+          });
+          
           // 接口要求：project 为空时传 other（表单已必填，这里兜底）
           if (!payload.project) payload.project = 'other';
           // 新增与编辑均使用 POST /sms/sop/sopEntity，编辑需带 id
